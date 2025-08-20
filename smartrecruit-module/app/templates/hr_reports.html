@@ -1,0 +1,459 @@
+{% extends 'base.html' %}
+
+{% block title %}数据报告{% endblock %}
+
+{% block content %}
+<div class="hr-reports">
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1><i class="uil uil-chart-line"></i> 数据报告</h1>
+            <p>招聘数据分析与洞察</p>
+        </div>
+        <div class="header-actions">
+            <select id="report-period" class="period-select">
+                <option value="7">最近7天</option>
+                <option value="30" selected>最近30天</option>
+                <option value="90">最近90天</option>
+                <option value="365">最近1年</option>
+            </select>
+            <button class="btn-secondary" onclick="exportReport()">
+                <i class="uil uil-export"></i> 导出报告
+            </button>
+        </div>
+    </div>
+
+    <!-- KPI指标卡片 -->
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <h3>平均招聘周期</h3>
+                <i class="uil uil-clock"></i>
+            </div>
+            <div class="kpi-value">23.5天</div>
+            <div class="kpi-change positive">
+                <i class="uil uil-arrow-down"></i> -12% vs 上月
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <h3>平均招聘成本</h3>
+                <i class="uil uil-money-bill"></i>
+            </div>
+            <div class="kpi-value">¥8,500</div>
+            <div class="kpi-change negative">
+                <i class="uil uil-arrow-up"></i> +8% vs 上月
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <h3>Offer接受率</h3>
+                <i class="uil uil-check-circle"></i>
+            </div>
+            <div class="kpi-value">78%</div>
+            <div class="kpi-change positive">
+                <i class="uil uil-arrow-up"></i> +5% vs 上月
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <h3>新员工留存率</h3>
+                <i class="uil uil-users"></i>
+            </div>
+            <div class="kpi-value">92%</div>
+            <div class="kpi-change positive">
+                <i class="uil uil-arrow-up"></i> +3% vs 上月
+            </div>
+        </div>
+    </div>
+
+    <!-- 图表区域 -->
+    <div class="charts-section">
+        <!-- 招聘漏斗图 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3><i class="uil uil-chart-pie"></i> 招聘漏斗分析</h3>
+                <div class="chart-actions">
+                    <button class="btn-chart active" data-chart="funnel">漏斗图</button>
+                    <button class="btn-chart" data-chart="trend">趋势图</button>
+                </div>
+            </div>
+            <div class="chart-content">
+                <div id="funnel-chart" class="chart active">
+                    <div class="funnel-visualization">
+                        <div class="funnel-stage applied">
+                            <div class="stage-info">
+                                <span class="stage-label">已申请</span>
+                                <span class="stage-count">1,250</span>
+                                <span class="stage-percentage">100%</span>
+                            </div>
+                            <div class="stage-bar" style="width: 100%"></div>
+                        </div>
+                        <div class="funnel-stage screened">
+                            <div class="stage-info">
+                                <span class="stage-label">已筛选</span>
+                                <span class="stage-count">980</span>
+                                <span class="stage-percentage">78.4%</span>
+                            </div>
+                            <div class="stage-bar" style="width: 78.4%"></div>
+                        </div>
+                        <div class="funnel-stage interviewed">
+                            <div class="stage-info">
+                                <span class="stage-label">已面试</span>
+                                <span class="stage-count">650</span>
+                                <span class="stage-percentage">52%</span>
+                            </div>
+                            <div class="stage-bar" style="width: 52%"></div>
+                        </div>
+                        <div class="funnel-stage offered">
+                            <div class="stage-info">
+                                <span class="stage-label">已发Offer</span>
+                                <span class="stage-count">180</span>
+                                <span class="stage-percentage">14.4%</span>
+                            </div>
+                            <div class="stage-bar" style="width: 14.4%"></div>
+                        </div>
+                        <div class="funnel-stage hired">
+                            <div class="stage-info">
+                                <span class="stage-label">已入职</span>
+                                <span class="stage-count">140</span>
+                                <span class="stage-percentage">11.2%</span>
+                            </div>
+                            <div class="stage-bar" style="width: 11.2%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="trend-chart" class="chart">
+                    <div class="trend-chart-placeholder">
+                        <div class="trend-line">
+                            <div class="trend-point" style="left: 10%; top: 80%"></div>
+                            <div class="trend-point" style="left: 25%; top: 70%"></div>
+                            <div class="trend-point" style="left: 40%; top: 60%"></div>
+                            <div class="trend-point" style="left: 55%; top: 50%"></div>
+                            <div class="trend-point" style="left: 70%; top: 40%"></div>
+                            <div class="trend-point" style="left: 85%; top: 30%"></div>
+                        </div>
+                        <div class="chart-labels">
+                            <span style="left: 10%">1月</span>
+                            <span style="left: 25%">2月</span>
+                            <span style="left: 40%">3月</span>
+                            <span style="left: 55%">4月</span>
+                            <span style="left: 70%">5月</span>
+                            <span style="left: 85%">6月</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 团队性能比较 -->
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3><i class="uil uil-users-alt"></i> 招聘团队性能</h3>
+                <div class="chart-actions">
+                    <button class="btn-chart active" data-chart="performance">招聘数量</button>
+                    <button class="btn-chart" data-chart="efficiency">效率指标</button>
+                </div>
+            </div>
+            <div class="chart-content">
+                <div id="performance-chart" class="chart active">
+                    <div class="performance-bars">
+                        <div class="performance-item">
+                            <div class="recruiter-name">王经理</div>
+                            <div class="performance-bar">
+                                <div class="bar-fill" style="width: 85%"></div>
+                                <span class="bar-value">17</span>
+                            </div>
+                        </div>
+                        <div class="performance-item">
+                            <div class="recruiter-name">李总监</div>
+                            <div class="performance-bar">
+                                <div class="bar-fill" style="width: 70%"></div>
+                                <span class="bar-value">14</span>
+                            </div>
+                        </div>
+                        <div class="performance-item">
+                            <div class="recruiter-name">张HR</div>
+                            <div class="performance-bar">
+                                <div class="bar-fill" style="width: 60%"></div>
+                                <span class="bar-value">12</span>
+                            </div>
+                        </div>
+                        <div class="performance-item">
+                            <div class="recruiter-name">刘专员</div>
+                            <div class="performance-bar">
+                                <div class="bar-fill" style="width: 45%"></div>
+                                <span class="bar-value">9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="efficiency-chart" class="chart">
+                    <div class="efficiency-metrics">
+                        <div class="efficiency-item">
+                            <div class="metric-name">平均面试时长</div>
+                            <div class="metric-value">45分钟</div>
+                        </div>
+                        <div class="efficiency-item">
+                            <div class="metric-name">反馈提交率</div>
+                            <div class="metric-value">92%</div>
+                        </div>
+                        <div class="efficiency-item">
+                            <div class="metric-name">候选人满意度</div>
+                            <div class="metric-value">4.6/5.0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详细数据表格 -->
+    <div class="data-tables-section">
+        <div class="table-container">
+            <div class="table-header">
+                <h3><i class="uil uil-table"></i> 职位招聘统计</h3>
+                <div class="table-actions">
+                    <button class="btn-secondary" onclick="exportTable('positions')">导出</button>
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>职位</th>
+                        <th>申请人数</th>
+                        <th>面试人数</th>
+                        <th>Offer人数</th>
+                        <th>入职人数</th>
+                        <th>平均周期</th>
+                        <th>成功率</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>高级软件工程师</td>
+                        <td>320</td>
+                        <td>180</td>
+                        <td>45</td>
+                        <td>35</td>
+                        <td>25天</td>
+                        <td>10.9%</td>
+                    </tr>
+                    <tr>
+                        <td>产品经理</td>
+                        <td>180</td>
+                        <td>95</td>
+                        <td>25</td>
+                        <td>20</td>
+                        <td>28天</td>
+                        <td>11.1%</td>
+                    </tr>
+                    <tr>
+                        <td>UI设计师</td>
+                        <td>150</td>
+                        <td>80</td>
+                        <td>20</td>
+                        <td>15</td>
+                        <td>22天</td>
+                        <td>10.0%</td>
+                    </tr>
+                    <tr>
+                        <td>市场营销专员</td>
+                        <td>200</td>
+                        <td>110</td>
+                        <td>30</td>
+                        <td>25</td>
+                        <td>20天</td>
+                        <td>12.5%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                <h3><i class="uil uil-calendar-alt"></i> 月度招聘趋势</h3>
+                <div class="table-actions">
+                    <button class="btn-secondary" onclick="exportTable('trends')">导出</button>
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>月份</th>
+                        <th>申请人数</th>
+                        <th>面试人数</th>
+                        <th>入职人数</th>
+                        <th>招聘成本</th>
+                        <th>平均周期</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2024年1月</td>
+                        <td>1,250</td>
+                        <td>650</td>
+                        <td>140</td>
+                        <td>¥1,190,000</td>
+                        <td>23.5天</td>
+                    </tr>
+                    <tr>
+                        <td>2023年12月</td>
+                        <td>1,180</td>
+                        <td>620</td>
+                        <td>135</td>
+                        <td>¥1,147,500</td>
+                        <td>24.2天</td>
+                    </tr>
+                    <tr>
+                        <td>2023年11月</td>
+                        <td>1,100</td>
+                        <td>580</td>
+                        <td>125</td>
+                        <td>¥1,062,500</td>
+                        <td>25.8天</td>
+                    </tr>
+                    <tr>
+                        <td>2023年10月</td>
+                        <td>1,050</td>
+                        <td>550</td>
+                        <td>120</td>
+                        <td>¥1,020,000</td>
+                        <td>26.1天</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 洞察与建议 -->
+    <div class="insights-section">
+        <div class="section-header">
+            <h3><i class="uil uil-lightbulb"></i> 数据洞察与建议</h3>
+        </div>
+        <div class="insights-grid">
+            <div class="insight-card positive">
+                <div class="insight-icon">
+                    <i class="uil uil-arrow-up"></i>
+                </div>
+                <div class="insight-content">
+                    <h4>招聘效率提升</h4>
+                    <p>平均招聘周期从26.1天缩短到23.5天，效率提升10%。建议继续保持当前流程优化措施。</p>
+                </div>
+            </div>
+            
+            <div class="insight-card warning">
+                <div class="insight-icon">
+                    <i class="uil uil-exclamation-triangle"></i>
+                </div>
+                <div class="insight-content">
+                    <h4>招聘成本上升</h4>
+                    <p>平均招聘成本上升8%，主要受市场薪资上涨影响。建议优化招聘渠道，提高候选人质量。</p>
+                </div>
+            </div>
+            
+            <div class="insight-card positive">
+                <div class="insight-icon">
+                    <i class="uil uil-check-circle"></i>
+                </div>
+                <div class="insight-content">
+                    <h4>Offer接受率改善</h4>
+                    <p>Offer接受率提升5%，达到78%。建议分析成功因素，优化候选人体验和沟通流程。</p>
+                </div>
+            </div>
+            
+            <div class="insight-card info">
+                <div class="insight-icon">
+                    <i class="uil uil-info-circle"></i>
+                </div>
+                <div class="insight-content">
+                    <h4>团队表现分析</h4>
+                    <p>王经理和李总监表现突出，建议分享最佳实践，提升整体团队效率。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setupChartTabs();
+    setupPeriodSelector();
+});
+
+function setupChartTabs() {
+    const chartButtons = document.querySelectorAll('.btn-chart');
+    
+    chartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const chartType = this.dataset.chart;
+            const chartContainer = this.closest('.chart-container');
+            
+            // 移除所有按钮的active状态
+            chartContainer.querySelectorAll('.btn-chart').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 添加当前按钮的active状态
+            this.classList.add('active');
+            
+            // 隐藏所有图表
+            chartContainer.querySelectorAll('.chart').forEach(chart => {
+                chart.classList.remove('active');
+            });
+            
+            // 显示对应图表
+            const targetChart = chartContainer.querySelector(`#${chartType}-chart`);
+            if (targetChart) {
+                targetChart.classList.add('active');
+            }
+        });
+    });
+}
+
+function setupPeriodSelector() {
+    const periodSelect = document.getElementById('report-period');
+    periodSelect.addEventListener('change', function() {
+        const period = this.value;
+        updateReportData(period);
+    });
+}
+
+function updateReportData(period) {
+    console.log('更新报告数据，周期:', period + '天');
+    
+    // 这里可以添加AJAX请求来更新数据
+    // 模拟数据更新
+    setTimeout(() => {
+        console.log('数据更新完成');
+    }, 1000);
+}
+
+function exportReport() {
+    const period = document.getElementById('report-period').value;
+    console.log('导出报告，周期:', period + '天');
+    
+    // 这里可以实现PDF或Excel导出功能
+    alert('报告导出功能开发中...');
+}
+
+function exportTable(tableType) {
+    console.log('导出表格:', tableType);
+    
+    // 这里可以实现表格导出功能
+    alert('表格导出功能开发中...');
+}
+
+// 模拟数据更新函数
+function refreshData() {
+    console.log('刷新数据...');
+    // 这里可以添加数据刷新逻辑
+}
+
+// 自动刷新数据（每5分钟）
+setInterval(refreshData, 300000);
+</script>
+{% endblock %}
