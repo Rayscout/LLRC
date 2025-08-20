@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能岗位搜索 - 演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .demo-notice {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .skills-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .skills-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .skill-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .recommended-section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .jobs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .job-card {
+            border: 2px solid #e1e8ed;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .job-card:hover {
+            border-color: #3498db;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .job-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .match-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        
+        .job-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        
+        .job-company {
+            color: #3498db;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .job-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .job-detail {
+            color: #7f8c8d;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .job-salary {
+            font-weight: 700;
+            color: #27ae60;
+        }
+        
+        .job-description {
+            color: #2c3e50;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .job-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #229954;
+        }
+        
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        
+        .btn-secondary:hover {
+            background: #d5dbdb;
+        }
+        
+        .all-jobs-section {
+            margin-top: 40px;
+        }
+        
+        .login-prompt {
+            background: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .login-prompt h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+        
+        .login-prompt p {
+            color: #0c5460;
+            margin-bottom: 15px;
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .jobs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 智能岗位搜索</h1>
+            <p>基于技能匹配的智能职位推荐系统</p>
+        </div>
+        
+        <div class="demo-notice">
+            🎯 演示模式 - 使用模拟数据进行展示
+        </div>
+        
+        <div class="content">
+            <!-- 技能展示 -->
+            <div class="skills-section">
+                <h3>🎯 模拟用户技能</h3>
+                <div class="skills-tags">
+                    {% for skill in user_skills %}
+                    <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- 推荐职位 -->
+            {% if recommended_jobs %}
+            <div class="recommended-section">
+                <h2 class="section-title">
+                    <span>💡</span>
+                    为您推荐
+                </h2>
+                <div class="jobs-grid">
+                    {% for rec in recommended_jobs %}
+                    <div class="job-card">
+                        <div class="match-badge">{{ rec.match_score }}% 匹配</div>
+                        <div class="job-title">{{ rec.job.title }}</div>
+                        <div class="job-company">{{ rec.job.company_name }}</div>
+                        <div class="job-details">
+                            <div class="job-detail">
+                                <span>📍</span>
+                                <span>{{ rec.job.location }}</span>
+                            </div>
+                            <div class="job-detail">
+                                <span>💰</span>
+                                <span class="job-salary">{{ rec.job.salary }} 元/月</span>
+                            </div>
+                            <div class="job-detail">
+                                <span>⏰</span>
+                                <span>{{ rec.job.job_type or '全职' }}</span>
+                            </div>
+                        </div>
+                        <div class="job-description">
+                            {{ rec.job.description[:150] }}{% if rec.job.description|length > 150 %}...{% endif %}
+                        </div>
+                        <div class="job-actions">
+                            <a href="#" class="btn btn-secondary">查看详情</a>
+                            <a href="#" class="btn btn-primary">立即申请</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- 所有职位 -->
+            <div class="all-jobs-section">
+                <h2 class="section-title">
+                    <span>💼</span>
+                    所有可用职位
+                </h2>
+                <div class="jobs-grid">
+                    {% for job in jobs %}
+                    <div class="job-card">
+                        <div class="job-title">{{ job.title }}</div>
+                        <div class="job-company">{{ job.company_name }}</div>
+                        <div class="job-details">
+                            <div class="job-detail">
+                                <span>📍</span>
+                                <span>{{ job.location }}</span>
+                            </div>
+                            <div class="job-detail">
+                                <span>💰</span>
+                                <span class="job-salary">{{ job.salary }} 元/月</span>
+                            </div>
+                            <div class="job-detail">
+                                <span>⏰</span>
+                                <span>{{ job.job_type or '全职' }}</span>
+                            </div>
+                        </div>
+                        <div class="job-description">
+                            {{ job.description[:150] }}{% if job.description|length > 150 %}...{% endif %}
+                        </div>
+                        <div class="job-actions">
+                            <a href="#" class="btn btn-secondary">查看详情</a>
+                            <a href="#" class="btn btn-primary">立即申请</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- 登录提示 -->
+            <div class="login-prompt">
+                <h4>🚀 想要体验完整功能？</h4>
+                <p>登录后可以上传简历，系统会自动分析您的技能并提供个性化推荐！</p>
+                <a href="/sign" class="login-btn">立即登录</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
