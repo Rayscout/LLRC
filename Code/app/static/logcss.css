@@ -1,0 +1,311 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css");
+
+* {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #000; /* 粒子画布填充背景为黑色，这里保持纯黑 */
+  font-size: 14px;
+}
+
+.container {
+  background-color: #fff;
+  width: 920px; /* 更宽以减少留白 */
+  max-width: 92vw;
+  height: 520px; /* 略增高度 */
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px; /* 圆角容器 */
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+
+.container .forms-container {
+  position: relative;
+  width: 50%;
+  text-align: center;
+}
+
+.container .forms-container .form-control {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 480px;
+  transition: all 0.5s ease-in;
+}
+
+.container .forms-container .form-control h2 {
+  font-size: 2rem;
+}
+
+.container .forms-container .form-control form {
+  display: flex;
+  flex-direction: column;
+  margin: 0px 30px;
+}
+
+.container .forms-container .form-control form input {
+  margin: 12px 0px;
+  border: 1px solid #e6e6e6;
+  padding: 14px 16px;
+  background-color: #f6f6f6;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease;
+}
+
+.container .forms-container .form-control form input:focus {
+  outline: none;
+  border-color: #ff8c00;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(255,140,0,0.15);
+}
+
+.container .forms-container .form-control form button {
+  border: none;
+  margin: 18px 34px 0;
+  padding: 12px 16px;
+  background-color: #ff8c00; /* 主按钮橙色 */
+  border-radius: 12px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: .3px;
+  transition: transform .06s ease, background-color .2s ease, box-shadow .2s ease;
+  box-shadow: 0 8px 20px rgba(255,140,0,0.25);
+}
+
+.container .forms-container .form-control form button:hover {
+  background-color: #ff7a00;
+}
+
+.container .forms-container .form-control form button:active {
+  transform: translateY(1px);
+}
+
+.container .forms-container .form-control form button:focus {
+  outline: none;
+}
+
+.container .forms-container .form-control span {
+  margin: 10px 0px;
+}
+
+.container .forms-container .form-control .socials i {
+  margin: 10px 10px; /* Increased margin to position icons higher */
+  color: #fff;
+  border-radius: 50%;
+  padding: 10px; /* Increased padding */
+}
+
+.container .forms-container .form-control .socials .fa-facebook-f {
+  background-color: #3b5998;
+}
+
+.container .forms-container .form-control .socials .fa-google-plus-g {
+  background-color: #db4a39;
+}
+
+.container .forms-container .form-control .socials .fa-linkedin-in {
+  background-color: #0e76a8;
+}
+
+.container .forms-container .form-control.signup-form {
+  opacity: 0;
+  z-index: 1;
+  left: 200%;
+}
+
+.container .forms-container .form-control.signin-form {
+  opacity: 1;
+  z-index: 2;
+  left: 0%;
+}
+
+.container .intros-container {
+  position: relative;
+  left: 50%;
+  width: 50%;
+  text-align: center;
+}
+
+.container .intros-container .intro-control {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 520px;
+  color: #fff;
+  background: linear-gradient(170deg, #ff9900, #ff4d00); /* 更现代的橙色渐变 */
+  transition: all 0.5s ease-in;
+}
+
+.container .intros-container .intro-control .intro-control__inner {
+  margin: 0px 30px;
+}
+
+.container .intros-container .intro-control button {
+  border: none;
+  padding: 14px 28px;
+  background-color: rgba(255,255,255,0.2);
+  border-radius: 999px;
+  color: #fff;
+  margin: 10px 0px;
+  cursor: pointer;
+  backdrop-filter: saturate(150%) blur(2px);
+  transition: background-color .2s ease, transform .06s ease;
+}
+
+.container .intros-container .intro-control button:focus, 
+.container .intros-container .intro-control button:hover {
+  outline: none;
+  background-color: rgba(255,255,255,0.28);
+}
+
+.container .intros-container .intro-control h3,
+.container .intros-container .intro-control p {
+  margin: 10px 0px;
+}
+
+.container .intros-container .intro-control.signin-intro {
+  opacity: 1;
+  z-index: 2;
+}
+
+.container .intros-container .intro-control.signup-intro {
+  opacity: 0;
+  z-index: 1;
+}
+
+.change .forms-container .form-control.signup-form {
+  opacity: 1;
+  z-index: 2;
+  transform: translateX(-100%);
+  padding: 10px;
+}
+
+.change .forms-container .form-control.signup-form button {
+  background-color: #ff6a00 !important; /* 注册按钮更深色 */
+}
+
+.change .forms-container .form-control.signin-form {
+  opacity: 0;
+  z-index: 1;
+  transform: translateX(-100%);
+}
+
+.change .intros-container .intro-control {
+  transform: translateX(-100%);
+  background: linear-gradient(170deg, #ff9900, #ff4d00);
+}
+
+.change .intros-container .intro-control #signin-btn {
+  background-color: #ff4500;
+}
+
+.change .intros-container .intro-control.signin-intro {
+  opacity: 0;
+  z-index: 1;
+}
+
+.change .intros-container .intro-control.signup-intro {
+  opacity: 1;
+  z-index: 2;
+}
+
+@media screen and (max-width: 480px) {
+  .container {
+    height: 94vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .container .forms-container {
+    order: 2;
+    width: 100%;
+    height: 54vh;
+  }
+  .container .forms-container .form-control {
+    position: absolute;
+    height: 54vh;
+  }
+  .container .forms-container .form-control.signup-form {
+    left: 0%;
+    margin-top: 70px;
+  }
+  .container .intros-container {
+    order: 1;
+    width: 100%;
+    left: 0%;
+    height: 36vh;
+  }
+  .container .intros-container .intro-control {
+    position: absolute;
+    height: 36vh;
+  }
+
+  .change .forms-container .form-control.signup-form {
+    transform: translateX(0%);
+  }
+  .change .forms-container .form-control.signin-form {
+    transform: translateX(0%);
+  }
+  .change .intros-container .intro-control {
+    transform: translateX(0%);
+  }
+}
+
+/* New form field styles */
+.container .forms-container .form-control form select {
+    margin: 10px 0px;
+    border: none;
+    padding: 15px;
+    background-color: #efefef;
+    border-radius: 5px;
+}
+
+.container .forms-container .form-control form input.additional-info {
+  margin: 10px 0px;
+  border: none;
+  padding: 15px;
+  background-color: #efefef;
+  border-radius: 5px;
+}
+
+/* Custom scrollbar styles for sign-up */
+.container .form-control.signup-form {
+  overflow-y: auto; /* Enable vertical scrollbar */
+}
+
+.container .form-control.signin-form {
+  overflow: hidden; /* Disable scrolling */
+}
+
+/* Adjust intro height */
+.container .intros-container .intro-control.signup-intro {
+  height: 480px; /* Same height as sign-up form */
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #aaa;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ddd;
+}
