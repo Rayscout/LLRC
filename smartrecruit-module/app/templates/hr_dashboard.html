@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}HR仪表板{% endblock %}
+
+{% block content %}
+<div class="hr-dashboard">
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1><i class="uil uil-chart-line"></i> HR仪表板</h1>
+            <p>招聘数据概览与关键指标</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="location.href='{{ url_for('main.publish_recruitment') }}'">
+                <i class="uil uil-plus"></i> 发布招聘
+            </button>
+        </div>
+    </div>
+
+    <!-- 关键指标卡片 -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon candidates">
+                <i class="uil uil-users-alt"></i>
+            </div>
+            <div class="metric-content">
+                <h3>总候选人</h3>
+                <div class="metric-value">{{ total_candidates|default(0) }}</div>
+                <div class="metric-change positive">
+                    <i class="uil uil-arrow-up"></i> +12% 本月
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon interviews">
+                <i class="uil uil-calendar-alt"></i>
+            </div>
+            <div class="metric-content">
+                <h3>面试安排</h3>
+                <div class="metric-value">{{ interviews_scheduled|default(0) }}</div>
+                <div class="metric-change positive">
+                    <i class="uil uil-arrow-up"></i> +8% 本周
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon offers">
+                <i class="uil uil-file-check"></i>
+            </div>
+            <div class="metric-content">
+                <h3>已发Offer</h3>
+                <div class="metric-value">{{ offers_made|default(0) }}</div>
+                <div class="metric-change neutral">
+                    <i class="uil uil-minus"></i> 0% 变化
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon hires">
+                <i class="uil uil-user-check"></i>
+            </div>
+            <div class="metric-content">
+                <h3>成功入职</h3>
+                <div class="metric-value">{{ hires_completed|default(0) }}</div>
+                <div class="metric-change positive">
+                    <i class="uil uil-arrow-up"></i> +15% 本月
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="dashboard-content">
+        <!-- 招聘漏斗图 -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="uil uil-chart-pie"></i> 招聘漏斗</h2>
+                <div class="section-actions">
+                    <select class="time-filter">
+                        <option value="7">最近7天</option>
+                        <option value="30" selected>最近30天</option>
+                        <option value="90">最近90天</option>
+                    </select>
+                </div>
+            </div>
+            <div class="funnel-chart">
+                <div class="funnel-stage applied">
+                    <div class="stage-label">已申请</div>
+                    <div class="stage-count">{{ funnel_data.applied|default(150) }}</div>
+                    <div class="stage-bar" style="width: 100%"></div>
+                </div>
+                <div class="funnel-stage screened">
+                    <div class="stage-label">已筛选</div>
+                    <div class="stage-count">{{ funnel_data.screened|default(120) }}</div>
+                    <div class="stage-bar" style="width: 80%"></div>
+                </div>
+                <div class="funnel-stage interviewed">
+                    <div class="stage-label">已面试</div>
+                    <div class="stage-count">{{ funnel_data.interviewed|default(80) }}</div>
+                    <div class="stage-bar" style="width: 53%"></div>
+                </div>
+                <div class="funnel-stage hired">
+                    <div class="stage-label">已入职</div>
+                    <div class="stage-count">{{ funnel_data.hired|default(25) }}</div>
+                    <div class="stage-bar" style="width: 17%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近活动 -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="uil uil-clock"></i> 最近活动</h2>
+                <a href="#" class="view-all">查看全部</a>
+            </div>
+            <div class="activity-feed">
+                {% for activity in recent_activities|default([]) %}
+                <div class="activity-item">
+                    <div class="activity-icon {{ activity.type }}">
+                        {% if activity.type == 'application' %}
+                            <i class="uil uil-user-plus"></i>
+                        {% elif activity.type == 'interview' %}
+                            <i class="uil uil-calendar-alt"></i>
+                        {% elif activity.type == 'offer' %}
+                            <i class="uil uil-file-check"></i>
+                        {% elif activity.type == 'hire' %}
+                            <i class="uil uil-user-check"></i>
+                        {% endif %}
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">{{ activity.description }}</div>
+                        <div class="activity-time">{{ activity.time }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- 默认活动数据 -->
+                <div class="activity-item">
+                    <div class="activity-icon application">
+                        <i class="uil uil-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">张三申请了高级软件工程师职位</div>
+                        <div class="activity-time">2小时前</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon interview">
+                        <i class="uil uil-calendar-alt"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">李四的面试安排在明天下午2点</div>
+                        <div class="activity-time">4小时前</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon offer">
+                        <i class="uil uil-file-check"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">王五接受了产品经理Offer</div>
+                        <div class="activity-time">1天前</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon hire">
+                        <i class="uil uil-user-check"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-text">赵六完成入职手续，正式加入团队</div>
+                        <div class="activity-time">2天前</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速操作 -->
+    <div class="quick-actions">
+        <div class="action-card" onclick="location.href='{{ url_for('main.hr_candidates') }}'">
+            <i class="uil uil-users-alt"></i>
+            <span>候选人管理</span>
+        </div>
+        <div class="action-card" onclick="location.href='{{ url_for('main.hr_interviews') }}'">
+            <i class="uil uil-calendar-alt"></i>
+            <span>面试安排</span>
+        </div>
+        <div class="action-card" onclick="location.href='{{ url_for('main.hr_reports') }}'">
+            <i class="uil uil-chart-line"></i>
+            <span>数据报告</span>
+        </div>
+        <div class="action-card" onclick="location.href='{{ url_for('main.hr_insights') }}'">
+            <i class="uil uil-lightbulb"></i>
+            <span>AI洞察</span>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 时间筛选器变化事件
+    const timeFilter = document.querySelector('.time-filter');
+    timeFilter.addEventListener('change', function() {
+        const days = this.value;
+        // 这里可以添加AJAX请求来更新数据
+        console.log('筛选时间范围:', days + '天');
+    });
+
+    // 模拟数据更新
+    function updateMetrics() {
+        // 这里可以添加实时数据更新逻辑
+        console.log('更新指标数据');
+    }
+
+    // 每30秒更新一次数据
+    setInterval(updateMetrics, 30000);
+});
+</script>
+{% endblock %}
