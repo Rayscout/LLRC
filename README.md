@@ -7,7 +7,7 @@ This system is built using **Flask**, **SQLAlchemy**, **MongoDB**, and **Hugging
 
 ---
 
-## **Video Walkthrough**
+## **lym**
 
 [Click here to watch the video walkthrough](https://drive.google.com/file/d/103M12Ok-hC81KZHVV7FvGC586wEa_KKX/view?usp=sharing)
 
