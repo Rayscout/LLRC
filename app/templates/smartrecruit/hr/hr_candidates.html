@@ -1,0 +1,419 @@
+{% extends 'base.html' %}
+
+{% block title %}候选人管理{% endblock %}
+
+{% block content %}
+<div class="hr-candidates">
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1><i class="uil uil-users-alt"></i> 候选人管理</h1>
+            <p>管理所有候选人信息与状态</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-secondary" onclick="exportCandidates()">
+                <i class="uil uil-export"></i> 导出数据
+            </button>
+            <button class="btn-primary" onclick="addCandidate()">
+                <i class="uil uil-plus"></i> 添加候选人
+            </button>
+        </div>
+    </div>
+
+    <!-- 筛选和搜索 -->
+    <div class="filters-section">
+        <div class="search-box">
+            <i class="uil uil-search"></i>
+            <input type="text" id="candidate-search" placeholder="搜索候选人姓名或技能...">
+        </div>
+        <div class="filter-controls">
+            <select id="status-filter" class="filter-select">
+                <option value="">所有状态</option>
+                <option value="applied">已申请</option>
+                <option value="screened">已筛选</option>
+                <option value="interview">面试中</option>
+                <option value="offer">已发Offer</option>
+                <option value="hired">已入职</option>
+                <option value="rejected">已拒绝</option>
+            </select>
+            <select id="position-filter" class="filter-select">
+                <option value="">所有职位</option>
+                <option value="software-engineer">软件工程师</option>
+                <option value="product-manager">产品经理</option>
+                <option value="designer">设计师</option>
+                <option value="marketing">市场营销</option>
+            </select>
+            <select id="experience-filter" class="filter-select">
+                <option value="">所有经验</option>
+                <option value="0-2">0-2年</option>
+                <option value="3-5">3-5年</option>
+                <option value="6-10">6-10年</option>
+                <option value="10+">10年以上</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 候选人表格 -->
+    <div class="candidates-table-container">
+        <table class="candidates-table">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="select-all">
+                    </th>
+                    <th>候选人</th>
+                    <th>职位</th>
+                    <th>技能匹配度</th>
+                    <th>状态</th>
+                    <th>申请时间</th>
+                    <th>最后更新</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for candidate in candidates|default([]) %}
+                <tr class="candidate-row" data-id="{{ candidate.id }}">
+                    <td>
+                        <input type="checkbox" class="candidate-select" value="{{ candidate.id }}">
+                    </td>
+                    <td class="candidate-info">
+                        <div class="candidate-avatar">
+                            {% if candidate.profile_photo %}
+                                <img src="{{ url_for('static', filename='uploads/photos/' + candidate.profile_photo) }}" alt="头像">
+                            {% else %}
+                                <div class="avatar-placeholder">{{ (candidate.first_name + ' ' + candidate.last_name)[0]|upper }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="candidate-details">
+                            <div class="candidate-name">{{ candidate.first_name }} {{ candidate.last_name }}</div>
+                            <div class="candidate-email">{{ candidate.email }}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="position-tag">{{ candidate.position }}</span>
+                    </td>
+                    <td>
+                        <div class="skills-match">
+                            <div class="match-bar">
+                                <div class="match-fill" style="width: {{ candidate.skills_match }}%"></div>
+                            </div>
+                            <span class="match-percentage">{{ candidate.skills_match }}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge {{ candidate.status }}">
+                            {% if candidate.status == 'applied' %}已申请
+                            {% elif candidate.status == 'screened' %}已筛选
+                            {% elif candidate.status == 'interview' %}面试中
+                            {% elif candidate.status == 'offer' %}已发Offer
+                            {% elif candidate.status == 'hired' %}已入职
+                            {% elif candidate.status == 'rejected' %}已拒绝
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>{{ candidate.applied_date }}</td>
+                    <td>{{ candidate.last_updated }}</td>
+                    <td class="actions">
+                        <button class="btn-icon" onclick="viewCandidate({{ candidate.id }})" title="查看详情">
+                            <i class="uil uil-eye"></i>
+                        </button>
+                        <button class="btn-icon" onclick="editCandidate({{ candidate.id }})" title="编辑">
+                            <i class="uil uil-edit"></i>
+                        </button>
+                        <button class="btn-icon" onclick="scheduleInterview({{ candidate.id }})" title="安排面试">
+                            <i class="uil uil-calendar-alt"></i>
+                        </button>
+                        <button class="btn-icon" onclick="sendEmail({{ candidate.id }})" title="发送邮件">
+                            <i class="uil uil-envelope"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <!-- 默认候选人数据 -->
+                <tr class="candidate-row" data-id="1">
+                    <td><input type="checkbox" class="candidate-select" value="1"></td>
+                    <td class="candidate-info">
+                        <div class="candidate-avatar">
+                            <div class="avatar-placeholder">张</div>
+                        </div>
+                        <div class="candidate-details">
+                            <div class="candidate-name">张三</div>
+                            <div class="candidate-email">zhangsan@email.com</div>
+                        </div>
+                    </td>
+                    <td><span class="position-tag">高级软件工程师</span></td>
+                    <td>
+                        <div class="skills-match">
+                            <div class="match-bar">
+                                <div class="match-fill" style="width: 85%"></div>
+                            </div>
+                            <span class="match-percentage">85%</span>
+                        </div>
+                    </td>
+                    <td><span class="status-badge interview">面试中</span></td>
+                    <td>2024-01-15</td>
+                    <td>2024-01-20</td>
+                    <td class="actions">
+                        <button class="btn-icon" onclick="viewCandidate(1)" title="查看详情">
+                            <i class="uil uil-eye"></i>
+                        </button>
+                        <button class="btn-icon" onclick="editCandidate(1)" title="编辑">
+                            <i class="uil uil-edit"></i>
+                        </button>
+                        <button class="btn-icon" onclick="scheduleInterview(1)" title="安排面试">
+                            <i class="uil uil-calendar-alt"></i>
+                        </button>
+                        <button class="btn-icon" onclick="sendEmail(1)" title="发送邮件">
+                            <i class="uil uil-envelope"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr class="candidate-row" data-id="2">
+                    <td><input type="checkbox" class="candidate-select" value="2"></td>
+                    <td class="candidate-info">
+                        <div class="candidate-avatar">
+                            <div class="avatar-placeholder">李</div>
+                        </div>
+                        <div class="candidate-details">
+                            <div class="candidate-name">李四</div>
+                            <div class="candidate-email">lisi@email.com</div>
+                        </div>
+                    </td>
+                    <td><span class="position-tag">产品经理</span></td>
+                    <td>
+                        <div class="skills-match">
+                            <div class="match-bar">
+                                <div class="match-fill" style="width: 92%"></div>
+                            </div>
+                            <span class="match-percentage">92%</span>
+                        </div>
+                    </td>
+                    <td><span class="status-badge offer">已发Offer</span></td>
+                    <td>2024-01-10</td>
+                    <td>2024-01-18</td>
+                    <td class="actions">
+                        <button class="btn-icon" onclick="viewCandidate(2)" title="查看详情">
+                            <i class="uil uil-eye"></i>
+                        </button>
+                        <button class="btn-icon" onclick="editCandidate(2)" title="编辑">
+                            <i class="uil uil-edit"></i>
+                        </button>
+                        <button class="btn-icon" onclick="scheduleInterview(2)" title="安排面试">
+                            <i class="uil uil-calendar-alt"></i>
+                        </button>
+                        <button class="btn-icon" onclick="sendEmail(2)" title="发送邮件">
+                            <i class="uil uil-envelope"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination">
+        <button class="btn-page" onclick="previousPage()">
+            <i class="uil uil-angle-left"></i> 上一页
+        </button>
+        <div class="page-numbers">
+            <span class="page-number active">1</span>
+            <span class="page-number">2</span>
+            <span class="page-number">3</span>
+            <span class="page-dots">...</span>
+            <span class="page-number">10</span>
+        </div>
+        <button class="btn-page" onclick="nextPage()">
+            下一页 <i class="uil uil-angle-right"></i>
+        </button>
+    </div>
+</div>
+
+<!-- 候选人详情侧边栏 -->
+<div id="candidate-sidebar" class="candidate-sidebar">
+    <div class="sidebar-header">
+        <h3>候选人详情</h3>
+        <button class="btn-close" onclick="closeSidebar()">
+            <i class="uil uil-times"></i>
+        </button>
+    </div>
+    <div class="sidebar-content">
+        <div class="candidate-profile">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <div class="avatar-placeholder">张</div>
+                </div>
+                <div class="profile-info">
+                    <h4>张三</h4>
+                    <p>高级软件工程师</p>
+                    <span class="status-badge interview">面试中</span>
+                </div>
+            </div>
+            
+            <div class="profile-section">
+                <h5>基本信息</h5>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>邮箱</label>
+                        <span>zhangsan@email.com</span>
+                    </div>
+                    <div class="info-item">
+                        <label>电话</label>
+                        <span>138****8888</span>
+                    </div>
+                    <div class="info-item">
+                        <label>工作经验</label>
+                        <span>5年</span>
+                    </div>
+                    <div class="info-item">
+                        <label>学历</label>
+                        <span>本科</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h5>技能匹配</h5>
+                <div class="skills-radar">
+                    <div class="skill-item">
+                        <span class="skill-name">Java</span>
+                        <div class="skill-bar">
+                            <div class="skill-fill" style="width: 90%"></div>
+                        </div>
+                        <span class="skill-score">90%</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Spring Boot</span>
+                        <div class="skill-bar">
+                            <div class="skill-fill" style="width: 85%"></div>
+                        </div>
+                        <span class="skill-score">85%</span>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">MySQL</span>
+                        <div class="skill-bar">
+                            <div class="skill-fill" style="width: 80%"></div>
+                        </div>
+                        <span class="skill-score">80%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <h5>面试记录</h5>
+                <div class="interview-notes">
+                    <div class="note-item">
+                        <div class="note-header">
+                            <span class="note-date">2024-01-20</span>
+                            <span class="note-interviewer">面试官：王经理</span>
+                        </div>
+                        <div class="note-content">
+                            技术能力优秀，沟通表达清晰，建议进入下一轮面试。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 搜索功能
+    const searchInput = document.getElementById('candidate-search');
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        filterCandidates();
+    });
+
+    // 筛选功能
+    const filters = ['status-filter', 'position-filter', 'experience-filter'];
+    filters.forEach(filterId => {
+        document.getElementById(filterId).addEventListener('change', filterCandidates);
+    });
+
+    // 全选功能
+    const selectAll = document.getElementById('select-all');
+    selectAll.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.candidate-select');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+});
+
+function filterCandidates() {
+    const searchTerm = document.getElementById('candidate-search').value.toLowerCase();
+    const statusFilter = document.getElementById('status-filter').value;
+    const positionFilter = document.getElementById('position-filter').value;
+    const experienceFilter = document.getElementById('experience-filter').value;
+
+    const rows = document.querySelectorAll('.candidate-row');
+    
+    rows.forEach(row => {
+        const name = row.querySelector('.candidate-name').textContent.toLowerCase();
+        const email = row.querySelector('.candidate-email').textContent.toLowerCase();
+        const position = row.querySelector('.position-tag').textContent;
+        const status = row.querySelector('.status-badge').classList[1];
+
+        let show = true;
+
+        // 搜索过滤
+        if (searchTerm && !name.includes(searchTerm) && !email.includes(searchTerm)) {
+            show = false;
+        }
+
+        // 状态过滤
+        if (statusFilter && status !== statusFilter) {
+            show = false;
+        }
+
+        // 职位过滤
+        if (positionFilter && position !== positionFilter) {
+            show = false;
+        }
+
+        row.style.display = show ? 'table-row' : 'none';
+    });
+}
+
+function viewCandidate(id) {
+    document.getElementById('candidate-sidebar').classList.add('active');
+}
+
+function closeSidebar() {
+    document.getElementById('candidate-sidebar').classList.remove('active');
+}
+
+function editCandidate(id) {
+    console.log('编辑候选人:', id);
+    // 实现编辑功能
+}
+
+function scheduleInterview(id) {
+    console.log('安排面试:', id);
+    // 跳转到面试安排页面
+    window.location.href = '{{ url_for("smartrecruit.hr.dashboard.interviews") }}';
+}
+
+function sendEmail(id) {
+    console.log('发送邮件:', id);
+    // 实现邮件发送功能
+}
+
+function exportCandidates() {
+    console.log('导出候选人数据');
+    // 实现导出功能
+}
+
+function previousPage() {
+    console.log('上一页');
+    // 实现分页功能
+}
+
+function nextPage() {
+    console.log('下一页');
+    // 实现分页功能
+}
+</script>
+{% endblock %}

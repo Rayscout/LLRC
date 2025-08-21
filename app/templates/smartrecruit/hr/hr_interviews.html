@@ -1,0 +1,554 @@
+{% extends 'base.html' %}
+
+{% block title %}面试安排{% endblock %}
+
+{% block content %}
+<div class="hr-interviews">
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1><i class="uil uil-calendar-alt"></i> 面试安排</h1>
+            <p>管理面试日程与安排</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-secondary" onclick="exportSchedule()">
+                <i class="uil uil-export"></i> 导出日程
+            </button>
+            <button class="btn-primary" onclick="scheduleInterview()">
+                <i class="uil uil-plus"></i> 安排面试
+            </button>
+        </div>
+    </div>
+
+    <!-- 日历导航 -->
+    <div class="calendar-navigation">
+        <button class="btn-nav" onclick="previousWeek()">
+            <i class="uil uil-angle-left"></i>
+        </button>
+        <div class="current-week">
+            <h3 id="week-display">2024年1月15日 - 1月21日</h3>
+            <button class="btn-today" onclick="goToToday()">今天</button>
+        </div>
+        <button class="btn-nav" onclick="nextWeek()">
+            <i class="uil uil-angle-right"></i>
+        </button>
+    </div>
+
+    <!-- 日历视图 -->
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <div class="time-column">时间</div>
+            <div class="day-column">周一</div>
+            <div class="day-column">周二</div>
+            <div class="day-column">周三</div>
+            <div class="day-column">周四</div>
+            <div class="day-column">周五</div>
+            <div class="day-column">周六</div>
+            <div class="day-column">周日</div>
+        </div>
+        
+        <div class="calendar-body">
+            {% for hour in range(9, 19) %}
+            <div class="time-slot">
+                <div class="time-label">{{ hour }}:00</div>
+                {% for day in range(7) %}
+                <div class="day-slot" data-day="{{ day }}" data-hour="{{ hour }}">
+                    {% set interviews = get_interviews_for_slot(day, hour) %}
+                    {% for interview in interviews %}
+                    <div class="interview-event" 
+                         data-interview-id="{{ interview.id }}"
+                         onclick="viewInterview({{ interview.id }})">
+                        <div class="event-title">{{ interview.candidate_name }}</div>
+                        <div class="event-position">{{ interview.position }}</div>
+                        <div class="event-time">{{ interview.start_time }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 面试列表 -->
+    <div class="interviews-list-section">
+        <div class="section-header">
+            <h2><i class="uil uil-list-ul"></i> 面试列表</h2>
+            <div class="list-filters">
+                <select id="status-filter" class="filter-select">
+                    <option value="">所有状态</option>
+                    <option value="scheduled">已安排</option>
+                    <option value="completed">已完成</option>
+                    <option value="cancelled">已取消</option>
+                </select>
+                <select id="interviewer-filter" class="filter-select">
+                    <option value="">所有面试官</option>
+                    <option value="wang">王经理</option>
+                    <option value="li">李总监</option>
+                    <option value="zhang">张HR</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="interviews-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>候选人</th>
+                        <th>职位</th>
+                        <th>面试官</th>
+                        <th>时间</th>
+                        <th>类型</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interview in interviews|default([]) %}
+                    <tr class="interview-row" data-id="{{ interview.id }}">
+                        <td class="candidate-info">
+                            <div class="candidate-avatar">
+                                <div class="avatar-placeholder">{{ interview.candidate_name[0] }}</div>
+                            </div>
+                            <div class="candidate-details">
+                                <div class="candidate-name">{{ interview.candidate_name }}</div>
+                                <div class="candidate-email">{{ interview.candidate_email }}</div>
+                            </div>
+                        </td>
+                        <td>{{ interview.position }}</td>
+                        <td>{{ interview.interviewer }}</td>
+                        <td>{{ interview.scheduled_time }}</td>
+                        <td>
+                            <span class="type-badge {{ interview.type }}">
+                                {% if interview.type == 'online' %}在线
+                                {% else %}现场
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge {{ interview.status }}">
+                                {% if interview.status == 'scheduled' %}已安排
+                                {% elif interview.status == 'completed' %}已完成
+                                {% elif interview.status == 'cancelled' %}已取消
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td class="actions">
+                            <button class="btn-icon" onclick="viewInterview({{ interview.id }})" title="查看详情">
+                                <i class="uil uil-eye"></i>
+                            </button>
+                            <button class="btn-icon" onclick="editInterview({{ interview.id }})" title="编辑">
+                                <i class="uil uil-edit"></i>
+                            </button>
+                            <button class="btn-icon" onclick="cancelInterview({{ interview.id }})" title="取消">
+                                <i class="uil uil-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <!-- 默认面试数据 -->
+                    <tr class="interview-row" data-id="1">
+                        <td class="candidate-info">
+                            <div class="candidate-avatar">
+                                <div class="avatar-placeholder">张</div>
+                            </div>
+                            <div class="candidate-details">
+                                <div class="candidate-name">张三</div>
+                                <div class="candidate-email">zhangsan@email.com</div>
+                            </div>
+                        </td>
+                        <td>高级软件工程师</td>
+                        <td>王经理</td>
+                        <td>2024-01-22 14:00</td>
+                        <td><span class="type-badge online">在线</span></td>
+                        <td><span class="status-badge scheduled">已安排</span></td>
+                        <td class="actions">
+                            <button class="btn-icon" onclick="viewInterview(1)" title="查看详情">
+                                <i class="uil uil-eye"></i>
+                            </button>
+                            <button class="btn-icon" onclick="editInterview(1)" title="编辑">
+                                <i class="uil uil-edit"></i>
+                            </button>
+                            <button class="btn-icon" onclick="cancelInterview(1)" title="取消">
+                                <i class="uil uil-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr class="interview-row" data-id="2">
+                        <td class="candidate-info">
+                            <div class="candidate-avatar">
+                                <div class="avatar-placeholder">李</div>
+                            </div>
+                            <div class="candidate-details">
+                                <div class="candidate-name">李四</div>
+                                <div class="candidate-email">lisi@email.com</div>
+                            </div>
+                        </td>
+                        <td>产品经理</td>
+                        <td>李总监</td>
+                        <td>2024-01-23 10:00</td>
+                        <td><span class="type-badge offline">现场</span></td>
+                        <td><span class="status-badge scheduled">已安排</span></td>
+                        <td class="actions">
+                            <button class="btn-icon" onclick="viewInterview(2)" title="查看详情">
+                                <i class="uil uil-eye"></i>
+                            </button>
+                            <button class="btn-icon" onclick="editInterview(2)" title="编辑">
+                                <i class="uil uil-edit"></i>
+                            </button>
+                            <button class="btn-icon" onclick="cancelInterview(2)" title="取消">
+                                <i class="uil uil-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 面试安排模态框 -->
+<div id="interview-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>安排面试</h3>
+            <button class="btn-close" onclick="closeModal()">
+                <i class="uil uil-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="interview-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="candidate">候选人</label>
+                        <select id="candidate" name="candidate" required>
+                            <option value="">选择候选人</option>
+                            <option value="1">张三 - 高级软件工程师</option>
+                            <option value="2">李四 - 产品经理</option>
+                            <option value="3">王五 - UI设计师</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="position">应聘职位</label>
+                        <input type="text" id="position" name="position" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="interviewer">面试官</label>
+                        <select id="interviewer" name="interviewer" required>
+                            <option value="">选择面试官</option>
+                            <option value="wang">王经理</option>
+                            <option value="li">李总监</option>
+                            <option value="zhang">张HR</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="interview-type">面试类型</label>
+                        <select id="interview-type" name="interview_type" required>
+                            <option value="online">在线面试</option>
+                            <option value="offline">现场面试</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="interview-date">面试日期</label>
+                        <input type="date" id="interview-date" name="interview_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="interview-time">面试时间</label>
+                        <input type="time" id="interview-time" name="interview_time" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interview-duration">面试时长</label>
+                    <select id="interview-duration" name="interview_duration">
+                        <option value="30">30分钟</option>
+                        <option value="60" selected>60分钟</option>
+                        <option value="90">90分钟</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interview-notes">备注</label>
+                    <textarea id="interview-notes" name="interview_notes" rows="3" placeholder="面试注意事项或特殊要求..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeModal()">取消</button>
+            <button class="btn-primary" onclick="saveInterview()">保存面试</button>
+        </div>
+    </div>
+</div>
+
+<!-- 面试详情模态框 -->
+<div id="interview-detail-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>面试详情</h3>
+            <button class="btn-close" onclick="closeDetailModal()">
+                <i class="uil uil-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="interview-detail-content">
+                <!-- 面试详情内容将通过JavaScript动态加载 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeDetailModal()">关闭</button>
+            <button class="btn-primary" onclick="editCurrentInterview()">编辑面试</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentWeek = new Date();
+let currentInterviewId = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateWeekDisplay();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    // 筛选器变化事件
+    document.getElementById('status-filter').addEventListener('change', filterInterviews);
+    document.getElementById('interviewer-filter').addEventListener('change', filterInterviews);
+    
+    // 候选人选择变化事件
+    document.getElementById('candidate').addEventListener('change', function() {
+        updatePositionField();
+    });
+    
+    // 面试日期变化事件
+    document.getElementById('interview-date').addEventListener('change', function() {
+        updateTimeSlots();
+    });
+}
+
+function updateWeekDisplay() {
+    const startOfWeek = getStartOfWeek(currentWeek);
+    const endOfWeek = getEndOfWeek(currentWeek);
+    
+    const startStr = startOfWeek.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+    const endStr = endOfWeek.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric' });
+    
+    document.getElementById('week-display').textContent = `${startStr} - ${endStr}`;
+}
+
+function getStartOfWeek(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(d.setDate(diff));
+}
+
+function getEndOfWeek(date) {
+    const start = getStartOfWeek(date);
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    return end;
+}
+
+function previousWeek() {
+    currentWeek.setDate(currentWeek.getDate() - 7);
+    updateWeekDisplay();
+    loadWeekData();
+}
+
+function nextWeek() {
+    currentWeek.setDate(currentWeek.getDate() + 7);
+    updateWeekDisplay();
+    loadWeekData();
+}
+
+function goToToday() {
+    currentWeek = new Date();
+    updateWeekDisplay();
+    loadWeekData();
+}
+
+function loadWeekData() {
+    // 这里可以添加AJAX请求来加载指定周的数据
+    console.log('加载周数据:', currentWeek);
+}
+
+function scheduleInterview() {
+    document.getElementById('interview-modal').classList.add('active');
+    // 设置默认日期为今天
+    document.getElementById('interview-date').value = new Date().toISOString().split('T')[0];
+}
+
+function closeModal() {
+    document.getElementById('interview-modal').classList.remove('active');
+    document.getElementById('interview-form').reset();
+}
+
+function closeDetailModal() {
+    document.getElementById('interview-detail-modal').classList.remove('active');
+    currentInterviewId = null;
+}
+
+function updatePositionField() {
+    const candidateSelect = document.getElementById('candidate');
+    const positionField = document.getElementById('position');
+    
+    if (candidateSelect.value) {
+        const selectedOption = candidateSelect.options[candidateSelect.selectedIndex];
+        const position = selectedOption.text.split(' - ')[1];
+        positionField.value = position;
+    } else {
+        positionField.value = '';
+    }
+}
+
+function updateTimeSlots() {
+    // 这里可以添加逻辑来更新可用时间槽
+    console.log('更新可用时间槽');
+}
+
+function saveInterview() {
+    const form = document.getElementById('interview-form');
+    const formData = new FormData(form);
+    
+    // 验证表单
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    // 收集表单数据
+    const interviewData = {
+        candidate: formData.get('candidate'),
+        position: formData.get('position'),
+        interviewer: formData.get('interviewer'),
+        interview_type: formData.get('interview_type'),
+        interview_date: formData.get('interview_date'),
+        interview_time: formData.get('interview_time'),
+        interview_duration: formData.get('interview_duration'),
+        interview_notes: formData.get('interview_notes')
+    };
+    
+    console.log('保存面试数据:', interviewData);
+    
+    // 这里可以添加AJAX请求来保存数据
+    // 保存成功后关闭模态框
+    closeModal();
+    
+    // 刷新页面或更新数据
+    location.reload();
+}
+
+function viewInterview(id) {
+    currentInterviewId = id;
+    
+    // 模拟加载面试详情
+    const detailContent = document.getElementById('interview-detail-content');
+    detailContent.innerHTML = `
+        <div class="interview-detail">
+            <div class="detail-section">
+                <h4>基本信息</h4>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>候选人:</label>
+                        <span>张三</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>职位:</label>
+                        <span>高级软件工程师</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>面试官:</label>
+                        <span>王经理</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>面试时间:</label>
+                        <span>2024-01-22 14:00</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>面试类型:</label>
+                        <span>在线面试</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>面试时长:</label>
+                        <span>60分钟</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h4>面试记录</h4>
+                <div class="interview-notes">
+                    <div class="note-item">
+                        <div class="note-header">
+                            <span class="note-date">2024-01-20</span>
+                            <span class="note-interviewer">面试官：王经理</span>
+                        </div>
+                        <div class="note-content">
+                            技术能力优秀，沟通表达清晰，建议进入下一轮面试。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('interview-detail-modal').classList.add('active');
+}
+
+function editInterview(id) {
+    console.log('编辑面试:', id);
+    // 实现编辑功能
+}
+
+function cancelInterview(id) {
+    if (confirm('确定要取消这个面试吗？')) {
+        console.log('取消面试:', id);
+        // 实现取消功能
+    }
+}
+
+function editCurrentInterview() {
+    if (currentInterviewId) {
+        editInterview(currentInterviewId);
+        closeDetailModal();
+    }
+}
+
+function filterInterviews() {
+    const statusFilter = document.getElementById('status-filter').value;
+    const interviewerFilter = document.getElementById('interviewer-filter').value;
+    
+    const rows = document.querySelectorAll('.interview-row');
+    
+    rows.forEach(row => {
+        const status = row.querySelector('.status-badge').classList[1];
+        const interviewer = row.querySelector('td:nth-child(3)').textContent;
+        
+        let show = true;
+        
+        if (statusFilter && status !== statusFilter) {
+            show = false;
+        }
+        
+        if (interviewerFilter && !interviewer.includes(interviewerFilter)) {
+            show = false;
+        }
+        
+        row.style.display = show ? 'table-row' : 'none';
+    });
+}
+
+function exportSchedule() {
+    console.log('导出面试日程');
+    // 实现导出功能
+}
+</script>
+{% endblock %}

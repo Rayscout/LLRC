@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+
+{% block title %}申请职位{% endblock %}
+
+{% block content %}
+<div class="apply-container">
+    <div class="page-header">
+        <div class="icon">📝</div>
+        <h1 class="page-title">申请职位</h1>
+        <p>填写申请信息，开始您的求职之旅</p>
+    </div>
+
+    <div class="apply-content">
+        <div class="job-summary">
+            <h3>{{ job.title }}</h3>
+            <div class="job-meta">
+                <span><i class="fas fa-building"></i> {{ job.company_name or '未知公司' }}</span>
+                <span><i class="fas fa-map-marker-alt"></i> {{ job.location }}</span>
+                <span><i class="fas fa-money-bill-wave"></i> {{ job.salary }} 元/月</span>
+            </div>
+            <div class="job-description">
+                <h4>职位描述：</h4>
+                <p>{{ job.description[:200] }}{% if job.description|length > 200 %}...{% endif %}</p>
+            </div>
+        </div>
+
+        <div class="application-form">
+            <h3>申请信息</h3>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="message">申请留言（可选）</label>
+                    <textarea 
+                        id="message" 
+                        name="message" 
+                        rows="4" 
+                        placeholder="请简要介绍您为什么适合这个职位，或者您对这个职位的理解..."
+                        class="form-control"
+                    ></textarea>
+                    <small class="form-text">让HR更好地了解您的申请动机</small>
+                </div>
+
+                <div class="resume-check">
+                    <h4>简历确认</h4>
+                    {% if user.cv_file %}
+                        <div class="resume-info">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span>已上传简历：{{ user.cv_file }}</span>
+                            <a href="{{ url_for('common.files.download_file', filename=user.cv_file) }}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-download"></i> 下载
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="resume-warning">
+                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                            <span>您还没有上传简历，请先上传简历再申请职位</span>
+                            <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-upload"></i> 上传简历
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" {% if not user.cv_file %}disabled{% endif %}>
+                        <i class="fas fa-paper-plane"></i> 提交申请
+                    </button>
+                    <a href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=job.id) }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> 返回职位详情
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.apply-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 30px;
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.page-header .icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.page-header .page-title {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 32px;
+}
+
+.page-header p {
+    color: #7f8c8d;
+    font-size: 16px;
+    margin: 0;
+}
+
+.apply-content {
+    display: grid;
+    gap: 30px;
+}
+
+.job-summary {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.job-summary h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.job-meta {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.job-meta span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.job-meta i {
+    color: #3498db;
+}
+
+.job-description h4 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.job-description p {
+    color: #7f8c8d;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.application-form {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.application-form h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ecf0f1;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+    resize: vertical;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.form-text {
+    display: block;
+    margin-top: 5px;
+    color: #7f8c8d;
+    font-size: 12px;
+}
+
+.resume-check {
+    margin: 25px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.resume-check h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.resume-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #27ae60;
+}
+
+.resume-warning {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #f39c12;
+}
+
+.text-success {
+    color: #27ae60;
+}
+
+.text-warning {
+    color: #f39c12;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: #3498db;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-primary:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-secondary {
+    background: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #7f8c8d;
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: #3498db;
+    border: 2px solid #3498db;
+}
+
+.btn-outline-primary:hover {
+    background: #3498db;
+    color: white;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 12px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .job-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}

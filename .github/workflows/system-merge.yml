@@ -1,0 +1,32 @@
+name: System Auto Merge
+
+on:
+  pull_request:
+    branches: [smartrecruit, talent_management]
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check system PR
+      run: |
+        echo "检查系统PR..."
+        echo "目标分支: ${{ github.event.pull_request.base.ref }}"
+        echo "源分支: ${{ github.event.pull_request.head.ref }}"
+    
+    - name: Run basic tests
+      run: |
+        echo "运行基础测试..."
+        # 这里可以添加简单的语法检查、格式检查等
+    
+    - name: Auto merge system PRs
+      if: github.event.pull_request.base.ref in ['smartrecruit', 'talent_management']
+      run: |
+        echo "自动合并系统PR..."
+        gh pr merge --auto --merge
+        echo "系统集成完成！"
+    
+    - name: Notify system teams
+      run: |
+        echo "通知系统团队集成完成"
+        # 可以添加Slack、邮件等通知
