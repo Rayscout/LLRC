@@ -1,15 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, g, current_app, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, g, current_app, jsonify, session
 from werkzeug.utils import secure_filename
 import os
 import logging
 from app.models import Job, Application, db
-<<<<<<< HEAD
-from werkzeug.utils import secure_filename
-from app.utils import allowed_file
-from app.utils import evaluate_cv, generate_interview_questions, generate_feedback, extract_text_from_resume, extract_text_from_file
-=======
-from app.utils import evaluate_cv, generate_interview_questions, generate_feedback, extract_text_from_resume, extract_text_from_file, allowed_file, get_allowed_cv_extensions
->>>>>>> ae344f88704721d586b7c36196f93ddbd0c72d7e
+from app.utils import (
+    evaluate_cv,
+    generate_interview_questions,
+    generate_feedback,
+    extract_text_from_resume,
+    extract_text_from_file,
+    allowed_file,
+    get_allowed_cv_extensions,
+)
 from app import applications_collection
 from datetime import datetime
 
@@ -120,7 +122,6 @@ def apply(job_id):
 
     job = Job.query.get_or_404(job_id)
 
-<<<<<<< HEAD
     # 重复申请拦截
     existing_application_sqlite = Application.query.filter_by(user_id=g.user.id, job_id=job_id).first()
     if existing_application_sqlite:
@@ -185,22 +186,6 @@ def apply(job_id):
             })
         except Exception:
             pass
-=======
-    # 确保在“我的申请”里出现：若不存在则创建待处理记录
-    existing_application_sqlite = Application.query.filter_by(user_id=g.user.id, job_id=job_id).first()
-    if not existing_application_sqlite:
-        try:
-            pending_app = Application(
-                user_id=g.user.id,
-                job_id=job_id,
-                status='Pending',
-                message='已提交申请，待面试'
-            )
-            db.session.add(pending_app)
-            db.session.commit()
-        except Exception as e:
-            logging.warning(f"创建待处理申请失败: {e}")
->>>>>>> ae344f88704721d586b7c36196f93ddbd0c72d7e
 
         flash('申请已提交！', 'success')
         return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
@@ -209,35 +194,6 @@ def apply(job_id):
         db.session.rollback()
         flash('保存申请失败，请稍后重试。', 'danger')
         return redirect(url_for('smartrecruit.candidate.jobs.job_detail', job_id=job_id))
-
-<<<<<<< HEAD
-=======
-    # 评估简历匹配度
-    match, similarity_score = evaluate_cv(text, job.description)
-    if not match:
-        # 更新申请为不匹配
-        try:
-            app_rec = Application.query.filter_by(user_id=g.user.id, job_id=job_id).first()
-            if app_rec:
-                app_rec.status = 'Rejected'
-                app_rec.message = f'简历不匹配，相似度：{similarity_score:.2f}%'
-                db.session.commit()
-        except Exception as e:
-            logging.warning(f"更新不匹配状态失败: {e}")
-        flash(f'你的简历与职位要求不匹配。相似度：{similarity_score:.2f}', 'error')
-        return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
-
-    # 生成面试问题
-    questions = generate_interview_questions(text, job.description)
-    session['questions'] = questions
-    session['current_question'] = 0
-    session['responses'] = {}
-    session['job_id'] = job_id
-    session['similarity_score'] = similarity_score
-
-    return redirect(url_for('smartrecruit.candidate.applications.interview_questions'))
-
->>>>>>> ae344f88704721d586b7c36196f93ddbd0c72d7e
 @applications_bp.route('/interview_questions', methods=['GET', 'POST'])
 def interview_questions():
     """面试问题页面"""

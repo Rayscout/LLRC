@@ -84,13 +84,18 @@ nav .logo-name{
 }
 nav .logo-image{
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; /* 左对齐，避免贴边裁切 */
+    padding-left: 8px;           /* 给logo留出左侧内边距 */
     min-width: 45px;
 }
 nav .logo-image img{
-    width: 200px;
-    object-fit: cover;
+    width: 190px;        /* 稍微缩小以适配 250px 侧栏与内边距 */
+    height: auto;
+    object-fit: contain; /* 保持完整显示，不裁切 */
+    display: block;
 }
+/* 隐藏左上角 logo 旁的黑色文字（品牌名） */
+nav .logo-name .logo_name{ display: none !important; }
 
 nav .logo-name .logo_name{
     font-size: 22px;
