@@ -97,7 +97,7 @@ def publish_recruitment():
             logging.error(f'发布/更新招聘启事失败: {e}')
             flash('操作失败，请稍后重试。', 'danger')
 
-    return render_template('smartrecruit/hr/publish_recruitment.html', job=job_to_edit, is_edit=bool(edit_job_id))
+    return render_template('smartrecruit/hr/publish_recruitment_new.html', job=job_to_edit, is_edit=bool(edit_job_id))
 
 @recruitment_bp.route('/my_jobs')
 def my_jobs():
