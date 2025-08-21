@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 import os
 import logging
 from app.models import Job, Application, db
+from werkzeug.utils import secure_filename
+from app.utils import allowed_file
 from app.utils import evaluate_cv, generate_interview_questions, generate_feedback, extract_text_from_resume, extract_text_from_file
 from app import applications_collection
 from datetime import datetime
@@ -26,72 +28,87 @@ def virtual_feedback():
 
     return render_template('smartrecruit/candidate/virtual_feedback.html')
 
-@applications_bp.route('/apply/<int:job_id>', methods=['GET'])
+@applications_bp.route('/apply/<int:job_id>', methods=['GET', 'POST'])
 def apply(job_id):
-    """申请职位"""
+    """申请职位：可使用已有简历或上传新简历，创建申请并跳转到“我的申请”。"""
     if g.user is None:
-        flash('You need to sign in first.', 'danger')
+        flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
 
     job = Job.query.get_or_404(job_id)
 
-    # 检查是否已经申请过
+    # 重复申请拦截
     existing_application_sqlite = Application.query.filter_by(user_id=g.user.id, job_id=job_id).first()
-    existing_application_mongo = None
+    if existing_application_sqlite:
+        flash('你已申请过该职位。', 'info')
+        return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
+
+    if request.method == 'GET':
+        return render_template(
+            'smartrecruit/candidate/apply_resume.html',
+            job=job,
+            has_saved_cv=bool(getattr(g.user, 'cv_file', None)),
+            saved_cv_filename=getattr(g.user, 'cv_file', '')
+        )
+
+    # POST: 处理表单
+    use_saved = request.form.get('use_saved') == 'on'
+    note = request.form.get('note', '').strip()
+    uploaded = request.files.get('cv_file')
+
+    cv_filename_to_use = getattr(g.user, 'cv_file', None) if use_saved else None
+
+    if uploaded and uploaded.filename:
+        filename = secure_filename(uploaded.filename)
+        if not allowed_file(filename, { 'pdf','doc','docx','png','jpg','jpeg' }):
+            flash('不支持的文件类型，请上传 PDF/DOC/DOCX/PNG/JPG。', 'danger')
+            return redirect(request.url)
+        # 保存文件
+        name_root, ext = os.path.splitext(filename)
+        unique_name = f"u{g.user.id}_j{job_id}_{int(datetime.utcnow().timestamp())}{ext}"
+        save_dir = current_app.config['UPLOAD_FOLDER_CV']
+        os.makedirs(save_dir, exist_ok=True)
+        save_path = os.path.join(save_dir, unique_name)
+        uploaded.save(save_path)
+        # 记录到用户资料，作为最新简历
+        g.user.cv_file = unique_name
+        db.session.commit()
+        cv_filename_to_use = unique_name
+
+    if not cv_filename_to_use:
+        flash('请勾选使用已保存的简历或上传新简历。', 'warning')
+        return redirect(request.url)
+
+    # 创建申请记录
     try:
-        existing_application_mongo = applications_collection.find_one({
-            'user_id': str(g.user.id),
-            'job_id': str(job_id)
-        })
-    except Exception:
-        pass
+        message = note or f'已提交简历: {cv_filename_to_use}'
+        application = Application(
+            user_id=g.user.id,
+            job_id=job_id,
+            status='submitted',
+            message=message
+        )
+        db.session.add(application)
+        db.session.commit()
 
-    if existing_application_sqlite or existing_application_mongo:
-        flash('你已申请过该职位。', 'alert')
-        return redirect(url_for('smartrecruit.candidate.jobs.job_detail', job_id=job_id))
+        # 可选写入 Mongo
+        try:
+            applications_collection.insert_one({
+                'user_id': str(g.user.id),
+                'job_id': str(job_id),
+                'message': message,
+                'created_at': datetime.utcnow()
+            })
+        except Exception:
+            pass
 
-    if not g.user.cv_file:
-        flash('申请前请在设置中上传你的简历。', 'danger')
-        return redirect(url_for('smartrecruit.candidate.profile.settings'))
-
-    # 提取简历文本
-    text = ''
-    try:
-        if getattr(g.user, 'cv_data', None):
-            text = extract_text_from_resume(g.user.cv_data, g.user.cv_file or '')
-        else:
-            cv_path = os.path.join(current_app.config['UPLOAD_FOLDER_CV'], g.user.cv_file)
-            if not os.path.isfile(cv_path):
-                flash('未找到简历文件，请重新上传。', 'danger')
-                return redirect(url_for('smartrecruit.candidate.profile.settings'))
-            
-            # 视频简历：允许上传/预览但不解析评分
-            ext = os.path.splitext(g.user.cv_file)[1].lower().lstrip('.')
-            if ext in {'mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'}:
-                flash('已上传视频简历，但目前无法自动解析评分。请上传 PDF/DOCX/PNG/JPG 简历用于申请。', 'danger')
-                return redirect(url_for('smartrecruit.candidate.profile.settings'))
-            
-            text = extract_text_from_file(cv_path)
+        flash('申请已提交！', 'success')
+        return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
     except Exception as e:
-        logging.error(f"Failed to process CV: {e}")
-        flash('处理简历失败。', 'danger')
+        logging.error(f"保存申请失败: {e}")
+        db.session.rollback()
+        flash('保存申请失败，请稍后重试。', 'danger')
         return redirect(url_for('smartrecruit.candidate.jobs.job_detail', job_id=job_id))
-
-    # 评估简历匹配度
-    match, similarity_score = evaluate_cv(text, job.description)
-    if not match:
-        flash(f'你的简历与职位要求不匹配。相似度：{similarity_score:.2f}', 'error')
-        return redirect(url_for('smartrecruit.candidate.jobs.job_detail', job_id=job_id))
-
-    # 生成面试问题
-    questions = generate_interview_questions(text, job.description)
-    session['questions'] = questions
-    session['current_question'] = 0
-    session['responses'] = {}
-    session['job_id'] = job_id
-    session['similarity_score'] = similarity_score
-
-    return redirect(url_for('smartrecruit.candidate.applications.interview_questions'))
 
 @applications_bp.route('/interview_questions', methods=['GET', 'POST'])
 def interview_questions():
@@ -234,3 +251,36 @@ def my_applications():
     
     return render_template('smartrecruit/candidate/view_applications.html', 
                          applications=applications_with_jobs)
+
+@applications_bp.route('/withdraw/<int:application_id>', methods=['POST', 'GET'])
+def withdraw(application_id: int):
+    """撤销当前用户的一条申请（软撤销：更新状态为 withdrawn）。"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    app_obj = Application.query.filter_by(id=application_id, user_id=g.user.id).first()
+    if app_obj is None:
+        flash('未找到该申请或无权限操作。', 'warning')
+        return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
+
+    try:
+        # 改为硬删除，确保列表立即移除且可再次申请
+        db.session.delete(app_obj)
+        db.session.commit()
+        # 可选：从 Mongo 清理对应记录（忽略异常）
+        try:
+            applications_collection.delete_many({'user_id': str(g.user.id), 'job_id': str(app_obj.job_id)})
+        except Exception:
+            pass
+        # AJAX 请求直接返回 JSON，页面立即更新而不重定向
+        if request.args.get('ajax') == '1' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True})
+        flash('已撤销该申请。', 'success')
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'撤销申请失败: {e}')
+        if request.args.get('ajax') == '1' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': '撤销失败，请稍后重试。'}), 500
+        flash('撤销失败，请稍后重试。', 'danger')
+    return redirect(url_for('smartrecruit.candidate.applications.my_applications'))

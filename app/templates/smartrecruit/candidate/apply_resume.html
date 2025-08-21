@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}提交申请 - {{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="apply-wrapper">
+  <div class="page-header">
+    <i class="uil uil-file-upload icon"></i>
+    <h1 class="page-title">提交申请 - {{ job.title }}</h1>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="apply-form">
+    {% if has_saved_cv %}
+    <label class="checkbox"><input type="checkbox" name="use_saved"> 使用已保存的简历（{{ saved_cv_filename }}）</label>
+    {% else %}
+    <div class="hint">你目前未在个人资料中保存简历，请上传一份。</div>
+    {% endif %}
+
+    <div class="field">
+      <label>上传新简历（PDF/DOC/DOCX/PNG/JPG）</label>
+      <input type="file" name="cv_file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+    </div>
+
+    <div class="field">
+      <label>备注（可选）</label>
+      <textarea name="note" rows="4" placeholder="给HR的简短说明"></textarea>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn-apply">提交申请</button>
+      <a class="btn-view" href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=job.id) }}">返回职位</a>
+    </div>
+  </form>
+</div>
+
+<style>
+.apply-wrapper { max-width: 720px; margin: 0 auto; }
+.apply-form { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+.field { margin: 16px 0; }
+label { font-weight: 600; color: #2c3e50; display: block; margin-bottom: 8px; }
+input[type="file"], textarea { width: 100%; border: 2px solid #e1e8ed; border-radius: 8px; padding: 10px; font-size: 14px; }
+.checkbox { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
+.hint { color: #7f8c8d; margin-bottom: 8px; }
+.actions { display: flex; gap: 10px; }
+.btn-apply { background: #27ae60; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; }
+.btn-view { background: #ecf0f1; color: #2c3e50; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; }
+</style>
+{% endblock %}
+
+

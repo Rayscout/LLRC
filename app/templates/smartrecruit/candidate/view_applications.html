@@ -130,19 +130,57 @@
         <thead>
             <tr>
                 <th>职位标题</th>
+                <th>公司</th>
+                <th>地点</th>
                 <th>申请日期</th>
                 <th>状态</th>
+                <th>操作</th>
             </tr>
         </thead>
         <tbody>
-            {% for application in applications %}
+            {% for item in applications %}
             <tr>
-                <td>{{ application.job_title }}</td>
-                <td>{{ application.application_date }}</td>
-                <td>{{ application.status }}</td>
+                <td>{{ item.job.title }}</td>
+                <td>{{ item.job.company_name }}</td>
+                <td>{{ item.job.location }}</td>
+                <td>{{ item.application.timestamp.strftime('%Y-%m-%d %H:%M') if item.application.timestamp else '' }}</td>
+                <td>{{ item.application.status }}</td>
+                <td>
+                    <a class="view-details-button" href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=item.job.id) }}">查看职位</a>
+                    <button type="button" class="view-details-button withdraw-btn" data-app-id="{{ item.application.id }}" style="margin-left:8px;">撤销申请</button>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const buttons = document.querySelectorAll('.withdraw-btn');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const appId = btn.getAttribute('data-app-id');
+      if (!appId) return;
+      // 双重确认以符合两次确认的交互
+      if (!confirm('确定撤销申请吗？')) return;
+      if (!confirm('你真的确定吗？')) return;
+      try {
+        const url = `{{ url_for('smartrecruit.candidate.applications.withdraw', application_id=0) }}`.replace('0', appId) + '?ajax=1';
+        const resp = await fetch(url, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        const data = await resp.json();
+        if (data && data.success) {
+          // 直接从DOM移除该行，无需整页刷新
+          const row = btn.closest('tr');
+          if (row) row.remove();
+        } else {
+          // 失败则回退为整页刷新
+          window.location.reload();
+        }
+      } catch (e) {
+        window.location.reload();
+      }
+    });
+  });
+});
+</script>
 {% endblock %}
