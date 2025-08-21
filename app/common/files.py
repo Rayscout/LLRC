@@ -45,6 +45,36 @@ def serve_video(filename):
     # 发送文件
     return send_file(file_path, mimetype='video/mp4')
 
+@files_bp.route('/download_video/<filename>')
+def download_video(filename):
+    """下载视频文件（供外部预览/本地播放）。"""
+    if g.user is None:
+        abort(401)
+
+    if not allowed_file(filename, {'mp4', 'mov', 'webm', 'ogg', 'avi', 'mkv'}):
+        abort(400)
+
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER_CV'], filename)
+    if not os.path.exists(file_path):
+        abort(404)
+
+    return send_file(file_path, as_attachment=True)
+
+@files_bp.route('/simple_video_download/<filename>')
+def simple_video_download(filename):
+    """简化的视频下载（与 download_video 类似，用于模板备用链接）。"""
+    if g.user is None:
+        abort(401)
+
+    if not allowed_file(filename, {'mp4', 'mov', 'webm', 'ogg', 'avi', 'mkv'}):
+        abort(400)
+
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER_CV'], filename)
+    if not os.path.exists(file_path):
+        abort(404)
+
+    return send_file(file_path, as_attachment=True)
+
 @files_bp.route('/photo/<filename>')
 def serve_photo(filename):
     """提供头像图片"""
