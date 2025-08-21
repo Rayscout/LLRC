@@ -3,358 +3,877 @@
 {% block title %}候选人管理{% endblock %}
 
 {% block content %}
-<div class="hr-candidates">
-    <!-- 页面标题 -->
+<div class="candidates-management">
+    <!-- 页面标题和统计 -->
     <div class="page-header">
         <div class="header-content">
             <h1><i class="uil uil-users-alt"></i> 候选人管理</h1>
-            <p>管理所有候选人信息与状态</p>
+            <p>管理所有候选人信息、跟踪申请状态、安排面试</p>
         </div>
-        <div class="header-actions">
+        <div class="header-stats">
+            <div class="stat-item">
+                <div class="stat-number">{{ candidates|length }}</div>
+                <div class="stat-label">总候选人</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ candidates|selectattr('status', 'equalto', 'interview')|list|length }}</div>
+                <div class="stat-label">面试中</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ candidates|selectattr('status', 'equalto', 'offer')|list|length }}</div>
+                <div class="stat-label">已发Offer</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ candidates|selectattr('status', 'equalto', 'hired')|list|length }}</div>
+                <div class="stat-label">已入职</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 筛选和搜索工具栏 -->
+    <div class="toolbar">
+        <div class="search-section">
+            <div class="search-box">
+                <i class="uil uil-search"></i>
+                <input type="text" id="candidate-search" placeholder="搜索候选人姓名、邮箱或技能...">
+            </div>
+        </div>
+        
+        <div class="filters-section">
+            <div class="filter-group">
+                <label>状态筛选</label>
+                <select id="status-filter" class="filter-select">
+                    <option value="">所有状态</option>
+                    <option value="applied">已申请</option>
+                    <option value="screened">已筛选</option>
+                    <option value="interview">面试中</option>
+                    <option value="offer">已发Offer</option>
+                    <option value="hired">已入职</option>
+                    <option value="rejected">已拒绝</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>技能匹配度</label>
+                <select id="skills-filter" class="filter-select">
+                    <option value="">所有匹配度</option>
+                    <option value="90-100">90%以上</option>
+                    <option value="80-89">80-89%</option>
+                    <option value="70-79">70-79%</option>
+                    <option value="0-69">70%以下</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>工作经验</label>
+                <select id="experience-filter" class="filter-select">
+                    <option value="">所有经验</option>
+                    <option value="0-2">0-2年</option>
+                    <option value="3-5">3-5年</option>
+                    <option value="6-10">6-10年</option>
+                    <option value="10+">10年以上</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="actions-section">
             <button class="btn-secondary" onclick="exportCandidates()">
                 <i class="uil uil-export"></i> 导出数据
             </button>
-            <button class="btn-primary" onclick="addCandidate()">
-                <i class="uil uil-plus"></i> 添加候选人
+            <button class="btn-primary" onclick="bulkActions()">
+                <i class="uil uil-check-square"></i> 批量操作
             </button>
         </div>
     </div>
 
-    <!-- 筛选和搜索 -->
-    <div class="filters-section">
-        <div class="search-box">
-            <i class="uil uil-search"></i>
-            <input type="text" id="candidate-search" placeholder="搜索候选人姓名或技能...">
+    <!-- 候选人卡片网格 -->
+    <div class="candidates-grid" id="candidates-grid">
+        {% for candidate in candidates %}
+        <div class="candidate-card" data-id="{{ candidate.id }}" data-status="{{ candidate.status }}" data-skills="{{ candidate.skills_match }}" data-experience="{{ candidate.experience_years }}">
+            <!-- 卡片头部 -->
+            <div class="card-header">
+                <div class="candidate-avatar">
+                    {% if candidate.profile_photo %}
+                        <img src="{{ url_for('static', filename='uploads/photos/' + candidate.profile_photo) }}" alt="头像">
+                    {% else %}
+                        <div class="avatar-placeholder">
+                            {{ (candidate.first_name + ' ' + candidate.last_name)[0]|upper if candidate.first_name else 'U' }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="candidate-info">
+                    <h3 class="candidate-name">{{ candidate.first_name }} {{ candidate.last_name }}</h3>
+                    <p class="candidate-email">{{ candidate.email }}</p>
+                </div>
+                <div class="status-indicator">
+                    <span class="status-badge {{ candidate.status }}">
+                        {% if candidate.status == 'applied' %}已申请
+                        {% elif candidate.status == 'screened' %}已筛选
+                        {% elif candidate.status == 'interview' %}面试中
+                        {% elif candidate.status == 'offer' %}已发Offer
+                        {% elif candidate.status == 'hired' %}已入职
+                        {% elif candidate.status == 'rejected' %}已拒绝
+                        {% else %}{{ candidate.status }}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- 卡片内容 -->
+            <div class="card-content">
+                <div class="position-info">
+                    <i class="uil uil-briefcase"></i>
+                    <span>{{ candidate.position }}</span>
+                </div>
+                
+                <div class="skills-match">
+                    <div class="match-header">
+                        <span>技能匹配度</span>
+                        <span class="match-percentage">{{ candidate.skills_match }}%</span>
+                    </div>
+                    <div class="match-bar">
+                        <div class="match-fill" style="width: {{ candidate.skills_match }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="candidate-details">
+                    <div class="detail-item">
+                        <i class="uil uil-clock"></i>
+                        <span>{{ candidate.experience_years }}年经验</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="uil uil-graduation-cap"></i>
+                        <span>{{ candidate.education }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="uil uil-calendar-alt"></i>
+                        <span>{{ candidate.applied_date }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片操作 -->
+            <div class="card-actions">
+                <button class="btn-action primary" onclick="viewCandidate({{ candidate.id }})" title="查看详情">
+                    <i class="uil uil-eye"></i>
+                </button>
+                <button class="btn-action" onclick="editCandidate({{ candidate.id }})" title="编辑信息">
+                    <i class="uil uil-edit"></i>
+                </button>
+                <button class="btn-action" onclick="scheduleInterview({{ candidate.id }})" title="安排面试">
+                    <i class="uil uil-calendar-alt"></i>
+                </button>
+                <button class="btn-action" onclick="sendEmail({{ candidate.id }})" title="发送邮件">
+                    <i class="uil uil-envelope"></i>
+                </button>
+                <button class="btn-action" onclick="downloadCV({{ candidate.id }})" title="下载简历">
+                    <i class="uil uil-download-alt"></i>
+                </button>
+            </div>
         </div>
-        <div class="filter-controls">
-            <select id="status-filter" class="filter-select">
-                <option value="">所有状态</option>
-                <option value="applied">已申请</option>
-                <option value="screened">已筛选</option>
-                <option value="interview">面试中</option>
-                <option value="offer">已发Offer</option>
-                <option value="hired">已入职</option>
-                <option value="rejected">已拒绝</option>
-            </select>
-            <select id="position-filter" class="filter-select">
-                <option value="">所有职位</option>
-                <option value="software-engineer">软件工程师</option>
-                <option value="product-manager">产品经理</option>
-                <option value="designer">设计师</option>
-                <option value="marketing">市场营销</option>
-            </select>
-            <select id="experience-filter" class="filter-select">
-                <option value="">所有经验</option>
-                <option value="0-2">0-2年</option>
-                <option value="3-5">3-5年</option>
-                <option value="6-10">6-10年</option>
-                <option value="10+">10年以上</option>
-            </select>
-        </div>
+        {% endfor %}
     </div>
 
-    <!-- 候选人表格 -->
-    <div class="candidates-table-container">
-        <table class="candidates-table">
-            <thead>
-                <tr>
-                    <th>
-                        <input type="checkbox" id="select-all">
-                    </th>
-                    <th>候选人</th>
-                    <th>职位</th>
-                    <th>技能匹配度</th>
-                    <th>状态</th>
-                    <th>申请时间</th>
-                    <th>最后更新</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for candidate in candidates|default([]) %}
-                <tr class="candidate-row" data-id="{{ candidate.id }}">
-                    <td>
-                        <input type="checkbox" class="candidate-select" value="{{ candidate.id }}">
-                    </td>
-                    <td class="candidate-info">
-                        <div class="candidate-avatar">
-                            {% if candidate.profile_photo %}
-                                <img src="{{ url_for('static', filename='uploads/photos/' + candidate.profile_photo) }}" alt="头像">
-                            {% else %}
-                                <div class="avatar-placeholder">{{ (candidate.first_name + ' ' + candidate.last_name)[0]|upper }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="candidate-details">
-                            <div class="candidate-name">{{ candidate.first_name }} {{ candidate.last_name }}</div>
-                            <div class="candidate-email">{{ candidate.email }}</div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="position-tag">{{ candidate.position }}</span>
-                    </td>
-                    <td>
-                        <div class="skills-match">
-                            <div class="match-bar">
-                                <div class="match-fill" style="width: {{ candidate.skills_match }}%"></div>
-                            </div>
-                            <span class="match-percentage">{{ candidate.skills_match }}%</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="status-badge {{ candidate.status }}">
-                            {% if candidate.status == 'applied' %}已申请
-                            {% elif candidate.status == 'screened' %}已筛选
-                            {% elif candidate.status == 'interview' %}面试中
-                            {% elif candidate.status == 'offer' %}已发Offer
-                            {% elif candidate.status == 'hired' %}已入职
-                            {% elif candidate.status == 'rejected' %}已拒绝
-                            {% endif %}
-                        </span>
-                    </td>
-                    <td>{{ candidate.applied_date }}</td>
-                    <td>{{ candidate.last_updated }}</td>
-                    <td class="actions">
-                        <button class="btn-icon" onclick="viewCandidate({{ candidate.id }})" title="查看详情">
-                            <i class="uil uil-eye"></i>
-                        </button>
-                        <button class="btn-icon" onclick="editCandidate({{ candidate.id }})" title="编辑">
-                            <i class="uil uil-edit"></i>
-                        </button>
-                        <button class="btn-icon" onclick="scheduleInterview({{ candidate.id }})" title="安排面试">
-                            <i class="uil uil-calendar-alt"></i>
-                        </button>
-                        <button class="btn-icon" onclick="sendEmail({{ candidate.id }})" title="发送邮件">
-                            <i class="uil uil-envelope"></i>
-                        </button>
-                    </td>
-                </tr>
-                {% else %}
-                <!-- 默认候选人数据 -->
-                <tr class="candidate-row" data-id="1">
-                    <td><input type="checkbox" class="candidate-select" value="1"></td>
-                    <td class="candidate-info">
-                        <div class="candidate-avatar">
-                            <div class="avatar-placeholder">张</div>
-                        </div>
-                        <div class="candidate-details">
-                            <div class="candidate-name">张三</div>
-                            <div class="candidate-email">zhangsan@email.com</div>
-                        </div>
-                    </td>
-                    <td><span class="position-tag">高级软件工程师</span></td>
-                    <td>
-                        <div class="skills-match">
-                            <div class="match-bar">
-                                <div class="match-fill" style="width: 85%"></div>
-                            </div>
-                            <span class="match-percentage">85%</span>
-                        </div>
-                    </td>
-                    <td><span class="status-badge interview">面试中</span></td>
-                    <td>2024-01-15</td>
-                    <td>2024-01-20</td>
-                    <td class="actions">
-                        <button class="btn-icon" onclick="viewCandidate(1)" title="查看详情">
-                            <i class="uil uil-eye"></i>
-                        </button>
-                        <button class="btn-icon" onclick="editCandidate(1)" title="编辑">
-                            <i class="uil uil-edit"></i>
-                        </button>
-                        <button class="btn-icon" onclick="scheduleInterview(1)" title="安排面试">
-                            <i class="uil uil-calendar-alt"></i>
-                        </button>
-                        <button class="btn-icon" onclick="sendEmail(1)" title="发送邮件">
-                            <i class="uil uil-envelope"></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr class="candidate-row" data-id="2">
-                    <td><input type="checkbox" class="candidate-select" value="2"></td>
-                    <td class="candidate-info">
-                        <div class="candidate-avatar">
-                            <div class="avatar-placeholder">李</div>
-                        </div>
-                        <div class="candidate-details">
-                            <div class="candidate-name">李四</div>
-                            <div class="candidate-email">lisi@email.com</div>
-                        </div>
-                    </td>
-                    <td><span class="position-tag">产品经理</span></td>
-                    <td>
-                        <div class="skills-match">
-                            <div class="match-bar">
-                                <div class="match-fill" style="width: 92%"></div>
-                            </div>
-                            <span class="match-percentage">92%</span>
-                        </div>
-                    </td>
-                    <td><span class="status-badge offer">已发Offer</span></td>
-                    <td>2024-01-10</td>
-                    <td>2024-01-18</td>
-                    <td class="actions">
-                        <button class="btn-icon" onclick="viewCandidate(2)" title="查看详情">
-                            <i class="uil uil-eye"></i>
-                        </button>
-                        <button class="btn-icon" onclick="editCandidate(2)" title="编辑">
-                            <i class="uil uil-edit"></i>
-                        </button>
-                        <button class="btn-icon" onclick="scheduleInterview(2)" title="安排面试">
-                            <i class="uil uil-calendar-alt"></i>
-                        </button>
-                        <button class="btn-icon" onclick="sendEmail(2)" title="发送邮件">
-                            <i class="uil uil-envelope"></i>
-                        </button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- 空状态 -->
+    <div class="empty-state" id="empty-state" style="display: none;">
+        <div class="empty-icon">
+            <i class="uil uil-users-alt"></i>
+        </div>
+        <h3>暂无候选人</h3>
+        <p>当前没有找到符合条件的候选人，请尝试调整筛选条件</p>
+        <button class="btn-primary" onclick="resetFilters()">
+            <i class="uil uil-refresh"></i> 重置筛选
+        </button>
     </div>
 
-    <!-- 分页 -->
-    <div class="pagination">
-        <button class="btn-page" onclick="previousPage()">
-            <i class="uil uil-angle-left"></i> 上一页
-        </button>
-        <div class="page-numbers">
-            <span class="page-number active">1</span>
-            <span class="page-number">2</span>
-            <span class="page-number">3</span>
-            <span class="page-dots">...</span>
-            <span class="page-number">10</span>
+    <!-- 分页控件 -->
+    <div class="pagination" id="pagination">
+        <div class="pagination-info">
+            <span>显示 1-{{ candidates|length }} 条，共 {{ candidates|length }} 条记录</span>
         </div>
-        <button class="btn-page" onclick="nextPage()">
-            下一页 <i class="uil uil-angle-right"></i>
-        </button>
+        <div class="pagination-controls">
+            <button class="btn-page" onclick="previousPage()" disabled>
+                <i class="uil uil-angle-left"></i> 上一页
+            </button>
+            <div class="page-numbers">
+                <span class="page-number active">1</span>
+            </div>
+            <button class="btn-page" onclick="nextPage()" disabled>
+                下一页 <i class="uil uil-angle-right"></i>
+            </button>
+        </div>
     </div>
 </div>
 
-<!-- 候选人详情侧边栏 -->
-<div id="candidate-sidebar" class="candidate-sidebar">
-    <div class="sidebar-header">
-        <h3>候选人详情</h3>
-        <button class="btn-close" onclick="closeSidebar()">
-            <i class="uil uil-times"></i>
-        </button>
+<!-- 候选人详情模态框 -->
+<div id="candidate-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>候选人详情</h3>
+            <button class="modal-close" onclick="closeModal()">
+                <i class="uil uil-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <!-- 动态加载候选人详情 -->
+        </div>
     </div>
-    <div class="sidebar-content">
-        <div class="candidate-profile">
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <div class="avatar-placeholder">张</div>
-                </div>
-                <div class="profile-info">
-                    <h4>张三</h4>
-                    <p>高级软件工程师</p>
-                    <span class="status-badge interview">面试中</span>
-                </div>
-            </div>
-            
-            <div class="profile-section">
-                <h5>基本信息</h5>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>邮箱</label>
-                        <span>zhangsan@email.com</span>
-                    </div>
-                    <div class="info-item">
-                        <label>电话</label>
-                        <span>138****8888</span>
-                    </div>
-                    <div class="info-item">
-                        <label>工作经验</label>
-                        <span>5年</span>
-                    </div>
-                    <div class="info-item">
-                        <label>学历</label>
-                        <span>本科</span>
-                    </div>
-                </div>
-            </div>
+</div>
 
-            <div class="profile-section">
-                <h5>技能匹配</h5>
-                <div class="skills-radar">
-                    <div class="skill-item">
-                        <span class="skill-name">Java</span>
-                        <div class="skill-bar">
-                            <div class="skill-fill" style="width: 90%"></div>
-                        </div>
-                        <span class="skill-score">90%</span>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">Spring Boot</span>
-                        <div class="skill-bar">
-                            <div class="skill-fill" style="width: 85%"></div>
-                        </div>
-                        <span class="skill-score">85%</span>
-                    </div>
-                    <div class="skill-item">
-                        <span class="skill-name">MySQL</span>
-                        <div class="skill-bar">
-                            <div class="skill-fill" style="width: 80%"></div>
-                        </div>
-                        <span class="skill-score">80%</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="profile-section">
-                <h5>面试记录</h5>
-                <div class="interview-notes">
-                    <div class="note-item">
-                        <div class="note-header">
-                            <span class="note-date">2024-01-20</span>
-                            <span class="note-interviewer">面试官：王经理</span>
-                        </div>
-                        <div class="note-content">
-                            技术能力优秀，沟通表达清晰，建议进入下一轮面试。
-                        </div>
-                    </div>
-                </div>
+<!-- 批量操作模态框 -->
+<div id="bulk-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>批量操作</h3>
+            <button class="modal-close" onclick="closeBulkModal()">
+                <i class="uil uil-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="bulk-actions">
+                <button class="btn-action-bulk" onclick="bulkScheduleInterview()">
+                    <i class="uil uil-calendar-alt"></i> 批量安排面试
+                </button>
+                <button class="btn-action-bulk" onclick="bulkSendEmail()">
+                    <i class="uil uil-envelope"></i> 批量发送邮件
+                </button>
+                <button class="btn-action-bulk" onclick="bulkExport()">
+                    <i class="uil uil-export"></i> 批量导出
+                </button>
+                <button class="btn-action-bulk danger" onclick="bulkReject()">
+                    <i class="uil uil-times"></i> 批量拒绝
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.candidates-management {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 页面标题和统计 */
+.page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+}
+
+.header-content h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-content p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.header-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* 工具栏 */
+.toolbar {
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+}
+
+.search-section {
+    flex: 1;
+    min-width: 300px;
+}
+
+.search-box {
+    position: relative;
+    width: 100%;
+}
+
+.search-box i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 12px 16px 12px 45px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.filters-section {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-group label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+}
+
+.actions-section {
+    display: flex;
+    gap: 12px;
+}
+
+/* 候选人卡片网格 */
+.candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.candidate-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.candidate-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border-color: #667eea;
+}
+
+.card-header {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.candidate-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.candidate-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.candidate-info {
+    flex: 1;
+}
+
+.candidate-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+}
+
+.candidate-email {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.status-indicator {
+    flex-shrink: 0;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-badge.applied { background: #dbeafe; color: #1d4ed8; }
+.status-badge.screened { background: #fef3c7; color: #d97706; }
+.status-badge.interview { background: #d1fae5; color: #059669; }
+.status-badge.offer { background: #e0e7ff; color: #7c3aed; }
+.status-badge.hired { background: #dcfce7; color: #16a34a; }
+.status-badge.rejected { background: #fee2e2; color: #dc2626; }
+
+.card-content {
+    padding: 20px;
+}
+
+.position-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.skills-match {
+    margin-bottom: 20px;
+}
+
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.match-percentage {
+    font-weight: 600;
+    color: #059669;
+}
+
+.match-bar {
+    width: 100%;
+    height: 8px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.match-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981, #059669);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.candidate-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.detail-item i {
+    color: #9ca3af;
+}
+
+.card-actions {
+    padding: 20px;
+    background: #f9fafb;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background: white;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+}
+
+.btn-action:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-action.primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-action.primary:hover {
+    background: #5a67d8;
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+.empty-icon {
+    font-size: 64px;
+    color: #d1d5db;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #374151;
+}
+
+.empty-state p {
+    margin-bottom: 25px;
+}
+
+/* 分页 */
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.pagination-info {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-page {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-page:hover:not(:disabled) {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.btn-page:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 5px;
+}
+
+.page-number {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    background: white;
+    color: #374151;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 36px;
+    text-align: center;
+}
+
+.page-number:hover {
+    background: #f3f4f6;
+}
+
+.page-number.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* 模态框 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #1f2937;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.modal-body {
+    padding: 25px;
+}
+
+/* 批量操作 */
+.bulk-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.btn-action-bulk {
+    padding: 15px 20px;
+    border: none;
+    border-radius: 12px;
+    background: #f3f4f6;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.btn-action-bulk:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+}
+
+.btn-action-bulk.danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-action-bulk.danger:hover {
+    background: #fecaca;
+}
+
+/* 按钮样式 */
+.btn-primary, .btn-secondary {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #d1d5db;
+    transform: translateY(-2px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .candidates-management {
+        padding: 15px;
+    }
+    
+    .page-header {
+        padding: 20px;
+    }
+    
+    .header-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-section {
+        min-width: auto;
+    }
+    
+    .filters-section {
+        justify-content: center;
+    }
+    
+    .candidates-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pagination {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // 搜索功能
     const searchInput = document.getElementById('candidate-search');
     searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
         filterCandidates();
     });
 
     // 筛选功能
-    const filters = ['status-filter', 'position-filter', 'experience-filter'];
+    const filters = ['status-filter', 'skills-filter', 'experience-filter'];
     filters.forEach(filterId => {
         document.getElementById(filterId).addEventListener('change', filterCandidates);
-    });
-
-    // 全选功能
-    const selectAll = document.getElementById('select-all');
-    selectAll.addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('.candidate-select');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
     });
 });
 
 function filterCandidates() {
     const searchTerm = document.getElementById('candidate-search').value.toLowerCase();
     const statusFilter = document.getElementById('status-filter').value;
-    const positionFilter = document.getElementById('position-filter').value;
+    const skillsFilter = document.getElementById('skills-filter').value;
     const experienceFilter = document.getElementById('experience-filter').value;
 
-    const rows = document.querySelectorAll('.candidate-row');
+    const cards = document.querySelectorAll('.candidate-card');
+    let visibleCount = 0;
     
-    rows.forEach(row => {
-        const name = row.querySelector('.candidate-name').textContent.toLowerCase();
-        const email = row.querySelector('.candidate-email').textContent.toLowerCase();
-        const position = row.querySelector('.position-tag').textContent;
-        const status = row.querySelector('.status-badge').classList[1];
+    cards.forEach(card => {
+        const name = card.querySelector('.candidate-name').textContent.toLowerCase();
+        const email = card.querySelector('.candidate-email').textContent.toLowerCase();
+        const status = card.dataset.status;
+        const skills = parseInt(card.dataset.skills);
+        const experience = parseInt(card.dataset.experience);
 
         let show = true;
 
@@ -368,21 +887,47 @@ function filterCandidates() {
             show = false;
         }
 
-        // 职位过滤
-        if (positionFilter && position !== positionFilter) {
-            show = false;
+        // 技能匹配度过滤
+        if (skillsFilter) {
+            const [min, max] = skillsFilter.split('-').map(Number);
+            if (max && (skills < min || skills > max)) {
+                show = false;
+            } else if (!max && skills < min) {
+                show = false;
+            }
         }
 
-        row.style.display = show ? 'table-row' : 'none';
+        // 工作经验过滤
+        if (experienceFilter) {
+            const [min, max] = experienceFilter.split('-').map(Number);
+            if (max && (experience < min || experience > max)) {
+                show = false;
+            } else if (!max && experience < min) {
+                show = false;
+            }
+        }
+
+        card.style.display = show ? 'block' : 'none';
+        if (show) visibleCount++;
     });
+
+    // 显示/隐藏空状态
+    const emptyState = document.getElementById('empty-state');
+    const candidatesGrid = document.getElementById('candidates-grid');
+    
+    if (visibleCount === 0) {
+        emptyState.style.display = 'block';
+        candidatesGrid.style.display = 'none';
+    } else {
+        emptyState.style.display = 'none';
+        candidatesGrid.style.display = 'grid';
+    }
 }
 
 function viewCandidate(id) {
-    document.getElementById('candidate-sidebar').classList.add('active');
-}
-
-function closeSidebar() {
-    document.getElementById('candidate-sidebar').classList.remove('active');
+    // 这里可以实现查看候选人详情的功能
+    console.log('查看候选人:', id);
+    // 可以打开模态框显示详细信息
 }
 
 function editCandidate(id) {
@@ -401,9 +946,52 @@ function sendEmail(id) {
     // 实现邮件发送功能
 }
 
+function downloadCV(id) {
+    console.log('下载简历:', id);
+    // 实现简历下载功能
+}
+
 function exportCandidates() {
     console.log('导出候选人数据');
     // 实现导出功能
+}
+
+function bulkActions() {
+    document.getElementById('bulk-modal').style.display = 'block';
+}
+
+function closeBulkModal() {
+    document.getElementById('bulk-modal').style.display = 'none';
+}
+
+function bulkScheduleInterview() {
+    console.log('批量安排面试');
+    closeBulkModal();
+}
+
+function bulkSendEmail() {
+    console.log('批量发送邮件');
+    closeBulkModal();
+}
+
+function bulkExport() {
+    console.log('批量导出');
+    closeBulkModal();
+}
+
+function bulkReject() {
+    if (confirm('确定要批量拒绝选中的候选人吗？此操作不可撤销。')) {
+        console.log('批量拒绝');
+        closeBulkModal();
+    }
+}
+
+function resetFilters() {
+    document.getElementById('candidate-search').value = '';
+    document.getElementById('status-filter').value = '';
+    document.getElementById('skills-filter').value = '';
+    document.getElementById('experience-filter').value = '';
+    filterCandidates();
 }
 
 function previousPage() {
@@ -414,6 +1002,16 @@ function previousPage() {
 function nextPage() {
     console.log('下一页');
     // 实现分页功能
+}
+
+// 点击模态框外部关闭
+window.onclick = function(event) {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 }
 </script>
 {% endblock %}

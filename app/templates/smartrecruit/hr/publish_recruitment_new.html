@@ -1,85 +1,400 @@
 {% extends 'base.html' %}
 
-{% block title %}发布招聘{% endblock %}
+{% block title %}{{ '编辑招聘启事' if is_edit else '发布招聘启事' }}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2>{{ '编辑招聘启事' if is_edit else '发布招聘启事' }}</h2>
-    <form method="POST">
-        <div class="form-group">
-            <label>职位标题</label>
-            <input type="text" class="form-control" name="title" value="{{ job.title if job else '' }}" required>
+<div class="publish-job-container">
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1><i class="uil uil-briefcase"></i> {{ '编辑招聘启事' if is_edit else '发布招聘启事' }}</h1>
+            <p>{{ '修改现有职位信息' if is_edit else '创建新的招聘职位，吸引优秀人才' }}</p>
         </div>
-        <div class="form-group">
-            <label>工作地点</label>
-            <input type="text" class="form-control" name="location" value="{{ job.location if job else '' }}" required>
+        <div class="header-actions">
+            <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="btn-secondary">
+                <i class="uil uil-arrow-left"></i> 返回职位列表
+            </a>
         </div>
-        <div class="form-group">
-            <label>职位描述</label>
-            <textarea class="form-control" name="description" rows="6" required>{{ job.description if job else '' }}</textarea>
-        </div>
-        <div class="form-group">
-            <label>薪资</label>
-            <input type="text" class="form-control" name="salary" value="{{ job.salary if job else '' }}" required>
-        </div>
-        <div class="row">
-            <div class="col">
-                <label>招聘人数</label>
-                <input type="number" class="form-control" name="positions_needed" value="{{ job.positions_needed if job else 1 }}">
+    </div>
+
+    <!-- 表单容器 -->
+    <div class="form-container">
+        <form method="POST" class="job-form">
+            <!-- 基本信息 -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="uil uil-info-circle"></i> 基本信息
+                </h3>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="title">职位标题 <span class="required">*</span></label>
+                        <input type="text" id="title" name="title" value="{{ job.title if job else '' }}" 
+                               placeholder="例如：高级前端开发工程师" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">工作地点 <span class="required">*</span></label>
+                        <input type="text" id="location" name="location" value="{{ job.location if job else '' }}" 
+                               placeholder="例如：北京、上海、远程" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="salary">薪资范围 <span class="required">*</span></label>
+                        <input type="text" id="salary" name="salary" value="{{ job.salary if job else '' }}" 
+                               placeholder="例如：15k-25k" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="positions_needed">招聘人数</label>
+                        <input type="number" id="positions_needed" name="positions_needed" 
+                               value="{{ job.positions_needed if job else 1 }}" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="job_type">工作类型</label>
+                        <select id="job_type" name="job_type">
+                            <option value="">请选择</option>
+                            <option value="全职" {{ 'selected' if job and job.job_type == '全职' else '' }}>全职</option>
+                            <option value="兼职" {{ 'selected' if job and job.job_type == '兼职' else '' }}>兼职</option>
+                            <option value="实习" {{ 'selected' if job and job.job_type == '实习' else '' }}>实习</option>
+                            <option value="远程" {{ 'selected' if job and job.job_type == '远程' else '' }}>远程</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="department">所属部门</label>
+                        <input type="text" id="department" name="department" value="{{ job.department if job else '' }}" 
+                               placeholder="例如：技术部、产品部">
+                    </div>
+                </div>
             </div>
-            <div class="col">
-                <label>最小年龄</label>
-                <input type="number" class="form-control" name="min_age" value="{{ job.min_age if job else '' }}">
+
+            <!-- 职位描述 -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="uil uil-file-text"></i> 职位描述
+                </h3>
+                <div class="form-group full-width">
+                    <label for="description">详细描述 <span class="required">*</span></label>
+                    <textarea id="description" name="description" rows="8" 
+                              placeholder="请详细描述职位职责、工作内容、团队情况等..." required>{{ job.description if job else '' }}</textarea>
+                </div>
             </div>
-            <div class="col">
-                <label>最大年龄</label>
-                <input type="number" class="form-control" name="max_age" value="{{ job.max_age if job else '' }}">
+
+            <!-- 任职要求 -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="uil uil-user-check"></i> 任职要求
+                </h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="education_requirement">学历要求</label>
+                        <select id="education_requirement" name="education_requirement">
+                            <option value="">不限</option>
+                            <option value="高中" {{ 'selected' if job and job.education_requirement == '高中' else '' }}>高中</option>
+                            <option value="大专" {{ 'selected' if job and job.education_requirement == '大专' else '' }}>大专</option>
+                            <option value="本科" {{ 'selected' if job and job.education_requirement == '本科' else '' }}>本科</option>
+                            <option value="硕士" {{ 'selected' if job and job.education_requirement == '硕士' else '' }}>硕士</option>
+                            <option value="博士" {{ 'selected' if job and job.education_requirement == '博士' else '' }}>博士</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="experience_years">工作经验（年）</label>
+                        <input type="number" id="experience_years" name="experience_years" 
+                               value="{{ job.experience_years if job else '' }}" min="0" max="50" 
+                               placeholder="例如：3">
+                    </div>
+                    <div class="form-group">
+                        <label for="min_age">最小年龄</label>
+                        <input type="number" id="min_age" name="min_age" value="{{ job.min_age if job else '' }}" 
+                               min="16" max="70" placeholder="例如：22">
+                    </div>
+                    <div class="form-group">
+                        <label for="max_age">最大年龄</label>
+                        <input type="number" id="max_age" name="max_age" value="{{ job.max_age if job else '' }}" 
+                               min="16" max="70" placeholder="例如：35">
+                    </div>
+                </div>
+                <div class="form-group full-width">
+                    <label for="skills_required">技能要求</label>
+                    <textarea id="skills_required" name="skills_required" rows="4" 
+                              placeholder="请列出所需的技能、工具、证书等...">{{ job.skills_required if job else '' }}</textarea>
+                </div>
             </div>
-        </div>
-        <div class="form-group">
-            <label>学历要求</label>
-            <input type="text" class="form-control" name="education_requirement" value="{{ job.education_requirement if job else '' }}">
-        </div>
-        <div class="form-group">
-            <label>工作经验（年）</label>
-            <input type="number" class="form-control" name="experience_years" value="{{ job.experience_years if job else '' }}">
-        </div>
-        <div class="form-group">
-            <label>技能要求</label>
-            <textarea class="form-control" name="skills_required" rows="3">{{ job.skills_required if job else '' }}</textarea>
-        </div>
-        <div class="form-group">
-            <label>福利待遇</label>
-            <textarea class="form-control" name="benefits" rows="3">{{ job.benefits if job else '' }}</textarea>
-        </div>
-        <div class="row">
-            <div class="col">
-                <label>联系邮箱</label>
-                <input type="email" class="form-control" name="contact_email" value="{{ job.contact_email if job else '' }}">
+
+            <!-- 福利待遇 -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="uil uil-gift"></i> 福利待遇
+                </h3>
+                <div class="form-group full-width">
+                    <label for="benefits">福利说明</label>
+                    <textarea id="benefits" name="benefits" rows="4" 
+                              placeholder="请描述公司提供的福利待遇，如五险一金、年终奖、培训机会等...">{{ job.benefits if job else '' }}</textarea>
+                </div>
             </div>
-            <div class="col">
-                <label>联系电话</label>
-                <input type="text" class="form-control" name="contact_phone" value="{{ job.contact_phone if job else '' }}">
+
+            <!-- 联系方式 -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="uil uil-phone"></i> 联系方式
+                </h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="contact_email">联系邮箱</label>
+                        <input type="email" id="contact_email" name="contact_email" 
+                               value="{{ job.contact_email if job else '' }}" 
+                               placeholder="hr@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact_phone">联系电话</label>
+                        <input type="tel" id="contact_phone" name="contact_phone" 
+                               value="{{ job.contact_phone if job else '' }}" 
+                               placeholder="13800138000">
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <label>申请截止日期</label>
-                <input type="date" class="form-control" name="application_deadline" value="{{ job.application_deadline.strftime('%Y-%m-%d') if job and job.application_deadline else '' }}">
+
+            <!-- 申请截止 -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="uil uil-calendar-alt"></i> 申请截止
+                </h3>
+                <div class="form-group">
+                    <label for="application_deadline">申请截止日期</label>
+                    <input type="date" id="application_deadline" name="application_deadline" 
+                           value="{{ job.application_deadline.strftime('%Y-%m-%d') if job and job.application_deadline else '' }}" 
+                           min="{{ today }}">
+                </div>
             </div>
-            <div class="col">
-                <label>工作类型</label>
-                <input type="text" class="form-control" name="job_type" value="{{ job.job_type if job else '' }}">
+
+            <!-- 提交按钮 -->
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    <i class="uil {{ 'uil-edit' if is_edit else 'uil-plus' }}"></i>
+                    {{ '保存修改' if is_edit else '发布职位' }}
+                </button>
+                <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="btn-secondary">
+                    <i class="uil uil-times"></i> 取消
+                </a>
             </div>
-            <div class="col">
-                <label>所属部门</label>
-                <input type="text" class="form-control" name="department" value="{{ job.department if job else '' }}">
-            </div>
-        </div>
-        <div class="mt-3">
-            <button type="submit" class="btn btn-primary">{{ '保存修改' if is_edit else '发布' }}</button>
-            <a class="btn btn-secondary" href="/smartrecruit/hr/recruitment/my_jobs">返回</a>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
+
+<style>
+.publish-job-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-content p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.header-actions .btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.header-actions .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.form-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.form-section {
+    padding: 30px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.required {
+    color: #e53e3e;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s;
+    background: #f8fafc;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-actions {
+    padding: 30px;
+    background: #f8fafc;
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e0;
+    transform: translateY(-2px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+// 设置最小日期为今天
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    const deadlineInput = document.getElementById('application_deadline');
+    if (deadlineInput) {
+        deadlineInput.min = today;
+    }
+    
+    // 表单验证
+    const form = document.querySelector('.job-form');
+    form.addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const location = document.getElementById('location').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const salary = document.getElementById('salary').value.trim();
+        
+        if (!title || !location || !description || !salary) {
+            e.preventDefault();
+            alert('请填写所有必填字段！');
+            return false;
+        }
+    });
+});
+</script>
 {% endblock %}
