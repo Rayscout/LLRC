@@ -1,14 +1,97 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, g, current_app, jsonify
+from werkzeug.utils import secure_filename
 import os
 import logging
 from app.models import Job, Application, db
+<<<<<<< HEAD
 from werkzeug.utils import secure_filename
 from app.utils import allowed_file
 from app.utils import evaluate_cv, generate_interview_questions, generate_feedback, extract_text_from_resume, extract_text_from_file
+=======
+from app.utils import evaluate_cv, generate_interview_questions, generate_feedback, extract_text_from_resume, extract_text_from_file, allowed_file, get_allowed_cv_extensions
+>>>>>>> ae344f88704721d586b7c36196f93ddbd0c72d7e
 from app import applications_collection
 from datetime import datetime
 
 applications_bp = Blueprint('applications', __name__, url_prefix='/applications')
+
+@applications_bp.route('/pre_apply/<int:job_id>', methods=['GET', 'POST'])
+def pre_apply(job_id):
+    """预申请：若有简历则直接申请；否则提供上传界面"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    job = Job.query.get_or_404(job_id)
+
+    # 已有简历，直接进入申请流程
+    if getattr(g.user, 'cv_file', None):
+        return redirect(url_for('smartrecruit.candidate.applications.apply', job_id=job_id))
+
+    if request.method == 'POST':
+        file = request.files.get('cv_file')
+        if not file or not file.filename:
+            flash('请选择简历文件。', 'danger')
+            return redirect(url_for('smartrecruit.candidate.applications.pre_apply', job_id=job_id))
+
+        allowed_extensions = get_allowed_cv_extensions()
+        if not allowed_file(file.filename, allowed_extensions):
+            flash(f'不支持的文件格式。支持：{", ".join(allowed_extensions)}', 'danger')
+            return redirect(url_for('smartrecruit.candidate.applications.pre_apply', job_id=job_id))
+
+        try:
+            filename = secure_filename(file.filename)
+            upload_path = current_app.config['UPLOAD_FOLDER_CV']
+            filepath = os.path.join(upload_path, filename)
+            os.makedirs(upload_path, exist_ok=True)
+            file.save(filepath)
+
+            ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+            video_exts = {'mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'}
+
+            cv_data = None
+            if ext not in video_exts:
+                try:
+                    file.stream.seek(0)
+                    cv_data = file.read()
+                except Exception:
+                    cv_data = None
+
+            g.user.cv_file = filename
+            g.user.cv_data = cv_data
+            db.session.commit()
+
+            flash('简历上传成功！', 'success')
+            return redirect(url_for('smartrecruit.candidate.applications.apply', job_id=job_id))
+        except Exception as e:
+            current_app.logger.error(f'上传简历失败: {e}')
+            flash('上传简历失败，请稍后重试。', 'danger')
+            return redirect(url_for('smartrecruit.candidate.applications.pre_apply', job_id=job_id))
+
+    return render_template('smartrecruit/candidate/upload_resume_apply.html', job=job)
+
+@applications_bp.route('/withdraw/<int:application_id>', methods=['POST'])
+def withdraw_application(application_id):
+    """撤销申请：仅允许撤销本人申请，状态改为 Withdrawn"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    app_rec = Application.query.filter_by(id=application_id, user_id=g.user.id).first()
+    if not app_rec:
+        flash('未找到该申请或无权限。', 'danger')
+        return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
+
+    try:
+        app_rec.status = 'Withdrawn'
+        app_rec.message = '用户已撤销申请'
+        db.session.commit()
+        flash('已撤销该申请。', 'success')
+    except Exception as e:
+        logging.error(f"撤销申请失败: {e}")
+        flash('撤销失败，请稍后重试。', 'danger')
+
+    return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
 
 @applications_bp.route('/virtual_interview', methods=['GET'])
 def virtual_interview():
@@ -37,6 +120,7 @@ def apply(job_id):
 
     job = Job.query.get_or_404(job_id)
 
+<<<<<<< HEAD
     # 重复申请拦截
     existing_application_sqlite = Application.query.filter_by(user_id=g.user.id, job_id=job_id).first()
     if existing_application_sqlite:
@@ -101,6 +185,22 @@ def apply(job_id):
             })
         except Exception:
             pass
+=======
+    # 确保在“我的申请”里出现：若不存在则创建待处理记录
+    existing_application_sqlite = Application.query.filter_by(user_id=g.user.id, job_id=job_id).first()
+    if not existing_application_sqlite:
+        try:
+            pending_app = Application(
+                user_id=g.user.id,
+                job_id=job_id,
+                status='Pending',
+                message='已提交申请，待面试'
+            )
+            db.session.add(pending_app)
+            db.session.commit()
+        except Exception as e:
+            logging.warning(f"创建待处理申请失败: {e}")
+>>>>>>> ae344f88704721d586b7c36196f93ddbd0c72d7e
 
         flash('申请已提交！', 'success')
         return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
@@ -110,6 +210,34 @@ def apply(job_id):
         flash('保存申请失败，请稍后重试。', 'danger')
         return redirect(url_for('smartrecruit.candidate.jobs.job_detail', job_id=job_id))
 
+<<<<<<< HEAD
+=======
+    # 评估简历匹配度
+    match, similarity_score = evaluate_cv(text, job.description)
+    if not match:
+        # 更新申请为不匹配
+        try:
+            app_rec = Application.query.filter_by(user_id=g.user.id, job_id=job_id).first()
+            if app_rec:
+                app_rec.status = 'Rejected'
+                app_rec.message = f'简历不匹配，相似度：{similarity_score:.2f}%'
+                db.session.commit()
+        except Exception as e:
+            logging.warning(f"更新不匹配状态失败: {e}")
+        flash(f'你的简历与职位要求不匹配。相似度：{similarity_score:.2f}', 'error')
+        return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
+
+    # 生成面试问题
+    questions = generate_interview_questions(text, job.description)
+    session['questions'] = questions
+    session['current_question'] = 0
+    session['responses'] = {}
+    session['job_id'] = job_id
+    session['similarity_score'] = similarity_score
+
+    return redirect(url_for('smartrecruit.candidate.applications.interview_questions'))
+
+>>>>>>> ae344f88704721d586b7c36196f93ddbd0c72d7e
 @applications_bp.route('/interview_questions', methods=['GET', 'POST'])
 def interview_questions():
     """面试问题页面"""
@@ -187,14 +315,19 @@ def generate_feedbacks():
 
     # 保存到数据库
     try:
-        # SQLite
-        application = Application(
-            user_id=g.user.id,
-            job_id=job_id,
-            status='completed',
-            message=f'相似度: {similarity_score:.2f}%, 面试得分: {final_score:.1f}%'
-        )
-        db.session.add(application)
+        # SQLite：若已存在待处理，则更新；否则创建
+        application = Application.query.filter_by(user_id=g.user.id, job_id=job_id).first()
+        if application:
+            application.status = 'Completed'
+            application.message = f'相似度: {similarity_score:.2f}%, 面试得分: {final_score:.1f}%'
+        else:
+            application = Application(
+                user_id=g.user.id,
+                job_id=job_id,
+                status='Completed',
+                message=f'相似度: {similarity_score:.2f}%, 面试得分: {final_score:.1f}%'
+            )
+            db.session.add(application)
         db.session.commit()
         
         # MongoDB (可选)

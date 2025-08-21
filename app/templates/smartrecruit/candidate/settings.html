@@ -3,9 +3,14 @@
 {% block title %}设置{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <i class="uil uil-settings icon"></i>
-    <h1 class="page-title">账户设置</h1>
+<div class="page-header" style="background: linear-gradient(135deg,#667eea 0%, #764ba2 100%); color:#fff;">
+    <i class="uil uil-setting icon" style="color:#fff;"></i>
+    <h1 class="page-title" style="color:#fff;">账户设置</h1>
+    <div style="margin-left:auto; display:flex; gap:8px;">
+        <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="btn" style="background:#ffffff22; color:#fff; border:1px solid #ffffff44;">去找职位</a>
+        <a href="{{ url_for('smartrecruit.candidate.profile.career_path') }}" class="btn" style="background:#ffffff22; color:#fff; border:1px solid #ffffff44;">职业与技能</a>
+    </div>
+    
 </div>
 
 <div class="settings-container">
@@ -233,6 +238,9 @@
                 <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download>下载当前简历</a>
             {% endif %}
         </div>
+        <form action="{{ url_for('smartrecruit.candidate.profile.settings') }}" method="post" onsubmit="return confirm('确定要删除当前简历吗？此操作不可恢复。');" style="margin-top:10px;">
+            <button type="submit" name="delete_cv" class="btn btn-danger">删除简历</button>
+        </form>
         {% endif %}
     </div>
 </div>
@@ -344,21 +352,21 @@
 }
 
 .settings-section button {
-    background-color: #007bff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: #fff;
     border: none;
     padding: 12px 20px;
-    border-radius: 5px;
+    border-radius: 10px;
     font-size: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform .2s ease, box-shadow .2s ease;
     margin-top: 10px;
+    box-shadow: 0 6px 16px rgba(102,126,234,.25);
 }
 
 .settings-section button:hover {
-    background-color: #0056b3;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 22px rgba(118,75,162,.25);
 }
 
 /* CV Display Styling */

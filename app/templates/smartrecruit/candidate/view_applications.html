@@ -141,6 +141,7 @@
             {% for item in applications %}
             <tr>
                 <td>{{ item.job.title }}</td>
+<<<<<<< HEAD
                 <td>{{ item.job.company_name }}</td>
                 <td>{{ item.job.location }}</td>
                 <td>{{ item.application.timestamp.strftime('%Y-%m-%d %H:%M') if item.application.timestamp else '' }}</td>
@@ -148,6 +149,16 @@
                 <td>
                     <a class="view-details-button" href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=item.job.id) }}">查看职位</a>
                     <button type="button" class="view-details-button withdraw-btn" data-app-id="{{ item.application.id }}" style="margin-left:8px;">撤销申请</button>
+=======
+                <td>{{ item.application.timestamp.strftime('%Y-%m-%d %H:%M') if item.application.timestamp else '' }}</td>
+                <td>
+                    {{ item.application.status }}
+                    {% if item.application.status not in ['Withdrawn'] %}
+                    <form method="post" action="{{ url_for('smartrecruit.candidate.applications.withdraw_application', application_id=item.application.id) }}" style="display:inline; margin-left:10px;" onsubmit="return confirm('确认撤销该申请？');">
+                        <button type="submit" class="view-details-button" style="background:#e11d48; border-color:#e11d48;">撤销申请</button>
+                    </form>
+                    {% endif %}
+>>>>>>> ae344f88704721d586b7c36196f93ddbd0c72d7e
                 </td>
             </tr>
             {% endfor %}
