@@ -14,3 +14,4 @@ Write-Host "启动应用..." -ForegroundColor Yellow
 python run.py
 
 Read-Host "按回车键退出"
+
