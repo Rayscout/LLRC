@@ -85,8 +85,8 @@
 
 <style>
 .job-search-container {
-    padding: 16px;
-    max-width: 1400px;
+    padding: 20px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -213,10 +213,10 @@
 .recommended-jobs,
 .search-results {
     background: white;
-    border-radius: 12px;
-    padding: 18px;
-    margin-bottom: 20px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .results-header {
@@ -232,25 +232,25 @@
 }
 
 .jobs-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(640px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 16px;
     align-items: stretch;
+    justify-content: flex-start;
 }
-@media (max-width: 768px) {
-    .jobs-grid { grid-template-columns: 1fr; }
+
+.jobs-grid .job-card {
+    flex: 0 1 calc(33.333% - 16px);
 }
 
 .job-card {
-    border: 1px solid #e5e7eb;
+    border: 2px solid #e1e8ed;
     border-radius: 12px;
-    padding: 14px;
-    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    padding: 16px;
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    aspect-ratio: 1 / 1;
-    display: flex;
-    flex-direction: column;
+    background: #fff;
 }
 
 .job-card:hover {
@@ -265,7 +265,7 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 4px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
@@ -277,10 +277,28 @@
     line-height: 1.3;
 }
 
+.job-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
 .job-company {
     color: #3498db;
     font-weight: 600;
     margin-bottom: 8px;
+}
+
+.icon-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #2c3e50;
+}
+
+.icon-text i {
+    color: #7f8c8d;
 }
 
 .job-location {
@@ -297,9 +315,9 @@
 
 .job-description {
     color: #2c3e50;
-    line-height: 1.4;
-    margin-bottom: 10px;
-    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    font-size: 14px;
 }
 
 .job-meta {
@@ -311,6 +329,15 @@
 
 .job-type,
 .job-experience {
+    background: #ecf0f1;
+    color: #2c3e50;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pill {
     background: #ecf0f1;
     color: #2c3e50;
     padding: 4px 12px;
@@ -333,8 +360,7 @@
 
 .job-actions {
     display: flex;
-    gap: 8px;
-    margin-top: auto;
+    gap: 10px;
 }
 
 .btn-apply,
@@ -396,13 +422,15 @@
         min-width: auto;
     }
     
-    .jobs-grid {
-        grid-template-columns: 1fr;
-    }
+    .jobs-grid .job-card { flex: 0 1 100%; }
     
     .filter-actions {
         flex-direction: column;
     }
+}
+
+@media (max-width: 1200px) and (min-width: 769px) {
+    .jobs-grid .job-card { flex: 0 1 calc(50% - 16px); }
 }
 </style>
 
@@ -496,24 +524,33 @@ function displayJobs(jobs, container, isRecommended) {
         return;
     }
     
-    container.innerHTML = jobs.map(job => `
+    container.innerHTML = jobs.map(job => {
+        const location = job.location || '未注明';
+        const salary = job.salary ? job.salary.toLocaleString() + ' 元/月' : '薪资面议';
+        const company = job.company_name || '';
+        const jobType = job.job_type || '全职';
+        const exp = job.experience_level || '不限';
+        const desc = job.description || '';
+        return `
         <div class="job-card">
             <div class="match-score">${job.match_score}% 匹配</div>
-            <div class="job-title">${job.title}</div>
-            <div class="job-company">${job.company_name}</div>
-            <div class="job-location">📍 ${job.location}</div>
-            <div class="job-salary">💰 ${job.salary ? job.salary.toLocaleString() + ' 元/月' : '薪资面议'}</div>
-            <div class="job-description">${job.description}</div>
+            <div class="job-header">
+                <div class="job-title">${job.title}</div>
+                <div class="job-company">${company}</div>
+            </div>
+            <div class="icon-text"><i class="uil uil-location-point"></i><span>${location}</span></div>
+            <div class="icon-text"><i class="uil uil-money-bill"></i><span class="job-salary">${salary}</span></div>
+            <div class="job-description">${desc}</div>
             <div class="job-meta">
-                <span class="job-type">${job.job_type || '全职'}</span>
-                <span class="job-experience">${job.experience_level || '不限'}</span>
+                <span class="pill">${jobType}</span>
+                <span class="pill">${exp}</span>
             </div>
             <div class="job-actions">
                 <a href="${'{{ url_for("smartrecruit.candidate.jobs.job_detail", job_id=0) }}'.replace('0', job.id)}" class="btn-view">查看详情</a>
                 <a href="${'{{ url_for("smartrecruit.candidate.applications.apply", job_id=0) }}'.replace('0', job.id)}" class="btn-apply">立即申请</a>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 // 清除筛选条件
