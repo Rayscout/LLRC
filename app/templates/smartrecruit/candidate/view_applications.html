@@ -57,63 +57,34 @@
     .applications-table th,
     .applications-table td {
         padding: 12px;
-        border: 1px solid #ddd;
+        border: 1px solid #e5e7eb;
         text-align: left;
+        vertical-align: middle;
     }
 
-    .applications-table th {
-        background-color: #ffaf00; /* Header background color */
-        color: #fff; /* Text color */
-    }
+    .applications-table th { background:#f8fafc; color:#0f172a; }
 
-    .applications-table tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
+    .applications-table tr:nth-child(even) { background-color:#fff; }
 
-    .applications-table tr:hover {
-        background-color: #f1f1f1;
-    }
+    .applications-table tr:hover { background-color:#f8fafc; }
 
-    .view-details-button {
-        display: inline-block; /* Ensure button is inline-block for centering */
-        color: #fff; /* Button text color */
-        background-color: #ffaf00; /* Button background color */
-        text-decoration: none;
-        padding: 5px 10px;
-        border: 1px solid #ffaf00;
-        border-radius: 4px;
-        text-align: center; /* Center text within button */
-    }
+    .view-details-button {display:inline-flex;align-items:center;gap:6px;color:#fff;background:#2563eb;text-decoration:none;padding:6px 12px;border:1px solid #2563eb;border-radius:8px;}
 
-    .view-details-button:hover {
-        background-color: #e59400; /* Darker orange for hover effect */
-        border-color: #e59400;
-    }
+    .view-details-button:hover { background:#1d4ed8; border-color:#1d4ed8; }
+
+    .btn-danger { background:#e11d48; border-color:#e11d48; }
+    .btn-danger:hover { background:#be123c; border-color:#be123c; }
 
     /* Dark Mode Table Styles */
-    body.dark .applications-table th {
-        background-color: #666; /* Darker background */
-        color: #fff; /* Light text color */
-    }
+    body.dark .applications-table th { background:#374151; color:#fff; }
 
-    body.dark .applications-table td {
-        border: 1px solid #555; /* Darker border */
-        color: #ccc; /* Light text color */
-    }
+    body.dark .applications-table td { border:1px solid #374151; color:#e5e7eb; }
 
-    body.dark .applications-table tr:nth-child(even) {
-        background-color: #2e2e2e; /* Darker row background */
-    }
+    body.dark .applications-table tr:nth-child(even) { background-color:#1f2937; }
 
-    body.dark .applications-table tr:hover {
-        background-color: #3a3a3a; /* Hover effect for dark mode */
-    }
+    body.dark .applications-table tr:hover { background-color:#111827; }
 
-    body.dark .view-details-button {
-        color: #fff; /* Button text color */
-        background-color: #ffaf00; /* Button background color */
-        border: 1px solid #ffaf00; /* Button border */
-    }
+    body.dark .view-details-button { color:#fff; background:#2563eb; border-color:#2563eb; }
 
     body.dark .view-details-button:hover {
         background-color: #e59400; /* Darker orange for hover effect */
@@ -141,24 +112,17 @@
             {% for item in applications %}
             <tr>
                 <td>{{ item.job.title }}</td>
-<<<<<<< HEAD
                 <td>{{ item.job.company_name }}</td>
                 <td>{{ item.job.location }}</td>
                 <td>{{ item.application.timestamp.strftime('%Y-%m-%d %H:%M') if item.application.timestamp else '' }}</td>
                 <td>{{ item.application.status }}</td>
                 <td>
                     <a class="view-details-button" href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=item.job.id) }}">查看职位</a>
-                    <button type="button" class="view-details-button withdraw-btn" data-app-id="{{ item.application.id }}" style="margin-left:8px;">撤销申请</button>
-=======
-                <td>{{ item.application.timestamp.strftime('%Y-%m-%d %H:%M') if item.application.timestamp else '' }}</td>
-                <td>
-                    {{ item.application.status }}
                     {% if item.application.status not in ['Withdrawn'] %}
-                    <form method="post" action="{{ url_for('smartrecruit.candidate.applications.withdraw_application', application_id=item.application.id) }}" style="display:inline; margin-left:10px;" onsubmit="return confirm('确认撤销该申请？');">
-                        <button type="submit" class="view-details-button" style="background:#e11d48; border-color:#e11d48;">撤销申请</button>
-                    </form>
+                        <form method="post" action="{{ url_for('smartrecruit.candidate.applications.withdraw_application', application_id=item.application.id) }}" style="display:inline; margin-left:10px;">
+                            <button type="submit" class="view-details-button btn-danger">撤销申请</button>
+                        </form>
                     {% endif %}
->>>>>>> ae344f88704721d586b7c36196f93ddbd0c72d7e
                 </td>
             </tr>
             {% endfor %}

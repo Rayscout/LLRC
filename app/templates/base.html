@@ -4,12 +4,22 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth_sign.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme1.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <title>{% block title %}HR招聘系统{% endblock %}</title>
 </head>
 <body>
+    <!-- 动效背景元素（全局） -->
+    <div class="scroll-progress"></div>
+    <div class="floating-shapes" id="floatingShapes"></div>
+    <div class="animated-bg"><div class="bg-pattern"></div></div>
+    <div class="particle-system" id="particleSystem"></div>
     <nav>
         <div class="logo-name">
             <div class="logo-image">
@@ -60,19 +70,17 @@
                 </a></li>
                 {% endif %}
             </ul>
-            <ul class="logout-mode">
+            <ul class="logout-mode" style="position:sticky;bottom:12px;align-self:flex-end">
                 <li><a href="{{ url_for('common.auth.logout') }}">
                     <i class="uil uil-signout"></i>
                     <span class="link-name">退出登录</span>
                 </a></li>
-                <li class="mode">
-                    <a href="#">
-                        <i class="uil uil-moon"></i>
-                        <span class="link-name">深色模式</span>
-                    </a>
-                    <div class="mode-toggle">
-                        <span class="switch"></span>
-                    </div>
+                <li class="mode" style="display:flex;align-items:center;gap:10px;padding:8px 12px">
+                    <i class="uil uil-moon"></i>
+                    <span class="link-name">深色模式</span>
+                    <label id="themeToggleLabel" style="margin-left:auto;display:inline-flex;align-items:center;gap:8px;cursor:pointer" aria-label="切换主题" title="切换主题">
+                        <input id="themeToggle" type="checkbox" style="appearance:none;width:42px;height:24px;border-radius:999px;background:#e5e7eb;position:relative;outline:none;border:1px solid #cbd5e1">
+                    </label>
                 </li>
             </ul>
         </div>
@@ -95,5 +103,6 @@
         </div>
     </section>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='auth_sign.js') }}"></script>
 </body>
 </html>

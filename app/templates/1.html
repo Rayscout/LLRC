@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hotel Dashboard (Static)</title>
+    <link rel="stylesheet" href="./1.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- Mobile FAB -->
+      <button class="fab" id="openSidebarBtn" aria-label="Open menu">☰</button>
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar__header">
+          <div class="brand">TripyTrip</div>
+          <button class="icon-btn sidebar__close" id="closeSidebarBtn" aria-label="Close menu">✕</button>
+        </div>
+        <nav class="nav">
+          <button class="nav__item is-active" data-section="dashboard">📊 Dashboard</button>
+          <button class="nav__item" data-section="check-in-out">🗓️ Check In-Out</button>
+          <button class="nav__item" data-section="rooms">🏠 Rooms</button>
+          <button class="nav__item" data-section="messages">💬 Messages</button>
+          <button class="nav__item" data-section="customer-review">⭐ Customer Review</button>
+          <button class="nav__item" data-section="billing">💳 Billing System</button>
+          <button class="nav__item" data-section="food-delivery">🍽️ Food Delivery</button>
+          <button class="nav__item" data-section="premium">🏅 Try Premium Version</button>
+        </nav>
+      </aside>
+
+      <!-- Main -->
+      <div class="main">
+        <header class="header">
+          <div class="header__left">
+            <button class="icon-btn header__menu" id="openSidebarBtnHeader" aria-label="Open menu">☰</button>
+            <h1 id="pageTitle">Dashboard</h1>
+          </div>
+          <div class="header__right">
+            <button class="btn btn-outline hotel-btn">
+              <span class="avatar avatar--sm"></span>
+              <span class="hotel-btn__text">Hotel Hilton Garden Inn</span>
+              ▾
+            </button>
+            <button class="icon-btn bell" aria-label="Notifications">
+              🔔<span class="dot"></span>
+            </button>
+            <button class="avatar" aria-label="User"></button>
+          </div>
+        </header>
+
+        <main class="content">
+          <!-- Dashboard -->
+          <section class="section" id="section-dashboard" data-section>
+            <div class="row right mb-16">
+              <p class="muted">Wed // July 26th, 2023</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-4 gap-16 mb-16">
+              <div class="card">
+                <div class="card__body row a-center gap-12">
+                  <div class="icon-badge bg-blue">➜</div>
+                  <div>
+                    <p class="muted small">Arrival <span class="xsmall">(This week)</span></p>
+                    <div class="row a-center gap-8">
+                      <h3 class="h2">73</h3>
+                      <span class="chip chip--green xsmall">+24%</span>
+                    </div>
+                    <p class="xsmall muted">Previous week: 35</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card__body row a-center gap-12">
+                  <div class="icon-badge bg-amber">⬅</div>
+                  <div>
+                    <p class="muted small">Departure <span class="xsmall">(This week)</span></p>
+                    <div class="row a-center gap-8">
+                      <h3 class="h2">35</h3>
+                      <span class="chip chip--red xsmall">-12%</span>
+                    </div>
+                    <p class="xsmall muted">Previous week: 97</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card__body row a-center gap-12">
+                  <div class="icon-badge bg-cyan">📅</div>
+                  <div>
+                    <p class="muted small">Booking <span class="xsmall">(This week)</span></p>
+                    <div class="row a-center gap-8">
+                      <h3 class="h2">237</h3>
+                      <span class="chip chip--green xsmall">+31%</span>
+                    </div>
+                    <p class="xsmall muted">Previous week: 187</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card__body">
+                  <p class="muted small mb-8">Today Activities</p>
+                  <div class="row j-between mb-12">
+                    <div class="center">
+                      <div class="bubble">5</div>
+                      <p class="xsmall center">Room<br/>Available</p>
+                    </div>
+                    <div class="center">
+                      <div class="bubble">10</div>
+                      <p class="xsmall center">Room<br/>Blocked</p>
+                    </div>
+                    <div class="center">
+                      <div class="bubble">15</div>
+                      <p class="xsmall center">Guest</p>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="xsmall muted">Total Revenue</p>
+                    <p class="h4">Rs.35k</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="grid grid-3 gap-16 mb-16">
+              <div class="card">
+                <div class="card__head row a-center j-between">
+                  <h3 class="h5">Revenue</h3>
+                  <button class="btn btn-ghost xsmall">this week ▾</button>
+                </div>
+                <div class="card__body">
+                  <div class="chart" id="chart-revenue"></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card__head row a-center j-between">
+                  <h3 class="h5">Guests</h3>
+                  <button class="btn btn-ghost xsmall">this week ▾</button>
+                </div>
+                <div class="card__body">
+                  <svg class="line-chart" id="chart-guests" viewBox="0 0 100 50" preserveAspectRatio="none"></svg>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card__head row a-center j-between">
+                  <h3 class="h5">Rooms</h3>
+                  <button class="btn btn-ghost xsmall">this week ▾</button>
+                </div>
+                <div class="card__body">
+                  <div class="legend xsmall mb-8">
+                    <span>Total 50 Rooms</span>
+                    <div class="row gap-12">
+                      <span class="dot dot--blue"></span> Occupied
+                      <span class="dot dot--green ml-8"></span> Booked
+                      <span class="dot dot--amber ml-8"></span> Available
+                    </div>
+                  </div>
+                  <div class="chart chart--grouped" id="chart-rooms"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Booking Table -->
+            <div class="card mb-16">
+              <div class="card__head"><h3 class="h5">Todays Booking <span class="muted xsmall">(8 Guest today)</span></h3></div>
+              <div class="card__body">
+                <div class="row j-between gap-12 mb-12 wrap">
+                  <div class="input input--with-icon">
+                    <span class="input__icon">🔍</span>
+                    <input id="bookingSearch" type="text" placeholder="Search guest by name or phone number or booking ID" />
+                  </div>
+                  <button class="btn btn-primary">＋ Add Booking</button>
+                </div>
+                <div class="tabs mb-12">
+                  <button class="tab is-active" data-tab="stays">Stays</button>
+                  <button class="tab" data-tab="packages">Packages</button>
+                  <button class="tab" data-tab="arrivals">Arrivals</button>
+                  <button class="tab" data-tab="departure">Departure</button>
+                </div>
+                <div class="table-wrap">
+                  <table class="table" id="table-bookings">
+                    <thead>
+                      <tr>
+                        <th>NAME ▾</th>
+                        <th>BOOKING ID</th>
+                        <th>NIGHTS</th>
+                        <th>ROOM TYPE</th>
+                        <th>GUESTS</th>
+                        <th>PAID</th>
+                        <th>COST</th>
+                        <th>ACTION</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+                <div class="row j-end mt-12">
+                  <button class="btn btn-link">See other Bookings</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Calendar + Rating -->
+            <div class="grid grid-2 gap-16">
+              <div class="card">
+                <div class="card__head"><h3 class="h5">Calendar</h3></div>
+                <div class="card__body">
+                  <div class="row j-between a-center mb-12">
+                    <button class="icon-btn">◀</button>
+                    <h4 class="small">August 2023</h4>
+                    <button class="icon-btn">▶</button>
+                  </div>
+                  <div class="calendar" id="calendar-grid"></div>
+                  <div class="card mt-12">
+                    <div class="card__body">
+                      <h4 class="small mb-4">August 02, 2023 Booking Lists</h4>
+                      <p class="xsmall muted mb-8">(3 Bookings)</p>
+                      <div id="calendar-events" class="vstack gap-8"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card__head row a-center j-between"><h3 class="h5">Overall Rating</h3><button class="btn btn-ghost xsmall">This Week ▾</button></div>
+                <div class="card__body">
+                  <div class="gauge-wrap">
+                    <svg viewBox="0 0 100 50" class="gauge"><path d="M 0 50 A 50 50 0 0 1 100 50" class="gauge__bg"/><path id="gauge-arc" d="M 0 50 A 50 50 0 0 1 90 50" class="gauge__fg"/></svg>
+                    <div class="gauge__center">
+                      <p class="small">Rating</p>
+                      <p class="h4">4.5/5</p>
+                      <span class="chip chip--green xsmall">+31%</span>
+                    </div>
+                  </div>
+                  <div class="vstack gap-8 mt-12">
+                    <div class="row j-between a-center"><span>Cleanliness</span><div class="progress"><span style="width:90%"></span></div><span>4.5</span></div>
+                    <div class="row j-between a-center"><span>Facilities</span><div class="progress"><span style="width:90%"></span></div><span>4.5</span></div>
+                    <div class="row j-between a-center"><span>Location</span><div class="progress"><span style="width:50%"></span></div><span>2.5</span></div>
+                    <div class="row j-between a-center"><span>Room Comfort</span><div class="progress"><span style="width:50%"></span></div><span>2.5</span></div>
+                    <div class="row j-between a-center"><span>Service</span><div class="progress"><span style="width:76%"></span></div><span>3.8</span></div>
+                    <div class="row j-between a-center"><span>Value for money</span><div class="progress"><span style="width:76%"></span></div><span>3.8</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Billing -->
+          <section class="section is-hidden" id="section-billing" data-section>
+            <div class="row j-between a-center mb-16">
+              <h2 class="h4">Billing System</h2>
+              <div class="row gap-8">
+                <button class="btn btn-outline xsmall">⧉ Filter</button>
+                <button class="btn btn-outline xsmall">⬇ Export</button>
+                <button class="btn btn-primary xsmall">＋ New Invoice</button>
+              </div>
+            </div>
+
+            <div class="grid grid-3 gap-16 mb-16">
+              <div class="card"><div class="card__body row a-center gap-12"><div class="icon-badge bg-blue">💳</div><div><p class="muted small">Total Revenue</p><h3 class="h2">Rs.125,000</h3><p class="xsmall green">+12% from last month</p></div></div></div>
+              <div class="card"><div class="card__body row a-center gap-12"><div class="icon-badge bg-green">₹</div><div><p class="muted small">Paid Invoices</p><h3 class="h2">Rs.98,500</h3><p class="xsmall green">78% of total</p></div></div></div>
+              <div class="card"><div class="card__body row a-center gap-12"><div class="icon-badge bg-amber">⏰</div><div><p class="muted small">Pending Payments</p><h3 class="h2">Rs.26,500</h3><p class="xsmall amber">22% of total</p></div></div></div>
+            </div>
+
+            <div class="card">
+              <div class="card__head"><h3 class="h5">Recent Invoices</h3></div>
+              <div class="card__body">
+                <div class="table-wrap">
+                  <table class="table" id="table-invoices">
+                    <thead><tr><th>Invoice ID</th><th>Guest</th><th>Date</th><th>Amount</th><th>Status</th><th class="t-right">Actions</th></tr></thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Food Delivery -->
+          <section class="section is-hidden" id="section-food-delivery" data-section>
+            <div class="row j-between a-center mb-16"><h2 class="h4">Food Delivery System</h2><div class="row gap-8"><button class="btn btn-outline xsmall">⧉ Filter</button><button class="btn btn-primary xsmall">＋ New Order</button></div></div>
+            <div class="grid grid-3 gap-16 mb-16">
+              <div class="card"><div class="card__body row a-center gap-12"><div class="icon-badge bg-blue">🍽️</div><div><p class="muted small">Total Orders</p><h3 class="h2">42</h3><p class="xsmall green">+8% from yesterday</p></div></div></div>
+              <div class="card"><div class="card__body row a-center gap-12"><div class="icon-badge bg-green">🛍️</div><div><p class="muted small">Completed</p><h3 class="h2">35</h3><p class="xsmall green">83% of total</p></div></div></div>
+              <div class="card"><div class="card__body row a-center gap-12"><div class="icon-badge bg-amber">🚚</div><div><p class="muted small">In Progress</p><h3 class="h2">7</h3><p class="xsmall amber">17% of total</p></div></div></div>
+            </div>
+
+            <div class="grid grid-3 gap-16">
+              <div class="card span-2">
+                <div class="card__head"><h3 class="h5">Active Orders</h3></div>
+                <div class="card__body">
+                  <div class="table-wrap">
+                    <table class="table" id="table-orders">
+                      <thead><tr><th>Order ID</th><th>Guest</th><th>Room</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card__head"><h3 class="h5">Order Distribution</h3></div>
+                <div class="card__body">
+                  <div class="pie" id="chart-pie"></div>
+                  <div id="pie-legend" class="row wrap gap-8 j-center mt-12"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Coming soon for other sections -->
+          <section class="section is-hidden" id="section-coming" data-section>
+            <div class="center h-100">
+              <div class="card w-400">
+                <div class="card__head"><h3 class="h5">Coming Soon</h3></div>
+                <div class="card__body">
+                  <p id="coming-text">This section is under development and will be available soon.</p>
+                  <div class="row mt-12">
+                    <button class="btn" id="backToDashboard">Return to Dashboard</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="./1.js"></script>
+  </body>
+  </html>
+
