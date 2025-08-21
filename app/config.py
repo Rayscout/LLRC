@@ -12,7 +12,7 @@ class Config:
     SESSION_FILE_DIR = os.path.join(os.getcwd(), 'flask_session_data')
     UPLOAD_FOLDER_CV = os.path.join(BASE_DIR, 'app', 'static', 'uploads', 'cv')
     UPLOAD_FOLDER_PHOTOS = os.path.join(BASE_DIR, 'app', 'static', 'uploads', 'photos')
-    
-
-    
-    MONGO_URI = 'mongodb://localhost:27017/applications'
+    # 外部服务
+    MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/applications')
+    API_TOKEN = os.environ.get('API_TOKEN', 'default_api_token')
+    API_URL = os.environ.get('API_URL', 'https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct')

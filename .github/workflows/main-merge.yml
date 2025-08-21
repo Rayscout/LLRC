@@ -1,0 +1,54 @@
+name: Main Project Merge
+
+on:
+  pull_request:
+    branches: [develop]
+
+jobs:
+  test-and-merge:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+    
+    - name: Install dependencies
+      run: |
+        echo "安装依赖..."
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+    
+    - name: Run tests
+      run: |
+        echo "运行测试..."
+        python -m pytest tests/ -v --cov=app --cov-report=xml
+    
+    - name: Check code coverage
+      run: |
+        echo "检查代码覆盖率..."
+        # 可以设置最低覆盖率要求
+    
+    - name: Run linting
+      run: |
+        echo "运行代码检查..."
+        pip install flake8 black
+        flake8 app/
+        black --check app/
+    
+    - name: Auto merge if all checks pass
+      if: success()
+      run: |
+        echo "所有检查通过，自动合并..."
+        gh pr merge --auto --merge
+        echo "总项目集成完成！"
+    
+    - name: Notify project team
+      run: |
+        echo "通知项目团队集成完成"
+        # 可以添加Slack、邮件等通知

@@ -13,36 +13,47 @@
     <nav>
         <div class="logo-name">
             <div class="logo-image">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="标志">
+                <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="标志">
             </div>
         </div>
         <div class="menu-items">
             <ul class="nav-links">
-                <li><a href="{{ url_for('main.home') }}">
+                <li><a href="{{ url_for('common.auth.home') }}">
                     <i class="uil uil-estate"></i>
                     <span class="link-name">首页</span>
                 </a></li>
-                <li><a href="{{ url_for('main.view_applications') }}">
+                {% if user and user.is_hr %}
+                <!-- HR用户菜单 -->
+                <li><a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}">
+                    <i class="uil uil-dashboard"></i>
+                    <span class="link-name">仪表盘</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}">
+                    <i class="uil uil-briefcase"></i>
+                    <span class="link-name">发布职位</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}">
+                    <i class="uil uil-users-alt"></i>
+                    <span class="link-name">候选人管理</span>
+                </a></li>
+                {% else %}
+                <!-- 求职者菜单 -->
+                <li><a href="{{ url_for('smartrecruit.candidate.jobs.job_list') }}">
+                    <i class="uil uil-search"></i>
+                    <span class="link-name">职位搜索</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.candidate.applications.my_applications') }}">
                     <i class="uil uil-list-ul"></i>
                     <span class="link-name">我的申请</span>
                 </a></li>
-                <li><a href="{{ url_for('main.my_jobs') }}">
-                    <i class="uil uil-briefcase"></i>
-                    <span class="link-name">我的职位</span>
+                <li><a href="{{ url_for('smartrecruit.candidate.profile.settings') }}">
+                    <i class="uil uil-user"></i>
+                    <span class="link-name">个人资料</span>
                 </a></li>
-                <li><a href="{{ url_for('main.job_search') }}">
-                    <i class="uil uil-search"></i>
-                    <span class="link-name">智能搜索</span>
-                </a></li>
-                <li><a href="{{ url_for('main.settings') }}">
-                    <i class="uil uil-setting"></i>
-                    <span class="link-name">设置</span>
-                </a></li>
-
-                <!-- Add more links if needed -->
+                {% endif %}
             </ul>
             <ul class="logout-mode">
-                <li><a href="{{ url_for('main.logout') }}">
+                <li><a href="{{ url_for('common.auth.logout') }}">
                     <i class="uil uil-signout"></i>
                     <span class="link-name">退出登录</span>
                 </a></li>
@@ -62,12 +73,12 @@
         <div class="top">
             <i class="uil uil-bars sidebar-toggle"></i>
             {% if user and user.profile_photo %}
-                <a href="{{ url_for('main.settings') }}">
+                <a href="{{ url_for('smartrecruit.candidate.profile.settings') if not user.is_hr else '#' }}">
                     <img src="{{ url_for('static', filename='uploads/photos/' + user.profile_photo) }}" alt="头像">
                 </a>
             {% else %}
-                <a href="{{ url_for('main.settings') }}">
-                    <img src="{{ url_for('static', filename='images/default-profile.png') }}" alt="默认头像">
+                <a href="{{ url_for('smartrecruit.candidate.profile.settings') if not user.is_hr else '#' }}">
+                    <img src="{{ url_for('static', filename='Images/profile.jpg') }}" alt="默认头像">
                 </a>
             {% endif %}
         </div>

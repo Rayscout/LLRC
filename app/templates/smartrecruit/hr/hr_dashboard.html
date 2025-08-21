@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}HR仪表板{% endblock %}
+
+{% block content %}
+<div class="hr-dashboard">
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1><i class="uil uil-chart-line"></i> HR仪表板</h1>
+            <p>招聘数据概览与关键指标</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" onclick="location.href='{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}'">
+                <i class="uil uil-plus"></i> 发布招聘
+            </button>
+        </div>
+    </div>
+
+    <!-- 关键指标卡片 -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon candidates">
+                <i class="uil uil-users-alt"></i>
+            </div>
+            <div class="metric-content">
+                <h3>总职位</h3>
+                <div class="metric-value">{{ total_jobs|default(0) }}</div>
+                <div class="metric-change positive">
+                    <i class="uil uil-arrow-up"></i> +12% 本月
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon interviews">
+                <i class="uil uil-calendar-alt"></i>
+            </div>
+            <div class="metric-content">
+                <h3>总申请</h3>
+                <div class="metric-value">{{ total_applications|default(0) }}</div>
+                <div class="metric-change positive">
+                    <i class="uil uil-arrow-up"></i> +8% 本周
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon offers">
+                <i class="uil uil-file-check"></i>
+            </div>
+            <div class="metric-content">
+                <h3>面试安排</h3>
+                <div class="metric-value">0</div>
+                <div class="metric-change neutral">
+                    <i class="uil uil-minus"></i> 0% 变化
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon hires">
+                <i class="uil uil-user-check"></i>
+            </div>
+            <div class="metric-content">
+                <h3>候选人</h3>
+                <div class="metric-value">0</div>
+                <div class="metric-change positive">
+                    <i class="uil uil-arrow-up"></i> +15% 本月
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="dashboard-content">
+        <!-- 最近职位 -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="uil uil-briefcase"></i> 最近职位</h2>
+                <div class="section-actions">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="btn-secondary">查看全部</a>
+                </div>
+            </div>
+            <div class="recent-jobs">
+                {% if recent_jobs %}
+                    {% for job in recent_jobs %}
+                    <div class="job-item">
+                        <div class="job-info">
+                            <h4>{{ job.title }}</h4>
+                            <p>{{ job.location }} • {{ job.salary }}</p>
+                        </div>
+                        <div class="job-actions">
+                            <a href="{{ url_for('smartrecruit.hr.recruitment.edit_job', job_id=job.id) }}" class="btn-small">编辑</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-data">暂无职位，<a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}">立即发布</a></p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 最近申请 -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2><i class="uil uil-file-alt"></i> 最近申请</h2>
+                <div class="section-actions">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="btn-secondary">查看全部</a>
+                </div>
+            </div>
+            <div class="recent-applications">
+                {% if recent_applications %}
+                    {% for app in recent_applications %}
+                    <div class="application-item">
+                        <div class="application-info">
+                            <h4>申请 #{{ app.id }}</h4>
+                            <p>{{ app.message|default('新申请') }}</p>
+                        </div>
+                        <div class="application-status">
+                            <span class="status-badge {{ app.status }}">{{ app.status }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-data">暂无申请</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -19,8 +19,22 @@ except Exception:
     SentenceTransformer = None  # type: ignore
     util = None  # type: ignore
 
-# Initialize the sentence transformer model if available
-model = SentenceTransformer('multi-qa-mpnet-base-dot-v1') if SentenceTransformer else None
+# Lazily initialize the sentence transformer model to avoid network/download at import time
+model = None
+
+def get_sentence_transformer():
+    global model
+    if model is not None:
+        return model
+    if SentenceTransformer is None:
+        return None
+    try:
+        model = SentenceTransformer('multi-qa-mpnet-base-dot-v1')
+        return model
+    except Exception as e:
+        logging.warning(f"SentenceTransformer load failed: {e}")
+        model = None
+        return None
 logging.basicConfig(level=logging.DEBUG)
 
 def create_upload_folders(app):
@@ -75,9 +89,10 @@ def compute_similarity(cv_text, job_description):
     cv_text = preprocess_text(cv_text)
     job_description = preprocess_text(job_description)
 
-    if model and util:
-        embeddings_cv = model.encode(cv_text, convert_to_tensor=True)
-        embeddings_job_desc = model.encode(job_description, convert_to_tensor=True)
+    st_model = get_sentence_transformer()
+    if st_model and util:
+        embeddings_cv = st_model.encode(cv_text, convert_to_tensor=True)
+        embeddings_job_desc = st_model.encode(job_description, convert_to_tensor=True)
         similarity_score = util.cos_sim(embeddings_cv, embeddings_job_desc)
         return similarity_score.item()
     # Fallback: naive token overlap ratio when transformer model not available
@@ -106,7 +121,32 @@ def evaluate_cv(cv_text, job_description, threshold = 0.5):
 
     return similarity > threshold, similarity
 
-def generate_interview_questions(cv_text, job_description, max_retries=10):
+def _hf_generate(prompt: str, max_new_tokens: int = 600):
+    if requests is None:
+        return None
+    try:
+        headers = {
+            'Authorization': f"Bearer {current_app.config.get('API_TOKEN', '')}",
+            'Content-Type': 'application/json'
+        }
+        data = {
+            'inputs': prompt,
+            'parameters': {
+                'max_new_tokens': max_new_tokens,
+                'temperature': 0.6,
+                'top_p': 0.9,
+                'do_sample': True
+            }
+        }
+        resp = requests.post(current_app.config.get('API_URL'), headers=headers, data=json.dumps(data), timeout=30)
+        resp.raise_for_status()
+        js = resp.json()
+        return js[0].get('generated_text') if isinstance(js, list) and js else None
+    except Exception as e:
+        logging.warning(f"HF generation failed: {e}")
+        return None
+
+def generate_interview_questions(cv_text, job_description, max_retries=3):
     """
     Generates personalized interview questions based on the candidate's CV and the job description.
 
@@ -118,7 +158,18 @@ def generate_interview_questions(cv_text, job_description, max_retries=10):
     Returns:
         list: A list of generated interview questions or an error message.
     """
-    # 返回通用问题
+    # 先尝试通过 HF API 生成
+    prompt = (
+        "Generate 10 concise, non-repetitive interview questions in Chinese based on the candidate resume and the job description.\n"
+        "Resume:\n" + cv_text + "\nJob Description:\n" + job_description + "\nQuestions:" 
+    )
+    generated = _hf_generate(prompt, max_new_tokens=800)
+    if generated:
+        lines = [ln.strip() for ln in generated.splitlines() if ln.strip()]
+        questions = [ln for ln in lines if ln.endswith('？') or ln.endswith('?')]
+        if len(questions) >= 5:
+            return questions[:10]
+    # 返回通用问题作为降级
     return [
         "请介绍一下你的技术背景和主要技能栈？",
         "你最近完成的一个项目是什么？遇到了什么挑战？",
@@ -132,7 +183,7 @@ def generate_interview_questions(cv_text, job_description, max_retries=10):
         "你对这个职位有什么期望？"
     ]
 
-def generate_feedback(question_text, response_text, job_description, max_retries=10):
+def generate_feedback(question_text, response_text, job_description, max_retries=3):
     """
     Generates feedback based on the candidate's response to an interview question, the question itself, and the job description, and generates a score out of 10 at the end.
 
@@ -145,12 +196,42 @@ def generate_feedback(question_text, response_text, job_description, max_retries
     Returns:
         str: The generated feedback or an error message.
     """
-    # 简单的评分算法
+    # 先尝试通过 HF API 生成
+    prompt = (
+        "使用中文，对候选人答复给出简短建设性的反馈，并在结尾给出形如‘评分：X/10’的分数。\n"
+        f"问题：{question_text}\n回答：{response_text}\n职位描述：{job_description}\n反馈："
+    )
+    generated = _hf_generate(prompt, max_new_tokens=400)
+    if generated:
+        return generated.strip()
+    # 简单的评分算法作为降级
     score_base = 5
     overlap = len(set(response_text.lower().split()) & set(job_description.lower().split()))
     length_bonus = min(len(response_text) // 120, 3)
     score = max(3, min(9, score_base + (1 if overlap > 10 else 0) + length_bonus))
     return f"感谢您的回答。建议可以增加更多具体的例子和量化成果。评分：{score}/10"
+
+def extract_text_from_resume(file_bytes: bytes, filename: str) -> str:
+    """从简历二进制中提取文本，支持 PDF/DOCX，图片不提取。"""
+    try:
+        ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+        if ext == 'pdf' and pdfplumber is not None:
+            from io import BytesIO
+            with pdfplumber.open(BytesIO(file_bytes)) as pdf:
+                return ''.join(page.extract_text() or '' for page in pdf.pages)
+        if ext == 'docx':
+            try:
+                import docx2txt
+                from tempfile import NamedTemporaryFile
+                with NamedTemporaryFile(suffix='.docx', delete=True) as tmp:
+                    tmp.write(file_bytes)
+                    tmp.flush()
+                    return (docx2txt.process(tmp.name) or '').strip()
+            except Exception:
+                return ''
+    except Exception as e:
+        logging.warning(f'extract_text_from_resume failed: {e}')
+    return ''
 
 def convert_keys_to_strings(data):
     """

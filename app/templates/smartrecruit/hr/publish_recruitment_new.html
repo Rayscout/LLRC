@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}发布招聘{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>{{ '编辑招聘启事' if is_edit else '发布招聘启事' }}</h2>
+    <form method="POST">
+        <div class="form-group">
+            <label>职位标题</label>
+            <input type="text" class="form-control" name="title" value="{{ job.title if job else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label>工作地点</label>
+            <input type="text" class="form-control" name="location" value="{{ job.location if job else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label>职位描述</label>
+            <textarea class="form-control" name="description" rows="6" required>{{ job.description if job else '' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label>薪资</label>
+            <input type="text" class="form-control" name="salary" value="{{ job.salary if job else '' }}" required>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>招聘人数</label>
+                <input type="number" class="form-control" name="positions_needed" value="{{ job.positions_needed if job else 1 }}">
+            </div>
+            <div class="col">
+                <label>最小年龄</label>
+                <input type="number" class="form-control" name="min_age" value="{{ job.min_age if job else '' }}">
+            </div>
+            <div class="col">
+                <label>最大年龄</label>
+                <input type="number" class="form-control" name="max_age" value="{{ job.max_age if job else '' }}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>学历要求</label>
+            <input type="text" class="form-control" name="education_requirement" value="{{ job.education_requirement if job else '' }}">
+        </div>
+        <div class="form-group">
+            <label>工作经验（年）</label>
+            <input type="number" class="form-control" name="experience_years" value="{{ job.experience_years if job else '' }}">
+        </div>
+        <div class="form-group">
+            <label>技能要求</label>
+            <textarea class="form-control" name="skills_required" rows="3">{{ job.skills_required if job else '' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label>福利待遇</label>
+            <textarea class="form-control" name="benefits" rows="3">{{ job.benefits if job else '' }}</textarea>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>联系邮箱</label>
+                <input type="email" class="form-control" name="contact_email" value="{{ job.contact_email if job else '' }}">
+            </div>
+            <div class="col">
+                <label>联系电话</label>
+                <input type="text" class="form-control" name="contact_phone" value="{{ job.contact_phone if job else '' }}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <label>申请截止日期</label>
+                <input type="date" class="form-control" name="application_deadline" value="{{ job.application_deadline.strftime('%Y-%m-%d') if job and job.application_deadline else '' }}">
+            </div>
+            <div class="col">
+                <label>工作类型</label>
+                <input type="text" class="form-control" name="job_type" value="{{ job.job_type if job else '' }}">
+            </div>
+            <div class="col">
+                <label>所属部门</label>
+                <input type="text" class="form-control" name="department" value="{{ job.department if job else '' }}">
+            </div>
+        </div>
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">{{ '保存修改' if is_edit else '发布' }}</button>
+            <a class="btn btn-secondary" href="/smartrecruit/hr/recruitment/my_jobs">返回</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

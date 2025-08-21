@@ -1,0 +1,27 @@
+name: Team Auto Merge
+
+on:
+  pull_request:
+    branches: [hr, candidate, hr_admin, employee_manager]
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check PR status
+      run: |
+        echo "检查PR状态..."
+        echo "目标分支: ${{ github.event.pull_request.base.ref }}"
+        echo "源分支: ${{ github.event.pull_request.head.ref }}"
+    
+    - name: Auto merge team PRs
+      if: github.event.pull_request.base.ref in ['hr', 'candidate', 'hr_admin', 'employee_manager']
+      run: |
+        echo "自动合并团队PR..."
+        gh pr merge --auto --merge
+        echo "合并完成！"
+    
+    - name: Notify team
+      run: |
+        echo "通知团队成员合并完成"
+        # 可以添加Slack、邮件等通知
