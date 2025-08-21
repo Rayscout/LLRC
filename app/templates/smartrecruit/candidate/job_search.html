@@ -65,13 +65,7 @@
         <div class="skills-tags" id="skillsTags"></div>
     </div>
 
-    <!-- 推荐职位 -->
-    <div class="recommended-jobs">
-        <h3>💡 为您推荐</h3>
-        <div class="jobs-grid" id="recommendedJobs">
-            <div class="loading">正在加载推荐职位...</div>
-        </div>
-    </div>
+    <!-- 推荐职位（首页专用）已移除：职位搜索页仅展示搜索相关内容 -->
 
     <!-- 搜索结果 -->
     <div class="search-results" id="searchResults" style="display: none;">
@@ -400,11 +394,9 @@
 
 <script>
 let currentSearchResults = [];
-let currentRecommendedJobs = [];
 
-// 页面加载时获取推荐职位
+// 页面加载时展示用户技能
 document.addEventListener('DOMContentLoaded', function() {
-    loadRecommendedJobs();
     displayUserSkills();
 });
 
@@ -419,27 +411,6 @@ function displayUserSkills() {
             `<span class="skill-tag">${skill}</span>`
         ).join('');
         skillsSection.style.display = 'block';
-    }
-}
-
-// 加载推荐职位
-async function loadRecommendedJobs() {
-    const recommendedJobs = document.getElementById('recommendedJobs');
-    recommendedJobs.innerHTML = '<div class="loading">正在加载推荐职位...</div>';
-    
-    try {
-        const response = await fetch('/api/recommend_jobs');
-        const data = await response.json();
-        
-        if (data.success) {
-            currentRecommendedJobs = data.jobs;
-            displayJobs(data.jobs, recommendedJobs, true);
-        } else {
-            recommendedJobs.innerHTML = '<div class="no-results">暂无推荐职位</div>';
-        }
-    } catch (error) {
-        console.error('加载推荐职位失败:', error);
-        recommendedJobs.innerHTML = '<div class="no-results">加载失败，请稍后重试</div>';
     }
 }
 
@@ -460,7 +431,7 @@ async function searchJobs() {
     searchResults.style.display = 'block';
     
     try {
-        const response = await fetch('/api/search_jobs', {
+        const response = await fetch('{{ url_for('smartrecruit.candidate.jobs.api_search_jobs') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

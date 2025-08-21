@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}为您推荐{% endblock %}
+
+{% block content %}
+<div class="recommended-section">
+    <div class="page-header">
+        <div class="icon">🎯</div>
+        <h1 class="page-title">为您推荐的岗位</h1>
+    </div>
+
+    {% if user_skills %}
+    <div class="skills-showcase">
+        <h3>您的技能匹配</h3>
+        <div class="skills-tags">
+            {% for skill in user_skills %}
+            <span class="skill-tag">{{ skill }}</span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="recommended-jobs-grid">
+        {% for rec in recommended_jobs %}
+        <div class="job-card recommended">
+            <div class="match-badge">{{ rec.match_score }}% 匹配</div>
+            <div class="job-image">{{ rec.job.title[0] | upper }}</div>
+            <div class="job-info">
+                <div class="job-title">
+                    <h2>{{ rec.job.title }}</h2>
+                    <p class="company-name">{{ rec.job.company_name }}</p>
+                </div>
+                <div class="job-details">
+                    <p><i class="fas fa-map-marker-alt"></i> {{ rec.job.location }}</p>
+                    <p><i class="fas fa-money-bill-wave"></i> {{ rec.job.salary }} 元/月</p>
+                    <p><i class="fas fa-clock"></i> {{ rec.job.job_type or '全职' }}</p>
+                </div>
+                <div class="job-description">
+                    {{ rec.job.description[:150] }}{% if rec.job.description|length > 150 %}...{% endif %}
+                </div>
+            </div>
+            <div class="job-actions">
+                <a href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=rec.job.id) }}" class="btn-view">查看详情</a>
+                <a href="{{ url_for('smartrecruit.candidate.applications.apply', job_id=rec.job.id) }}" class="btn-apply">立即申请</a>
+            </div>
+        </div>
+        {% else %}
+        <p>暂无推荐职位，完善个人资料以获得更精准推荐。</p>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .recommended-section { margin-bottom: 40px; }
+    .skills-showcase { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+    .skills-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+    .skill-tag { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; padding:8px 16px; border-radius:20px; font-size:12px; font-weight:600; }
+    .recommended-jobs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px; }
+    .job-card.recommended { position: relative; border: 2px solid #e1e8ed; border-radius: 12px; padding: 20px; transition: all .3s ease; background: white; box-shadow: 0 4px 20px rgba(0,0,0,.1); }
+    .job-card.recommended:hover { border-color:#3498db; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,.15); }
+    .match-badge { position:absolute; top:15px; right:15px; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; padding:6px 12px; border-radius:15px; font-size:12px; font-weight:700; }
+    .job-image { background-color:#ffaf00; color:#fff; font-size:24px; font-weight:bold; display:flex; align-items:center; justify-content:center; border-radius:50%; width:50px; height:50px; margin-right:20px; }
+    .job-actions { display:flex; gap:10px; margin-top:15px; }
+    .btn-view, .btn-apply { flex:1; padding:10px; border:none; border-radius:8px; font-weight:600; cursor:pointer; transition:all .3s ease; font-size:14px; text-decoration:none; text-align:center; }
+    .btn-apply { background:#27ae60; color:#fff; }
+    .btn-view { background:#ecf0f1; color:#2c3e50; }
+</style>
+{% endblock %}
+
+
+

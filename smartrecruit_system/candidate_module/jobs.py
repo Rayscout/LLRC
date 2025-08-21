@@ -4,33 +4,33 @@ import logging
 
 jobs_bp = Blueprint('jobs', __name__, url_prefix='/jobs')
 
-@jobs_bp.route('/')
-def job_list():
-    """职位列表页面"""
+@jobs_bp.route('/home')
+def home_recommended():
+    """候选人首页：仅展示为您推荐的岗位"""
     if g.user is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
-    
+
     try:
-        # 获取所有职位（移除status过滤，因为Job模型没有这个字段）
-        jobs = Job.query.order_by(Job.date_posted.desc()).all()
-        
-        # 获取推荐职位（基于用户技能）
         recommended_jobs = get_job_recommendations(g.user)
-        
-        # 获取用户技能
         user_skills = extract_user_skills(g.user)
-        
-    except Exception as e:
-        flash('获取职位列表失败，请稍后重试。', 'danger')
-        jobs = []
+    except Exception:
         recommended_jobs = []
         user_skills = []
-    
-    return render_template('smartrecruit/candidate/snippet_career_list.html', 
-                         jobs=jobs, 
-                         recommended_jobs=recommended_jobs,
-                         user_skills=user_skills)
+
+    return render_template(
+        'smartrecruit/candidate/home_recommended.html',
+        recommended_jobs=recommended_jobs,
+        user_skills=user_skills,
+    )
+
+@jobs_bp.route('/')
+def job_list():
+    """兼容旧地址：直接跳转到职位搜索页面，避免混排模板"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    return redirect(url_for('smartrecruit.candidate.jobs.job_search'))
 
 @jobs_bp.route('/<int:job_id>')
 def job_detail(job_id):
@@ -44,7 +44,7 @@ def job_detail(job_id):
         return render_template('smartrecruit/candidate/job_detail.html', job=job)
     except Exception as e:
         flash('获取职位详情失败，请稍后重试。', 'danger')
-        return redirect(url_for('smartrecruit.candidate.jobs.job_list'))
+        return redirect(url_for('smartrecruit.candidate.jobs.job_search'))
 
 @jobs_bp.route('/search')
 def job_search():
@@ -70,11 +70,20 @@ def job_search():
     except Exception as e:
         flash('搜索职位失败，请稍后重试。', 'danger')
         jobs = []
-    
-    return render_template('smartrecruit/candidate/job_search.html', 
-                         jobs=jobs, 
-                         query=query, 
-                         location=location)
+        
+    # 补充用户技能（用于页面顶部可选展示）
+    try:
+        user_skills = extract_user_skills(g.user)
+    except Exception:
+        user_skills = []
+
+    return render_template(
+        'smartrecruit/candidate/job_search.html',
+        jobs=jobs,
+        query=query,
+        location=location,
+        user_skills=user_skills,
+    )
 
 @jobs_bp.route('/recommendations')
 def job_recommendations():
@@ -108,19 +117,29 @@ def job_recommendations():
             'message': f'推荐失败: {str(e)}'
         }), 500
 
-@jobs_bp.route('/api/search_jobs')
+@jobs_bp.route('/api/search_jobs', methods=['GET', 'POST'])
 def api_search_jobs():
     """智能搜索API"""
     if g.user is None:
         return jsonify({'error': '请先登录'}), 401
     
     try:
-        query = request.args.get('q', '')
-        location = request.args.get('location', '')
-        salary_min = request.args.get('salary_min', type=float)
-        salary_max = request.args.get('salary_max', type=float)
-        job_type = request.args.get('job_type', '')
-        experience_level = request.args.get('experience_level', '')
+        # 兼容 GET 查询参数 和 POST JSON
+        if request.method == 'POST' and request.is_json:
+            payload = request.get_json(silent=True) or {}
+            query = payload.get('query', '')
+            location = payload.get('location', '')
+            salary_min = payload.get('salary_min')
+            salary_max = payload.get('salary_max')
+            job_type = payload.get('job_type', '')
+            experience_level = payload.get('experience_level', '')
+        else:
+            query = request.args.get('q', '')
+            location = request.args.get('location', '')
+            salary_min = request.args.get('salary_min', type=float)
+            salary_max = request.args.get('salary_max', type=float)
+            job_type = request.args.get('job_type', '')
+            experience_level = request.args.get('experience_level', '')
         
         # 构建查询
         jobs_query = Job.query
@@ -165,7 +184,8 @@ def api_search_jobs():
         return jsonify({
             'success': True,
             'jobs': jobs_with_match,
-            'total': len(jobs_with_match)
+            'total': len(jobs_with_match),
+            'total_count': len(jobs_with_match),
         })
         
     except Exception as e:
@@ -173,6 +193,32 @@ def api_search_jobs():
             'success': False,
             'message': f'搜索失败: {str(e)}'
         }), 500
+
+@jobs_bp.route('/api/recommend_jobs')
+def api_recommend_jobs():
+    """推荐职位API（供职位搜索页使用）"""
+    if g.user is None:
+        return jsonify({'error': '请先登录'}), 401
+
+    try:
+        recs = get_job_recommendations(g.user)
+        jobs = []
+        for item in recs:
+            job = item['job']
+            jobs.append({
+                'id': job.id,
+                'title': job.title,
+                'company_name': getattr(job, 'company_name', ''),
+                'location': job.location,
+                'salary': job.salary,
+                'description': job.description[:200] + '...' if len(job.description) > 200 else job.description,
+                'job_type': getattr(job, 'job_type', ''),
+                'experience_level': getattr(job, 'experience_level', ''),
+                'match_score': item['match_score'],
+            })
+        return jsonify({'success': True, 'jobs': jobs})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 def get_job_recommendations(user):
     """获取职位推荐"""

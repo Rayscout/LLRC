@@ -129,7 +129,7 @@ def generate_feedbacks():
 
     if not all([responses, questions, job_id]):
         flash('面试数据不完整，请重新开始。', 'danger')
-        return redirect(url_for('smartrecruit.candidate.jobs.job_list'))
+        return redirect(url_for('smartrecruit.candidate.jobs.job_search'))
 
     # 生成反馈
     feedbacks = []
