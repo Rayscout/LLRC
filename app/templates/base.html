@@ -18,12 +18,10 @@
         </div>
         <div class="menu-items">
             <ul class="nav-links">
-                {% if not (user and user.is_hr) %}
                 <li><a href="{{ url_for('common.auth.home') }}">
                     <i class="uil uil-estate"></i>
                     <span class="link-name">首页</span>
                 </a></li>
-                {% endif %}
                 {% if user and user.is_hr %}
                 <!-- HR用户菜单 -->
                 <li><a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}">

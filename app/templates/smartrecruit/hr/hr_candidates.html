@@ -95,9 +95,9 @@
                     <td>
                         <div class="skills-match">
                             <div class="match-bar">
-                                <div class="match-fill" style="width: {{ candidate.skills_match|default(0)|int }}%"></div>
+                                <div class="match-fill" style="width: {{ candidate.skills_match }}%"></div>
                             </div>
-                            <span class="match-percentage">{{ candidate.skills_match|default(0)|int }}%</span>
+                            <span class="match-percentage">{{ candidate.skills_match }}%</span>
                         </div>
                     </td>
                     <td>
@@ -114,16 +114,16 @@
                     <td>{{ candidate.applied_date }}</td>
                     <td>{{ candidate.last_updated }}</td>
                     <td class="actions">
-                        <button class="btn-icon" onclick="viewCandidate('{{ candidate.id }}')" title="查看详情">
+                        <button class="btn-icon" onclick="viewCandidate({{ candidate.id }})" title="查看详情">
                             <i class="uil uil-eye"></i>
                         </button>
-                        <button class="btn-icon" onclick="editCandidate('{{ candidate.id }}')" title="编辑">
+                        <button class="btn-icon" onclick="editCandidate({{ candidate.id }})" title="编辑">
                             <i class="uil uil-edit"></i>
                         </button>
-                        <button class="btn-icon" onclick="scheduleInterview('{{ candidate.id }}')" title="安排面试">
+                        <button class="btn-icon" onclick="scheduleInterview({{ candidate.id }})" title="安排面试">
                             <i class="uil uil-calendar-alt"></i>
                         </button>
-                        <button class="btn-icon" onclick="sendEmail('{{ candidate.id }}')" title="发送邮件">
+                        <button class="btn-icon" onclick="sendEmail({{ candidate.id }})" title="发送邮件">
                             <i class="uil uil-envelope"></i>
                         </button>
                     </td>
