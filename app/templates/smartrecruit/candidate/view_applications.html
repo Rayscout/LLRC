@@ -135,11 +135,18 @@
             </tr>
         </thead>
         <tbody>
-            {% for application in applications %}
+            {% for item in applications %}
             <tr>
-                <td>{{ application.job_title }}</td>
-                <td>{{ application.application_date }}</td>
-                <td>{{ application.status }}</td>
+                <td>{{ item.job.title }}</td>
+                <td>{{ item.application.timestamp.strftime('%Y-%m-%d %H:%M') if item.application.timestamp else '' }}</td>
+                <td>
+                    {{ item.application.status }}
+                    {% if item.application.status not in ['Withdrawn'] %}
+                    <form method="post" action="{{ url_for('smartrecruit.candidate.applications.withdraw_application', application_id=item.application.id) }}" style="display:inline; margin-left:10px;" onsubmit="return confirm('确认撤销该申请？');">
+                        <button type="submit" class="view-details-button" style="background:#e11d48; border-color:#e11d48;">撤销申请</button>
+                    </form>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>

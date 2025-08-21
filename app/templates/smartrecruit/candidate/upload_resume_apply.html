@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}上传简历并申请{% endblock %}
+
+{% block content %}
+<style>
+  .ua-wrap{max-width:720px;margin:20px auto;background:#fff;border-radius:12px;box-shadow:0 6px 16px rgba(0,0,0,.08);padding:18px}
+  .ua-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .ua-title{font-size:20px;font-weight:700}
+  .ua-sub{color:#6b7280;font-size:13px}
+  .ua-form{display:grid;gap:12px;margin-top:10px}
+  .ua-input{padding:10px;border:1px solid #e5e7eb;border-radius:8px}
+  .ua-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+  .ua-btn{padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+  .ua-btn.primary{background:#2563eb;color:#fff}
+  .ua-btn.neutral{background:#f3f4f6}
+  body.dark .ua-wrap{background:#1f2937;color:#e5e7eb}
+</style>
+
+<div class="ua-wrap">
+  <div class="ua-head">
+    <div>
+      <div class="ua-title">上传简历后立即申请</div>
+      <div class="ua-sub">职位：{{ job.title }} · {{ job.company_name }}</div>
+    </div>
+    <a class="ua-btn neutral" href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=job.id) }}">返回</a>
+  </div>
+
+  <form class="ua-form" method="post" enctype="multipart/form-data">
+    <label>选择简历文件（PDF/DOCX/PNG/JPG，或可上传视频简历）</label>
+    <input class="ua-input" type="file" name="cv_file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.mp4,.webm,.ogg,.mov,.avi,.mkv" required>
+    <div class="ua-actions">
+      <button type="submit" class="ua-btn primary">上传并申请</button>
+    </div>
+  </form>
+
+  <div class="ua-sub" style="margin-top:10px">提示：若为视频简历，系统不会自动解析评分，但仍可继续申请。</div>
+</div>
+{% endblock %}
+
+
