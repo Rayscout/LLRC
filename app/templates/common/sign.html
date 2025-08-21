@@ -1,170 +1,377 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>登录 & 注册</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='logcss.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='common/模板.css') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <style>
-        /* Flash Message Styles */
-        .alert-container {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 500px;
-            z-index: 1000;
-        }
-
-        .alert {
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            color: #fff;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .alert.alert-info {
-            background-color: #007bff; /* Blue for general alerts */
-        }
-
-        .alert.alert-danger {
-            background-color: #dc3545; /* Red for errors */
-        }
-
-        .alert .icon {
-            margin-right: 10px;
-            font-size: 18px;
-        }
-        
-        .alert.alert-success {
-            background-color: #1a9d1a; /* Blue for general alerts */
-        }
-
-        /* Dark Mode */
-        body.dark .alert.alert-info {
-            background-color: #0056b3; /* Darker blue for alerts in dark mode */
-        }
-
-        body.dark .alert.alert-danger {
-            background-color: #c82333; /* Darker red for errors in dark mode */
-        }
-
-        body.dark .alert.alert-success {
-            background-color: #c82333; /* Darker red for errors in dark mode */
-        }
-
-        /* Moved background style from inline to CSS to avoid linter parsing issues */
-        body.login-bg {
-            background-image: url("{{ url_for('static', filename='Images/background.jpg') }}");
-            background-size: cover;
-            background-position: center;
-        }
-
+        .hero .hero-bg{background-image:url("{{ url_for('static', filename='Images/background.jpg') }}");}
     </style>
 </head>
-<body class="login-bg">
-    <div class="alert-container">
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress"></div>
+    <!-- Floating Geometric Shapes -->
+    <div class="floating-shapes" id="floatingShapes"></div>
+    <!-- Animated Background -->
+    <div class="animated-bg"><div class="bg-pattern"></div></div>
+    <!-- Particle System -->
+    <div class="particle-system" id="particleSystem"></div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="#home" class="brand" data-scroll><span class="brand-text">林理人才</span></a>
+            <nav class="nav md-nav" aria-label="Primary">
+                <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" id="navToggle">☰</button>
+                <ul class="nav-list" id="navList">
+                    <li><a href="#home" data-scroll data-section="home">主页</a></li>
+                    <li><a href="#services" data-scroll data-section="services">方案</a></li>
+                    <li><a href="#portfolio" data-scroll data-section="portfolio">产品</a></li>
+                    <li><a href="#skills" data-scroll data-section="skills">能力</a></li>
+                    <li><a href="#testimonials" data-scroll data-section="testimonials">合作</a></li>
+                    <li><a href="#contact" data-scroll data-section="contact">联系</a></li>
+                    <li class="hire"><a href="#" class="auth-trigger" data-auth="signin">登录</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Flash Messages -->
+    <div class="container" style="position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:10000;max-width:560px;width:calc(100% - 24px)">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        <i class="fas fa-info-circle icon"></i> <!-- Add appropriate icon based on category if needed -->
-                        {{ message }}
-                    </div>
+                    <div class="info-card" style="margin-bottom:8px">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
     </div>
     
-    <div class="container">
-        <div class="forms-container">
-            <div class="form-control signup-form" style="justify-content: flex-start;">
-                <form method="POST" action="{{ url_for('common.auth.sign') }}">
-                    <h2>注册</h2>
-                    <input type="text" name="first_name" placeholder="名字" required />
-                    <input type="text" name="last_name" placeholder="姓氏" required />
-                    <input type="text" name="company_name" placeholder="公司名称" required />
-                    <input type="email" name="email" placeholder="邮箱" required />
-                    <input type="tel" name="phone_number" placeholder="电话号码" required />
-                    <input type="date" name="birthday" placeholder="生日" required />
-                    <input type="password" name="password" placeholder="密码" required />
-                    <input type="password" name="confirm_password" placeholder="确认密码" required />
-                    <div style="display:flex;gap:16px;align-items:center;justify-content:center;margin:8px 0 16px;">
-                        <label style="color:#333;">身份选择：</label>
-                        <label style="color:#333;">
-                            <input type="radio" name="role" value="candidate" checked /> 求职者
-                        </label>
-                        <label style="color:#333;">
-                            <input type="radio" name="role" value="recruiter" /> 招聘者（HR）
-                        </label>
+    <main>
+        <!-- Hero -->
+        <section id="home" class="section hero">
+            <div class="hero-bg"></div>
+            <div class="container hero-content">
+                <div class="hero-left">
+                    <h1>基于 AI 的智能招聘与人才发展系统</h1>
+                    <p>欢迎使用林理人才系统。请登录或注册以继续。</p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary auth-trigger" href="#" data-auth="signin">登录 <span class="icon">→</span></a>
+                        <a class="btn btn-ghost auth-trigger" href="#" data-auth="signup">注册</a>
                     </div>
-                    <input type="hidden" name="action" value="signup" />
-                    <button type="submit">注册</button>
-                </form>
+                </div>
             </div>
-            <div class="form-control signin-form">
-                <form method="POST" action="{{ url_for('common.auth.sign') }}">
-                    <h2>登录</h2>
-                    <input type="email" name="email" placeholder="邮箱" required />
-                    <input type="password" name="password" placeholder="密码" required />
-                    <div style="display:flex;gap:16px;align-items:center;justify-content:center;margin:8px 0 16px;">
-                        <label style="color:#333;">以身份登录：</label>
-                        <label style="color:#333;">
-                            <input type="radio" name="role" value="candidate" checked /> 求职者
-                        </label>
-                        <label style="color:#333;">
-                            <input type="radio" name="role" value="recruiter" /> 招聘者（HR）
-                        </label>
+        </section>
+
+        <!-- 可按需保留的展示区块（与模板结构一致） -->
+        <section id="services" class="section">
+            <div class="container">
+                <div class="section-head">
+                    <span class="pill">解决方案</span>
+                    <h2>我们提供什么</h2>
+                    <p class="muted">围绕“招-育-用-留”的人才全生命周期，提供可落地的 AI 方案与工程化实践。</p>
+                </div>
+                <div class="grid grid-4 mt-12">
+                    <article class="card"><div class="card-head"><div class="icon-badge">🤖</div><h3>智能招聘引擎</h3></div><p class="card-desc">多渠道职位发布、简历解析与意向识别，自动化收集与预筛选候选人。</p></article>
+                    <article class="card"><div class="card-head"><div class="icon-badge">🧭</div><h3>人岗匹配</h3></div><p class="card-desc">基于职位与人才画像，利用向量检索与知识图谱进行匹配、排序与推荐。</p></article>
+                    <article class="card"><div class="card-head"><div class="icon-badge">📊</div><h3>人才画像与测评</h3></div><p class="card-desc">整合能力/性格/胜任力量表与面试问答，形成动态人才画像与风险提示。</p></article>
+                    <article class="card"><div class="card-head"><div class="icon-badge">📈</div><h3>发展与数据看板</h3></div><p class="card-desc">培训路径个性化推荐与用人数据可视化，沉淀组织能力地图与经营洞察。</p></article>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="section section-alt">
+    <div class="container">
+                <div class="section-head">
+                    <span class="pill">产品模块</span>
+                    <h2>核心能力一览</h2>
+                    <p class="muted">覆盖“招聘、匹配、测评、发展、数据、集成”等关键模块，支持灵活扩展与私有化部署。</p>
+                </div>
+                <div class="tabs mt-12" role="tablist" aria-label="Portfolio filter">
+                    <button class="tab active" data-filter="all" aria-selected="true">全部</button>
+                    <button class="tab" data-filter="recruit">招聘</button>
+                    <button class="tab" data-filter="match">匹配</button>
+                    <button class="tab" data-filter="assess">测评</button>
+                    <button class="tab" data-filter="develop">发展</button>
+                    <button class="tab" data-filter="data">数据</button>
+                    <button class="tab" data-filter="integration">集成</button>
+                </div>
+                <div class="grid grid-3 mt-8" id="portfolioGrid">
+                    <article class="tile" data-category="recruit"><div class="media"><img src="./img-recruit.svg" alt="智能招聘引擎" /></div><div class="tile-body"><h3>智能招聘引擎</h3><p>职位一键分发、简历解析与意向识别。</p><div class="actions"><button class="btn btn-outline" data-details data-title="智能招聘引擎" data-img="./img-recruit.svg" data-desc="支持多平台职位一键发布、简历结构化解析、意向识别与去重。" data-link="#">了解详情</button></div></div></article>
+                    <article class="tile" data-category="match"><div class="media"><img src="./img-match.svg" alt="人岗匹配" /></div><div class="tile-body"><h3>人岗匹配</h3><p>向量检索 + 知识图谱，输出匹配度评分。</p><div class="actions"><button class="btn btn-outline" data-details data-title="人岗匹配" data-img="./img-match.svg" data-desc="结合职位与人才画像，输出可解释的匹配度与推荐。" data-link="#">了解详情</button></div></div></article>
+                    <article class="tile" data-category="assess"><div class="media"><img src="./img-portrait.svg" alt="人才画像与测评" /></div><div class="tile-body"><h3>人才画像与测评</h3><p>量表与面试问答融合评估。</p><div class="actions"><button class="btn btn-outline" data-details data-title="人才画像与测评" data-img="./img-portrait.svg" data-desc="生成可视化人才画像与胜任力评估。" data-link="#">了解详情</button></div></div></article>
+                </div>
+
+                <!-- Modal for portfolio -->
+                <div class="modal" id="detailsModal" aria-hidden="true" role="dialog" aria-modal="true">
+                    <div class="modal-backdrop" data-modal-close></div>
+                    <div class="modal-dialog" role="document">
+                        <button class="modal-close" aria-label="Close" data-modal-close>✕</button>
+                        <h3 id="modalTitle"></h3>
+                        <p id="modalDesc" class="muted"></p>
+                        <div class="modal-media"><img id="modalImg" alt="" /></div>
+                        <div class="modal-actions"><a id="modalLink" class="btn btn-primary" target="_blank" rel="noopener noreferrer">访问链接</a></div>
                     </div>
-                    <input type="hidden" name="action" value="signin" />
-                    <button type="submit">登录</button>
-                </form>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="section">
+            <div class="container">
+                <div class="section-head">
+                    <span class="pill">技术能力</span>
+                    <h2>我们的技术栈</h2>
+                    <p class="muted">面向真实业务场景的工程化 AI：NLP/LLM、向量检索、知识图谱、多模态与 MLOps。</p>
+                </div>
+                <div class="grid grid-2 mt-12">
+                    <div>
+                        <h3 class="h4">AI 能力</h3>
+                        <div class="skills">
+                            <div class="skill"><div class="label"><span>NLP/LLM 微调</span><span>90%</span></div><div class="bar" data-value="90"></div></div>
+                            <div class="skill"><div class="label"><span>向量检索/重排</span><span>88%</span></div><div class="bar" data-value="88"></div></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="h4">工程能力</h3>
+                        <div class="skills">
+                            <div class="skill"><div class="label"><span>Web 全栈</span><span>92%</span></div><div class="bar" data-value="92"></div></div>
             </div>
         </div>
-        <div class="intros-container">
-            <div class="intro-control signin-intro">
-                <div class="intro-control__inner">
-                    <h2>Welcome back!</h2>
-                    <p>
-                        Welcome back! We are so happy to have you here. It's great to see you again. We hope you had a safe and enjoyable time away.
-                    </p>
-                    <button id="signup-btn">No account yet? Signup.</button>
                 </div>
             </div>
-            <div class="intro-control signup-intro">
-                <div class="intro-control__inner">
-                    <h2>Come join us!</h2>
-                    <p>
-                        We are so excited to have you here. If you haven't already, create an account to get access to exclusive offers, rewards, and discounts.
-                    </p>
-                    <button id="signin-btn">Already have an account? Signin.</button>
+        </section>
+
+        <section id="contact" class="section">
+            <div class="container">
+                <div class="section-head"><span class="pill">联系</span><h2>取得联系</h2><p class="muted">欢迎交流合作与试用事宜，我们将尽快与您联系。</p></div>
+                <div class="grid grid-3 mt-12">
+                    <article class="info-card"><div class="icon-badge">✉️</div><h3>邮箱</h3><a href="mailto:contact@ll-talent.cn" class="link">contact@ll-talent.cn</a><p class="muted">24 小时内回复</p></article>
                 </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="left">
+                <a class="brand" href="#home" data-scroll><span class="brand-text">林理人才</span></a>
+                <p class="muted">© <span id="year"></span> 林理人才开发团队（北京林业大学）. 保留所有权利.</p>
+            </div>
+            <div class="socials"><a href="#" aria-label="GitHub">💻</a></div>
+        </div>
+    </footer>
+
+    <!-- 登录/注册弹窗（与后端字段保持一致） -->
+    <div class="modal" id="authModal" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="modal-backdrop" data-modal-close></div>
+        <div class="modal-dialog" role="document" style="padding:0;overflow:hidden">
+            <button class="modal-close" aria-label="Close" data-modal-close>✕</button>
+            <div style="display:flex;height:560px">
+                <!-- 左侧介绍 -->
+                <aside style="flex:1;height:100%;padding:40px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
+                    <div class="left-signup" style="text-align:center">
+                        <h2 style="font-size:32px;margin:0 0 16px">加入我们！</h2>
+                        <p style="opacity:.95;max-width:280px">成为林理人才招聘系统的一员，开启智能招聘新时代</p>
+                        <button class="btn" id="toSignin" style="margin-top:20px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)">已有账号？ 去登录</button>
+                    </div>
+                    <div class="left-signin" style="text-align:center;display:none">
+                        <h2 style="font-size:32px;margin:0 0 16px">欢迎回来！</h2>
+                        <p style="opacity:.95;max-width:280px">很高兴再次见到你！ 欢迎回到系统。</p>
+                        <button class="btn" id="toSignup" style="margin-top:20px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)">还没有账号？ 去注册</button>
+                    </div>
+                </aside>
+                <!-- 右侧表单容器 -->
+                <section style="flex:1;height:100%;padding:32px 24px;overflow:auto">
+                    <div class="section-head" style="margin-bottom:12px"><h2 id="authTitle">注册</h2></div>
+                    <!-- 注册表单（默认显示） -->
+                    <form id="signupForm" class="form" method="post" action="{{ url_for('common.auth.sign') }}">
+                        <input type="hidden" name="action" value="signup" />
+                        <div class="grid grid-2 gap-6">
+                            <label class="field"><span class="label">名</span><input type="text" name="first_name" placeholder="名" required /></label>
+                            <label class="field"><span class="label">姓</span><input type="text" name="last_name" placeholder="姓" required /></label>
+                        </div>
+                        <label class="field"><span class="label">公司名称</span><input type="text" name="company_name" placeholder="公司名称" required /></label>
+                        <label class="field"><span class="label">邮箱</span><input type="email" name="email" placeholder="邮箱" required /></label>
+                        <div class="grid grid-2 gap-6">
+                            <label class="field"><span class="label">电话号码</span><input type="tel" name="phone_number" placeholder="电话号码" required /></label>
+                            <label class="field"><span class="label">生日</span><input type="date" name="birthday" required /></label>
+                        </div>
+                        <div class="grid grid-2 gap-6">
+                            <label class="field"><span class="label">密码</span><input type="password" name="password" placeholder="密码" required /></label>
+                            <label class="field"><span class="label">确认密码</span><input type="password" name="confirm_password" placeholder="确认密码" required /></label>
+                        </div>
+                        <div class="field">
+                            <span class="label">身份选择</span>
+                            <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+                                <label><input type="radio" name="role" value="candidate" checked /> 求职者</label>
+                                <label><input type="radio" name="role" value="recruiter" /> 招聘者（HR）</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%">注册</button>
+                    </form>
+                    <!-- 登录表单 -->
+                    <form id="signinForm" class="form" method="post" action="{{ url_for('common.auth.sign') }}" style="display:none">
+                        <input type="hidden" name="action" value="signin" />
+                        <label class="field"><span class="label">邮箱</span><input type="email" name="email" placeholder="邮箱" required /></label>
+                        <label class="field"><span class="label">密码</span><input type="password" name="password" placeholder="密码" required /></label>
+                        <div class="field">
+                            <span class="label">以身份登录</span>
+                            <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+                                <label><input type="radio" name="role" value="candidate" checked /> 求职者</label>
+                                <label><input type="radio" name="role" value="recruiter" /> 招聘者（HR）</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:16px">登录</button>
+                    </form>
+                </section>
             </div>
         </div>
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const signupBtn = document.getElementById("signup-btn");
-            const signinBtn = document.getElementById("signin-btn");
-            const mainContainer = document.querySelector(".container");
 
-            signupBtn.addEventListener("click", () => {
-                mainContainer.classList.toggle("change");
-                document.querySelector(".intro-control.signin-intro").style.opacity = '0';
-                document.querySelector(".intro-control.signup-intro").style.opacity = '1';
+    <!-- Scroll To Top -->
+    <button id="scrollTop" class="scroll-top" aria-label="Scroll to top">↑</button>
+
+    <script src="{{ url_for('static', filename='common/script.js') }}"></script>
+    <script>
+    // Enhanced Animation System from 模板.html
+    class AnimationManager {
+        constructor() {
+            this.observers = new Map();
+            this.init();
+        }
+        init() {
+            this.setupScrollProgress();
+            this.setupSmoothScrolling();
+            this.setupHeaderEffects();
+            this.setupScrollAnimations();
+            this.setupParallaxEffects();
+            this.setupCardInteractions();
+            this.setupFloatingShapes();
+            this.setupParticleSystem();
+            this.setupPlayButton();
+            this.setupMagneticEffect();
+        }
+        setupScrollProgress() {
+            const progressBar = document.querySelector('.scroll-progress');
+            window.addEventListener('scroll', () => {
+                const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+                progressBar.style.width = scrolled + '%';
             });
-            signinBtn.addEventListener("click", () => {
-                mainContainer.classList.toggle("change");
-                document.querySelector(".intro-control.signin-intro").style.opacity = '1';
-                document.querySelector(".intro-control.signup-intro").style.opacity = '0';
+        }
+        setupSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
             });
-        });
+        }
+        setupHeaderEffects() {
+            const header = document.querySelector('.site-header, .header');
+            let lastScrollY = window.scrollY;
+            window.addEventListener('scroll', () => {
+                const currentScrollY = window.scrollY;
+                if (currentScrollY > 100) {
+                    header.style.background = 'rgba(255, 255, 255, 0.95)';
+                    header.style.backdropFilter = 'blur(10px)';
+                    header.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+                } else {
+                    header.style.background = '#fff';
+                    header.style.backdropFilter = 'none';
+                    header.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                }
+                if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                    header.style.transform = 'translateY(-100%)';
+                } else {
+                    header.style.transform = 'translateY(0)';
+                }
+                lastScrollY = currentScrollY;
+            });
+        }
+        setupScrollAnimations() {
+            const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+            const featureObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) { entry.target.classList.add('animate'); }
+                    else { entry.target.classList.remove('animate'); }
+                });
+            }, observerOptions);
+            document.querySelectorAll('.feature-card, .feature-item').forEach(card => { featureObserver.observe(card); });
+            const titleObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) { entry.target.style.animation = 'fadeInUp 0.8s ease-out forwards'; } });
+            }, { threshold: 0.5 });
+            document.querySelectorAll('.section-title').forEach(title => { titleObserver.observe(title); });
+        }
+        setupParallaxEffects() {
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const parallaxElements = document.querySelectorAll('.parallax');
+                parallaxElements.forEach(element => { const speed = 0.5; element.style.transform = `translateY(${scrolled * speed}px)`; });
+            });
+        }
+        setupCardInteractions() {
+            document.querySelectorAll('.feature-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2; const centerY = rect.height / 2;
+                    const rotateX = (y - centerY) / 10; const rotateY = (centerX - x) / 10;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+                });
+                card.addEventListener('mouseleave', () => { card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)'; });
+            });
+            document.querySelectorAll('.btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const ripple = document.createElement('span');
+                    const rect = button.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2; const y = e.clientY - rect.top - size / 2;
+                    ripple.style.width = ripple.style.height = size + 'px'; ripple.style.left = x + 'px'; ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple'); button.appendChild(ripple); setTimeout(() => { ripple.remove(); }, 600);
+                });
+            });
+        }
+        setupFloatingShapes() {
+            const shapesContainer = document.getElementById('floatingShapes');
+            const shapes = ['triangle', 'circle', 'square', 'diamond'];
+            for (let i = 0; i < 20; i++) { const shape = document.createElement('div'); const shapeType = shapes[Math.floor(Math.random() * shapes.length)]; shape.className = `shape ${shapeType}`; shape.style.left = Math.random() * 100 + '%'; shape.style.top = Math.random() * 100 + '%'; shape.style.animationDelay = Math.random() * 15 + 's'; shape.style.animationDuration = (Math.random() * 10 + 10) + 's'; shapesContainer.appendChild(shape); }
+        }
+        setupParticleSystem() {
+            const particleContainer = document.getElementById('particleSystem');
+            for (let i = 0; i < 30; i++) { const particle = document.createElement('div'); particle.className = 'particle'; particle.style.left = Math.random() * 100 + '%'; particle.style.animationDelay = Math.random() * 8 + 's'; particle.style.animationDuration = (Math.random() * 4 + 6) + 's'; particleContainer.appendChild(particle); }
+        }
+        setupPlayButton() {}
+        setupMagneticEffect() {
+            document.querySelectorAll('.magnetic-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect(); const x = e.clientX - rect.left - rect.width / 2; const y = e.clientY - rect.top - rect.height / 2;
+                    const moveX = x * 0.1; const moveY = y * 0.1; card.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                });
+                card.addEventListener('mouseleave', () => { card.style.transform = 'translate(0, 0)'; });
+            });
+        }
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        new AnimationManager(); setTimeout(() => { document.body.style.opacity = '1'; }, 100);
+    });
+    const style = document.createElement('style');
+    style.textContent = `
+        .ripple { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.6); transform: scale(0); animation: ripple-animation 0.6s linear; pointer-events: none; }
+        @keyframes ripple-animation { to { transform: scale(4); opacity: 0; } }
+        body { opacity: 0; transition: opacity 0.5s ease; }
+        .fadeInUp { animation: fadeInUp 0.8s ease-out forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    `;
+    document.head.appendChild(style);
     </script>
 </body>
 </html>
