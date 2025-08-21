@@ -241,7 +241,7 @@
 
     <div class="actions">
         <a href="{{ url_for('smartrecruit.candidate.jobs.job_list') }}" class="back-link">&larr; 返回职位列表</a>
-        <a href="{{ url_for('smartrecruit.candidate.applications.apply_job', job_id = job.id) }}" class="apply-button">申请</a>
+        <a href="{{ url_for('smartrecruit.candidate.applications.apply', job_id = job.id) }}" class="apply-button">申请</a>
     </div>
 </div>
 {% endblock %}

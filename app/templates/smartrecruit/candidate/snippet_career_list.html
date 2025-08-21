@@ -43,7 +43,7 @@
             </div>
             <div class="job-actions">
                 <a href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=rec.job.id) }}" class="btn-view">查看详情</a>
-                <a href="{{ url_for('smartrecruit.candidate.applications.apply_job', job_id=rec.job.id) }}" class="btn-apply">立即申请</a>
+                <a href="{{ url_for('smartrecruit.candidate.applications.apply', job_id=rec.job.id) }}" class="btn-apply">立即申请</a>
             </div>
         </div>
         {% endfor %}
