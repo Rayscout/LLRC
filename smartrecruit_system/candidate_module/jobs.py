@@ -4,6 +4,28 @@ import logging
 
 jobs_bp = Blueprint('jobs', __name__, url_prefix='/jobs')
 
+@jobs_bp.route('/home')
+def candidate_home():
+    """候选者首页：智能推荐+最新职位"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    try:
+        jobs = Job.query.order_by(Job.date_posted.desc()).limit(12).all()
+        recommended_jobs = get_job_recommendations(g.user)
+        user_skills = extract_user_skills(g.user)
+    except Exception as e:
+        logging.error(f"加载候选者首页失败: {e}")
+        jobs = []
+        recommended_jobs = []
+        user_skills = []
+
+    return render_template('smartrecruit/candidate/snippet_career_list.html',
+                           jobs=jobs,
+                           recommended_jobs=recommended_jobs,
+                           user_skills=user_skills)
+
 @jobs_bp.route('/')
 def job_list():
     """职位列表页面"""
@@ -67,14 +89,19 @@ def job_search():
             jobs_query = jobs_query.filter(Job.location.contains(location))
         
         jobs = jobs_query.order_by(Job.date_posted.desc()).all()
+
+        # 用户技能用于页面展示
+        user_skills = extract_user_skills(g.user)
     except Exception as e:
         flash('搜索职位失败，请稍后重试。', 'danger')
         jobs = []
+        user_skills = []
     
     return render_template('smartrecruit/candidate/job_search.html', 
                          jobs=jobs, 
                          query=query, 
-                         location=location)
+                         location=location,
+                         user_skills=user_skills)
 
 @jobs_bp.route('/recommendations')
 def job_recommendations():

@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}AI 虚拟面试{% endblock %}
+
+{% block content %}
+<style>
+    .vi-container { max-width: 1000px; margin: 20px auto; }
+    .vi-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .vi-card { background: #fff; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.08); padding: 16px; }
+    .vi-video { width: 100%; aspect-ratio: 16 / 9; background: #111; border-radius: 10px; overflow: hidden; display: grid; place-items: center; color: #aaa; }
+    .vi-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    .vi-btns { display: flex; gap: 10px; }
+    .vi-btn { padding: 10px 14px; border-radius: 8px; border: none; cursor: pointer; }
+    .vi-btn.primary { background: #2563eb; color: #fff; }
+    .vi-btn.danger { background: #ef4444; color: #fff; }
+    .vi-btn.neutral { background: #f3f4f6; color: #111; }
+    .vi-status { font-size: 14px; color: #6b7280; }
+    .vi-panel h3 { margin: 0 0 8px; }
+    .vi-qa { display: grid; gap: 8px; }
+    .vi-q { background: #f9fafb; border-radius: 8px; padding: 10px; font-size: 14px; }
+    .vi-q.active { border: 1px solid #2563eb; background: #eff6ff; }
+    .vi-timer { font-variant-numeric: tabular-nums; font-weight: 600; }
+    .vi-progress { height: 8px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+    .vi-progress > div { height: 100%; background: linear-gradient(90deg,#22c55e,#16a34a); width: 0%; }
+    .vi-tips { display: grid; gap: 6px; font-size: 13px; color: #374151; }
+    body.dark .vi-card { background: #1f2937; color: #e5e7eb; }
+    body.dark .vi-q { background: #111827; }
+    body.dark .vi-q.active { background: #0b1220; }
+</style>
+
+<div class="vi-container">
+  <div class="vi-grid">
+    <div class="vi-card">
+      <div class="vi-video">
+        <video id="viVideo" autoplay muted playsinline style="width:100%; height:100%; object-fit:cover; display:none;"></video>
+        <div id="viVideoPlaceholder">摄像头预览</div>
+      </div>
+      <div class="vi-controls">
+        <div class="vi-btns">
+          <button class="vi-btn neutral" id="btnCam">开启摄像头</button>
+          <button class="vi-btn neutral" id="btnMic">开启麦克风</button>
+          <button class="vi-btn primary" id="btnStart">开始答题</button>
+          <button class="vi-btn danger" id="btnEnd" disabled>结束面试</button>
+        </div>
+        <div class="vi-status">
+          <span>状态：</span><span id="viStatus">准备中</span>
+          <span style="margin-left:12px;">时间：</span><span class="vi-timer" id="viTimer">00:00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vi-card vi-panel">
+      <h3>面试进度</h3>
+      <div class="vi-progress" aria-label="progress"><div id="viProgress"></div></div>
+      <p style="margin:6px 0 12px; color:#6b7280;">第 <span id="viIndex">0</span> / <span id="viTotal">0</span> 题</p>
+      <div class="vi-qa" id="viQuestions"></div>
+      <div style="margin-top:12px; display:grid; gap:8px;">
+        <label for="viAnswer">当前题目回答</label>
+        <textarea id="viAnswer" rows="4" placeholder="可在此记录要点（模拟，不上传）" style="width:100%; padding:10px; border-radius:8px; border:1px solid #e5e7eb;"></textarea>
+        <button class="vi-btn primary" id="btnNext" disabled>提交并下一题</button>
+      </div>
+      <hr style="margin:16px 0; border:none; border-top:1px solid #e5e7eb;">
+      <h3>小提示</h3>
+      <div class="vi-tips">
+        <div>· 保持目视摄像头，语速平稳。</div>
+        <div>· 用 STAR 法则组织答案。</div>
+        <div>· 控制在 1-2 分钟内作答。</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const sampleQuestions = [
+      '请做一个 30 秒的自我介绍。',
+      '谈谈你最近一次解决棘手问题的经历。',
+      '你为什么想加入我们公司？',
+      '描述一个你主导的项目以及你的贡献。',
+      '收到批评时你如何应对？'
+    ];
+
+    const viVideo = document.getElementById('viVideo');
+    const viVideoPh = document.getElementById('viVideoPlaceholder');
+    const btnCam = document.getElementById('btnCam');
+    const btnMic = document.getElementById('btnMic');
+    const btnStart = document.getElementById('btnStart');
+    const btnEnd = document.getElementById('btnEnd');
+    const btnNext = document.getElementById('btnNext');
+    const viStatus = document.getElementById('viStatus');
+    const viTimer = document.getElementById('viTimer');
+    const viQuestions = document.getElementById('viQuestions');
+    const viAnswer = document.getElementById('viAnswer');
+    const viIndex = document.getElementById('viIndex');
+    const viTotal = document.getElementById('viTotal');
+    const viProgress = document.getElementById('viProgress');
+
+    let mediaStream = null;
+    let micEnabled = false;
+    let camEnabled = false;
+    let started = false;
+    let current = 0;
+    let timerId = null; let seconds = 0;
+
+    function formatTime(s){ const m = Math.floor(s/60).toString().padStart(2,'0'); return `${m}:${(s%60).toString().padStart(2,'0')}` }
+    function startTimer(){ if(timerId) return; timerId = setInterval(()=>{ seconds++; viTimer.textContent = formatTime(seconds); },1000); }
+    function stopTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } }
+    function updateProgress(){ const pct = sampleQuestions.length ? (current / sampleQuestions.length) * 100 : 0; viProgress.style.width = `${pct}%`; viIndex.textContent = String(Math.min(current, sampleQuestions.length)); viTotal.textContent = String(sampleQuestions.length); }
+    function renderQuestions(){ viQuestions.innerHTML=''; sampleQuestions.forEach((q,i)=>{ const div=document.createElement('div'); div.className='vi-q'+(i===current?' active':''); div.textContent = `${i+1}. ${q}`; viQuestions.appendChild(div); }); updateProgress(); }
+
+    async function ensureStream(withAudio){
+      try {
+        if(mediaStream){ mediaStream.getTracks().forEach(t=>t.stop()); }
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: withAudio });
+        viVideo.srcObject = mediaStream; viVideo.style.display='block'; viVideoPh.style.display='none';
+      } catch(e) {
+        viStatus.textContent = '无法访问摄像头/麦克风';
+      }
+    }
+
+    btnCam.addEventListener('click', async ()=>{
+      camEnabled = !camEnabled;
+      if(camEnabled){ await ensureStream(micEnabled); btnCam.textContent='关闭摄像头'; viStatus.textContent='摄像头已开启'; }
+      else { if(mediaStream){ mediaStream.getTracks().forEach(t=>t.stop()); mediaStream=null; } viVideo.style.display='none'; viVideoPh.style.display='grid'; btnCam.textContent='开启摄像头'; viStatus.textContent='摄像头已关闭'; }
+    });
+
+    btnMic.addEventListener('click', async ()=>{
+      micEnabled = !micEnabled;
+      if(camEnabled){ await ensureStream(micEnabled); }
+      btnMic.textContent = micEnabled ? '关闭麦克风' : '开启麦克风';
+      viStatus.textContent = micEnabled ? '麦克风已开启' : '麦克风已关闭';
+    });
+
+    btnStart.addEventListener('click', ()=>{
+      if(started) return; started = true; current = 0; seconds = 0; startTimer(); viStatus.textContent='面试进行中';
+      btnStart.disabled = true; btnEnd.disabled = false; btnNext.disabled = false; renderQuestions(); viAnswer.focus();
+    });
+
+    btnNext.addEventListener('click', ()=>{
+      if(!started) return; current++;
+      viAnswer.value = '';
+      if(current >= sampleQuestions.length){ viStatus.textContent='面试已完成，跳转中...'; stopTimer(); setTimeout(()=>{ window.location.href = "{{ url_for('smartrecruit.candidate.applications.virtual_feedback') }}"; }, 700); }
+      renderQuestions();
+    });
+
+    btnEnd.addEventListener('click', ()=>{
+      if(!started) return; viStatus.textContent='已手动结束'; stopTimer(); setTimeout(()=>{ window.location.href = "{{ url_for('smartrecruit.candidate.applications.virtual_feedback') }}"; }, 400);
+    });
+
+    // 初始化
+    viTotal.textContent = String(sampleQuestions.length);
+    renderQuestions();
+  })();
+</script>
+{% endblock %}
+
+

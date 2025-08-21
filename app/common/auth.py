@@ -93,4 +93,5 @@ def home():
     if getattr(g.user, 'is_hr', False):
         return redirect(url_for('smartrecruit.hr.dashboard.hr_dashboard'))
     else:
-        return redirect(url_for('smartrecruit.candidate.jobs.job_list'))
+        # 求职者：显示智能推荐首页
+        return redirect(url_for('smartrecruit.candidate.jobs.candidate_home'))

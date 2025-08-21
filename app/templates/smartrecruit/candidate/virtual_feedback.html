@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}AI 面试反馈{% endblock %}
+
+{% block content %}
+<style>
+  .vf-wrap { max-width: 900px; margin: 20px auto; display: grid; gap: 16px; }
+  .vf-card { background: #fff; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.08); padding: 16px; }
+  .vf-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  .vf-meter { height: 14px; background:#e5e7eb; border-radius: 999px; overflow: hidden; }
+  .vf-meter > div { height: 100%; background: linear-gradient(90deg,#60a5fa,#2563eb); width: 0%; }
+  .vf-badges { display:flex; flex-wrap: wrap; gap: 8px; }
+  .vf-badge { background:#eff6ff; color:#1d4ed8; padding:6px 10px; border-radius: 999px; font-size:12px; }
+  .vf-list { list-style: none; padding: 0; margin: 0; display:grid; gap: 8px; }
+  .vf-item { background:#f9fafb; padding:10px; border-radius:10px; }
+  .vf-actions { display:flex; gap:10px; justify-content: flex-end; }
+  .vf-btn { padding:10px 14px; border-radius: 8px; border:none; cursor:pointer; }
+  .vf-btn.primary { background:#2563eb; color:#fff; }
+  .vf-btn.neutral { background:#f3f4f6; color:#111; }
+  body.dark .vf-card { background: #1f2937; color: #e5e7eb; }
+  body.dark .vf-item { background: #111827; }
+</style>
+
+<div class="vf-wrap">
+  <div class="vf-card">
+    <h2 style="margin:0 0 12px;">本次面试总体评价</h2>
+    <div class="vf-meter"><div id="vfScore"></div></div>
+    <p id="vfScoreText" style="color:#6b7280; margin:8px 0 0;">正在生成评分...</p>
+  </div>
+
+  <div class="vf-row">
+    <div class="vf-card">
+      <h3 style="margin-top:0;">优势亮点</h3>
+      <div class="vf-badges" id="vfStrengths"></div>
+      <h3>可改进建议</h3>
+      <ul class="vf-list" id="vfImprovements"></ul>
+    </div>
+    <div class="vf-card">
+      <h3 style="margin-top:0;">维度评分</h3>
+      <ul class="vf-list" id="vfDimensions"></ul>
+    </div>
+  </div>
+
+  <div class="vf-card">
+    <h3 style="margin-top:0;">下一步</h3>
+    <div class="vf-actions">
+      <a class="vf-btn neutral" href="{{ url_for('smartrecruit.candidate.applications.virtual_interview') }}">重新模拟</a>
+      <a class="vf-btn primary" href="{{ url_for('smartrecruit.candidate.jobs.job_list') }}">去投递职位</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // 纯前端假数据与生成逻辑
+    const randomBetween = (a,b)=> Math.floor(Math.random()*(b-a+1))+a;
+    const percent = randomBetween(62, 92);
+    const strengths = ['表达清晰', '思路完整', '案例具体', '动机明确', '逻辑严谨'];
+    const improvements = [
+      '回答可更精炼，突出关键信息。',
+      '多使用数据量化成果以增强可信度。',
+      '可加入风险与复盘思考，体现反思能力。',
+      '注意语速与停顿，提升表达节奏。'
+    ];
+    const dims = [
+      ['沟通表达', randomBetween(60,95)],
+      ['问题分析', randomBetween(60,95)],
+      ['项目经验', randomBetween(60,95)],
+      ['岗位匹配', randomBetween(60,95)],
+      ['压力应对', randomBetween(60,95)]
+    ];
+
+    const vfScore = document.getElementById('vfScore');
+    const vfScoreText = document.getElementById('vfScoreText');
+    const vfStrengths = document.getElementById('vfStrengths');
+    const vfImprovements = document.getElementById('vfImprovements');
+    const vfDimensions = document.getElementById('vfDimensions');
+
+    // 渐进式渲染
+    requestAnimationFrame(()=>{ vfScore.style.width = '0%'; });
+    setTimeout(()=>{ vfScore.style.width = percent + '%'; vfScoreText.textContent = `综合评分：${percent}%（模拟）`; }, 400);
+
+    strengths.slice(0, randomBetween(3, strengths.length)).forEach(s=>{
+      const span = document.createElement('span'); span.className='vf-badge'; span.textContent = s; vfStrengths.appendChild(span);
+    });
+
+    improvements.forEach(tip=>{
+      const li = document.createElement('li'); li.className='vf-item'; li.textContent = tip; vfImprovements.appendChild(li);
+    });
+
+    dims.forEach(([name,score])=>{
+      const li = document.createElement('li'); li.className='vf-item';
+      li.innerHTML = `<div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>${name}</strong><span>${score}%</span></div>
+      <div class="vf-meter"><div style="width:${score}%; background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div>`;
+      vfDimensions.appendChild(li);
+    });
+  })();
+ </script>
+{% endblock %}
+
+

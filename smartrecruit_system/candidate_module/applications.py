@@ -8,6 +8,24 @@ from datetime import datetime
 
 applications_bp = Blueprint('applications', __name__, url_prefix='/applications')
 
+@applications_bp.route('/virtual_interview', methods=['GET'])
+def virtual_interview():
+    """AI 虚拟面试（仅前端界面，不接入API）"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    return render_template('smartrecruit/candidate/virtual_interview.html')
+
+@applications_bp.route('/virtual_feedback', methods=['GET'])
+def virtual_feedback():
+    """AI 虚拟面试反馈（仅前端界面，不接入API）"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    return render_template('smartrecruit/candidate/virtual_feedback.html')
+
 @applications_bp.route('/apply/<int:job_id>', methods=['GET'])
 def apply(job_id):
     """申请职位"""

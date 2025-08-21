@@ -428,12 +428,12 @@ async function loadRecommendedJobs() {
     recommendedJobs.innerHTML = '<div class="loading">正在加载推荐职位...</div>';
     
     try {
-        const response = await fetch('/api/recommend_jobs');
+        const response = await fetch('{{ url_for("smartrecruit.candidate.jobs.job_recommendations") }}');
         const data = await response.json();
         
         if (data.success) {
-            currentRecommendedJobs = data.jobs;
-            displayJobs(data.jobs, recommendedJobs, true);
+            currentRecommendedJobs = data.recommendations;
+            displayJobs(data.recommendations, recommendedJobs, true);
         } else {
             recommendedJobs.innerHTML = '<div class="no-results">暂无推荐职位</div>';
         }
@@ -460,27 +460,18 @@ async function searchJobs() {
     searchResults.style.display = 'block';
     
     try {
-        const response = await fetch('/api/search_jobs', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: searchQuery,
-                location: locationFilter,
-                salary_min: salaryMin ? parseInt(salaryMin) : 0,
-                salary_max: salaryMax ? parseInt(salaryMax) : 999999,
-                job_type: jobType,
-                experience_level: experienceLevel
-            })
+        const params = new URLSearchParams({
+            q: searchQuery,
+            location: locationFilter
         });
+        const response = await fetch('{{ url_for("smartrecruit.candidate.jobs.api_search_jobs") }}?' + params.toString());
         
         const data = await response.json();
         
         if (data.success) {
             currentSearchResults = data.jobs;
             displayJobs(data.jobs, searchResultsGrid, false);
-            resultsCount.textContent = `找到 ${data.total_count} 个职位`;
+            resultsCount.textContent = `找到 ${data.total} 个职位`;
         } else {
             searchResultsGrid.innerHTML = '<div class="no-results">搜索失败，请稍后重试</div>';
         }
@@ -510,8 +501,8 @@ function displayJobs(jobs, container, isRecommended) {
                 <span class="job-experience">${job.experience_level || '不限'}</span>
             </div>
             <div class="job-actions">
-                <a href="/job/${job.id}" class="btn-view">查看详情</a>
-                <a href="/apply/${job.id}" class="btn-apply">立即申请</a>
+                <a href="${'{{ url_for("smartrecruit.candidate.jobs.job_detail", job_id=0) }}'.replace('0', job.id)}" class="btn-view">查看详情</a>
+                <a href="${'{{ url_for("smartrecruit.candidate.applications.apply", job_id=0) }}'.replace('0', job.id)}" class="btn-apply">立即申请</a>
             </div>
         </div>
     `).join('');
