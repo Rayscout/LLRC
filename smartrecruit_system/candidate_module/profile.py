@@ -70,3 +70,12 @@ def settings():
         return redirect(url_for('smartrecruit.candidate.profile.settings'))
     
     return render_template('smartrecruit/candidate/settings.html', user=g.user)
+
+@profile_bp.route('/career_path')
+def career_path():
+    """职业发展与技能差距（仅界面，前端模拟数据）"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    return render_template('smartrecruit/candidate/career_path.html', user=g.user)
