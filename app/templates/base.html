@@ -21,14 +21,18 @@
     #themeToggle:checked{ background:#111827; border-color:#111827; }
     #themeToggle:checked::after{ transform:translateX(18px); background:#e5e7eb; }
 
-    /* 全局深色模式基础覆盖 */
+    /* 全局深色模式基础覆盖（毛玻璃流动感） */
     body.dark { color:#e5e7eb; background:#0b1220; }
     body.dark a { color:#e5e7eb; }
-    body.dark nav { background:#0f172a; border-right:1px solid #1f2937; }
+    /* 毛玻璃侧边栏 */
+    body.dark nav { position:relative; background:rgba(15,23,42,.35); border-right:1px solid rgba(148,163,184,.25); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    body.dark nav::before{ content:""; position:absolute; inset:0; background: radial-gradient(1200px 400px at -10% -20%, rgba(99,102,241,.18), transparent 60%), radial-gradient(1000px 380px at 120% 120%, rgba(236,72,153,.18), transparent 60%); background-size:200% 200%; animation:glassFlow 14s ease-in-out infinite; pointer-events:none; }
     body.dark nav .link-name, body.dark nav i { color:#e5e7eb; }
-    body.dark .dashboard { background:#0b1220; }
+    /* 主内容毛玻璃背景 */
+    body.dark .dashboard { background:linear-gradient(180deg, rgba(11,18,32,.75), rgba(11,18,32,.6)); }
     body.dark .dash-content { background:transparent; }
     body.dark .logout-mode .mode { background:transparent; }
+    @keyframes glassFlow{ 0%{background-position:0% 0%} 50%{background-position:100% 100%} 100%{background-position:0% 0%} }
 
     /* 顶部快捷主题按钮 */
     .theme-btn{ border:1px solid #e5e7eb; background:#fff; color:#111827; border-radius:999px; padding:6px 10px; margin-left:10px; cursor:pointer }
