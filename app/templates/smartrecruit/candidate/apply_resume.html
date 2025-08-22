@@ -84,11 +84,11 @@ input[type="file"], textarea { width: 100%; border: 2px solid #e7e7e7; border-ra
 </style>
 <style>
 /* 深色模式 */
-body.dark .apply-form{ background:#111827; box-shadow: 0 6px 22px rgba(0,0,0,.6) }
+body.dark .apply-form{ background:rgba(17,24,39,.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,.35) }
 body.dark .page-title, body.dark label, body.dark .checkbox, body.dark .dz-title{ color:#e5e7eb }
 body.dark .hint, body.dark .muted, body.dark .dz-hint{ color:#9ca3af }
-body.dark input[type="file"], body.dark textarea{ background:#0f172a; border-color:#374151; color:#e5e7eb }
-body.dark .dropzone{ border-color:#374151; background:#0f172a }
+body.dark input[type="file"], body.dark textarea{ background:rgba(15,23,42,.45); border-color:#374151; color:#e5e7eb; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px) }
+body.dark .dropzone{ border-color:#374151; background:rgba(15,23,42,.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px) }
 body.dark .dropzone:hover{ border-color:#9ca3af; background:#111827 }
 body.dark .dz-file{ background:#1f2937; color:#e5e7eb }
 body.dark .btn-primary{ background:#e5e7eb; color:#111827 }
