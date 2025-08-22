@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR仪表盘 - 改进版示例</title>
+    <link rel="stylesheet" href="app/static/ios_hr_style.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <a href="#" class="ios-nav-brand">
+                <div class="ios-nav-brand-icon">
+                    <i class="uil uil-briefcase"></i>
+                </div>
+                <span>HR智能招聘</span>
+            </a>
+            
+            <ul class="ios-nav-menu">
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link active">
+                        <i class="ios-nav-icon uil uil-dashboard"></i>
+                        <span class="ios-nav-text">仪表板</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-briefcase"></i>
+                        <span class="ios-nav-text">发布职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-users-alt"></i>
+                        <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-briefcase-alt"></i>
+                        <span class="ios-nav-text">我的职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-chart-pie"></i>
+                        <span class="ios-nav-text">报表</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-lightbulb"></i>
+                        <span class="ios-nav-text">AI洞察</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="ios-nav-actions">
+                <div class="ios-nav-search">
+                    <i class="uil uil-search"></i>
+                    <input type="text" placeholder="搜索..." />
+                </div>
+                
+                <div class="ios-nav-divider"></div>
+                
+                <button class="ios-nav-button secondary" data-action="notifications">
+                    <i class="uil uil-bell"></i>
+                    <span class="ios-nav-badge">3</span>
+                </button>
+                
+                <button class="ios-nav-button" data-action="profile">
+                    <i class="uil uil-user"></i>
+                    <span>HR</span>
+                </button>
+            </div>
+            
+            <!-- 移动端菜单切换按钮 -->
+            <button class="ios-nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="ios-scroll-container">
+        <!-- 第一屏：欢迎和功能引导 -->
+        <section class="ios-section">
+            <div class="ios-container">
+                <!-- 功能引导卡片 -->
+                <div class="ios-feature-guide">
+                    <div class="ios-guide-header">
+                        <i class="uil uil-lightbulb"></i>
+                        <h3>快速开始</h3>
+                    </div>
+                    <div class="ios-guide-content">
+                        <p>欢迎使用HR智能招聘系统！这里是一些常用功能：</p>
+                        <ul>
+                            <li>📝 <strong>发布职位</strong> - 创建新的招聘需求</li>
+                            <li>👥 <strong>管理候选人</strong> - 查看和处理申请</li>
+                            <li>📊 <strong>数据分析</strong> - 了解招聘效果</li>
+                            <li>🗓️ <strong>面试管理</strong> - 安排面试和记录反馈</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 快速操作按钮 -->
+                <div class="ios-quick-actions">
+                    <h3>快速操作</h3>
+                    <div class="ios-action-buttons">
+                        <button class="ios-button large">
+                            <i class="uil uil-plus"></i>
+                            发布新职位
+                        </button>
+                        <button class="ios-button large secondary">
+                            <i class="uil uil-eye"></i>
+                            查看申请
+                        </button>
+                        <button class="ios-button large secondary">
+                            <i class="uil uil-calendar-plus"></i>
+                            安排面试
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 功能概览面板 -->
+                <div class="ios-feature-overview">
+                    <h3>系统功能概览</h3>
+                    <div class="ios-feature-grid">
+                        <div class="ios-feature-card">
+                            <i class="uil uil-briefcase"></i>
+                            <h4>职位管理</h4>
+                            <p>发布、编辑、管理招聘职位</p>
+                            <a href="#" class="ios-button">开始使用</a>
+                        </div>
+                        <div class="ios-feature-card">
+                            <i class="uil uil-users-alt"></i>
+                            <h4>候选人管理</h4>
+                            <p>查看、筛选、评估候选人</p>
+                            <a href="#" class="ios-button">开始使用</a>
+                        </div>
+                        <div class="ios-feature-card">
+                            <i class="uil uil-calendar-alt"></i>
+                            <h4>面试管理</h4>
+                            <p>安排面试、记录反馈</p>
+                            <a href="#" class="ios-button">开始使用</a>
+                        </div>
+                        <div class="ios-feature-card">
+                            <i class="uil uil-chart-pie"></i>
+                            <h4>数据分析</h4>
+                            <p>招聘效果分析和报表</p>
+                            <a href="#" class="ios-button">开始使用</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第二屏：操作步骤指引 -->
+        <section class="ios-section">
+            <div class="ios-container">
+                <h2 class="ios-title">如何使用系统</h2>
+                <p class="ios-subtitle">按照以下步骤开始您的招聘工作</p>
+                
+                <!-- 操作步骤指引 -->
+                <div class="ios-step-guide">
+                    <div class="ios-step">
+                        <div class="ios-step-number">1</div>
+                        <div class="ios-step-content">
+                            <h4>选择职位</h4>
+                            <p>从下拉菜单中选择要管理的职位</p>
+                        </div>
+                    </div>
+                    <div class="ios-step">
+                        <div class="ios-step-number">2</div>
+                        <div class="ios-step-content">
+                            <h4>查看候选人</h4>
+                            <p>浏览申请该职位的候选人列表</p>
+                        </div>
+                    </div>
+                    <div class="ios-step">
+                        <div class="ios-step-number">3</div>
+                        <div class="ios-step-content">
+                            <h4>进行评估</h4>
+                            <p>查看简历并进行初步评估</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 帮助中心 -->
+                <div class="ios-help-center">
+                    <div class="ios-help-header">
+                        <i class="uil uil-question-circle"></i>
+                        <h3>需要帮助？</h3>
+                    </div>
+                    <div class="ios-help-content">
+                        <div class="ios-help-item">
+                            <h4>如何使用系统？</h4>
+                            <p>查看我们的使用指南和视频教程</p>
+                            <a href="#" class="ios-link">查看指南</a>
+                        </div>
+                        <div class="ios-help-item">
+                            <h4>常见问题</h4>
+                            <p>快速找到常见问题的答案</p>
+                            <a href="#" class="ios-link">查看FAQ</a>
+                        </div>
+                        <div class="ios-help-item">
+                            <h4>联系支持</h4>
+                            <p>如果还有问题，请联系我们的支持团队</p>
+                            <a href="#" class="ios-link">联系支持</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第三屏：数据统计和指标 -->
+        <section class="ios-section">
+            <div class="ios-container">
+                <h2 class="ios-title">招聘概览</h2>
+                <p class="ios-subtitle">实时了解您的招聘情况</p>
+                
+                <div class="ios-grid ios-grid-4">
+                    <div class="ios-metric-card">
+                        <div class="ios-metric-icon">
+                            <i class="uil uil-briefcase"></i>
+                        </div>
+                        <div class="ios-metric-value">12</div>
+                        <div class="ios-metric-label">活跃职位</div>
+                        <div class="ios-metric-change">
+                            <i class="uil uil-arrow-up"></i>
+                            +2 本周
+                        </div>
+                    </div>
+                    
+                    <div class="ios-metric-card">
+                        <div class="ios-metric-icon">
+                            <i class="uil uil-users-alt"></i>
+                        </div>
+                        <div class="ios-metric-value">156</div>
+                        <div class="ios-metric-label">候选人申请</div>
+                        <div class="ios-metric-change">
+                            <i class="uil uil-arrow-up"></i>
+                            +23 本周
+                        </div>
+                    </div>
+                    
+                    <div class="ios-metric-card">
+                        <div class="ios-metric-icon">
+                            <i class="uil uil-calendar-alt"></i>
+                        </div>
+                        <div class="ios-metric-value">8</div>
+                        <div class="ios-metric-label">面试安排</div>
+                        <div class="ios-metric-change">
+                            <i class="uil uil-arrow-up"></i>
+                            +3 本周
+                        </div>
+                    </div>
+                    
+                    <div class="ios-metric-card">
+                        <div class="ios-metric-icon">
+                            <i class="uil uil-check-circle"></i>
+                        </div>
+                        <div class="ios-metric-value">5</div>
+                        <div class="ios-metric-label">成功录用</div>
+                        <div class="ios-metric-change">
+                            <i class="uil uil-arrow-up"></i>
+                            +2 本周
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 上下文帮助示例 -->
+                <div class="ios-card" style="text-align: center; margin-top: var(--ios-spacing-xl);">
+                    <h3>候选人管理帮助</h3>
+                    <p>点击下面的帮助按钮了解更多信息</p>
+                    <div class="ios-context-help">
+                        <button class="ios-help-trigger" data-help="candidate-management">
+                            <i class="uil uil-question-circle"></i>
+                        </button>
+                        <div class="ios-help-popup" id="help-candidate-management">
+                            <h4>候选人管理帮助</h4>
+                            <ul>
+                                <li>使用筛选器快速找到合适的候选人</li>
+                                <li>点击候选人姓名查看详细信息</li>
+                                <li>使用标签功能对候选人进行分类</li>
+                                <li>记录评估结果和反馈意见</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 第四屏：最近活动和通知 -->
+        <section class="ios-section">
+            <div class="ios-container">
+                <h2 class="ios-title">最近活动</h2>
+                <p class="ios-subtitle">了解最新的招聘动态</p>
+                
+                <div class="ios-grid ios-grid-2">
+                    <div class="ios-card">
+                        <h3>最近申请</h3>
+                        <div class="ios-activity-list">
+                            <div class="ios-activity-item">
+                                <div class="ios-activity-icon">
+                                    <i class="uil uil-user-plus"></i>
+                                </div>
+                                <div class="ios-activity-content">
+                                    <h4>张三申请了前端开发工程师职位</h4>
+                                    <p>2小时前</p>
+                                </div>
+                                <div class="ios-activity-action">
+                                    <button class="ios-button secondary">查看</button>
+                                </div>
+                            </div>
+                            
+                            <div class="ios-activity-item">
+                                <div class="ios-activity-icon">
+                                    <i class="uil uil-user-plus"></i>
+                                </div>
+                                <div class="ios-activity-content">
+                                    <h4>李四申请了产品经理职位</h4>
+                                    <p>4小时前</p>
+                                </div>
+                                <div class="ios-activity-action">
+                                    <button class="ios-button secondary">查看</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-card">
+                        <h3>面试安排</h3>
+                        <div class="ios-activity-list">
+                            <div class="ios-activity-item">
+                                <div class="ios-activity-icon">
+                                    <i class="uil uil-calendar-alt"></i>
+                                </div>
+                                <div class="ios-activity-content">
+                                    <h4>明天上午10点面试王五</h4>
+                                    <p>前端开发工程师职位</p>
+                                </div>
+                                <div class="ios-activity-action">
+                                    <button class="ios-button secondary">详情</button>
+                                </div>
+                            </div>
+                            
+                            <div class="ios-activity-item">
+                                <div class="ios-activity-icon">
+                                    <i class="uil uil-calendar-alt"></i>
+                                </div>
+                                <div class="ios-activity-content">
+                                    <h4>后天下午2点面试赵六</h4>
+                                    <p>产品经理职位</p>
+                                </div>
+                                <div class="ios-activity-action">
+                                    <button class="ios-button secondary">详情</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app/static/ios_hr_script.js"></script>
+    <script>
+        // 初始化界面
+        document.addEventListener('DOMContentLoaded', function() {
+            new IOSHRInterface();
+        });
+    </script>
+
+    <style>
+        /* 活动列表样式 */
+        .ios-activity-list {
+            margin-top: var(--ios-spacing-lg);
+        }
+        
+        .ios-activity-item {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-md);
+            padding: var(--ios-spacing-md);
+            border-bottom: 1px solid var(--ios-border-secondary);
+            transition: all var(--ios-transition-fast);
+        }
+        
+        .ios-activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .ios-activity-item:hover {
+            background: rgba(0, 122, 255, 0.05);
+        }
+        
+        .ios-activity-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 122, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ios-blue);
+            font-size: 1.1rem;
+        }
+        
+        .ios-activity-content {
+            flex: 1;
+        }
+        
+        .ios-activity-content h4 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--ios-text-primary);
+            margin: 0 0 var(--ios-spacing-xs) 0;
+        }
+        
+        .ios-activity-content p {
+            font-size: 0.9rem;
+            color: var(--ios-text-tertiary);
+            margin: 0;
+        }
+        
+        .ios-activity-action {
+            flex-shrink: 0;
+        }
+    </style>
+</body>
+</html>

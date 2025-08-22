@@ -68,7 +68,7 @@ body {
   margin: 13px 34px;
   padding: 10px;
   margin-top: 5px;
-  background-color: #ff8c00; /* Orange color */
+  background-color: #60a5fa; /* Blue color */
   border-radius: 10px;
   color: #fff;
   cursor: pointer;
@@ -128,7 +128,7 @@ body {
   flex-direction: column;
   height: 480px;
   color: #fff;
-  background: linear-gradient(170deg, #ff8c00, #ff4500); /* Orange gradient */
+  background: linear-gradient(170deg, #60a5fa, #3b82f6); /* Blue gradient */
   transition: all 0.5s ease-in;
 }
 
@@ -139,7 +139,7 @@ body {
 .container .intros-container .intro-control button {
   border: none;
   padding: 15px 30px;
-  background-color: #ff8c00; /* Orange color */
+  background-color: #60a5fa; /* Blue color */
   border-radius: 50px;
   color: #fff;
   margin: 10px 0px;
@@ -149,7 +149,7 @@ body {
 .container .intros-container .intro-control button:focus, 
 .container .intros-container .intro-control button:hover {
   outline: none;
-  background-color: #ff4500; /* Darker orange on hover */
+  background-color: #3b82f6; /* Darker blue on hover */
 }
 
 .container .intros-container .intro-control h3,
@@ -175,7 +175,7 @@ body {
 }
 
 .change .forms-container .form-control.signup-form button {
-  background-color: #ff4500 !important; /* Darker orange for signup */
+  background-color: #3b82f6 !important; /* Darker blue for signup */
 }
 
 .change .forms-container .form-control.signin-form {
@@ -186,11 +186,11 @@ body {
 
 .change .intros-container .intro-control {
   transform: translateX(-100%);
-  background: linear-gradient(170deg, #ff8c00, #ff4500); /* Matching gradient */
+  background: linear-gradient(170deg, #60a5fa, #3b82f6); /* Matching gradient */
 }
 
 .change .intros-container .intro-control #signin-btn {
-  background-color: #ff4500;
+  background-color: #3b82f6;
 }
 
 .change .intros-container .intro-control.signin-intro {

@@ -1,0 +1,619 @@
+/* HR通用页面美化样式 - 磨砂灰色毛玻璃风格 */
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --frosted-gray: rgba(128, 128, 128, 0.15);
+  --frosted-gray-dark: rgba(64, 64, 64, 0.2);
+  --frosted-gray-light: rgba(192, 192, 192, 0.1);
+  --accent-gradient: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+  --card-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%);
+  --text-primary: #2d3748;
+  --text-secondary: #718096;
+  --text-muted: #a0aec0;
+  --success-color: #48bb78;
+  --warning-color: #60a5fa;
+  --info-color: #4299e1;
+  --danger-color: #f56565;
+  --border-radius: 12px;
+  --border-radius-sm: 8px;
+}
+
+body.dark {
+  --glass-bg: rgba(0, 0, 0, 0.2);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --frosted-gray: rgba(128, 128, 128, 0.1);
+  --frosted-gray-dark: rgba(64, 64, 64, 0.15);
+  --frosted-gray-light: rgba(192, 192, 192, 0.05);
+  --text-primary: #f7fafc;
+  --text-secondary: #e2e8f0;
+  --text-muted: #a0aec0;
+}
+
+/* 毛玻璃效果基础样式 */
+.glass-effect {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* 通用容器样式 */
+.ios-style {
+  background: #ffffff;
+  min-height: 100vh;
+  padding: 24px;
+  position: relative;
+}
+
+.ios-style::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(128, 128, 128, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(192, 192, 192, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 页面标题区域 */
+.page-header {
+  position: relative;
+  z-index: 1;
+  background: var(--card-gradient);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--glass-shadow);
+}
+
+.header-content h1 {
+  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-content h1 i {
+  background: linear-gradient(135deg, #4a5568 0%, #718096 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 32px;
+}
+
+.header-content p {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* 统计信息 */
+.header-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 16px;
+  background: var(--frosted-gray);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-sm);
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: var(--frosted-gray-dark);
+  transform: translateY(-2px);
+}
+
+.stat-number {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 工具栏 */
+.toolbar {
+  position: relative;
+  z-index: 1;
+  background: var(--card-gradient);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: var(--glass-shadow);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-section {
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box i {
+  position: absolute;
+  left: 16px;
+  color: var(--text-secondary);
+  font-size: 18px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 16px 12px 48px;
+  background: var(--frosted-gray);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  outline: none;
+  background: var(--frosted-gray-dark);
+  border-color: var(--accent-gradient);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-box input::placeholder {
+  color: var(--text-muted);
+}
+
+/* 筛选器 */
+.filters-section {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  background: var(--frosted-gray);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-select:focus {
+  outline: none;
+  background: var(--frosted-gray-dark);
+  border-color: var(--accent-gradient);
+}
+
+/* 操作按钮 */
+.actions-section {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* 磨砂灰色毛玻璃按钮 */
+.btn-primary,
+.btn-secondary {
+  background: var(--frosted-gray);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: var(--glass-shadow);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  background: var(--frosted-gray-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary i,
+.btn-secondary i {
+  font-size: 16px;
+}
+
+/* 表格容器 */
+.candidates-table-container {
+  position: relative;
+  z-index: 1;
+  background: var(--card-gradient);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+
+/* 表格样式 */
+.candidates-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+.candidates-table thead {
+  background: var(--frosted-gray);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.candidates-table th {
+  padding: 16px;
+  text-align: left;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.candidates-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.candidates-table tbody tr {
+  transition: all 0.3s ease;
+}
+
+.candidates-table tbody tr:hover {
+  background: var(--frosted-gray-light);
+  transform: scale(1.01);
+}
+
+/* 候选人信息单元格 */
+.candidate-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.candidate-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--frosted-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.candidate-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--accent-gradient);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.candidate-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.candidate-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.candidate-email {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* 状态标签 */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+.status-badge.applied {
+  background: rgba(66, 153, 225, 0.2);
+  color: var(--info-color);
+  border: 1px solid rgba(66, 153, 225, 0.3);
+}
+
+.status-badge.interview {
+  background: rgba(237, 137, 54, 0.2);
+  color: var(--warning-color);
+  border: 1px solid rgba(237, 137, 54, 0.3);
+}
+
+.status-badge.offer {
+  background: rgba(72, 187, 120, 0.2);
+  color: var(--success-color);
+  border: 1px solid rgba(72, 187, 120, 0.3);
+}
+
+.status-badge.hired {
+  background: rgba(72, 187, 120, 0.3);
+  color: var(--success-color);
+  border: 1px solid rgba(72, 187, 120, 0.4);
+}
+
+.status-badge.rejected {
+  background: rgba(245, 101, 101, 0.2);
+  color: var(--danger-color);
+  border: 1px solid rgba(245, 101, 101, 0.3);
+}
+
+/* 操作按钮 */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-small {
+  background: var(--frosted-gray);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-small:hover {
+  background: var(--frosted-gray-dark);
+  transform: translateY(-1px);
+}
+
+.btn-small i {
+  font-size: 12px;
+}
+
+/* 分页 */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 20px;
+  background: var(--frosted-gray);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--glass-border);
+}
+
+.pagination button {
+  background: var(--frosted-gray);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.pagination button:hover {
+  background: var(--frosted-gray-dark);
+  transform: translateY(-1px);
+}
+
+.pagination button.active {
+  background: var(--accent-gradient);
+  color: white;
+  border-color: transparent;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-section {
+    min-width: auto;
+  }
+  
+  .filters-section {
+    justify-content: center;
+  }
+  
+  .actions-section {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .ios-style {
+    padding: 16px;
+  }
+  
+  .page-header {
+    padding: 16px;
+  }
+  
+  .header-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .candidates-table {
+    font-size: 12px;
+  }
+  
+  .candidates-table th,
+  .candidates-table td {
+    padding: 12px 8px;
+  }
+  
+  .candidate-name-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content h1 {
+    font-size: 24px;
+  }
+  
+  .toolbar {
+    padding: 16px;
+  }
+  
+  .search-box input {
+    padding: 10px 16px 10px 40px;
+  }
+  
+  .search-box i {
+    left: 12px;
+  }
+}
+
+/* 动画效果 */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-header,
+.toolbar,
+.candidates-table-container {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.toolbar {
+  animation-delay: 0.2s;
+}
+
+.candidates-table-container {
+  animation-delay: 0.4s;
+}
+
+/* 滚动条美化 */
+.ios-style::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ios-style::-webkit-scrollbar-track {
+  background: var(--frosted-gray);
+  border-radius: 4px;
+}
+
+.ios-style::-webkit-scrollbar-thumb {
+  background: var(--frosted-gray-dark);
+  border-radius: 4px;
+}
+
+.ios-style::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}

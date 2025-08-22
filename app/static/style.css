@@ -9,7 +9,7 @@
 
 :root{
     /* ===== Colors ===== */
-    --primary-color: #ffaf00;
+    --primary-color: #60a5fa;
     --panel-color: #FFF;
     --text-color: #000;
     --black-light-color: #707070;
@@ -763,7 +763,7 @@ body.dark .socials i {
 }
 
 .add-job-button {
-    background: #ffaf00; /* Accent color */
+    background: #60a5fa; /* Accent color */
     color: #fff;
     padding: 9px 16px;
     border-radius: 5px;
@@ -771,7 +771,7 @@ body.dark .socials i {
 }
 
 .add-job-button:hover {
-    background: #e68a00; /* Hover color */
+    background: #3b82f6; /* Hover color */
 }
 
 .jobs-list {
@@ -805,7 +805,7 @@ body.dark .socials i {
 
 .job-card .job-title h2 {
     font-size: 24px;
-    color: #ffaf00; /* Accent color */
+    color: #60a5fa; /* Accent color */
 }
 
 .job-card p {
@@ -833,13 +833,13 @@ body.dark .socials i {
 }
 
 .job-card .job-actions a {
-    color: #ffaf00; /* Accent color */
-    border: 2px solid #ffaf00;
+    color: #60a5fa; /* Accent color */
+    border: 2px solid #60a5fa;
     background: none;
 }
 
 .job-card .job-actions a:hover {
-    background: #ffaf00; /* Accent color */
+    background: #60a5fa; /* Accent color */
     color: #fff; /* Light text */
 }
 
@@ -880,7 +880,7 @@ body.dark .job-card {
 }
 
 body.dark .job-card .job-title h2 {
-    color: #ffaf00; /* Accent color */
+    color: #60a5fa; /* Accent color */
 }
 
 body.dark .job-card .job-actions button.edit-button {
@@ -1101,12 +1101,12 @@ body.dark .create-job .form-group select {
 .hr-dashboard { padding: 10px; }
 .page-header { display:flex; align-items:center; justify-content:space-between; margin: 10px 0 16px; }
 .page-header h1 { color: var(--text-color); font-size: 22px; }
-.btn-primary { background: #ffaf00; color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; }
-.btn-primary:hover { background:#e68a00; }
+.btn-primary { background: #60a5fa; color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; }
+.btn-primary:hover { background:#3b82f6; }
 
 .metrics-grid { display:grid; grid-template-columns: repeat(4, minmax(180px,1fr)); gap:12px; margin-bottom:16px; }
 .metric-card { background: var(--panel-color); border:1px solid var(--border-color); border-radius:10px; padding:12px; display:flex; gap:10px; align-items:center; }
-.metric-icon i { font-size:22px; color:#ffaf00; }
+.metric-icon i { font-size:22px; color:#60a5fa; }
 .metric-content h3 { margin:0; font-size:14px; color: var(--black-light-color); }
 .metric-value { font-size:22px; font-weight:600; color: var(--text-color); }
 .metric-change { font-size:12px; color: var(--black-light-color); }
@@ -1118,7 +1118,7 @@ body.dark .create-job .form-group select {
 body.dark .funnel-stage { background:#2f2f2f; }
 .stage-label { font-size:13px; color: var(--black-light-color); }
 .stage-count { font-size:16px; color: var(--text-color); }
-.stage-bar { height:8px; background:#ffaf00; border-radius:8px; }
+.stage-bar { height:8px; background:#60a5fa; border-radius:8px; }
 
 .activity-feed { display:grid; gap:10px; }
 .activity-item { display:flex; gap:10px; align-items:flex-start; }
@@ -1130,7 +1130,7 @@ body.dark .activity-icon { background:#444; color:#fff; }
 .quick-actions { display:grid; grid-template-columns: repeat(4, minmax(140px,1fr)); gap:12px; }
 .action-card { background: var(--panel-color); border:1px solid var(--border-color); border-radius:10px; padding:16px; text-align:center; cursor:pointer; transition: var(--tran-03); color: var(--text-color); }
 .action-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-.action-card i { display:block; font-size:20px; margin-bottom:6px; color:#ffaf00; }
+.action-card i { display:block; font-size:20px; margin-bottom:6px; color:#60a5fa; }
 
 @media (max-width: 1200px) {
   .metrics-grid { grid-template-columns: repeat(2, 1fr); }

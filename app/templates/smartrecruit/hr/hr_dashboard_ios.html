@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR智能仪表板 - iOS风格</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        /* 页面特定样式 */
+        .ios-hero-section {
+            background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%);
+        }
+        
+        .ios-stats-section {
+            background: var(--ios-bg-secondary);
+        }
+        
+        .ios-actions-section {
+            background: var(--ios-bg-tertiary);
+        }
+        
+        .ios-recent-section {
+            background: var(--ios-bg-secondary);
+        }
+        
+        .ios-insights-section {
+            background: var(--ios-bg-primary);
+        }
+        
+        .ios-footer-section {
+            background: var(--ios-bg-secondary);
+            min-height: 60vh;
+        }
+        
+        .ios-welcome-text {
+            font-size: 1.125rem;
+            color: var(--ios-text-secondary);
+            margin-bottom: var(--ios-spacing-xl);
+            text-align: center;
+        }
+        
+        .ios-hero-actions {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .ios-quick-action {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-lg);
+            text-align: center;
+            text-decoration: none;
+            color: var(--ios-text-primary);
+            transition: all var(--ios-transition-medium);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+        }
+        
+        .ios-quick-action:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--ios-shadow-heavy);
+            color: var(--ios-blue);
+        }
+        
+        .ios-quick-action i {
+            font-size: 2rem;
+            color: var(--ios-blue);
+            margin-bottom: var(--ios-spacing-md);
+        }
+        
+        .ios-quick-action h4 {
+            font-size: 1.125rem;
+            margin-bottom: var(--ios-spacing-sm);
+            font-weight: 600;
+        }
+        
+        .ios-quick-action p {
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-recent-item {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-medium);
+            padding: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all var(--ios-transition-fast);
+        }
+        
+        .ios-recent-item:hover {
+            transform: translateX(8px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--ios-spacing-md);
+        }
+        
+        .ios-recent-title {
+            font-weight: 600;
+            color: var(--ios-text-primary);
+        }
+        
+        .ios-recent-meta {
+            font-size: 0.875rem;
+            color: var(--ios-text-tertiary);
+        }
+        
+        .ios-recent-actions {
+            display: flex;
+            gap: var(--ios-spacing-sm);
+        }
+        
+        .ios-chart-container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-chart-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, var(--ios-bg-tertiary), var(--ios-bg-secondary));
+            border-radius: var(--ios-radius-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ios-text-tertiary);
+            font-size: 1.125rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-brand">
+                <div class="ios-nav-brand-icon">
+                    <i class="uil uil-briefcase"></i>
+                </div>
+                <span>HR智能招聘</span>
+            </a>
+            
+            <ul class="ios-nav-menu">
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-link active">
+                        <i class="ios-nav-icon uil uil-dashboard"></i>
+                        <span class="ios-nav-text">仪表板</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-briefcase"></i>
+                        <span class="ios-nav-text">发布职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-users-alt"></i>
+                        <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-chart-pie"></i>
+                        <span class="ios-nav-text">报表</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-lightbulb"></i>
+                        <span class="ios-nav-text">AI洞察</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="ios-nav-actions">
+                <div class="ios-nav-search">
+                    <i class="uil uil-search"></i>
+                    <input type="text" placeholder="搜索..." />
+                </div>
+                
+                <div class="ios-nav-divider"></div>
+                
+                <button class="ios-nav-button secondary" data-action="notifications">
+                    <i class="uil uil-bell"></i>
+                    <span class="ios-nav-badge">3</span>
+                </button>
+                
+                <button class="ios-nav-button" data-action="profile">
+                    <i class="uil uil-user"></i>
+                    <span>HR</span>
+                </button>
+            </div>
+            
+            <!-- 移动端菜单切换按钮 -->
+            <button class="ios-nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 视差背景 -->
+    <div class="ios-parallax-bg"></div>
+    
+    <!-- 滚动容器 -->
+    <div class="ios-scroll-container">
+        <!-- 欢迎Section -->
+        <section class="ios-section ios-hero-section">
+            <div class="ios-container">
+                <h1 class="ios-title ios-fade-in">HR智能仪表板</h1>
+                <p class="ios-subtitle ios-fade-in">数据驱动的招聘决策与人才管理平台</p>
+                <p class="ios-welcome-text ios-fade-in">欢迎回来，{{ user.name if user else 'HR管理员' }}！</p>
+                
+                <!-- 功能引导卡片 -->
+                <div class="ios-feature-guide ios-fade-in-up">
+                    <div class="ios-guide-header">
+                        <i class="uil uil-lightbulb"></i>
+                        <h3>快速开始指南</h3>
+                    </div>
+                    <div class="ios-guide-content">
+                        <p>欢迎使用HR智能招聘系统！这里是您开始工作的快速指南：</p>
+                        <ul>
+                            <li>📝 <strong>发布职位</strong> - 创建新的招聘需求，设置职位要求和截止日期</li>
+                            <li>👥 <strong>管理候选人</strong> - 查看申请者简历，进行初步筛选和评估</li>
+                            <li>🗓️ <strong>安排面试</strong> - 为合适的候选人安排面试时间</li>
+                            <li>📊 <strong>数据分析</strong> - 查看招聘效果报表和趋势分析</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="ios-hero-actions ios-fade-in-up">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-button large">
+                        <i class="uil uil-plus"></i>
+                        发布新职位
+                    </a>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-button large secondary">
+                        <i class="uil uil-users-alt"></i>
+                        查看候选人
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 关键指标Section -->
+        <section class="ios-section ios-stats-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">关键指标</h2>
+                <p class="ios-subtitle ios-fade-in">实时监控招聘流程的核心数据</p>
+                
+                <!-- 指标说明帮助 -->
+                <div class="ios-context-help" style="text-align: center; margin-bottom: var(--ios-spacing-lg);">
+                    <button class="ios-help-trigger" data-help="metrics-explanation">
+                        <i class="uil uil-question-circle"></i>
+                        了解这些指标的含义
+                    </button>
+                    <div class="ios-help-popup" id="help-metrics-explanation">
+                        <h4>关键指标说明</h4>
+                        <ul>
+                            <li><strong>活跃职位</strong>：当前正在招聘的职位数量</li>
+                            <li><strong>总申请数</strong>：所有职位的申请总数</li>
+                            <li><strong>面试安排</strong>：已安排的面试数量</li>
+                            <li><strong>候选人库</strong>：系统中的候选人总数</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="ios-grid ios-grid-4">
+                    <div class="ios-metric-card ios-fade-in-up">
+                        <div class="ios-metric-icon">
+                            <i class="uil uil-briefcase-alt"></i>
+                        </div>
+                        <div class="ios-metric-label">活跃职位</div>
+                        <div class="ios-metric-value">{{ total_jobs|default(0) }}</div>
+                        <div class="ios-metric-change">
+                            <i class="uil uil-arrow-up"></i>
+                            +12% 本月
+                        </div>
+                    </div>
+                    
+                    <div class="ios-metric-card ios-fade-in-up">
+                        <div class="ios-metric-icon">
+                            <i class="uil uil-file-alt"></i>
+                        </div>
+                        <div class="ios-metric-label">总申请数</div>
+                        <div class="ios-metric-value">{{ total_applications|default(0) }}</div>
+                        <div class="ios-metric-change">
+                            <i class="uil uil-arrow-up"></i>
+                            +8% 本周
+                        </div>
+                    </div>
+                    
+                    <div class="ios-metric-card ios-fade-in-up">
+                        <div class="ios-metric-icon">
+                            <i class="uil uil-calendar-alt"></i>
+                        </div>
+                        <div class="ios-metric-label">面试安排</div>
+                        <div class="ios-metric-value">0</div>
+                        <div class="ios-metric-change">
+                            <i class="uil uil-minus"></i>
+                            0% 变化
+                        </div>
+                    </div>
+                    
+                    <div class="ios-metric-card ios-fade-in-up">
+                        <div class="ios-metric-icon">
+                            <i class="uil uil-users-alt"></i>
+                        </div>
+                        <div class="ios-metric-label">候选人库</div>
+                        <div class="ios-metric-value">0</div>
+                        <div class="ios-metric-change">
+                            <i class="uil uil-arrow-up"></i>
+                            +15% 本月
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快速操作Section -->
+        <section class="ios-section ios-actions-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">快速操作</h2>
+                <p class="ios-subtitle ios-fade-in">高效管理招聘流程的常用功能</p>
+                
+                <div class="ios-grid ios-grid-4">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-quick-action ios-fade-in-up">
+                        <i class="uil uil-plus-circle"></i>
+                        <h4>发布职位</h4>
+                        <p>创建新的招聘需求</p>
+                        <div class="ios-feature-tooltip">
+                            <i class="uil uil-info-circle"></i>
+                            <span class="ios-tooltip-text">点击这里创建新的招聘职位，设置职位描述、要求和截止日期</span>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-quick-action ios-fade-in-up">
+                        <i class="uil uil-users-alt"></i>
+                        <h4>候选人管理</h4>
+                        <p>查看和管理申请者</p>
+                        <div class="ios-feature-tooltip">
+                            <i class="uil uil-info-circle"></i>
+                            <span class="ios-tooltip-text">管理所有职位申请者，查看简历，进行筛选和评估</span>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-quick-action ios-fade-in-up">
+                        <i class="uil uil-calendar-alt"></i>
+                        <h4>面试安排</h4>
+                        <p>安排和管理面试</p>
+                        <div class="ios-feature-tooltip">
+                            <i class="uil uil-info-circle"></i>
+                            <span class="ios-tooltip-text">为合适的候选人安排面试时间，记录面试反馈和结果</span>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-quick-action ios-fade-in-up">
+                        <i class="uil uil-chart-line"></i>
+                        <h4>数据报表</h4>
+                        <p>招聘数据分析</p>
+                        <div class="ios-feature-tooltip">
+                            <i class="uil uil-info-circle"></i>
+                            <span class="ios-tooltip-text">查看招聘效果分析，了解申请趋势和成功率数据</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最近活动Section -->
+        <section class="ios-section ios-recent-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">最近活动</h2>
+                <p class="ios-subtitle ios-fade-in">跟踪最新的招聘动态和申请情况</p>
+                
+                <!-- 操作指引 -->
+                <div class="ios-step-guide" style="margin-bottom: var(--ios-spacing-xl);">
+                    <div class="ios-step">
+                        <div class="ios-step-number">1</div>
+                        <div class="ios-step-content">
+                            <h4>查看申请</h4>
+                            <p>浏览最新的职位申请</p>
+                        </div>
+                    </div>
+                    <div class="ios-step">
+                        <div class="ios-step-number">2</div>
+                        <div class="ios-step-content">
+                            <h4>评估候选人</h4>
+                            <p>查看简历并进行初步评估</p>
+                        </div>
+                    </div>
+                    <div class="ios-step">
+                        <div class="ios-step-number">3</div>
+                        <div class="ios-step-content">
+                            <h4>安排面试</h4>
+                            <p>为合适的候选人安排面试</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ios-grid ios-grid-2">
+                    <!-- 最近职位 -->
+                    <div class="ios-card ios-fade-in-up">
+                        <h3 class="ios-recent-title">
+                            <i class="uil uil-briefcase"></i>
+                            最近发布职位
+                        </h3>
+                        
+                        {% if recent_jobs %}
+                            {% for job in recent_jobs %}
+                            <div class="ios-recent-item">
+                                <div class="ios-recent-header">
+                                    <div>
+                                        <div class="ios-recent-title">{{ job.title }}</div>
+                                        <div class="ios-recent-meta">
+                                            <i class="uil uil-map-marker"></i> {{ job.location }} • 
+                                            <i class="uil uil-money-bill"></i> {{ job.salary }}
+                                        </div>
+                                    </div>
+                                    <div class="ios-recent-actions">
+                                        <a href="{{ url_for('smartrecruit.hr.recruitment.edit_job', job_id=job.id) }}" class="ios-button secondary">
+                                            <i class="uil uil-edit"></i>
+                                            编辑
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="ios-recent-item">
+                                <div class="ios-recent-header">
+                                    <div>
+                                        <div class="ios-recent-title">暂无活跃职位</div>
+                                        <div class="ios-recent-meta">立即发布第一个职位开始招聘</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div style="text-align: center; margin-top: var(--ios-spacing-lg);">
+                            <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="ios-button secondary">
+                                查看全部职位
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 最新申请 -->
+                    <div class="ios-card ios-fade-in-up">
+                        <h3 class="ios-recent-title">
+                            <i class="uil uil-file-alt"></i>
+                            最新申请
+                        </h3>
+                        
+                        {% if recent_applications %}
+                            {% for app in recent_applications %}
+                            <div class="ios-recent-item">
+                                <div class="ios-recent-header">
+                                    <div>
+                                        <div class="ios-recent-title">申请 #{{ app.id }}</div>
+                                        <div class="ios-recent-meta">{{ app.message|default('新申请') }}</div>
+                                    </div>
+                                    <div class="ios-recent-actions">
+                                        <span class="ios-status success">{{ app.status }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="ios-recent-item">
+                                <div class="ios-recent-header">
+                                    <div>
+                                        <div class="ios-recent-title">暂无申请记录</div>
+                                        <div class="ios-recent-meta">发布职位后，申请将显示在这里</div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div style="text-align: center; margin-top: var(--ios-spacing-lg);">
+                            <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-button secondary">
+                                查看全部申请
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据洞察Section -->
+        <section class="ios-section ios-insights-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">数据洞察</h2>
+                <p class="ios-subtitle ios-fade-in">深度分析招聘效果和趋势</p>
+                
+                <div class="ios-grid ios-grid-2">
+                    <div class="ios-chart-container ios-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
+                            <i class="uil uil-chart-line"></i>
+                            申请趋势
+                        </h3>
+                        <div class="ios-chart-placeholder">
+                            <i class="uil uil-chart-line" style="font-size: 3rem; margin-right: var(--ios-spacing-md);"></i>
+                            申请趋势图表
+                        </div>
+                    </div>
+                    
+                    <div class="ios-chart-container ios-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
+                            <i class="uil uil-chart-pie"></i>
+                            职位分布
+                        </h3>
+                        <div class="ios-chart-placeholder">
+                            <i class="uil uil-chart-pie" style="font-size: 3rem; margin-right: var(--ios-spacing-md);"></i>
+                            职位分布图表
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: var(--ios-spacing-xl);">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-button large">
+                        <i class="uil uil-chart-bar"></i>
+                        查看详细报表
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 底部导航Section -->
+        <section class="ios-section ios-footer-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">系统导航</h2>
+                <p class="ios-subtitle ios-fade-in">快速访问所有HR功能模块</p>
+                
+                <!-- 帮助中心 -->
+                <div class="ios-help-center ios-fade-in-up" style="margin-bottom: var(--ios-spacing-xl);">
+                    <div class="ios-help-header">
+                        <i class="uil uil-question-circle"></i>
+                        <h3>需要帮助？</h3>
+                    </div>
+                    <div class="ios-help-content">
+                        <div class="ios-help-item">
+                            <h4>如何使用系统？</h4>
+                            <p>查看我们的使用指南和操作说明</p>
+                            <a href="#" class="ios-link">查看指南</a>
+                        </div>
+                        <div class="ios-help-item">
+                            <h4>常见问题</h4>
+                            <p>快速找到常见问题的答案</p>
+                            <a href="#" class="ios-link">查看FAQ</a>
+                        </div>
+                        <div class="ios-help-item">
+                            <h4>联系支持</h4>
+                            <p>如果还有问题，请联系支持团队</p>
+                            <a href="#" class="ios-link">联系支持</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ios-grid ios-grid-3">
+                    <div class="ios-card ios-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-blue);">
+                            <i class="uil uil-briefcase"></i>
+                            招聘管理
+                        </h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: var(--ios-spacing-sm);">
+                                <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" style="color: var(--ios-text-secondary); text-decoration: none;">
+                                    <i class="uil uil-plus"></i> 发布职位
+                                </a>
+                            </li>
+                            <li style="margin-bottom: var(--ios-spacing-sm);">
+                                <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" style="color: var(--ios-text-secondary); text-decoration: none;">
+                                    <i class="uil uil-list-ul"></i> 我的职位
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="ios-card ios-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-blue);">
+                            <i class="uil uil-users-alt"></i>
+                            候选人管理
+                        </h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: var(--ios-spacing-sm);">
+                                <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" style="color: var(--ios-text-secondary); text-decoration: none;">
+                                    <i class="uil uil-user-check"></i> 查看候选人
+                                </a>
+                            </li>
+                            <li style="margin-bottom: var(--ios-spacing-sm);">
+                                <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" style="color: var(--ios-text-secondary); text-decoration: none;">
+                                    <i class="uil uil-calendar-alt"></i> 面试安排
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="ios-card ios-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-blue);">
+                            <i class="uil uil-chart-line"></i>
+                            数据分析
+                        </h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: var(--ios-spacing-sm);">
+                                <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" style="color: var(--ios-text-secondary); text-decoration: none;">
+                                    <i class="uil uil-chart-bar"></i> 数据报表
+                                </a>
+                            </li>
+                            <li style="margin-bottom: var(--ios-spacing-sm);">
+                                <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" style="color: var(--ios-text-secondary); text-decoration: none;">
+                                    <i class="uil uil-lightbulb"></i> 智能洞察
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 引入iOS风格脚本 -->
+    <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+</body>
+</html>

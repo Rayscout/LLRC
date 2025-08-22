@@ -131,7 +131,7 @@ def hr_dashboard():
     total_candidates = User.query.filter_by(is_hr=False).count()
     total_jobs = Job.query.filter_by(user_id=user.id).count()
     
-    return render_template('smartrecruit/hr/hr_dashboard.html',
+    return render_template('smartrecruit/hr/hr_dashboard_ios.html',
                          total_candidates=total_candidates,
                          total_jobs=total_jobs)
 

@@ -50,7 +50,7 @@ def hr_dashboard():
             logging.error(f"查询最近申请失败: {e}")
             recent_applications = []
         
-        return render_template('smartrecruit/hr/hr_dashboard.html',
+        return render_template('smartrecruit/hr/hr_dashboard_ios.html',
                              total_jobs=total_jobs,
                              total_applications=total_applications,
                              recent_jobs=recent_jobs,
@@ -58,7 +58,7 @@ def hr_dashboard():
     except Exception as e:
         logging.error(f"HR仪表盘加载失败: {e}")
         flash('加载仪表盘时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_dashboard.html',
+        return render_template('smartrecruit/hr/hr_dashboard_ios.html',
                              total_jobs=0,
                              total_applications=0,
                              recent_jobs=[],
@@ -117,11 +117,11 @@ def candidates():
             logging.error(f"查询候选人数据失败: {e}")
             candidates_data = []
         
-        return render_template('smartrecruit/hr/hr_candidates.html', candidates=candidates_data)
+        return render_template('smartrecruit/hr/hr_candidates_ios.html', candidates=candidates_data)
     except Exception as e:
         logging.error(f"候选人管理页面加载失败: {e}")
         flash('加载候选人管理页面时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_candidates.html', candidates=[])
+        return render_template('smartrecruit/hr/hr_candidates_ios.html', candidates=[])
 
 @dashboard_bp.route('/interviews')
 def interviews():
@@ -198,14 +198,14 @@ def interviews():
         ]
         
         print("准备渲染模板")  # 调试信息
-        return render_template('smartrecruit/hr/hr_interviews_new.html', 
+        return render_template('smartrecruit/hr/hr_interviews_ios.html', 
                              candidates=candidates_data,
                              interviews=interviews_data)
     except Exception as e:
         print(f"面试安排页面加载失败: {e}")  # 调试信息
         logging.error(f"面试安排页面加载失败: {e}")
         flash('加载面试安排页面时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_interviews_new.html', 
+        return render_template('smartrecruit/hr/hr_interviews_ios.html', 
                              candidates=[],
                              interviews=[])
 
@@ -378,7 +378,7 @@ def reports():
             'jobs_by_status': {}
         }
         
-        return render_template('smartrecruit/hr/hr_reports_simple.html', report_data=report_data)
+        return render_template('smartrecruit/hr/hr_reports_ios.html', report_data=report_data)
     except Exception as e:
         logging.error(f"数据报告页面加载失败: {e}")
         flash('加载数据报告页面时出现错误，请稍后重试。', 'danger')
@@ -414,11 +414,11 @@ def insights():
             'candidate_quality_score': 85.5
         }
         
-        return render_template('smartrecruit/hr/hr_insights.html', insights=insights)
+        return render_template('smartrecruit/hr/hr_insights_ios.html', insights=insights)
     except Exception as e:
         logging.error(f"AI洞察页面加载失败: {e}")
         flash('加载AI洞察页面时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_insights.html', insights={
+        return render_template('smartrecruit/hr/hr_insights_ios.html', insights={
             'top_skills': [],
             'trending_positions': [],
             'candidate_quality_score': 0

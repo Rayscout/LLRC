@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试管理 - iOS风格</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .ios-interviews-hero { background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%); }
+        .ios-stats-section { background: var(--ios-bg-secondary); }
+        .ios-calendar-section { background: var(--ios-bg-tertiary); }
+        .ios-list-section { background: var(--ios-bg-secondary); }
+        
+        .ios-interview-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-xl);
+        }
+        
+        .ios-interview-stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-lg);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-interview-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-interview-stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--ios-blue);
+            margin-bottom: var(--ios-spacing-xs);
+        }
+        
+        .ios-interview-stat-label {
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-calendar-container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-medium);
+            margin-bottom: var(--ios-spacing-xl);
+        }
+        
+        .ios-calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--ios-spacing-lg);
+            padding-bottom: var(--ios-spacing-md);
+            border-bottom: 1px solid var(--ios-border-secondary);
+        }
+        
+        .ios-calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-md);
+        }
+        
+        .ios-calendar-nav-btn {
+            background: var(--ios-bg-tertiary);
+            border: 1px solid var(--ios-border-primary);
+            border-radius: var(--ios-radius-medium);
+            padding: var(--ios-spacing-sm) var(--ios-spacing-md);
+            color: var(--ios-text-secondary);
+            cursor: pointer;
+            transition: all var(--ios-transition-fast);
+        }
+        
+        .ios-calendar-nav-btn:hover {
+            background: var(--ios-blue);
+            color: white;
+            border-color: var(--ios-blue);
+        }
+        
+        .ios-calendar-current {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+        }
+        
+        .ios-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: var(--ios-spacing-sm);
+        }
+        
+        .ios-calendar-day-header {
+            text-align: center;
+            padding: var(--ios-spacing-sm);
+            font-weight: 600;
+            color: var(--ios-text-secondary);
+            background: var(--ios-bg-tertiary);
+            border-radius: var(--ios-radius-small);
+        }
+        
+        .ios-calendar-day {
+            min-height: 120px;
+            padding: var(--ios-spacing-sm);
+            border: 1px solid var(--ios-border-secondary);
+            border-radius: var(--ios-radius-small);
+            background: var(--ios-bg-secondary);
+            transition: all var(--ios-transition-fast);
+        }
+        
+        .ios-calendar-day:hover {
+            background: var(--ios-bg-tertiary);
+            border-color: var(--ios-blue);
+        }
+        
+        .ios-calendar-day.today {
+            background: rgba(0, 122, 255, 0.1);
+            border-color: var(--ios-blue);
+        }
+        
+        .ios-calendar-day-number {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-xs);
+        }
+        
+        .ios-interview-event {
+            background: var(--ios-blue);
+            color: white;
+            padding: var(--ios-spacing-xs);
+            border-radius: var(--ios-radius-small);
+            font-size: 0.75rem;
+            margin-bottom: var(--ios-spacing-xs);
+            cursor: pointer;
+            transition: all var(--ios-transition-fast);
+        }
+        
+        .ios-interview-event:hover {
+            background: var(--ios-blue-dark);
+            transform: scale(1.02);
+        }
+        
+        .ios-interview-event.completed {
+            background: var(--ios-green);
+        }
+        
+        .ios-interview-event.cancelled {
+            background: var(--ios-red);
+        }
+        
+        .ios-interview-list {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-interview-item {
+            background: var(--ios-bg-secondary);
+            border-radius: var(--ios-radius-medium);
+            padding: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-md);
+            border: 1px solid var(--ios-border-secondary);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-interview-item:hover {
+            transform: translateX(8px);
+            box-shadow: var(--ios-shadow-medium);
+            border-color: var(--ios-blue);
+        }
+        
+        .ios-interview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--ios-spacing-md);
+        }
+        
+        .ios-interview-candidate {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-xs);
+        }
+        
+        .ios-interview-position {
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-interview-status {
+            padding: var(--ios-spacing-xs) var(--ios-spacing-sm);
+            border-radius: var(--ios-radius-small);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .ios-interview-status.scheduled {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--ios-blue);
+        }
+        
+        .ios-interview-status.completed {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--ios-green);
+        }
+        
+        .ios-interview-status.cancelled {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--ios-red);
+        }
+        
+        .ios-interview-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--ios-spacing-md);
+            margin-bottom: var(--ios-spacing-md);
+        }
+        
+        .ios-interview-detail {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-xs);
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-interview-actions {
+            display: flex;
+            gap: var(--ios-spacing-sm);
+            flex-wrap: wrap;
+        }
+        
+        .ios-quick-actions {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            justify-content: center;
+            margin-bottom: var(--ios-spacing-xl);
+            flex-wrap: wrap;
+        }
+        
+        .ios-quick-action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--ios-border-primary);
+            border-radius: var(--ios-radius-medium);
+            padding: var(--ios-spacing-md) var(--ios-spacing-lg);
+            color: var(--ios-text-secondary);
+            text-decoration: none;
+            transition: all var(--ios-transition-medium);
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+        }
+        
+        .ios-quick-action-btn:hover {
+            background: var(--ios-blue);
+            color: white;
+            border-color: var(--ios-blue);
+            transform: translateY(-2px);
+        }
+        
+        .ios-quick-action-btn.primary {
+            background: var(--ios-blue);
+            color: white;
+            border-color: var(--ios-blue);
+        }
+        
+        .ios-quick-action-btn.primary:hover {
+            background: var(--ios-blue-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-brand">
+                <div class="ios-nav-brand-icon">
+                    <i class="uil uil-briefcase"></i>
+                </div>
+                <span>HR智能招聘</span>
+            </a>
+            
+            <ul class="ios-nav-menu">
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.hr_dashboard' else '' }}">
+                        <i class="ios-nav-icon uil uil-dashboard"></i>
+                        <span class="ios-nav-text">仪表板</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.recruitment.publish_recruitment' else '' }}">
+                        <i class="ios-nav-icon uil uil-briefcase"></i>
+                        <span class="ios-nav-text">发布职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.candidates' else '' }}">
+                        <i class="ios-nav-icon uil uil-users-alt"></i>
+                        <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.recruitment.my_jobs' else '' }}">
+                        <i class="ios-nav-icon uil uil-briefcase-alt"></i>
+                        <span class="ios-nav-text">我的职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.interviews' else '' }}">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.reports' else '' }}">
+                        <i class="ios-nav-icon uil uil-chart-pie"></i>
+                        <span class="ios-nav-text">报表</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.insights' else '' }}">
+                        <i class="ios-nav-icon uil uil-lightbulb"></i>
+                        <span class="ios-nav-text">AI洞察</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="ios-nav-actions">
+                <div class="ios-nav-search">
+                    <i class="uil uil-search"></i>
+                    <input type="text" placeholder="搜索..." />
+                </div>
+                
+                <div class="ios-nav-divider"></div>
+                
+                <button class="ios-nav-button secondary" data-action="notifications">
+                    <i class="uil uil-bell"></i>
+                    <span class="ios-nav-badge">3</span>
+                </button>
+                
+                <button class="ios-nav-button" data-action="profile">
+                    <i class="uil uil-user"></i>
+                    <span>HR</span>
+                </button>
+            </div>
+            
+            <!-- 移动端菜单切换按钮 -->
+            <button class="ios-nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="ios-parallax-bg"></div>
+    
+    <div class="ios-scroll-container">
+        <!-- 欢迎Section -->
+        <section class="ios-section ios-interviews-hero">
+            <div class="ios-container">
+                <h1 class="ios-title ios-fade-in">面试管理</h1>
+                <p class="ios-subtitle ios-fade-in">高效安排面试日程，管理面试流程，记录面试反馈</p>
+                
+                <div class="ios-quick-actions ios-fade-in-up">
+                    <button class="ios-quick-action-btn primary" onclick="openScheduleModal()">
+                        <i class="uil uil-plus"></i>
+                        安排新面试
+                    </button>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-quick-action-btn">
+                        <i class="uil uil-users-alt"></i>
+                        查看候选人
+                    </a>
+                    <button class="ios-quick-action-btn" onclick="exportSchedule()">
+                        <i class="uil uil-export"></i>
+                        导出日程
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 统计概览Section -->
+        <section class="ios-section ios-stats-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">面试概览</h2>
+                <p class="ios-subtitle ios-fade-in">实时了解面试安排情况和进度</p>
+                
+                <div class="ios-interview-stats">
+                    <div class="ios-interview-stat-card ios-fade-in-up">
+                        <div class="ios-interview-stat-number">
+                            {{ interviews|selectattr('status', 'equalto', 'scheduled')|list|length if interviews else 0 }}
+                        </div>
+                        <div class="ios-interview-stat-label">已安排面试</div>
+                    </div>
+                    <div class="ios-interview-stat-card ios-fade-in-up">
+                        <div class="ios-interview-stat-number">
+                            {{ interviews|selectattr('status', 'equalto', 'completed')|list|length if interviews else 0 }}
+                        </div>
+                        <div class="ios-interview-stat-label">已完成面试</div>
+                    </div>
+                    <div class="ios-interview-stat-card ios-fade-in-up">
+                        <div class="ios-interview-stat-number">
+                            {{ interviews|selectattr('status', 'equalto', 'cancelled')|list|length if interviews else 0 }}
+                        </div>
+                        <div class="ios-interview-stat-label">已取消面试</div>
+                    </div>
+                    <div class="ios-interview-stat-card ios-fade-in-up">
+                        <div class="ios-interview-stat-number">
+                            {{ candidates|length if candidates else 0 }}
+                        </div>
+                        <div class="ios-interview-stat-label">候选人总数</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 日历视图Section -->
+        <section class="ios-section ios-calendar-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">面试日历</h2>
+                <p class="ios-subtitle ios-fade-in">直观查看面试安排，合理规划时间</p>
+                
+                <div class="ios-calendar-container ios-fade-in-up">
+                    <div class="ios-calendar-header">
+                        <div class="ios-calendar-nav">
+                            <button class="ios-calendar-nav-btn" onclick="previousWeek()">
+                                <i class="uil uil-angle-left"></i>
+                            </button>
+                            <div class="ios-calendar-current" id="week-display">
+                                2024年1月15日 - 1月21日
+                            </div>
+                            <button class="ios-calendar-nav-btn" onclick="nextWeek()">
+                                <i class="uil uil-angle-right"></i>
+                            </button>
+                        </div>
+                        <button class="ios-button secondary" onclick="goToToday()">
+                            <i class="uil uil-calendar-alt"></i>
+                            今天
+                        </button>
+                    </div>
+                    
+                    <div class="ios-calendar-grid">
+                        <div class="ios-calendar-day-header">周一</div>
+                        <div class="ios-calendar-day-header">周二</div>
+                        <div class="ios-calendar-day-header">周三</div>
+                        <div class="ios-calendar-day-header">周四</div>
+                        <div class="ios-calendar-day-header">周五</div>
+                        <div class="ios-calendar-day-header">周六</div>
+                        <div class="ios-calendar-day-header">周日</div>
+                        
+                        {% for day in range(7) %}
+                        {% for hour in range(9, 19) %}
+                        <div class="ios-calendar-day" data-day="{{ day }}" data-hour="{{ hour }}">
+                            <div class="ios-calendar-day-number">{{ hour }}:00</div>
+                            {% for interview in interviews %}
+                            {% if interview.date and interview.start_time %}
+                            {% set interview_hour = interview.start_time.split(':')[0]|int %}
+                            {% if interview_hour == hour %}
+                            <div class="ios-interview-event {{ interview.status }}" 
+                                 onclick="showInterviewDetails({{ interview.id }})"
+                                 title="{{ interview.candidate_name }} - {{ interview.position }}">
+                                {{ interview.candidate_name[:4] }}...
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 面试列表Section -->
+        <section class="ios-section ios-list-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">面试列表</h2>
+                <p class="ios-subtitle ios-fade-in">管理所有面试安排，查看详细信息和状态</p>
+                
+                <div class="ios-interview-list ios-fade-in-up">
+                    <div class="ios-filter-group" style="margin-bottom: var(--ios-spacing-lg);">
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">状态筛选</label>
+                            <select class="ios-input" id="statusFilter" style="min-width: 120px;">
+                                <option value="">全部状态</option>
+                                <option value="scheduled">已安排</option>
+                                <option value="completed">已完成</option>
+                                <option value="cancelled">已取消</option>
+                            </select>
+                        </div>
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">面试方式</label>
+                            <select class="ios-input" id="methodFilter" style="min-width: 120px;">
+                                <option value="">全部方式</option>
+                                <option value="online">在线面试</option>
+                                <option value="offline">现场面试</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    {% if interviews %}
+                        {% for interview in interviews %}
+                        <div class="ios-interview-item">
+                            <div class="ios-interview-header">
+                                <div>
+                                    <div class="ios-interview-candidate">{{ interview.candidate_name }}</div>
+                                    <div class="ios-interview-position">{{ interview.position }}</div>
+                                </div>
+                                <span class="ios-interview-status {{ interview.status }}">
+                                    {% if interview.status == 'scheduled' %}
+                                        已安排
+                                    {% elif interview.status == 'completed' %}
+                                        已完成
+                                    {% elif interview.status == 'cancelled' %}
+                                        已取消
+                                    {% else %}
+                                        {{ interview.status }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <div class="ios-interview-details">
+                                <div class="ios-interview-detail">
+                                    <i class="uil uil-calendar-alt"></i>
+                                    <span>{{ interview.date }}</span>
+                                </div>
+                                <div class="ios-interview-detail">
+                                    <i class="uil uil-clock"></i>
+                                    <span>{{ interview.start_time }} - {{ interview.end_time }}</span>
+                                </div>
+                                <div class="ios-interview-detail">
+                                    <i class="uil uil-user"></i>
+                                    <span>面试官: {{ interview.interviewer_name }}</span>
+                                </div>
+                                <div class="ios-interview-detail">
+                                    <i class="uil uil-envelope"></i>
+                                    <span>{{ interview.candidate_email }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="ios-interview-actions">
+                                {% if interview.status == 'scheduled' %}
+                                <button class="ios-button" onclick="startInterview({{ interview.id }})">
+                                    <i class="uil uil-play"></i>
+                                    开始面试
+                                </button>
+                                <button class="ios-button secondary" onclick="rescheduleInterview({{ interview.id }})">
+                                    <i class="uil uil-calendar-alt"></i>
+                                    重新安排
+                                </button>
+                                <button class="ios-button secondary" onclick="cancelInterview({{ interview.id }})">
+                                    <i class="uil uil-times"></i>
+                                    取消面试
+                                </button>
+                                {% elif interview.status == 'completed' %}
+                                <button class="ios-button" onclick="viewFeedback({{ interview.id }})">
+                                    <i class="uil uil-eye"></i>
+                                    查看反馈
+                                </button>
+                                <button class="ios-button secondary" onclick="editFeedback({{ interview.id }})">
+                                    <i class="uil uil-edit"></i>
+                                    编辑反馈
+                                </button>
+                                {% endif %}
+                                <button class="ios-button secondary" onclick="showInterviewDetails({{ interview.id }})">
+                                    <i class="uil uil-info-circle"></i>
+                                    详细信息
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="ios-card" style="text-align: center; padding: var(--ios-spacing-xxl); color: var(--ios-text-tertiary);">
+                            <i class="uil uil-calendar-alt" style="font-size: 4rem; margin-bottom: var(--ios-spacing-lg); opacity: 0.5;"></i>
+                            <h3 style="font-size: 1.5rem; margin-bottom: var(--ios-spacing-md); color: var(--ios-text-secondary);">暂无面试安排</h3>
+                            <p>目前还没有安排面试，立即安排第一个面试开始招聘流程</p>
+                            <button class="ios-button large" onclick="openScheduleModal()" style="margin-top: var(--ios-spacing-lg);">
+                                <i class="uil uil-plus"></i>
+                                安排面试
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </div>    <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+    
+    <script>
+        // 面试管理相关JavaScript功能
+        let currentWeek = new Date();
+        
+        function updateWeekDisplay() {
+            const startOfWeek = new Date(currentWeek);
+            startOfWeek.setDate(currentWeek.getDate() - currentWeek.getDay() + 1);
+            
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            
+            const weekDisplay = document.getElementById('week-display');
+            weekDisplay.textContent = `${startOfWeek.getFullYear()}年${startOfWeek.getMonth() + 1}月${startOfWeek.getDate()}日 - ${endOfWeek.getMonth() + 1}月${endOfWeek.getDate()}日`;
+        }
+        
+        function previousWeek() {
+            currentWeek.setDate(currentWeek.getDate() - 7);
+            updateWeekDisplay();
+        }
+        
+        function nextWeek() {
+            currentWeek.setDate(currentWeek.getDate() + 7);
+            updateWeekDisplay();
+        }
+        
+        function goToToday() {
+            currentWeek = new Date();
+            updateWeekDisplay();
+        }
+        
+        function openScheduleModal() {
+            alert('面试安排功能开发中...');
+        }
+        
+        function exportSchedule() {
+            alert('日程导出功能开发中...');
+        }
+        
+        function startInterview(interviewId) {
+            alert(`开始面试 #${interviewId}`);
+        }
+        
+        function rescheduleInterview(interviewId) {
+            alert(`重新安排面试 #${interviewId}`);
+        }
+        
+        function cancelInterview(interviewId) {
+            if (confirm('确定要取消这个面试吗？')) {
+                alert(`面试 #${interviewId} 已取消`);
+            }
+        }
+        
+        function viewFeedback(interviewId) {
+            alert(`查看面试反馈 #${interviewId}`);
+        }
+        
+        function editFeedback(interviewId) {
+            alert(`编辑面试反馈 #${interviewId}`);
+        }
+        
+        function showInterviewDetails(interviewId) {
+            alert(`显示面试详情 #${interviewId}`);
+        }
+        
+        // 筛选功能
+        document.getElementById('statusFilter').addEventListener('change', function() {
+            filterInterviews();
+        });
+        
+        document.getElementById('methodFilter').addEventListener('change', function() {
+            filterInterviews();
+        });
+        
+        function filterInterviews() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const methodFilter = document.getElementById('methodFilter').value;
+            
+            // 这里实现筛选逻辑
+            console.log('筛选条件:', { status: statusFilter, method: methodFilter });
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateWeekDisplay();
+        });
+    </script>
+</body>
+</html>

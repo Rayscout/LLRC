@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR智能招聘 - 顶部导航栏演示</title>
+    <link rel="stylesheet" href="app/static/ios_hr_style.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .demo-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 120px 24px 24px;
+            text-align: center;
+        }
+        
+        .demo-section:nth-child(odd) {
+            background: var(--ios-bg-primary);
+        }
+        
+        .demo-section:nth-child(even) {
+            background: var(--ios-bg-secondary);
+        }
+        
+        .demo-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-lg);
+            animation: iosFadeInUp 1s ease-out;
+        }
+        
+        .demo-subtitle {
+            font-size: 1.25rem;
+            color: var(--ios-text-secondary);
+            margin-bottom: var(--ios-spacing-xl);
+            max-width: 600px;
+            animation: iosFadeInUp 1s ease-out 0.2s both;
+        }
+        
+        .demo-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--ios-spacing-lg);
+            max-width: 1000px;
+            width: 100%;
+            animation: iosFadeInUp 1s ease-out 0.4s both;
+        }
+        
+        .demo-feature {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-medium);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .demo-feature:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--ios-shadow-heavy);
+        }
+        
+        .demo-feature-icon {
+            font-size: 3rem;
+            color: var(--ios-blue);
+            margin-bottom: var(--ios-spacing-md);
+        }
+        
+        .demo-feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .demo-feature-desc {
+            color: var(--ios-text-secondary);
+            line-height: 1.6;
+        }
+        
+        .demo-nav-info {
+            background: rgba(0, 122, 255, 0.1);
+            border: 1px solid rgba(0, 122, 255, 0.2);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-lg);
+            margin-top: var(--ios-spacing-xl);
+            animation: iosFadeInUp 1s ease-out 0.6s both;
+        }
+        
+        .demo-nav-info h3 {
+            color: var(--ios-blue);
+            margin-bottom: var(--ios-spacing-md);
+        }
+        
+        .demo-nav-info ul {
+            text-align: left;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .demo-nav-info li {
+            margin-bottom: var(--ios-spacing-sm);
+            color: var(--ios-text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .demo-title {
+                font-size: 2rem;
+            }
+            
+            .demo-subtitle {
+                font-size: 1rem;
+            }
+            
+            .demo-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <a href="#" class="ios-nav-brand">
+                <div class="ios-nav-brand-icon">
+                    <i class="uil uil-briefcase"></i>
+                </div>
+                <span>HR智能招聘</span>
+            </a>
+            
+            <ul class="ios-nav-menu">
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link active">
+                        <i class="ios-nav-icon uil uil-dashboard"></i>
+                        <span class="ios-nav-text">仪表板</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-briefcase"></i>
+                        <span class="ios-nav-text">发布职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-users-alt"></i>
+                        <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-briefcase-alt"></i>
+                        <span class="ios-nav-text">我的职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-chart-pie"></i>
+                        <span class="ios-nav-text">报表</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="#" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-lightbulb"></i>
+                        <span class="ios-nav-text">AI洞察</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="ios-nav-actions">
+                <div class="ios-nav-search">
+                    <i class="uil uil-search"></i>
+                    <input type="text" placeholder="搜索..." />
+                </div>
+                
+                <div class="ios-nav-divider"></div>
+                
+                <button class="ios-nav-button secondary" data-action="notifications">
+                    <i class="uil uil-bell"></i>
+                    <span class="ios-nav-badge">3</span>
+                </button>
+                
+                <button class="ios-nav-button" data-action="profile">
+                    <i class="uil uil-user"></i>
+                    <span>HR</span>
+                </button>
+            </div>
+            
+            <!-- 移动端菜单切换按钮 -->
+            <button class="ios-nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 演示内容 -->
+    <div class="ios-scroll-container">
+        <section class="demo-section">
+            <h1 class="demo-title">🚀 全新顶部导航栏</h1>
+            <p class="demo-subtitle">体验iOS风格的透明磨砂质感导航，功能完整，交互流畅</p>
+            
+            <div class="demo-features">
+                <div class="demo-feature">
+                    <div class="demo-feature-icon">
+                        <i class="uil uil-arrow-up"></i>
+                    </div>
+                    <h3 class="demo-feature-title">顶部定位</h3>
+                    <p class="demo-feature-desc">导航栏移至顶部，符合现代Web应用设计习惯</p>
+                </div>
+                
+                <div class="demo-feature">
+                    <div class="demo-feature-icon">
+                        <i class="uil uil-window"></i>
+                    </div>
+                    <h3 class="demo-feature-title">磨砂质感</h3>
+                    <p class="demo-feature-desc">透明毛玻璃效果，营造层次感和现代感</p>
+                </div>
+                
+                <div class="demo-feature">
+                    <div class="demo-feature-icon">
+                        <i class="uil uil-mobile-android"></i>
+                    </div>
+                    <h3 class="demo-feature-title">响应式设计</h3>
+                    <p class="demo-feature-desc">完美适配各种屏幕尺寸，移动端支持汉堡菜单</p>
+                </div>
+            </div>
+            
+            <div class="demo-nav-info">
+                <h3>导航栏特性</h3>
+                <ul>
+                    <li>✨ 品牌标识：渐变图标 + 应用名称</li>
+                    <li>🧭 主导航：7个核心功能模块</li>
+                    <li>🔍 搜索功能：实时搜索框</li>
+                    <li>🔔 通知中心：消息提醒和通知管理</li>
+                    <li>👤 个人资料：用户信息和设置</li>
+                    <li>📱 移动适配：响应式设计，小屏幕自动折叠</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section class="demo-section">
+            <h2 class="demo-title">🎨 设计亮点</h2>
+            <p class="demo-subtitle">采用iOS设计语言，结合现代Web技术，打造卓越用户体验</p>
+            
+            <div class="demo-features">
+                <div class="demo-feature">
+                    <div class="demo-feature-icon">
+                        <i class="uil uil-palette"></i>
+                    </div>
+                    <h3 class="demo-feature-title">iOS风格</h3>
+                    <p class="demo-feature-desc">使用SF Pro字体，iOS蓝色主题，大圆角设计</p>
+                </div>
+                
+                <div class="demo-feature">
+                    <div class="demo-feature-icon">
+                        <i class="uil uil-motion"></i>
+                    </div>
+                    <h3 class="demo-feature-title">流畅动画</h3>
+                    <p class="demo-feature-desc">平滑过渡效果，悬停动画，滚动时动态调整</p>
+                </div>
+                
+                <div class="demo-feature">
+                    <div class="demo-feature-icon">
+                        <i class="uil uil-layer-group"></i>
+                    </div>
+                    <h3 class="demo-feature-title">层次感</h3>
+                    <p class="demo-feature-desc">毛玻璃效果，阴影系统，视觉层次丰富</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="demo-section">
+            <h2 class="demo-title">🔧 技术实现</h2>
+            <p class="demo-subtitle">基于现代Web技术栈，性能优异，兼容性强</p>
+            
+            <div class="demo-features">
+                <div class="demo-feature">
+                    <div class="demo-feature-icon">
+                        <i class="uil uil-css3-simple"></i>
+                    </div>
+                    <h3 class="demo-feature-title">CSS技术</h3>
+                    <p class="demo-feature-desc">CSS变量、backdrop-filter、Grid布局、动画系统</p>
+                </div>
+                
+                <div class="demo-feature">
+                    <div class="demo-feature-icon">
+                        <i class="uil uil-java-script"></i>
+                    </div>
+                    <h3 class="demo-feature-title">JavaScript</h3>
+                    <p class="demo-feature-desc">滚动监听、状态管理、交互逻辑、移动端适配</p>
+                </div>
+                
+                <div class="demo-feature">
+                    <div class="demo-feature-icon">
+                        <i class="uil uil-html5"></i>
+                    </div>
+                    <h3 class="demo-feature-title">HTML结构</h3>
+                    <p class="demo-feature-desc">语义化标签、无障碍支持、SEO友好</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app/static/ios_hr_script.js"></script>
+    <script>
+        // 演示页面的特殊交互
+        document.addEventListener('DOMContentLoaded', function() {
+            // 模拟通知按钮点击
+            document.querySelector('[data-action="notifications"]').addEventListener('click', function() {
+                const notification = document.createElement('div');
+                notification.className = 'ios-notification';
+                notification.innerHTML = `
+                    <i class="uil uil-bell"></i>
+                    <span>这是演示通知，展示通知功能</span>
+                `;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            });
+            
+            // 模拟个人资料按钮点击
+            document.querySelector('[data-action="profile"]').addEventListener('click', function() {
+                const profileMenu = document.createElement('div');
+                profileMenu.className = 'ios-profile-menu';
+                profileMenu.innerHTML = `
+                    <div class="ios-profile-menu-item">
+                        <i class="uil uil-user"></i>
+                        <span>个人资料</span>
+                    </div>
+                    <div class="ios-profile-menu-item">
+                        <i class="uil uil-cog"></i>
+                        <span>设置</span>
+                    </div>
+                    <div class="ios-profile-menu-item">
+                        <i class="uil uil-sign-out-alt"></i>
+                        <span>退出登录</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(profileMenu);
+                
+                setTimeout(() => {
+                    profileMenu.remove();
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>

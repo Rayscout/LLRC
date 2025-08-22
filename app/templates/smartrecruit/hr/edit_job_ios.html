@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑职位 - iOS风格</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .ios-edit-hero { background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%); }
+        .ios-form-section { background: var(--ios-bg-secondary); }
+        .ios-preview-section { background: var(--ios-bg-tertiary); }
+        
+        .ios-edit-form {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-medium);
+            margin-bottom: var(--ios-spacing-xl);
+        }
+        
+        .ios-form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .ios-form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-xs);
+        }
+        
+        .ios-form-input {
+            width: 100%;
+            padding: var(--ios-spacing-md);
+            border: 1px solid var(--ios-border-primary);
+            border-radius: var(--ios-radius-medium);
+            background: var(--ios-bg-secondary);
+            color: var(--ios-text-primary);
+            font-size: 0.875rem;
+            transition: all var(--ios-transition-fast);
+        }
+        
+        .ios-form-input:focus {
+            outline: none;
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        .ios-form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .ios-form-select {
+            cursor: pointer;
+        }
+        
+        .ios-form-actions {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            justify-content: flex-end;
+            margin-top: var(--ios-spacing-xl);
+            flex-wrap: wrap;
+        }
+        
+        .ios-preview-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-preview-header {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+            margin-bottom: var(--ios-spacing-lg);
+            padding-bottom: var(--ios-spacing-md);
+            border-bottom: 1px solid var(--ios-border-secondary);
+        }
+        
+        .ios-preview-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--ios-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .ios-preview-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+        }
+        
+        .ios-preview-content {
+            color: var(--ios-text-secondary);
+            line-height: 1.6;
+        }
+        
+        .ios-preview-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--ios-spacing-md);
+            margin: var(--ios-spacing-lg) 0;
+        }
+        
+        .ios-preview-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-xs);
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-preview-description {
+            margin: var(--ios-spacing-lg) 0;
+        }
+        
+        .ios-preview-description h4 {
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-preview-description p {
+            color: var(--ios-text-secondary);
+            line-height: 1.6;
+        }
+        
+        .ios-preview-skills {
+            margin-top: var(--ios-spacing-lg);
+        }
+        
+        .ios-preview-skills h4 {
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-preview-skills ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--ios-spacing-xs);
+        }
+        
+        .ios-preview-skills li {
+            background: var(--ios-blue);
+            color: white;
+            padding: var(--ios-spacing-xs) var(--ios-spacing-sm);
+            border-radius: var(--ios-radius-small);
+            font-size: 0.75rem;
+        }
+        
+        .ios-quick-actions {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            justify-content: center;
+            margin-bottom: var(--ios-spacing-xl);
+            flex-wrap: wrap;
+        }
+        
+        .ios-quick-action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--ios-border-primary);
+            border-radius: var(--ios-radius-medium);
+            padding: var(--ios-spacing-md) var(--ios-spacing-lg);
+            color: var(--ios-text-secondary);
+            text-decoration: none;
+            transition: all var(--ios-transition-medium);
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+        }
+        
+        .ios-quick-action-btn:hover {
+            background: var(--ios-blue);
+            color: white;
+            border-color: var(--ios-blue);
+            transform: translateY(-2px);
+        }
+        
+        .ios-quick-action-btn.primary {
+            background: var(--ios-blue);
+            color: white;
+            border-color: var(--ios-blue);
+        }
+        
+        .ios-quick-action-btn.primary:hover {
+            background: var(--ios-blue-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-brand">
+                <div class="ios-nav-brand-icon">
+                    <i class="uil uil-briefcase"></i>
+                </div>
+                <span>HR智能招聘</span>
+            </a>
+            
+            <ul class="ios-nav-menu">
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.hr_dashboard' else '' }}">
+                        <i class="ios-nav-icon uil uil-dashboard"></i>
+                        <span class="ios-nav-text">仪表板</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.recruitment.publish_recruitment' else '' }}">
+                        <i class="ios-nav-icon uil uil-briefcase"></i>
+                        <span class="ios-nav-text">发布职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.candidates' else '' }}">
+                        <i class="ios-nav-icon uil uil-users-alt"></i>
+                        <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.recruitment.my_jobs' else '' }}">
+                        <i class="ios-nav-icon uil uil-briefcase-alt"></i>
+                        <span class="ios-nav-text">我的职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.interviews' else '' }}">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.reports' else '' }}">
+                        <i class="ios-nav-icon uil uil-chart-pie"></i>
+                        <span class="ios-nav-text">报表</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.insights' else '' }}">
+                        <i class="ios-nav-icon uil uil-lightbulb"></i>
+                        <span class="ios-nav-text">AI洞察</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="ios-nav-actions">
+                <div class="ios-nav-search">
+                    <i class="uil uil-search"></i>
+                    <input type="text" placeholder="搜索..." />
+                </div>
+                
+                <div class="ios-nav-divider"></div>
+                
+                <button class="ios-nav-button secondary" data-action="notifications">
+                    <i class="uil uil-bell"></i>
+                    <span class="ios-nav-badge">3</span>
+                </button>
+                
+                <button class="ios-nav-button" data-action="profile">
+                    <i class="uil uil-user"></i>
+                    <span>HR</span>
+                </button>
+            </div>
+            
+            <!-- 移动端菜单切换按钮 -->
+            <button class="ios-nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="ios-parallax-bg"></div>
+    
+    <div class="ios-scroll-container">
+        <!-- 欢迎Section -->
+        <section class="ios-section ios-edit-hero">
+            <div class="ios-container">
+                <h1 class="ios-title ios-fade-in">编辑职位</h1>
+                <p class="ios-subtitle ios-fade-in">修改职位信息，优化招聘要求，提升招聘效果</p>
+                
+                <div class="ios-quick-actions ios-fade-in-up">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="ios-quick-action-btn">
+                        <i class="uil uil-arrow-left"></i>
+                        返回职位列表
+                    </a>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-quick-action-btn">
+                        <i class="uil uil-dashboard"></i>
+                        HR仪表板
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 编辑表单Section -->
+        <section class="ios-section ios-form-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">职位信息</h2>
+                <p class="ios-subtitle ios-fade-in">完善职位详情，吸引更多优秀候选人</p>
+                
+                <form action="{{ url_for('smartrecruit.hr.recruitment.edit_job', job_id=job.id) }}" method="POST" class="ios-edit-form ios-fade-in-up">
+                    <div class="ios-form-row">
+                        <div class="ios-form-group">
+                            <label class="ios-form-label">职位名称 *</label>
+                            <input type="text" name="title" class="ios-form-input" value="{{ job.title }}" placeholder="如：高级前端工程师" required>
+                        </div>
+                        <div class="ios-form-group">
+                            <label class="ios-form-label">工作地点 *</label>
+                            <input type="text" name="location" class="ios-form-input" value="{{ job.location }}" placeholder="如：北京、上海、深圳" required>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-form-row">
+                        <div class="ios-form-group">
+                            <label class="ios-form-label">薪资范围 *</label>
+                            <input type="text" name="salary" class="ios-form-input" value="{{ job.salary }}" placeholder="如：15k-25k、面议" required>
+                        </div>
+                        <div class="ios-form-group">
+                            <label class="ios-form-label">工作类型</label>
+                            <select name="job_type" class="ios-form-input ios-form-select">
+                                <option value="全职" {% if job.job_type == '全职' %}selected{% endif %}>全职</option>
+                                <option value="兼职" {% if job.job_type == '兼职' %}selected{% endif %}>兼职</option>
+                                <option value="实习" {% if job.job_type == '实习' %}selected{% endif %}>实习</option>
+                                <option value="远程" {% if job.job_type == '远程' %}selected{% endif %}>远程</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-form-row">
+                        <div class="ios-form-group">
+                            <label class="ios-form-label">招聘人数</label>
+                            <input type="number" name="positions_needed" class="ios-form-input" value="{{ job.positions_needed|default(1) }}" min="1" max="100">
+                        </div>
+                        <div class="ios-form-group">
+                            <label class="ios-form-label">经验要求</label>
+                            <select name="experience_years" class="ios-form-input ios-form-select">
+                                <option value="不限" {% if job.experience_years == '不限' %}selected{% endif %}>不限</option>
+                                <option value="应届生" {% if job.experience_years == '应届生' %}selected{% endif %}>应届生</option>
+                                <option value="1-3年" {% if job.experience_years == '1-3年' %}selected{% endif %}>1-3年</option>
+                                <option value="3-5年" {% if job.experience_years == '3-5年' %}selected{% endif %}>3-5年</option>
+                                <option value="5-10年" {% if job.experience_years == '5-10年' %}selected{% endif %}>5-10年</option>
+                                <option value="10年以上" {% if job.experience_years == '10年以上' %}selected{% endif %}>10年以上</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-form-group full-width">
+                        <label class="ios-form-label">职位描述 *</label>
+                        <textarea name="description" class="ios-form-input ios-form-textarea" placeholder="详细描述职位职责、要求和工作内容..." required>{{ job.description }}</textarea>
+                    </div>
+                    
+                    <div class="ios-form-group full-width">
+                        <label class="ios-form-label">技能要求</label>
+                        <textarea name="skills_required" class="ios-form-input ios-form-textarea" placeholder="列出所需的技能和技术栈，用逗号分隔...">{{ job.skills_required|default('') }}</textarea>
+                    </div>
+                    
+                    <div class="ios-form-actions">
+                        <button type="button" class="ios-button secondary" onclick="window.history.back()">
+                            <i class="uil uil-times"></i>
+                            取消
+                        </button>
+                        <button type="submit" class="ios-button">
+                            <i class="uil uil-check-circle"></i>
+                            保存修改
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- 预览Section -->
+        <section class="ios-section ios-preview-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">职位预览</h2>
+                <p class="ios-subtitle ios-fade-in">实时预览职位发布效果</p>
+                
+                <div class="ios-preview-card ios-fade-in-up">
+                    <div class="ios-preview-header">
+                        <div class="ios-preview-icon">
+                            <i class="uil uil-briefcase"></i>
+                        </div>
+                        <div class="ios-preview-title" id="previewTitle">{{ job.title }}</div>
+                    </div>
+                    
+                    <div class="ios-preview-meta">
+                        <div class="ios-preview-meta-item">
+                            <i class="uil uil-map-marker"></i>
+                            <span id="previewLocation">{{ job.location }}</span>
+                        </div>
+                        <div class="ios-preview-meta-item">
+                            <i class="uil uil-money-bill"></i>
+                            <span id="previewSalary">{{ job.salary }}</span>
+                        </div>
+                        <div class="ios-preview-meta-item">
+                            <i class="uil uil-users-alt"></i>
+                            <span id="previewPositions">{{ job.positions_needed|default(1) }}人</span>
+                        </div>
+                        <div class="ios-preview-meta-item">
+                            <i class="uil uil-clock"></i>
+                            <span id="previewType">{{ job.job_type|default('全职') }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-preview-description">
+                        <h4>职位描述</h4>
+                        <p id="previewDescription">{{ job.description }}</p>
+                    </div>
+                    
+                    <div class="ios-preview-skills">
+                        <h4>技能要求</h4>
+                        <ul id="previewSkills">
+                            {% if job.skills_required %}
+                                {% for skill in job.skills_required.split(',') %}
+                                <li>{{ skill.strip() }}</li>
+                                {% endfor %}
+                            {% else %}
+                                <li>技能要求将在这里显示...</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>    <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+    
+    <script>
+        // 职位编辑相关JavaScript功能
+        
+        // 实时预览更新
+        function updatePreview() {
+            const title = document.querySelector('input[name="title"]').value;
+            const location = document.querySelector('input[name="location"]').value;
+            const salary = document.querySelector('input[name="salary"]').value;
+            const positions = document.querySelector('input[name="positions_needed"]').value;
+            const type = document.querySelector('select[name="job_type"]').value;
+            const description = document.querySelector('textarea[name="description"]').value;
+            const skills = document.querySelector('textarea[name="skills_required"]').value;
+            
+            // 更新预览内容
+            document.getElementById('previewTitle').textContent = title || '职位名称';
+            document.getElementById('previewLocation').textContent = location || '工作地点';
+            document.getElementById('previewSalary').textContent = salary || '薪资范围';
+            document.getElementById('previewPositions').textContent = (positions || 1) + '人';
+            document.getElementById('previewType').textContent = type || '全职';
+            document.getElementById('previewDescription').textContent = description || '职位描述将在这里显示...';
+            
+            // 更新技能要求
+            const skillsList = document.getElementById('previewSkills');
+            if (skills.trim()) {
+                const skillsArray = skills.split(',').map(skill => skill.trim()).filter(skill => skill);
+                skillsList.innerHTML = skillsArray.map(skill => `<li>${skill}</li>`).join('');
+            } else {
+                skillsList.innerHTML = '<li>技能要求将在这里显示...</li>';
+            }
+        }
+        
+        // 绑定输入事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.addEventListener('input', updatePreview);
+                input.addEventListener('change', updatePreview);
+            });
+            
+            // 初始化预览
+            updatePreview();
+            
+            console.log('职位编辑页面已加载');
+        });
+    </script>
+</body>
+</html>

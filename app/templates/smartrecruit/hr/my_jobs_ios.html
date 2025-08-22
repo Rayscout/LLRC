@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的职位 - iOS风格</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .ios-jobs-hero { background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%); }
+        .ios-stats-section { background: var(--ios-bg-secondary); }
+        .ios-jobs-list { background: var(--ios-bg-tertiary); }
+        
+        .ios-job-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-xl);
+        }
+        
+        .ios-job-stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-lg);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-job-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-job-stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--ios-blue);
+            margin-bottom: var(--ios-spacing-xs);
+        }
+        
+        .ios-job-stat-label {
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-job-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            margin-bottom: var(--ios-spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-job-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-job-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-job-company {
+            font-size: 1rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-job-status {
+            padding: var(--ios-spacing-xs) var(--ios-spacing-sm);
+            border-radius: var(--ios-radius-small);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .ios-job-status.active {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--ios-green);
+        }
+        
+        .ios-job-status.draft {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--ios-orange);
+        }
+        
+        .ios-job-status.closed {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--ios-red);
+        }
+        
+        .ios-job-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--ios-spacing-md);
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-job-detail {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-xs);
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-job-description {
+            color: var(--ios-text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--ios-spacing-lg);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .ios-job-actions {
+            display: flex;
+            gap: var(--ios-spacing-sm);
+            flex-wrap: wrap;
+        }
+        
+        .ios-job-metrics {
+            display: flex;
+            gap: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-lg);
+            flex-wrap: wrap;
+        }
+        
+        .ios-job-metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--ios-spacing-xs);
+        }
+        
+        .ios-job-metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ios-blue);
+        }
+        
+        .ios-job-metric-label {
+            font-size: 0.75rem;
+            color: var(--ios-text-tertiary);
+            text-align: center;
+        }
+        
+        .ios-quick-actions {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            justify-content: center;
+            margin-bottom: var(--ios-spacing-xl);
+            flex-wrap: wrap;
+        }
+        
+        .ios-quick-action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--ios-border-primary);
+            border-radius: var(--ios-radius-medium);
+            padding: var(--ios-spacing-md) var(--ios-spacing-lg);
+            color: var(--ios-text-secondary);
+            text-decoration: none;
+            transition: all var(--ios-transition-medium);
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+        }
+        
+        .ios-quick-action-btn:hover {
+            background: var(--ios-blue);
+            color: white;
+            border-color: var(--ios-blue);
+            transform: translateY(-2px);
+        }
+        
+        .ios-quick-action-btn.primary {
+            background: var(--ios-blue);
+            color: white;
+            border-color: var(--ios-blue);
+        }
+        
+        .ios-quick-action-btn.primary:hover {
+            background: var(--ios-blue-dark);
+        }
+        
+        .ios-filter-section {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+        }
+        
+        .ios-filter-group {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .ios-filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--ios-spacing-xs);
+        }
+        
+        .ios-filter-label {
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+            font-weight: 500;
+        }
+        
+        .ios-search-box {
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .ios-search-box .ios-input {
+            padding-left: 48px;
+        }
+        
+        .ios-search-icon {
+            position: absolute;
+            left: var(--ios-spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ios-text-tertiary);
+            font-size: 1.125rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-brand">
+                <div class="ios-nav-brand-icon">
+                    <i class="uil uil-briefcase"></i>
+                </div>
+                <span>HR智能招聘</span>
+            </a>
+            
+            <ul class="ios-nav-menu">
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.hr_dashboard' else '' }}">
+                        <i class="ios-nav-icon uil uil-dashboard"></i>
+                        <span class="ios-nav-text">仪表板</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.recruitment.publish_recruitment' else '' }}">
+                        <i class="ios-nav-icon uil uil-briefcase"></i>
+                        <span class="ios-nav-text">发布职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.candidates' else '' }}">
+                        <i class="ios-nav-icon uil uil-users-alt"></i>
+                        <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.recruitment.my_jobs' else '' }}">
+                        <i class="ios-nav-icon uil uil-briefcase-alt"></i>
+                        <span class="ios-nav-text">我的职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.interviews' else '' }}">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.reports' else '' }}">
+                        <i class="ios-nav-icon uil uil-chart-pie"></i>
+                        <span class="ios-nav-text">报表</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.insights' else '' }}">
+                        <i class="ios-nav-icon uil uil-lightbulb"></i>
+                        <span class="ios-nav-text">AI洞察</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="ios-nav-actions">
+                <div class="ios-nav-search">
+                    <i class="uil uil-search"></i>
+                    <input type="text" placeholder="搜索..." />
+                </div>
+                
+                <div class="ios-nav-divider"></div>
+                
+                <button class="ios-nav-button secondary" data-action="notifications">
+                    <i class="uil uil-bell"></i>
+                    <span class="ios-nav-badge">3</span>
+                </button>
+                
+                <button class="ios-nav-button" data-action="profile">
+                    <i class="uil uil-user"></i>
+                    <span>HR</span>
+                </button>
+            </div>
+            
+            <!-- 移动端菜单切换按钮 -->
+            <button class="ios-nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="ios-parallax-bg"></div>
+    
+    <div class="ios-scroll-container">
+        <!-- 欢迎Section -->
+        <section class="ios-section ios-jobs-hero">
+            <div class="ios-container">
+                <h1 class="ios-title ios-fade-in">我的职位</h1>
+                <p class="ios-subtitle ios-fade-in">管理已发布的招聘职位，跟踪申请情况，优化招聘效果</p>
+                
+                <div class="ios-quick-actions ios-fade-in-up">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-quick-action-btn primary">
+                        <i class="uil uil-plus"></i>
+                        发布新职位
+                    </a>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-quick-action-btn">
+                        <i class="uil uil-users-alt"></i>
+                        查看候选人
+                    </a>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-quick-action-btn">
+                        <i class="uil uil-chart-line"></i>
+                        招聘分析
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 统计概览Section -->
+        <section class="ios-section ios-stats-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">职位概览</h2>
+                <p class="ios-subtitle ios-fade-in">了解职位发布情况和招聘效果</p>
+                
+                <div class="ios-job-stats">
+                    <div class="ios-job-stat-card ios-fade-in-up">
+                        <div class="ios-job-stat-number">{{ jobs|length if jobs else 0 }}</div>
+                        <div class="ios-job-stat-label">总职位数</div>
+                    </div>
+                    <div class="ios-job-stat-card ios-fade-in-up">
+                        <div class="ios-job-stat-number">
+                            {{ jobs|selectattr('status', 'equalto', 'active')|list|length if jobs else 0 }}
+                        </div>
+                        <div class="ios-job-stat-label">活跃职位</div>
+                    </div>
+                    <div class="ios-job-stat-card ios-fade-in-up">
+                        <div class="ios-job-stat-number">
+                            {{ jobs|selectattr('status', 'equalto', 'draft')|list|length if jobs else 0 }}
+                        </div>
+                        <div class="ios-job-stat-label">草稿职位</div>
+                    </div>
+                    <div class="ios-job-stat-card ios-fade-in-up">
+                        <div class="ios-job-stat-number">
+                            {{ jobs|selectattr('status', 'equalto', 'closed')|list|length if jobs else 0 }}
+                        </div>
+                        <div class="ios-job-stat-label">已关闭职位</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 筛选Section -->
+        <section class="ios-section ios-stats-section">
+            <div class="ios-container">
+                <div class="ios-filter-section ios-fade-in-up">
+                    <div class="ios-filter-group">
+                        <div class="ios-search-box">
+                            <i class="ios-search-icon uil uil-search"></i>
+                            <input type="text" class="ios-input" placeholder="搜索职位标题、描述或要求..." id="searchInput">
+                        </div>
+                        
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">状态筛选</label>
+                            <select class="ios-input" id="statusFilter" style="min-width: 120px;">
+                                <option value="">全部状态</option>
+                                <option value="active">活跃</option>
+                                <option value="draft">草稿</option>
+                                <option value="closed">已关闭</option>
+                            </select>
+                        </div>
+                        
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">工作类型</label>
+                            <select class="ios-input" id="typeFilter" style="min-width: 120px;">
+                                <option value="">全部类型</option>
+                                <option value="全职">全职</option>
+                                <option value="兼职">兼职</option>
+                                <option value="实习">实习</option>
+                                <option value="远程">远程</option>
+                            </select>
+                        </div>
+                        
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">排序方式</label>
+                            <select class="ios-input" id="sortFilter" style="min-width: 120px;">
+                                <option value="date_desc">发布时间 ↓</option>
+                                <option value="date_asc">发布时间 ↑</option>
+                                <option value="title_asc">标题 A-Z</option>
+                                <option value="title_desc">标题 Z-A</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 职位列表Section -->
+        <section class="ios-section ios-jobs-list">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">职位列表</h2>
+                <p class="ios-subtitle ios-fade-in">管理所有已发布的招聘职位</p>
+                
+                {% if jobs %}
+                    {% for job in jobs %}
+                    <div class="ios-job-card ios-fade-in-up">
+                        <div class="ios-job-header">
+                            <div>
+                                <div class="ios-job-title">{{ job.title }}</div>
+                                <div class="ios-job-company">{{ job.company_name }}</div>
+                            </div>
+                            <span class="ios-job-status {{ job.status }}">
+                                {% if job.status == 'active' %}
+                                    活跃
+                                {% elif job.status == 'draft' %}
+                                    草稿
+                                {% elif job.status == 'closed' %}
+                                    已关闭
+                                {% else %}
+                                    {{ job.status }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="ios-job-metrics">
+                            <div class="ios-job-metric">
+                                <div class="ios-job-metric-value">{{ job.positions_needed|default(1) }}</div>
+                                <div class="ios-job-metric-label">招聘人数</div>
+                            </div>
+                            <div class="ios-job-metric">
+                                <div class="ios-job-metric-value">{{ job.experience_years|default('不限') }}</div>
+                                <div class="ios-job-metric-label">经验要求</div>
+                            </div>
+                            <div class="ios-job-metric">
+                                <div class="ios-job-metric-value">{{ job.job_type|default('全职') }}</div>
+                                <div class="ios-job-metric-label">工作类型</div>
+                            </div>
+                        </div>
+                        
+                        <div class="ios-job-details">
+                            <div class="ios-job-detail">
+                                <i class="uil uil-map-marker"></i>
+                                <span>{{ job.location }}</span>
+                            </div>
+                            <div class="ios-job-detail">
+                                <i class="uil uil-money-bill"></i>
+                                <span>{{ job.salary }}</span>
+                            </div>
+                            <div class="ios-job-detail">
+                                <i class="uil uil-calendar-alt"></i>
+                                <span>发布于 {{ job.date_posted.strftime('%Y年%m月%d日') if job.date_posted else '未知' }}</span>
+                            </div>
+                            {% if job.department %}
+                            <div class="ios-job-detail">
+                                <i class="uil uil-building"></i>
+                                <span>{{ job.department }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="ios-job-description">
+                            {{ job.description|truncate(200) }}
+                        </div>
+                        
+                        <div class="ios-job-actions">
+                            <a href="{{ url_for('smartrecruit.hr.recruitment.edit_job', job_id=job.id) }}" class="ios-button">
+                                <i class="uil uil-edit"></i>
+                                编辑职位
+                            </a>
+                            
+                            <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-button secondary">
+                                <i class="uil uil-users-alt"></i>
+                                查看候选人
+                            </a>
+                            
+                            {% if job.status == 'active' %}
+                            <button class="ios-button secondary" onclick="closeJob({{ job.id }})">
+                                <i class="uil uil-times"></i>
+                                关闭职位
+                            </button>
+                            {% elif job.status == 'draft' %}
+                            <button class="ios-button" onclick="publishJob({{ job.id }})">
+                                <i class="uil uil-upload"></i>
+                                发布职位
+                            </button>
+                            {% endif %}
+                            
+                            <button class="ios-button secondary" onclick="deleteJob({{ job.id }})">
+                                <i class="uil uil-trash-alt"></i>
+                                删除职位
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="ios-card ios-fade-in-up">
+                        <div style="text-align: center; padding: var(--ios-spacing-xxl); color: var(--ios-text-tertiary);">
+                            <i class="uil uil-briefcase" style="font-size: 4rem; margin-bottom: var(--ios-spacing-lg); opacity: 0.5;"></i>
+                            <h3 style="font-size: 1.5rem; margin-bottom: var(--ios-spacing-md); color: var(--ios-text-secondary);">暂无职位</h3>
+                            <p>您还没有发布任何招聘职位，立即发布第一个职位开始招聘</p>
+                            <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-button large" style="margin-top: var(--ios-spacing-lg);">
+                                <i class="uil uil-plus"></i>
+                                发布职位
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>    <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+    
+    <script>
+        // 职位管理相关JavaScript功能
+        
+        function closeJob(jobId) {
+            if (confirm('确定要关闭这个职位吗？关闭后将不再接受新的申请。')) {
+                // 这里实现关闭职位的逻辑
+                alert(`职位 #${jobId} 已关闭`);
+                location.reload();
+            }
+        }
+        
+        function publishJob(jobId) {
+            if (confirm('确定要发布这个职位吗？发布后将开始接受申请。')) {
+                // 这里实现发布职位的逻辑
+                alert(`职位 #${jobId} 已发布`);
+                location.reload();
+            }
+        }
+        
+        function deleteJob(jobId) {
+            if (confirm('确定要删除这个职位吗？删除后将无法恢复。')) {
+                // 这里实现删除职位的逻辑
+                alert(`职位 #${jobId} 已删除`);
+                location.reload();
+            }
+        }
+        
+        // 搜索和筛选功能
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterJobs();
+        });
+        
+        document.getElementById('statusFilter').addEventListener('change', function() {
+            filterJobs();
+        });
+        
+        document.getElementById('typeFilter').addEventListener('change', function() {
+            filterJobs();
+        });
+        
+        document.getElementById('sortFilter').addEventListener('change', function() {
+            filterJobs();
+        });
+        
+        function filterJobs() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+            
+            // 这里实现筛选逻辑
+            console.log('筛选条件:', { 
+                search: searchTerm, 
+                status: statusFilter, 
+                type: typeFilter, 
+                sort: sortFilter 
+            });
+            
+            // 可以在这里实现实时筛选或发送AJAX请求
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以在这里添加初始化逻辑
+            console.log('职位管理页面已加载');
+        });
+    </script>
+</body>
+</html>

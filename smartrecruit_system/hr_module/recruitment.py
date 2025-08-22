@@ -97,7 +97,7 @@ def publish_recruitment():
             logging.error(f'发布/更新招聘启事失败: {e}')
             flash('操作失败，请稍后重试。', 'danger')
 
-    return render_template('smartrecruit/hr/publish_recruitment_new.html', job=job_to_edit, is_edit=bool(edit_job_id))
+    return render_template('smartrecruit/hr/create_job_ios.html', job=job_to_edit, is_edit=bool(edit_job_id))
 
 @recruitment_bp.route('/my_jobs')
 def my_jobs():
@@ -107,7 +107,7 @@ def my_jobs():
         return redirect(url_for('common.auth.sign'))
 
     jobs = Job.query.filter_by(user_id=g.user.id).all()
-    return render_template('smartrecruit/hr/my_jobs.html', jobs=jobs)
+    return render_template('smartrecruit/hr/my_jobs_ios.html', jobs=jobs)
 
 @recruitment_bp.route('/edit/<int:job_id>', methods=['GET', 'POST'])
 def edit_job(job_id):
@@ -142,7 +142,7 @@ def edit_job(job_id):
         flash('职位更新成功！', 'success')
         return redirect(url_for('smartrecruit.hr.recruitment.my_jobs'))
 
-    return render_template('smartrecruit/hr/edit_job.html', job=job)
+    return render_template('smartrecruit/hr/edit_job_ios.html', job=job)
 
 @recruitment_bp.route('/delete/<int:job_id>', methods=['POST'])
 def delete_job(job_id):

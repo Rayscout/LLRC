@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI洞察 - iOS风格</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .ios-insights-hero { background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-purple) 100%); }
+        .ios-trends-section { background: var(--ios-bg-secondary); }
+        .ios-skills-section { background: var(--ios-bg-tertiary); }
+        .ios-predictions-section { background: var(--ios-bg-secondary); }
+        
+        .ios-insight-score {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-medium);
+            margin-bottom: var(--ios-spacing-xl);
+        }
+        
+        .ios-score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--ios-blue) 0deg, var(--ios-blue) {{ insights.candidate_quality_score|default(85.5) * 3.6 }}deg, var(--ios-bg-tertiary) {{ insights.candidate_quality_score|default(85.5) * 3.6 }}deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--ios-spacing-lg);
+            position: relative;
+        }
+        
+        .ios-score-circle::before {
+            content: '';
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            position: absolute;
+        }
+        
+        .ios-score-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ios-blue);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .ios-score-label {
+            font-size: 1.125rem;
+            color: var(--ios-text-secondary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-score-description {
+            color: var(--ios-text-tertiary);
+            font-size: 0.875rem;
+        }
+        
+        .ios-trend-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-trend-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-trend-header {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+            margin-bottom: var(--ios-spacing-md);
+        }
+        
+        .ios-trend-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .ios-trend-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+        }
+        
+        .ios-trend-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .ios-trend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+            padding: var(--ios-spacing-sm) 0;
+            border-bottom: 1px solid var(--ios-border-secondary);
+        }
+        
+        .ios-trend-item:last-child {
+            border-bottom: none;
+        }
+        
+        .ios-trend-rank {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--ios-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .ios-trend-rank.top-3 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+        }
+        
+        .ios-trend-name {
+            flex: 1;
+            color: var(--ios-text-primary);
+            font-weight: 500;
+        }
+        
+        .ios-trend-growth {
+            color: var(--ios-green);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .ios-skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--ios-spacing-md);
+            margin-bottom: var(--ios-spacing-xl);
+        }
+        
+        .ios-skill-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-lg);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-skill-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-skill-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-skill-demand {
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+            margin-bottom: var(--ios-spacing-md);
+        }
+        
+        .ios-skill-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--ios-bg-tertiary);
+            border-radius: var(--ios-radius-small);
+            overflow: hidden;
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-skill-progress {
+            height: 100%;
+            background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+            border-radius: var(--ios-radius-small);
+            transition: width var(--ios-transition-slow);
+        }
+        
+        .ios-skill-percentage {
+            font-size: 0.875rem;
+            color: var(--ios-blue);
+            font-weight: 600;
+        }
+        
+        .ios-prediction-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-prediction-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-prediction-header {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+            margin-bottom: var(--ios-spacing-md);
+        }
+        
+        .ios-prediction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--ios-orange);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .ios-prediction-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+        }
+        
+        .ios-prediction-content {
+            color: var(--ios-text-secondary);
+            line-height: 1.6;
+            font-size: 0.875rem;
+        }
+        
+        .ios-prediction-confidence {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-xs);
+            margin-top: var(--ios-spacing-sm);
+            font-size: 0.75rem;
+            color: var(--ios-text-tertiary);
+        }
+        
+        .ios-confidence-bar {
+            width: 60px;
+            height: 4px;
+            background: var(--ios-bg-tertiary);
+            border-radius: var(--ios-radius-small);
+            overflow: hidden;
+        }
+        
+        .ios-confidence-progress {
+            height: 100%;
+            background: var(--ios-green);
+            border-radius: var(--ios-radius-small);
+        }
+        
+        .ios-quick-actions {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            justify-content: center;
+            margin-bottom: var(--ios-spacing-xl);
+            flex-wrap: wrap;
+        }
+        
+        .ios-quick-action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--ios-border-primary);
+            border-radius: var(--ios-radius-medium);
+            padding: var(--ios-spacing-md) var(--ios-spacing-lg);
+            color: var(--ios-text-secondary);
+            text-decoration: none;
+            transition: all var(--ios-transition-medium);
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+        }
+        
+        .ios-quick-action-btn:hover {
+            background: var(--ios-blue);
+            color: white;
+            border-color: var(--ios-blue);
+            transform: translateY(-2px);
+        }
+        
+        .ios-quick-action-btn.primary {
+            background: var(--ios-blue);
+            color: white;
+            border-color: var(--ios-blue);
+        }
+        
+        .ios-quick-action-btn.primary:hover {
+            background: var(--ios-blue-dark);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-brand">
+                <div class="ios-nav-brand-icon">
+                    <i class="uil uil-briefcase"></i>
+                </div>
+                <span>HR智能招聘</span>
+            </a>
+            
+            <ul class="ios-nav-menu">
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.hr_dashboard' else '' }}">
+                        <i class="ios-nav-icon uil uil-dashboard"></i>
+                        <span class="ios-nav-text">仪表板</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.recruitment.publish_recruitment' else '' }}">
+                        <i class="ios-nav-icon uil uil-briefcase"></i>
+                        <span class="ios-nav-text">发布职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.candidates' else '' }}">
+                        <i class="ios-nav-icon uil uil-users-alt"></i>
+                        <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.recruitment.my_jobs' else '' }}">
+                        <i class="ios-nav-icon uil uil-briefcase-alt"></i>
+                        <span class="ios-nav-text">我的职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.interviews' else '' }}">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.reports' else '' }}">
+                        <i class="ios-nav-icon uil uil-chart-pie"></i>
+                        <span class="ios-nav-text">报表</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.insights' else '' }}">
+                        <i class="ios-nav-icon uil uil-lightbulb"></i>
+                        <span class="ios-nav-text">AI洞察</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="ios-nav-actions">
+                <div class="ios-nav-search">
+                    <i class="uil uil-search"></i>
+                    <input type="text" placeholder="搜索..." />
+                </div>
+                
+                <div class="ios-nav-divider"></div>
+                
+                <button class="ios-nav-button secondary" data-action="notifications">
+                    <i class="uil uil-bell"></i>
+                    <span class="ios-nav-badge">3</span>
+                </button>
+                
+                <button class="ios-nav-button" data-action="profile">
+                    <i class="uil uil-user"></i>
+                    <span>HR</span>
+                </button>
+            </div>
+            
+            <!-- 移动端菜单切换按钮 -->
+            <button class="ios-nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="ios-parallax-bg"></div>
+    
+    <div class="ios-scroll-container">
+        <!-- 欢迎Section -->
+        <section class="ios-section ios-insights-hero">
+            <div class="ios-container">
+                <h1 class="ios-title ios-fade-in">AI洞察</h1>
+                <p class="ios-subtitle ios-fade-in">智能分析招聘趋势，预测人才需求，优化招聘策略</p>
+                
+                <div class="ios-quick-actions ios-fade-in-up">
+                    <button class="ios-quick-action-btn primary" onclick="generateInsights()">
+                        <i class="uil uil-lightbulb"></i>
+                        生成新洞察
+                    </button>
+                    <button class="ios-quick-action-btn" onclick="exportInsights()">
+                        <i class="uil uil-export"></i>
+                        导出洞察
+                    </button>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-quick-action-btn">
+                        <i class="uil uil-chart-pie"></i>
+                        数据报表
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 质量评分Section -->
+        <section class="ios-section ios-trends-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">候选人质量评分</h2>
+                <p class="ios-subtitle ios-fade-in">基于AI算法的综合评估，帮助识别最佳候选人</p>
+                
+                <div class="ios-insight-score ios-fade-in-up">
+                    <div class="ios-score-label">整体候选人质量评分</div>
+                    <div class="ios-score-circle">
+                        <div class="ios-score-value">{{ "%.1f"|format(insights.candidate_quality_score|default(85.5)) }}</div>
+                    </div>
+                    <div class="ios-score-description">
+                        基于技能匹配度、经验相关性、教育背景等多维度AI分析
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 热门技能Section -->
+        <section class="ios-section ios-skills-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">热门技能分析</h2>
+                <p class="ios-subtitle ios-fade-in">了解市场最受欢迎的技能需求，优化职位要求</p>
+                
+                <div class="ios-skills-grid">
+                    {% for skill in insights.top_skills|default(['Python', 'JavaScript', 'React', 'Node.js', 'SQL']) %}
+                    <div class="ios-skill-card ios-fade-in-up">
+                        <div class="ios-skill-name">{{ skill }}</div>
+                        <div class="ios-skill-demand">市场需求度</div>
+                        <div class="ios-skill-bar">
+                            {% set demand = range(70, 95) | random %}
+                            <div class="ios-skill-progress" style="width: {{ demand }}%"></div>
+                        </div>
+                        <div class="ios-skill-percentage">{{ demand }}%</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- 热门职位Section -->
+        <section class="ios-section ios-trends-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">热门职位趋势</h2>
+                <p class="ios-subtitle ios-fade-in">实时监控市场热门职位，把握招聘先机</p>
+                
+                <div class="ios-trend-card ios-fade-in-up">
+                    <div class="ios-trend-header">
+                        <div class="ios-trend-icon">
+                            <i class="uil uil-trending-up"></i>
+                        </div>
+                        <div class="ios-trend-title">增长最快的职位</div>
+                    </div>
+                    <ul class="ios-trend-list">
+                        {% for position in insights.trending_positions|default(['Full Stack Developer', 'Data Scientist', 'DevOps Engineer']) %}
+                        <li class="ios-trend-item">
+                            <div class="ios-trend-rank {% if loop.index <= 3 %}top-3{% endif %}">{{ loop.index }}</div>
+                            <div class="ios-trend-name">{{ position }}</div>
+                            <div class="ios-trend-growth">+{{ range(15, 45) | random }}%</div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI预测Section -->
+        <section class="ios-section ios-predictions-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">AI预测分析</h2>
+                <p class="ios-subtitle ios-fade-in">基于历史数据和市场趋势的智能预测</p>
+                
+                <div class="ios-grid ios-grid-2">
+                    <div class="ios-prediction-card ios-fade-in-up">
+                        <div class="ios-prediction-header">
+                            <div class="ios-prediction-icon">
+                                <i class="uil uil-users-alt"></i>
+                            </div>
+                            <div class="ios-prediction-title">人才需求预测</div>
+                        </div>
+                        <div class="ios-prediction-content">
+                            根据市场趋势分析，预计未来3个月前端开发工程师需求将增长25%，建议提前储备相关人才。
+                        </div>
+                        <div class="ios-prediction-confidence">
+                            <span>预测置信度</span>
+                            <div class="ios-confidence-bar">
+                                <div class="ios-confidence-progress" style="width: 85%"></div>
+                            </div>
+                            <span>85%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-prediction-card ios-fade-in-up">
+                        <div class="ios-prediction-header">
+                            <div class="ios-prediction-icon">
+                                <i class="uil uil-clock"></i>
+                            </div>
+                            <div class="ios-prediction-title">招聘时机预测</div>
+                        </div>
+                        <div class="ios-prediction-content">
+                            分析显示，每年3-4月和9-10月是技术人才求职高峰期，建议在这些时期加大招聘力度。
+                        </div>
+                        <div class="ios-prediction-confidence">
+                            <span>预测置信度</span>
+                            <div class="ios-confidence-bar">
+                                <div class="ios-confidence-progress" style="width: 92%"></div>
+                            </div>
+                            <span>92%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-prediction-card ios-fade-in-up">
+                        <div class="ios-prediction-header">
+                            <div class="ios-prediction-icon">
+                                <i class="uil uil-dollar-sign"></i>
+                            </div>
+                            <div class="ios-prediction-title">薪资趋势预测</div>
+                        </div>
+                        <div class="ios-prediction-content">
+                            预计未来6个月，AI/ML相关岗位薪资将上涨15-20%，建议调整薪资策略以保持竞争力。
+                        </div>
+                        <div class="ios-prediction-confidence">
+                            <span>预测置信度</span>
+                            <div class="ios-confidence-bar">
+                                <div class="ios-confidence-progress" style="width: 78%"></div>
+                            </div>
+                            <span>78%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-prediction-card ios-fade-in-up">
+                        <div class="ios-prediction-header">
+                            <div class="ios-prediction-icon">
+                                <i class="uil uil-target-lock"></i>
+                            </div>
+                            <div class="ios-prediction-title">技能需求预测</div>
+                        </div>
+                        <div class="ios-prediction-content">
+                            预计React Native和Flutter等跨平台开发技能需求将在未来12个月内增长30%，建议关注相关人才。
+                        </div>
+                        <div class="ios-prediction-confidence">
+                            <span>预测置信度</span>
+                            <div class="ios-confidence-bar">
+                                <div class="ios-confidence-progress" style="width: 81%"></div>
+                            </div>
+                            <span>81%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>    <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+    
+    <script>
+        // AI洞察相关JavaScript功能
+        
+        function generateInsights() {
+            alert('AI洞察生成功能开发中...');
+            // 这里可以实现生成新洞察的逻辑
+        }
+        
+        function exportInsights() {
+            alert('洞察导出功能开发中...');
+            // 这里可以实现导出洞察的逻辑
+        }
+        
+        // 技能进度条动画
+        function animateSkillBars() {
+            const skillBars = document.querySelectorAll('.ios-skill-progress');
+            skillBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, Math.random() * 1000);
+            });
+        }
+        
+        // 预测置信度动画
+        function animateConfidenceBars() {
+            const confidenceBars = document.querySelectorAll('.ios-confidence-progress');
+            confidenceBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, Math.random() * 1000);
+            });
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 延迟执行动画，让页面先加载完成
+            setTimeout(() => {
+                animateSkillBars();
+                animateConfidenceBars();
+            }, 500);
+            
+            console.log('AI洞察页面已加载');
+        });
+    </script>
+</body>
+</html>

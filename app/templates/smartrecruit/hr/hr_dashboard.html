@@ -3,12 +3,17 @@
 {% block title %}HR仪表板{% endblock %}
 
 {% block content %}
+<!-- 引入HR仪表盘专用样式 -->
+<link rel="stylesheet" href="{{ url_for('static', filename='hr_dashboard.css') }}">
+<!-- 引入HR仪表盘交互增强脚本 -->
+<script src="{{ url_for('static', filename='hr_dashboard.js') }}" defer></script>
+
 <div class="hr-dashboard">
     <!-- 页面标题 -->
     <div class="page-header">
         <div class="header-content">
-            <h1><i class="uil uil-chart-line"></i> HR仪表板</h1>
-            <p>招聘数据概览与关键指标</p>
+            <h1><i class="uil uil-chart-line"></i> HR智能仪表板</h1>
+            <p>数据驱动的招聘决策与人才管理平台</p>
         </div>
         <div class="header-actions">
             <button class="btn-primary" onclick="location.href='{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}'">
@@ -21,10 +26,10 @@
     <div class="metrics-grid">
         <div class="metric-card">
             <div class="metric-icon candidates">
-                <i class="uil uil-users-alt"></i>
+                <i class="uil uil-briefcase-alt"></i>
             </div>
             <div class="metric-content">
-                <h3>总职位</h3>
+                <h3>活跃职位</h3>
                 <div class="metric-value">{{ total_jobs|default(0) }}</div>
                 <div class="metric-change positive">
                     <i class="uil uil-arrow-up"></i> +12% 本月
@@ -34,10 +39,10 @@
 
         <div class="metric-card">
             <div class="metric-icon interviews">
-                <i class="uil uil-calendar-alt"></i>
+                <i class="uil uil-file-alt"></i>
             </div>
             <div class="metric-content">
-                <h3>总申请</h3>
+                <h3>总申请数</h3>
                 <div class="metric-value">{{ total_applications|default(0) }}</div>
                 <div class="metric-change positive">
                     <i class="uil uil-arrow-up"></i> +8% 本周
@@ -66,7 +71,7 @@
                 <i class="uil uil-chart-pie"></i>
             </div>
             <div class="metric-content">
-                <h3>报表分析</h3>
+                <h3>数据分析</h3>
                 <div class="metric-value">实时</div>
                 <div class="metric-change positive">
                     <i class="uil uil-arrow-up"></i> 数据驱动
@@ -79,10 +84,10 @@
 
         <div class="metric-card">
             <div class="metric-icon hires">
-                <i class="uil uil-user-check"></i>
+                <i class="uil uil-users-alt"></i>
             </div>
             <div class="metric-content">
-                <h3>候选人</h3>
+                <h3>候选人库</h3>
                 <div class="metric-value">0</div>
                 <div class="metric-change positive">
                     <i class="uil uil-arrow-up"></i> +15% 本月
@@ -96,7 +101,7 @@
         <!-- 最近职位 -->
         <div class="dashboard-section">
             <div class="section-header">
-                <h2><i class="uil uil-briefcase"></i> 最近职位</h2>
+                <h2><i class="uil uil-briefcase"></i> 最近发布职位</h2>
                 <div class="section-actions">
                     <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="btn-secondary">查看全部</a>
                 </div>
@@ -106,16 +111,22 @@
                     {% for job in recent_jobs %}
                     <div class="job-item">
                         <div class="job-info">
-                            <h4>{{ job.title }}</h4>
-                            <p>{{ job.location }} • {{ job.salary }}</p>
+                            <h4><i class="uil uil-briefcase-alt"></i> {{ job.title }}</h4>
+                            <p><i class="uil uil-map-marker"></i> {{ job.location }} • <i class="uil uil-money-bill"></i> {{ job.salary }}</p>
                         </div>
                         <div class="job-actions">
-                            <a href="{{ url_for('smartrecruit.hr.recruitment.edit_job', job_id=job.id) }}" class="btn-small">编辑</a>
+                            <a href="{{ url_for('smartrecruit.hr.recruitment.edit_job', job_id=job.id) }}" class="btn-small">
+                                <i class="uil uil-edit"></i> 编辑
+                            </a>
                         </div>
                     </div>
                     {% endfor %}
                 {% else %}
-                    <p class="no-data">暂无职位，<a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}">立即发布</a></p>
+                    <div class="no-data">
+                        <i class="uil uil-briefcase" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <p>暂无活跃职位</p>
+                        <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}">立即发布第一个职位</a>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -123,7 +134,7 @@
         <!-- 最近申请 -->
         <div class="dashboard-section">
             <div class="section-header">
-                <h2><i class="uil uil-file-alt"></i> 最近申请</h2>
+                <h2><i class="uil uil-file-alt"></i> 最新申请</h2>
                 <div class="section-actions">
                     <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="btn-secondary">查看全部</a>
                 </div>
@@ -133,7 +144,7 @@
                     {% for app in recent_applications %}
                     <div class="application-item">
                         <div class="application-info">
-                            <h4>申请 #{{ app.id }}</h4>
+                            <h4><i class="uil uil-user-check"></i> 申请 #{{ app.id }}</h4>
                             <p>{{ app.message|default('新申请') }}</p>
                         </div>
                         <div class="application-status">
@@ -142,10 +153,71 @@
                     </div>
                     {% endfor %}
                 {% else %}
-                    <p class="no-data">暂无申请</p>
+                    <div class="no-data">
+                        <i class="uil uil-file-alt" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <p>暂无申请记录</p>
+                        <p>发布职位后，申请将显示在这里</p>
+                    </div>
                 {% endif %}
             </div>
         </div>
     </div>
+
+    <!-- 快速操作区域 -->
+    <div class="dashboard-section" style="margin-top: 24px;">
+        <div class="section-header">
+            <h2><i class="uil uil-rocket"></i> 快速操作</h2>
+        </div>
+        <div class="quick-actions">
+            <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="action-card">
+                <i class="uil uil-plus-circle"></i>
+                <h4>发布职位</h4>
+                <p>创建新的招聘需求</p>
+            </a>
+            <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="action-card">
+                <i class="uil uil-users-alt"></i>
+                <h4>候选人管理</h4>
+                <p>查看和管理申请者</p>
+            </a>
+            <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="action-card">
+                <i class="uil uil-calendar-alt"></i>
+                <h4>面试安排</h4>
+                <p>安排和管理面试</p>
+            </a>
+            <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="action-card">
+                <i class="uil uil-chart-line"></i>
+                <h4>数据报表</h4>
+                <p>招聘数据分析</p>
+            </a>
+        </div>
+    </div>
 </div>
+
+<!-- 添加一些JavaScript增强交互 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 为指标卡片添加点击效果
+    const metricCards = document.querySelectorAll('.metric-card');
+    metricCards.forEach(card => {
+        card.addEventListener('click', function() {
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+
+    // 为快速操作卡片添加悬停效果
+    const actionCards = document.querySelectorAll('.action-card');
+    actionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+});
+</script>
 {% endblock %}
