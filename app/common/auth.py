@@ -75,7 +75,7 @@ def sign():
             else:
                 flash('邮箱或密码错误。', 'danger')
 
-    return render_template('common/sign.html')
+    return render_template('common/1.html')
 
 @auth_bp.route('/logout')
 def logout():
