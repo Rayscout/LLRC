@@ -16,7 +16,7 @@
     .alert.alert-danger{background:#dc3545}
     .alert.alert-success{background:#1a9d1a}
     .alert.alert-info{background:#2563eb}
-         .hero-bg{background-image:url("{{ url_for('static', filename='Images/1.jpg') }}");}
+         .hero-bg{background-image:url("{{ url_for('static', filename='Images/background.jpg') }}");}
   </style>
 </head>
 <body>
@@ -42,7 +42,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container header-inner">
-      <a href="#home" class="brand" data-scroll><img src="@job-seeker.svg" alt="北京林业大学 Logo" /></a>
+      <a href="#home" class="brand" data-scroll><img src="https://mcp-media.8n6n.com/img/2025/08/20/c0ce9b147f51df7246a8d9ffb6a64012" alt="北京林业大学 Logo" /><span class="brand-text">智能招聘与人才发展系统</span></a>
       <nav class="nav md-nav" aria-label="Primary">
         <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" id="navToggle">☰</button>
         <ul class="nav-list" id="navList">
@@ -76,7 +76,7 @@
         </div>
         <div class="hero-right">
           <div class="avatar">
-            <img src="@job-seeker.svg" alt="Job Seeker" />
+            <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Logo" />
           </div>
         </div>
       </div>
@@ -168,62 +168,62 @@
 
         <div class="grid grid-3 mt-8" id="portfolioGrid">
                      <article class="tile" data-category="recruit">
-             <div class="media"><img src="@Images/tile-1.svg" alt="智能招聘引擎" /></div>
+             <div class="media"><img src="{{ url_for('static', filename='Images/img-recruit.svg') }}" alt="智能招聘引擎" /></div>
              <div class="tile-body">
                <h3>智能招聘引擎</h3>
                <p>职位多平台一键分发、简历解析与意向识别，自动预筛候选人并聚合人才库。</p>
                               <div class="actions">
-                  <button class="btn btn-outline" data-details data-title="智能招聘引擎" data-img="@Images/tile-1.svg" data-desc="支持多平台职位一键发布、简历结构化解析、意向识别与去重。自动化预筛候选，统一沉淀到人才库并可复用。" data-link="#">了解详情</button>
+                  <button class="btn btn-outline" data-details data-title="智能招聘引擎" data-img="{{ url_for('static', filename='Images/img-recruit.svg') }}" data-desc="支持多平台职位一键发布、简历结构化解析、意向识别与去重。自动化预筛候选，统一沉淀到人才库并可复用。" data-link="#">了解详情</button>
                 </div>
              </div>
            </article>
                      <article class="tile" data-category="match">
-             <div class="media"><img src="@Images/tile-2.svg" alt="人岗匹配" /></div>
+             <div class="media"><img src="{{ url_for('static', filename='Images/img-match.svg') }}" alt="人岗匹配" /></div>
              <div class="tile-body">
                <h3>人岗匹配</h3>
                <p>向量检索 + 知识图谱，给出匹配度评分、解释与相似人选推荐，辅助高效筛选。</p>
                               <div class="actions">
-                  <button class="btn btn-outline" data-details data-title="人岗匹配" data-img="@Images/tile-2.svg" data-desc="结合职位画像与人才画像，采用向量检索/重排与知识图谱规则，输出可解释的匹配度、关键命中点与相似候选推荐。" data-link="#">了解详情</button>
+                  <button class="btn btn-outline" data-details data-title="人岗匹配" data-img="{{ url_for('static', filename='Images/img-match.svg') }}" data-desc="结合职位画像与人才画像，采用向量检索/重排与知识图谱规则，输出可解释的匹配度、关键命中点与相似候选推荐。" data-link="#">了解详情</button>
                 </div>
              </div>
            </article>
                      <article class="tile" data-category="assess">
-             <div class="media"><img src="@Images/tile-3.svg" alt="人才画像与测评" /></div>
+             <div class="media"><img src="{{ url_for('static', filename='Images/img-portrait.svg') }}" alt="人才画像与测评" /></div>
              <div class="tile-body">
                <h3>人才画像与测评</h3>
                <p>整合量表与面试问答，输出可视化画像、胜任力评估与风险提示。</p>
                               <div class="actions">
-                  <button class="btn btn-outline" data-details data-title="人才画像与测评" data-img="@Images/tile-3.svg" data-desc="融合在线量表、结构化面试与多模态要素，生成可视化人才画像与胜任力评估，并给出风险与提升建议。" data-link="#">了解详情</button>
+                  <button class="btn btn-outline" data-details data-title="人才画像与测评" data-img="{{ url_for('static', filename='Images/img-portrait.svg') }}" data-desc="融合在线量表、结构化面试与多模态要素，生成可视化人才画像与胜任力评估，并给出风险与提升建议。" data-link="#">了解详情</button>
                 </div>
              </div>
            </article>
                      <article class="tile" data-category="develop">
-             <div class="media"><img src="@Images/tile-4.svg" alt="培训与发展" /></div>
+             <div class="media"><img src="{{ url_for('static', filename='Images/img-develop.svg') }}" alt="培训与发展" /></div>
              <div class="tile-body">
                <h3>培训与发展</h3>
                <p>个性化学习路径与岗位能力地图，支撑人才发展与组织升级。</p>
                               <div class="actions">
-                  <button class="btn btn-outline" data-details data-title="培训与发展" data-img="@Images/tile-4.svg" data-desc="依据岗位能力模型与画像差距，自动推荐个性化学习路径；结合能力地图与学习记录，持续跟踪成长。" data-link="#">了解详情</button>
+                  <button class="btn btn-outline" data-details data-title="培训与发展" data-img="{{ url_for('static', filename='Images/img-develop.svg') }}" data-desc="依据岗位能力模型与画像差距，自动推荐个性化学习路径；结合能力地图与学习记录，持续跟踪成长。" data-link="#">了解详情</button>
                 </div>
              </div>
            </article>
                      <article class="tile" data-category="data">
-             <div class="media"><img src="@Images/tile-5.svg" alt="数据看板" /></div>
+             <div class="media"><img src="{{ url_for('static', filename='Images/img-dashboard.svg') }}" alt="数据看板" /></div>
              <div class="tile-body">
                <h3>数据看板</h3>
                <p>招聘漏斗、用工效率、留任与流失预警，多维报表助力经营与人效提升。</p>
                               <div class="actions">
-                  <button class="btn btn-outline" data-details data-title="数据看板" data-img="@Images/tile-5.svg" data-desc="提供招聘漏斗、入转离、效率与成本等指标看板，支持维度钻取、预警与导出，沉淀组织管理洞察。" data-link="#">了解详情</button>
+                  <button class="btn btn-outline" data-details data-title="数据看板" data-img="{{ url_for('static', filename='Images/img-dashboard.svg') }}" data-desc="提供招聘漏斗、入转离、效率与成本等指标看板，支持维度钻取、预警与导出，沉淀组织管理洞察。" data-link="#">了解详情</button>
                 </div>
              </div>
            </article>
                      <article class="tile" data-category="integration">
-             <div class="media"><img src="@Images/tile-6.svg" alt="集成与 API" /></div>
+             <div class="media"><img src="{{ url_for('static', filename='Images/img-api.svg') }}" alt="集成与 API" /></div>
              <div class="tile-body">
                <h3>集成与 API</h3>
                <p>开放 API 与 Webhook，支持与 HR 系统、企业微信、钉钉与单点登录集成。</p>
                               <div class="actions">
-                  <button class="btn btn-outline" data-details data-title="集成与 API" data-img="@Images/tile-6.svg" data-desc="提供标准化 REST API 与 Webhook 事件，覆盖组织、职位、候选、流程与单点登录，轻松打通现有 HR/IM/SSO 系统。" data-link="#">了解详情</button>
+                  <button class="btn btn-outline" data-details data-title="集成与 API" data-img="{{ url_for('static', filename='Images/img-api.svg') }}" data-desc="提供标准化 REST API 与 Webhook 事件，覆盖组织、职位、候选、流程与单点登录，轻松打通现有 HR/IM/SSO 系统。" data-link="#">了解详情</button>
                 </div>
              </div>
            </article>
@@ -412,7 +412,7 @@
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="left">
-        <a class="brand" href="#home" data-scroll><img src="{{ url_for('static', filename='Images/bfu-logo.svg') }}" alt="北京林业大学" /></a>
+        <a class="brand" href="#home" data-scroll><img src="https://mcp-media.8n6n.com/img/2025/08/20/c0ce9b147f51df7246a8d9ffb6a64012" alt="北京林业大学" /></a>
         <p class="muted">© <span id="year"></span> 林理人才开发团队（北京林业大学）. 保留所有权利.</p>
       </div>
       <div class="socials">
