@@ -70,12 +70,12 @@ def sign():
                     # HR进入仪表盘
                     return redirect(url_for('smartrecruit.hr.dashboard.hr_dashboard'))
                 else:
-                    # 求职者进入职位列表
-                    return redirect(url_for('smartrecruit.candidate.jobs.job_list'))
+                    # 求职者进入首页
+                    return redirect(url_for('smartrecruit.candidate.home'))
             else:
                 flash('邮箱或密码错误。', 'danger')
 
-    return render_template('common/sign.html')
+    return render_template('common/1.html')
 
 @auth_bp.route('/logout')
 def logout():
@@ -93,5 +93,5 @@ def home():
     if getattr(g.user, 'is_hr', False):
         return redirect(url_for('smartrecruit.hr.dashboard.hr_dashboard'))
     else:
-        # 求职者：显示智能推荐首页
-        return redirect(url_for('smartrecruit.candidate.jobs.candidate_home'))
+        # 求职者：显示首页
+        return redirect(url_for('smartrecruit.candidate.home'))

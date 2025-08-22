@@ -1,12 +1,2 @@
-from flask import Blueprint
-from .profile import profile_bp
-from .jobs import jobs_bp
-from .applications import applications_bp
-
-# 创建求职者主蓝图
-candidate_bp = Blueprint('candidate', __name__, url_prefix='/candidate')
-
-# 注册求职者子蓝图
-candidate_bp.register_blueprint(profile_bp)
-candidate_bp.register_blueprint(jobs_bp)
-candidate_bp.register_blueprint(applications_bp)
+# 统一从 routes 导出含首页的 candidate_bp，避免重复定义导致路由缺失
+from .routes import candidate_bp  # noqa: F401

@@ -9,7 +9,7 @@
     <h1 class="page-title">提交申请 - {{ job.title }}</h1>
   </div>
 
-  <form method="post" enctype="multipart/form-data" class="apply-form">
+  <form method="post" enctype="multipart/form-data" class="apply-form" id="applyForm">
     {% if has_saved_cv %}
     <label class="checkbox"><input type="checkbox" name="use_saved"> 使用已保存的简历（{{ saved_cv_filename }}）</label>
     {% else %}
@@ -18,33 +18,113 @@
 
     <div class="field">
       <label>上传新简历（PDF/DOC/DOCX/PNG/JPG）</label>
-      <input type="file" name="cv_file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+      <div class="dropzone" id="dropzone">
+        <input id="cvInput" type="file" name="cv_file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+        <div class="dz-content">
+          <i class="uil uil-cloud-upload"></i>
+          <div class="dz-title">拖拽文件到此处，或点击选择文件</div>
+          <div class="dz-hint">支持最大 20MB | 建议命名：姓名_岗位_日期</div>
+          <div class="dz-file" id="fileName" style="display:none"></div>
+        </div>
+      </div>
     </div>
 
     <div class="field">
-      <label>备注（可选）</label>
-      <textarea name="note" rows="4" placeholder="给HR的简短说明"></textarea>
+      <label>备注（可选） <span class="muted" id="noteCount">0/300</span></label>
+      <textarea id="noteArea" name="note" rows="4" maxlength="300" placeholder="给HR的简短说明，例如可入职时间、亮点项目、证书等"></textarea>
     </div>
 
     <div class="actions">
-      <button type="submit" class="btn-apply">提交申请</button>
-      <a class="btn-view" href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=job.id) }}">返回职位</a>
+      <button type="submit" class="btn-primary">提交申请</button>
+      <a class="btn-secondary" href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=job.id) }}">返回职位</a>
     </div>
   </form>
 </div>
 
 <style>
-.apply-wrapper { max-width: 720px; margin: 0 auto; }
-.apply-form { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+.apply-wrapper { max-width: 820px; margin: 0 auto; text-align:left; }
+.page-header{ display:flex; align-items:center; gap:10px; margin: 6px 0 12px; justify-content:flex-start; text-align:left; }
+.page-header .icon{ font-size:22px; color:#333 }
+.page-title{ margin:0; font-size:20px; font-weight:700; color:#333 }
+
+.apply-form { background: #fff; border-radius: 12px; padding: 22px; box-shadow: 0 6px 22px rgba(0,0,0,.08); text-align:left; }
 .field { margin: 16px 0; }
-label { font-weight: 600; color: #2c3e50; display: block; margin-bottom: 8px; }
-input[type="file"], textarea { width: 100%; border: 2px solid #e1e8ed; border-radius: 8px; padding: 10px; font-size: 14px; }
-.checkbox { display: flex; align-items: center; gap: 8px; margin: 8px 0; }
-.hint { color: #7f8c8d; margin-bottom: 8px; }
+label { font-weight: 700; color: #333; display: block; margin-bottom: 8px; }
+input[type="file"], textarea { width: 100%; border: 2px solid #e7e7e7; border-radius: 10px; padding: 10px; font-size: 14px; }
+.checkbox { display: flex; align-items: center; gap: 8px; margin: 8px 0; color:#333; justify-content:flex-start; text-align:left; width:100%; }
+.checkbox input{ margin-right:8px }
+.hint { color: #777; margin-bottom: 8px; text-align:left; }
+.muted{ color:#999; font-weight:600; font-size:12px }
+
+/* 拖拽上传 */
+.dropzone{ position:relative; border:2px dashed #d9d9d9; border-radius:12px; background:#fafafa; transition:.2s; }
+.dropzone:hover{ border-color:#333; background:#f5f5f5 }
+.dropzone input{ position:absolute; inset:0; opacity:0; cursor:pointer }
+.dz-content{ text-align:left; padding:24px; display:flex; flex-direction:column; align-items:flex-start }
+.dz-content i{ font-size:26px; color:#666 }
+.dz-title{ margin-top:6px; font-weight:700; color:#333 }
+.dz-hint{ margin-top:2px; color:#999; font-size:12px }
+.dz-file{ margin-top:10px; font-size:13px; color:#333; background:#eee; display:inline-block; padding:6px 10px; border-radius:14px }
+
+/* 按钮 黑白灰 */
 .actions { display: flex; gap: 10px; }
-.btn-apply { background: #27ae60; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; }
-.btn-view { background: #ecf0f1; color: #2c3e50; padding: 10px 16px; border-radius: 8px; text-decoration: none; display: inline-block; }
+.btn-primary{ background:#333; color:#fff; border:none; padding:12px 18px; border-radius:10px; font-weight:700; }
+.btn-primary:hover{ background:#555 }
+.btn-secondary{ background:#efefef; color:#333; padding:12px 18px; border-radius:10px; text-decoration:none; display:inline-block; border:1px solid #e5e5e5 }
+.btn-secondary:hover{ background:#e5e5e5 }
+
+/* 文本域 */
+#noteArea{ resize:vertical; min-height:90px }
+
+/* 响应式 */
+@media (max-width: 768px){
+  .apply-wrapper{ padding: 0 10px }
+  .apply-form{ padding: 16px }
+}
 </style>
+<style>
+/* 深色模式 */
+body.dark .apply-form{ background:#111827; box-shadow: 0 6px 22px rgba(0,0,0,.6) }
+body.dark .page-title, body.dark label, body.dark .checkbox, body.dark .dz-title{ color:#e5e7eb }
+body.dark .hint, body.dark .muted, body.dark .dz-hint{ color:#9ca3af }
+body.dark input[type="file"], body.dark textarea{ background:#0f172a; border-color:#374151; color:#e5e7eb }
+body.dark .dropzone{ border-color:#374151; background:#0f172a }
+body.dark .dropzone:hover{ border-color:#9ca3af; background:#111827 }
+body.dark .dz-file{ background:#1f2937; color:#e5e7eb }
+body.dark .btn-primary{ background:#e5e7eb; color:#111827 }
+body.dark .btn-primary:hover{ background:#d1d5db }
+body.dark .btn-secondary{ background:#1f2937; color:#e5e7eb; border-color:#374151 }
+body.dark .btn-secondary:hover{ background:#374151 }
+</style>
+
+<script>
+(function(){
+  const input = document.getElementById('cvInput');
+  const dz = document.getElementById('dropzone');
+  const fileName = document.getElementById('fileName');
+  const note = document.getElementById('noteArea');
+  const noteCount = document.getElementById('noteCount');
+
+  function showFileName(f){
+    if(!f){ fileName.style.display='none'; return; }
+    fileName.textContent = `已选择：${f.name}`;
+    fileName.style.display = 'inline-block';
+  }
+
+  input.addEventListener('change', e => showFileName(e.target.files[0]));
+
+  ;['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e=>{e.preventDefault(); dz.style.borderColor='#333'}));
+  ;['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e=>{e.preventDefault(); dz.style.borderColor='#d9d9d9'}));
+  dz.addEventListener('drop', e=>{
+    if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]){
+      input.files = e.dataTransfer.files;
+      showFileName(e.dataTransfer.files[0]);
+    }
+  });
+
+  note.addEventListener('input', ()=>{ noteCount.textContent = `${note.value.length}/300`; });
+})();
+</script>
 {% endblock %}
 
 

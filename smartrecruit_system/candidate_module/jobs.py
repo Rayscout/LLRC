@@ -122,6 +122,9 @@ def job_recommendations():
                 'company_name': getattr(rec['job'], 'company_name', ''),
                 'location': rec['job'].location,
                 'salary': rec['job'].salary,
+                'job_type': getattr(rec['job'], 'job_type', '全职'),
+                'experience_level': getattr(rec['job'], 'experience_level', '不限'),
+                'description': rec['job'].description[:200] + '...' if len(rec['job'].description) > 200 else rec['job'].description,
                 'match_score': rec['match_score']
             })
         
