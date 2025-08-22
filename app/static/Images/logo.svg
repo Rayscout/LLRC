@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Job Seeker Illustration</title>
+  <desc id="desc">A friendly flat-style person with a resume and briefcase inside a soft circular badge</desc>
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e0f2fe"/>
+      <stop offset="100%" stop-color="#e6fffb"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <clipPath id="circleClip">
+      <circle cx="256" cy="256" r="230"/>
+    </clipPath>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Outer soft circle -->
+  <circle cx="256" cy="256" r="246" fill="none" stroke="url(#accentGrad)" stroke-width="8" opacity="0.4"/>
+  <g clip-path="url(#circleClip)">
+    <rect x="0" y="0" width="512" height="512" fill="url(#bgGrad)"/>
+
+    <!-- Abstract background shapes -->
+    <circle cx="120" cy="140" r="46" fill="#93c5fd" opacity="0.25"/>
+    <rect x="360" y="110" width="64" height="64" rx="14" fill="#34d399" opacity="0.22"/>
+    <polygon points="88,398 152,346 184,410 126,444" fill="#a78bfa" opacity="0.2"/>
+
+    <!-- Person (job seeker) -->
+    <!-- Head -->
+    <circle cx="256" cy="190" r="46" fill="#fef3c7" stroke="#0f172a" stroke-opacity="0.06"/>
+    <!-- Hair -->
+    <path d="M220 188c8-30 40-44 72-26 8 4 14 10 18 17 2 3-1 7-5 6-22-6-43 0-58 10-6 4-13 2-19-1-4-2-8-4-8-6z" fill="#1f2937" opacity="0.7"/>
+    <!-- Body -->
+    <path d="M186 336c0-54 31-98 70-98s70 44 70 98v54H186v-54z" fill="#60a5fa"/>
+    <!-- Collar / tie -->
+    <path d="M236 246l20 20 20-20 16 16-36 44-36-44 16-16z" fill="#fff" opacity="0.9"/>
+    <rect x="248" y="310" width="16" height="40" rx="4" fill="#1d4ed8" opacity="0.9"/>
+
+    <!-- Resume sheet -->
+    <g transform="translate(316 276)" filter="url(#shadow)">
+      <rect x="0" y="0" width="90" height="120" rx="10" fill="#ffffff"/>
+      <rect x="14" y="18" width="62" height="10" rx="5" fill="#60a5fa" opacity=".7"/>
+      <rect x="14" y="42" width="48" height="8" rx="4" fill="#94a3b8"/>
+      <rect x="14" y="60" width="62" height="8" rx="4" fill="#94a3b8"/>
+      <rect x="14" y="78" width="56" height="8" rx="4" fill="#94a3b8"/>
+      <circle cx="74" cy="20" r="6" fill="#34d399"/>
+    </g>
+
+    <!-- Briefcase -->
+    <g transform="translate(106 316)" filter="url(#shadow)">
+      <rect x="0" y="22" width="120" height="74" rx="12" fill="#10b981"/>
+      <rect x="32" y="0" width="56" height="26" rx="6" fill="#059669"/>
+      <rect x="54" y="-8" width="12" height="14" rx="3" fill="#0ea5e9"/>
+      <rect x="56" y="52" width="8" height="16" rx="3" fill="#fff" opacity=".9"/>
+    </g>
+
+    <!-- Ground shadow -->
+    <ellipse cx="256" cy="406" rx="120" ry="22" fill="#0f172a" opacity="0.07"/>
+  </g>
+</svg>
+
+
