@@ -121,14 +121,8 @@
       e.preventDefault();
       const type = btn.getAttribute('data-auth');
       if(!authModal) return;
-      // 为了触发CSS过渡：先使容器可见，再在下一帧添加open类
-      authModal.classList.remove('open');
-      authModal.style.display = 'flex';
+      authModal.classList.add('open');
       authModal.setAttribute('aria-hidden','false');
-      requestAnimationFrame(()=>{
-        authModal.classList.add('open');
-        authModal.style.display = '';
-      });
       if(type==='signup'){
         if(authTitle) authTitle.textContent = '注册';
         if(signupForm) signupForm.style.display='block';
@@ -176,12 +170,6 @@
     if(!authModal) return;
     authModal.classList.remove('open');
     authModal.setAttribute('aria-hidden','true');
-    // 避免clip-path残影：动画结束后保持隐藏
-    setTimeout(()=>{
-      if(!authModal.classList.contains('open')){
-        authModal.style.display = '';
-      }
-    }, 300);
   }
   if(authModal){
     // backdrop click
@@ -228,7 +216,7 @@
         el.classList.add('out-view');
       }
     })
-  }, { threshold: 0.15, rootMargin: '0px 0px -15% 0px' });
+  }, { threshold: 0.2, rootMargin: '0px 0px -20% 0px' });
   animatedBlocks.forEach(el => revealObserver.observe(el));
 
   // Testimonials slider (paged)
@@ -317,13 +305,13 @@
     const shapes = ['triangle', 'circle', 'square', 'diamond'];
     const colors = ['rgba(24, 144, 255, 0.3)', 'rgba(64, 169, 255, 0.4)', 'rgba(24, 144, 255, 0.2)', 'rgba(64, 169, 255, 0.3)'];
     
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 15; i++) {
       const shape = document.createElement('div');
       shape.className = `shape ${shapes[i % shapes.length]}`;
       shape.style.left = Math.random() * 100 + '%';
       shape.style.top = Math.random() * 100 + '%';
-      shape.style.animationDelay = Math.random() * 18 + 's';
-      shape.style.animationDuration = (18 + Math.random() * 12) + 's';
+      shape.style.animationDelay = Math.random() * 15 + 's';
+      shape.style.animationDuration = (15 + Math.random() * 10) + 's';
       shapesContainer.appendChild(shape);
     }
   }
@@ -332,12 +320,12 @@
     const particleContainer = document.querySelector('.particle-system');
     if (!particleContainer) return;
     
-    for (let i = 0; i < 28; i++) {
+    for (let i = 0; i < 20; i++) {
       const particle = document.createElement('div');
       particle.className = 'particle';
       particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 10 + 's';
-      particle.style.animationDuration = (10 + Math.random() * 6) + 's';
+      particle.style.animationDelay = Math.random() * 8 + 's';
+      particle.style.animationDuration = (8 + Math.random() * 4) + 's';
       particleContainer.appendChild(particle);
     }
   }
@@ -360,5 +348,3 @@
   window.addEventListener('scroll', updateScrollProgress);
   updateScrollProgress();
 })();
-
-
