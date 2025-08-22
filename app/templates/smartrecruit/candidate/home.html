@@ -320,6 +320,30 @@
     .recommended-section { --card-size: 300px; }
 }
 </style>
+<style>
+/* 深色模式 */
+body.dark .welcome-banner{ background: linear-gradient(135deg,#1f2937,#374151); color:#e5e7eb }
+body.dark .recommended-section{ background:#111827; box-shadow: 0 2px 12px rgba(0,0,0,.6) }
+body.dark .section-header h2{ color:#e5e7eb }
+body.dark .view-all{ color:#e5e7eb; border-color:#e5e7eb }
+body.dark .view-all:hover{ background:#e5e7eb; color:#111827 }
+body.dark .user-skills{ background:#0f172a; border-left-color:#9ca3af }
+body.dark .skill-tag{ background:#374151; color:#e5e7eb }
+body.dark .job-card{ background:#0f172a; border-color:#374151; box-shadow: 0 1px 3px rgba(0,0,0,.6) }
+body.dark .job-card::before{ background:#9ca3af }
+body.dark .job-title{ color:#e5e7eb }
+body.dark .job-company{ color:#9ca3af }
+body.dark .icon-text{ color:#d1d5db }
+body.dark .icon-text i{ color:#9ca3af }
+body.dark .job-description{ color:#e5e7eb }
+body.dark .pill{ background:#374151; color:#e5e7eb }
+body.dark .match-score{ background:#9ca3af; color:#111827 }
+body.dark .btn-view{ background:#1f2937; color:#e5e7eb; border-color:#374151 }
+body.dark .btn-view:hover{ background:#374151 }
+body.dark .btn-apply{ background:#e5e7eb; color:#111827 }
+body.dark .btn-apply:hover{ background:#d1d5db }
+body.dark .no-results{ background:#111827; border-color:#374151; color:#e5e7eb }
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

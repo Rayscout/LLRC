@@ -37,8 +37,13 @@ img{display:block;max-width:100%;height:auto}
 .brand{font-weight:800;font-size:18px;color:var(--fg);text-decoration:none;display:inline-flex;align-items:center;gap:10px}
 .brand img{height:28px;width:auto;display:block}
 .brand-text{font-weight:800;font-style:italic;color:#63a3a0;letter-spacing:.5px}
-/* 使用繁體顯示優先（若系統無繁體字體則退回通用字體） */
-.brand-text{font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+/* 喜鹊体相似风格（若本地无字体则退回系统字体）*/
+@font-face{
+  font-family:'ZaoZiGongFangXiYueTi';
+  src: local('ZaoZiGongFangXiYueTi'), local('ZaoZi GongFang XiYueTi');
+  font-display: swap;
+}
+.brand-text{font-family:'ZaoZiGongFangXiYueTi', 'SF Pro SC', 'PingFang SC','-apple-system','Helvetica Neue',Arial,Inter,ui-sans-serif,system-ui}
 .nav-toggle{display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);background:#fff;border-radius:8px;width:40px;height:40px}
 .nav{position:relative}
 .nav-list{list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:12px}
@@ -69,7 +74,29 @@ img{display:block;max-width:100%;height:auto}
 .hero-left h1{font-size:40px;line-height:1.1;margin:0 0 8px}
 .hero-left p{font-size:18px;color:var(--muted);margin:0 0 16px}
 .hero-actions{display:flex;flex-wrap:wrap;gap:10px}
-.avatar{width:280px;height:280px;border-radius:999px;border:8px solid rgba(255,255,255,.6);overflow:hidden;margin:0 auto}
+.avatar{width:280px;height:280px;border-radius:999px;border:8px solid rgba(255,255,255,.6);overflow:visible;margin:0 auto;position:relative;box-shadow:0 0 10px rgba(96,165,250,.28);animation:avatar-breath 4.5s ease-in-out infinite}
+/* 呼吸灯与环形波浪 */
+.avatar::before{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  box-shadow:0 0 0 0 rgba(59,130,246,.38);
+  animation:avatar-wave 3.6s ease-out infinite;
+  animation-delay:1.8s; /* 第二道错峰波纹 */
+  pointer-events:none;will-change:transform,box-shadow,opacity
+}
+.avatar::after{
+  content:"";position:absolute;inset:0;border-radius:50%;
+  box-shadow:0 0 0 0 rgba(96,165,250,.38);
+  animation:avatar-wave 3.6s ease-out infinite;
+  pointer-events:none;will-change:transform,box-shadow,opacity
+}
+@keyframes avatar-breath{
+  0%,100%{box-shadow:0 0 12px rgba(59,130,246,.3)}
+  50%{box-shadow:0 0 36px 10px rgba(59,130,246,.65)}
+}
+@keyframes avatar-wave{
+  0%{transform:scale(1);box-shadow:0 0 0 0 rgba(59,130,246,.42);opacity:1}
+  100%{transform:scale(1.35);box-shadow:0 0 0 56px rgba(59,130,246,0);opacity:0}
+}
 @media(min-width:992px){
   .hero-content{grid-template-columns:1fr 480px}
   .avatar{width:400px;height:400px}

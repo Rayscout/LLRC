@@ -12,7 +12,29 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='theme1.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="https://mcp-media.8n6n.com/img/2025/08/20/c0ce9b147f51df7246a8d9ffb6a64012" />
     <title>{% block title %}HR招聘系统{% endblock %}</title>
+    <style>
+    /* 深色模式开关样式 */
+    #themeToggle{ position:relative; display:inline-block; vertical-align:middle; cursor:pointer; pointer-events:auto; }
+    #themeToggle::after{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:999px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.2); transition:transform .2s ease; }
+    #themeToggle:checked{ background:#111827; border-color:#111827; }
+    #themeToggle:checked::after{ transform:translateX(18px); background:#e5e7eb; }
+
+    /* 全局深色模式基础覆盖 */
+    body.dark { color:#e5e7eb; background:#0b1220; }
+    body.dark a { color:#e5e7eb; }
+    body.dark nav { background:#0f172a; border-right:1px solid #1f2937; }
+    body.dark nav .link-name, body.dark nav i { color:#e5e7eb; }
+    body.dark .dashboard { background:#0b1220; }
+    body.dark .dash-content { background:transparent; }
+    body.dark .logout-mode .mode { background:transparent; }
+
+    /* 顶部快捷主题按钮 */
+    .theme-btn{ border:1px solid #e5e7eb; background:#fff; color:#111827; border-radius:999px; padding:6px 10px; margin-left:10px; cursor:pointer }
+    .theme-btn i{ pointer-events:none }
+    body.dark .theme-btn{ background:#111827; color:#e5e7eb; border-color:#374151 }
+    </style>
 </head>
 <body>
     <!-- 动效背景元素（全局） -->
@@ -46,9 +68,13 @@
                     <i class="uil uil-calendar-alt"></i>
                     <span class="link-name">面试安排</span>
                 </a></li>
+                <li><a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}">
+                    <i class="uil uil-chart-pie"></i>
+                    <span class="link-name">报表与分析</span>
+                </a></li>
                 <li><a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}">
                     <i class="uil uil-list-ul"></i>
-                    <span class="link-name">我的职位</span>
+                    <span class="link-name">已发布招聘</span>
                 </a></li>
                 {% else %}
                 <!-- 求职者菜单 -->
@@ -86,9 +112,8 @@
                 <li class="mode" style="display:flex;align-items:center;gap:10px;padding:8px 12px">
                     <i class="uil uil-moon"></i>
                     <span class="link-name">深色模式</span>
-                    <label id="themeToggleLabel" style="margin-left:auto;display:inline-flex;align-items:center;gap:8px;cursor:pointer" aria-label="切换主题" title="切换主题">
-                        <input id="themeToggle" type="checkbox" style="appearance:none;width:42px;height:24px;border-radius:999px;background:#e5e7eb;position:relative;outline:none;border:1px solid #cbd5e1">
-                    </label>
+                    <input id="themeToggle" type="checkbox" style="appearance:none;width:42px;height:24px;border-radius:999px;background:#e5e7eb;position:relative;outline:none;border:1px solid #cbd5e1;cursor:pointer;pointer-events:auto;margin-left:auto">
+                    <label id="themeToggleLabel" for="themeToggle" style="cursor:pointer" aria-label="切换主题" title="切换主题"></label>
                 </li>
             </ul>
         </div>
@@ -96,6 +121,7 @@
     <section class="dashboard">
         <div class="top">
             <i class="uil uil-bars sidebar-toggle"></i>
+            <button id="topThemeBtn" class="theme-btn" type="button" title="切换深色/浅色"><i class="uil uil-moon"></i></button>
             {% if user and user.profile_photo %}
                 <a href="{{ url_for('smartrecruit.candidate.profile.settings') if not user.is_hr else '#' }}">
                     <img src="{{ url_for('static', filename='uploads/photos/' + user.profile_photo) }}" alt="头像">
@@ -112,5 +138,68 @@
     </section>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="{{ url_for('static', filename='auth_sign.js') }}"></script>
+    <script>
+    (function(){
+        var body = document.body;
+        var toggle = document.getElementById('themeToggle');
+        var label = document.getElementById('themeToggleLabel');
+        var topBtn = document.getElementById('topThemeBtn');
+        if(!toggle){ return; }
+
+        function initialTheme(){
+            try {
+                var saved = localStorage.getItem('theme');
+                if(saved){ return saved; }
+            } catch(e) {}
+            try {
+                if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+                    return 'dark';
+                }
+            } catch(e) {}
+            return 'light';
+        }
+
+        function applyTheme(val){
+            if(val === 'dark'){
+                body.classList.add('dark');
+                toggle.checked = true;
+            } else {
+                body.classList.remove('dark');
+                toggle.checked = false;
+            }
+            toggle.style.background = toggle.checked ? '#111827' : '#e5e7eb';
+        }
+
+        applyTheme(initialTheme());
+
+        // 监听切换（侧边开关）
+        toggle.addEventListener('change', function(){
+            var theme = this.checked ? 'dark' : 'light';
+            applyTheme(theme);
+            try { localStorage.setItem('theme', theme); } catch(e){}
+        });
+
+        // 兼容：点击整块标签也能切换
+        if(label){
+            label.addEventListener('click', function(e){
+                if(e.target !== toggle){
+                    toggle.checked = !toggle.checked;
+                    var theme = toggle.checked ? 'dark' : 'light';
+                    applyTheme(theme);
+                    try { localStorage.setItem('theme', theme); } catch(e){}
+                }
+            });
+        }
+
+        // 顶部按钮切换
+        if(topBtn){
+            topBtn.addEventListener('click', function(){
+                var toDark = !body.classList.contains('dark');
+                applyTheme(toDark ? 'dark' : 'light');
+                try { localStorage.setItem('theme', toDark ? 'dark' : 'light'); } catch(e){}
+            });
+        }
+    })();
+    </script>
 </body>
 </html>
