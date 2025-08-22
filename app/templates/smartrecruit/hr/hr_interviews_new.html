@@ -1,0 +1,1451 @@
+{% extends 'base.html' %}
+
+{% block title %}面试安排{% endblock %}
+
+{% block content %}
+<div class="interviews-management ios-style">
+    <!-- 页面标题和统计 -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1><i class="uil uil-calendar-alt"></i> 面试安排</h1>
+            <p>管理面试日程、安排面试官、记录面试反馈</p>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <div class="stat-number">{{ interviews|selectattr('status', 'equalto', 'scheduled')|list|length if interviews else 0 }}</div>
+                <div class="stat-label">已安排</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ interviews|selectattr('status', 'equalto', 'completed')|list|length if interviews else 0 }}</div>
+                <div class="stat-label">已完成</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ interviews|selectattr('status', 'equalto', 'cancelled')|list|length if interviews else 0 }}</div>
+                <div class="stat-label">已取消</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+        <div class="calendar-navigation">
+            <button class="btn-nav" onclick="previousWeek()">
+                <i class="uil uil-angle-left"></i>
+            </button>
+            <div class="current-week">
+                <h3 id="week-display">2024年1月15日 - 1月21日</h3>
+                <button class="btn-today" onclick="goToToday()">今天</button>
+            </div>
+            <button class="btn-nav" onclick="nextWeek()">
+                <i class="uil uil-angle-right"></i>
+            </button>
+        </div>
+        
+        <div class="actions-section">
+            <button class="btn-secondary" onclick="exportSchedule()">
+                <i class="uil uil-export"></i> 导出日程
+            </button>
+            <button class="btn-primary" onclick="openScheduleModal()">
+                <i class="uil uil-plus"></i> 安排面试
+            </button>
+        </div>
+    </div>
+
+    <!-- 周历视图 -->
+    <div class="week-calendar-container">
+        <div class="calendar-header">
+            <div class="time-column">时间</div>
+            <div class="day-column">周一</div>
+            <div class="day-column">周二</div>
+            <div class="day-column">周三</div>
+            <div class="day-column">周四</div>
+            <div class="day-column">周五</div>
+            <div class="day-column">周六</div>
+            <div class="day-column">周日</div>
+        </div>
+        
+        <div class="calendar-body">
+            {% for hour in range(9, 19) %}
+            <div class="time-slot">
+                <div class="time-label">{{ hour }}:00</div>
+                {% for day in range(7) %}
+                <div class="day-slot" data-day="{{ day }}" data-hour="{{ hour }}">
+                    <!-- 面试事件将在这里动态显示 -->
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 面试列表 -->
+    <div class="interviews-list-section">
+        <div class="section-header">
+            <h2><i class="uil uil-list-ul"></i> 面试列表</h2>
+            <div class="list-filters">
+                <select id="status-filter" class="filter-select">
+                    <option value="">所有状态</option>
+                    <option value="scheduled">已安排</option>
+                    <option value="completed">已完成</option>
+                    <option value="cancelled">已取消</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="interviews-table-container">
+            <table class="interviews-table" id="interviews-table">
+                <thead>
+                    <tr>
+                        <th>候选人</th>
+                        <th>职位</th>
+                        <th>面试官</th>
+                        <th>时间</th>
+                        <th>方式</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interview in interviews %}
+                    <tr class="interview-row" data-id="{{ interview.id }}" data-status="{{ interview.status }}">
+                        <td class="candidate-cell">
+                            <div class="candidate-info">
+                                <div class="candidate-avatar">
+                                    <div class="avatar-placeholder">
+                                        {{ interview.candidate_name[0]|upper if interview.candidate_name else 'U' }}
+                                    </div>
+                                </div>
+                                <div class="candidate-details">
+                                    <div class="candidate-name">{{ interview.candidate_name }}</div>
+                                    <div class="candidate-email">{{ interview.candidate_email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="position-cell">{{ interview.position }}</td>
+                        <td class="interviewer-cell">{{ interview.interviewer_name }}</td>
+                        <td class="time-cell">
+                            <div class="interview-time">
+                                <div class="date">{{ interview.date }}</div>
+                                <div class="time">{{ interview.start_time }} - {{ interview.end_time }}</div>
+                            </div>
+                        </td>
+                        <td class="method-cell">
+                            <span class="method-badge {{ interview.method }}">
+                                {% if interview.method == 'online' %}线上
+                                {% elif interview.method == 'offline' %}线下
+                                {% else %}{{ interview.method }}
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td class="status-cell">
+                            <span class="status-badge {{ interview.status }}">
+                                {% if interview.status == 'scheduled' %}已安排
+                                {% elif interview.status == 'completed' %}已完成
+                                {% elif interview.status == 'cancelled' %}已取消
+                                {% else %}{{ interview.status }}
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td class="actions-cell">
+                            <div class="action-buttons">
+                                <button class="btn-action" onclick="viewInterview({{ interview.id }})" title="查看">
+                                    <i class="uil uil-eye"></i>
+                                </button>
+                                <button class="btn-action" onclick="editInterview({{ interview.id }})" title="编辑">
+                                    <i class="uil uil-edit"></i>
+                                </button>
+                                <button class="btn-action" onclick="addFeedback({{ interview.id }})" title="添加反馈">
+                                    <i class="uil uil-comment-plus"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 面试安排模态框 -->
+<div id="schedule-modal" class="modal">
+    <div class="modal-content schedule-modal">
+        <div class="modal-header">
+            <h3>安排面试</h3>
+            <button class="modal-close" onclick="closeScheduleModal()">
+                <i class="uil uil-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="schedule-form" class="schedule-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="candidate-select">候选人</label>
+                        <select id="candidate-select" name="candidate" required>
+                            <option value="">选择候选人</option>
+                            {% for candidate in candidates %}
+                            <option value="{{ candidate.id }}">
+                                {{ candidate.first_name }} {{ candidate.last_name }} - {{ candidate.position }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="interviewer-select">面试官</label>
+                        <select id="interviewer-select" name="interviewer" required>
+                            <option value="">选择面试官</option>
+                            <option value="wang">王经理 - 技术面试</option>
+                            <option value="li">李总监 - 终面</option>
+                            <option value="zhang">张HR - HR面试</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="interview-date">面试日期</label>
+                        <input type="date" id="interview-date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="interview-time">面试时间</label>
+                        <input type="time" id="interview-time" name="time" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="interview-duration">面试时长</label>
+                        <select id="interview-duration" name="duration" required>
+                            <option value="30">30分钟</option>
+                            <option value="60" selected>1小时</option>
+                            <option value="90">1.5小时</option>
+                            <option value="120">2小时</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="interview-method">面试方式</label>
+                        <select id="interview-method" name="method" required>
+                            <option value="online">线上</option>
+                            <option value="offline">线下</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interview-location">面试地点/链接</label>
+                    <input type="text" id="interview-location" name="location" placeholder="线下填写地址，线上填写会议链接">
+                </div>
+                
+                <div class="form-group">
+                    <label for="interview-notes">备注</label>
+                    <textarea id="interview-notes" name="notes" rows="3" placeholder="面试注意事项、特殊要求等"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeScheduleModal()">取消</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="uil uil-calendar-alt"></i> 安排面试
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 面试反馈模态框 -->
+<div id="feedback-modal" class="modal">
+    <div class="modal-content feedback-modal">
+        <div class="modal-header">
+            <h3>面试反馈</h3>
+            <button class="modal-close" onclick="closeFeedbackModal()">
+                <i class="uil uil-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="feedback-content">
+                <!-- 反馈内容将在这里动态加载 -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.interviews-management.ios-style {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* iOS风格变量 */
+:root {
+    --ios-bg: #f2f2f7;
+    --ios-card: #ffffff;
+    --ios-border: #e5e5ea;
+    --ios-text: #000000;
+    --ios-text-secondary: #8e8e93;
+    --ios-blue: #007aff;
+    --ios-green: #34c759;
+    --ios-orange: #ff9500;
+    --ios-red: #ff3b30;
+    --ios-radius: 12px;
+    --ios-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 页面标题和统计 */
+.page-header {
+    background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+    color: white;
+    padding: 30px;
+    border-radius: var(--ios-radius);
+    margin-bottom: 30px;
+    box-shadow: var(--ios-shadow);
+}
+
+.header-content h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+}
+
+.header-content p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.header-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: var(--ios-radius);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* 工具栏 */
+.toolbar {
+    background: var(--ios-card);
+    padding: 20px;
+    border-radius: var(--ios-radius);
+    box-shadow: var(--ios-shadow);
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--ios-border);
+}
+
+.calendar-navigation {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.btn-nav {
+    padding: 8px 12px;
+    border: 1px solid var(--ios-border);
+    background: var(--ios-card);
+    color: var(--ios-text);
+    border-radius: var(--ios-radius);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-nav:hover {
+    background: var(--ios-bg);
+    transform: translateY(-1px);
+}
+
+.current-week {
+    text-align: center;
+}
+
+.current-week h3 {
+    margin: 0 0 8px 0;
+    color: var(--ios-text);
+    font-size: 18px;
+}
+
+.btn-today {
+    padding: 6px 12px;
+    border: 1px solid var(--ios-blue);
+    background: var(--ios-blue);
+    color: white;
+    border-radius: var(--ios-radius);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-today:hover {
+    background: #0056cc;
+    transform: translateY(-1px);
+}
+
+.actions-section {
+    display: flex;
+    gap: 12px;
+}
+
+/* 周历视图 */
+.week-calendar-container {
+    background: var(--ios-card);
+    border-radius: var(--ios-radius);
+    box-shadow: var(--ios-shadow);
+    overflow: hidden;
+    border: 1px solid var(--ios-border);
+    margin-bottom: 25px;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: 80px repeat(7, 1fr);
+    background: var(--ios-bg);
+    border-bottom: 1px solid var(--ios-border);
+}
+
+.time-column, .day-column {
+    padding: 16px 12px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--ios-text);
+    border-right: 1px solid var(--ios-border);
+}
+
+.day-column:last-child {
+    border-right: none;
+}
+
+.calendar-body {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.time-slot {
+    display: grid;
+    grid-template-columns: 80px repeat(7, 1fr);
+    border-bottom: 1px solid var(--ios-border);
+    min-height: 60px;
+}
+
+.time-slot:last-child {
+    border-bottom: none;
+}
+
+.time-label {
+    padding: 16px 12px;
+    text-align: center;
+    color: var(--ios-text-secondary);
+    font-size: 14px;
+    border-right: 1px solid var(--ios-border);
+    background: var(--ios-bg);
+}
+
+.day-slot {
+    padding: 8px;
+    border-right: 1px solid var(--ios-border);
+    position: relative;
+    min-height: 60px;
+}
+
+.day-slot:last-child {
+    border-right: none;
+}
+
+/* 面试事件样式 */
+.interview-event {
+    background: var(--ios-blue);
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.interview-event:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.event-title {
+    font-weight: 600;
+    margin-bottom: 2px;
+    font-size: 11px;
+}
+
+.event-position {
+    opacity: 0.9;
+    font-size: 10px;
+    margin-bottom: 2px;
+}
+
+.event-time {
+    opacity: 0.8;
+    font-size: 9px;
+}
+
+/* 面试列表 */
+.interviews-list-section {
+    background: var(--ios-card);
+    border-radius: var(--ios-radius);
+    box-shadow: var(--ios-shadow);
+    overflow: hidden;
+    border: 1px solid var(--ios-border);
+}
+
+.section-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--ios-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--ios-bg);
+}
+
+.section-header h2 {
+    margin: 0;
+    color: var(--ios-text);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.list-filters {
+    display: flex;
+    gap: 12px;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    border: 1px solid var(--ios-border);
+    border-radius: var(--ios-radius);
+    background: var(--ios-card);
+    color: var(--ios-text);
+    font-size: 14px;
+}
+
+/* 面试表格 */
+.interviews-table-container {
+    overflow-x: auto;
+}
+
+.interviews-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.interviews-table th {
+    background: var(--ios-bg);
+    padding: 16px 20px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--ios-text);
+    border-bottom: 1px solid var(--ios-border);
+    font-size: 14px;
+}
+
+.interviews-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--ios-border);
+    vertical-align: middle;
+}
+
+.interviews-table tr:hover {
+    background: var(--ios-bg);
+}
+
+.candidate-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.candidate-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--ios-blue), #5856d6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.candidate-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.candidate-name {
+    font-weight: 600;
+    color: var(--ios-text);
+    font-size: 16px;
+}
+
+.candidate-email {
+    color: var(--ios-text-secondary);
+    font-size: 14px;
+}
+
+.interview-time {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.date {
+    font-weight: 600;
+    color: var(--ios-text);
+    font-size: 14px;
+}
+
+.time {
+    color: var(--ios-text-secondary);
+    font-size: 13px;
+}
+
+.method-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.method-badge.online { background: #e3f2fd; color: #1976d2; }
+.method-badge.offline { background: #fff3e0; color: #f57c00; }
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-badge.scheduled { background: #e3f2fd; color: #1976d2; }
+.status-badge.completed { background: #e8f5e8; color: #388e3c; }
+.status-badge.cancelled { background: #ffebee; color: #d32f2f; }
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    padding: 8px;
+    border: none;
+    border-radius: var(--ios-radius);
+    background: var(--ios-bg);
+    color: var(--ios-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    border: 1px solid var(--ios-border);
+}
+
+.btn-action:hover {
+    background: var(--ios-blue);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: var(--ios-shadow);
+}
+
+/* 按钮样式 */
+.btn-primary {
+    background: var(--ios-blue);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: var(--ios-radius);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary:hover {
+    background: #0056cc;
+    transform: translateY(-1px);
+    box-shadow: var(--ios-shadow);
+}
+
+.btn-secondary {
+    background: var(--ios-card);
+    color: var(--ios-text);
+    border: 1px solid var(--ios-border);
+    padding: 12px 20px;
+    border-radius: var(--ios-radius);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary:hover {
+    background: var(--ios-bg);
+    transform: translateY(-1px);
+}
+
+/* 模态框 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--ios-card);
+    margin: 5% auto;
+    padding: 0;
+    border-radius: var(--ios-radius);
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+.schedule-modal {
+    max-width: 700px;
+}
+
+.feedback-modal {
+    max-width: 800px;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--ios-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--ios-text);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: var(--ios-text-secondary);
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: var(--ios-bg);
+    color: var(--ios-text);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+/* 表单样式 */
+.schedule-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: var(--ios-text);
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 12px;
+    border: 1px solid var(--ios-border);
+    border-radius: var(--ios-radius);
+    background: var(--ios-card);
+    color: var(--ios-text);
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--ios-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid var(--ios-border);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .interviews-management.ios-style {
+        padding: 15px;
+    }
+    
+    .page-header {
+        padding: 20px;
+    }
+    
+    .header-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        gap: 20px;
+        align-items: stretch;
+    }
+    
+    .calendar-navigation {
+        justify-content: center;
+    }
+    
+    .actions-section {
+        justify-content: center;
+    }
+    
+    .calendar-header {
+        grid-template-columns: 60px repeat(7, 1fr);
+    }
+    
+    .time-slot {
+        grid-template-columns: 60px repeat(7, 1fr);
+    }
+    
+    .time-column,
+    .time-label {
+        padding: 12px 8px;
+        font-size: 12px;
+    }
+    
+    .day-slot {
+        padding: 4px;
+        min-height: 50px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+    
+    .list-filters {
+        justify-content: center;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+}
+</style>
+
+<script>
+// 全局变量
+let currentWeek = new Date();
+let interviews = [];
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCalendar();
+    loadInterviews();
+    setupEventListeners();
+});
+
+// 初始化日历
+function initializeCalendar() {
+    updateWeekDisplay();
+    renderCalendar();
+}
+
+// 设置事件监听器
+function setupEventListeners() {
+    // 面试安排表单提交
+    document.getElementById('schedule-form').addEventListener('submit', handleScheduleSubmit);
+    
+    // 筛选器变化
+    document.getElementById('status-filter').addEventListener('change', filterInterviews);
+    
+    // 模态框外部点击关闭
+    window.onclick = function(event) {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    };
+    
+    // ESC键关闭模态框
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (modal.style.display === 'block') {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    });
+}
+
+// 日历导航功能
+function previousWeek() {
+    currentWeek.setDate(currentWeek.getDate() - 7);
+    updateWeekDisplay();
+    renderCalendar();
+}
+
+function nextWeek() {
+    currentWeek.setDate(currentWeek.getDate() + 7);
+    updateWeekDisplay();
+    renderCalendar();
+}
+
+function goToToday() {
+    currentWeek = new Date();
+    updateWeekDisplay();
+    renderCalendar();
+}
+
+// 更新周显示
+function updateWeekDisplay() {
+    const startOfWeek = getStartOfWeek(currentWeek);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 6);
+    
+    const weekDisplay = document.getElementById('week-display');
+    weekDisplay.textContent = `${startOfWeek.getFullYear()}年${startOfWeek.getMonth() + 1}月${startOfWeek.getDate()}日 - ${endOfWeek.getMonth() + 1}月${endOfWeek.getDate()}日`;
+}
+
+// 获取周开始日期
+function getStartOfWeek(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(d.setDate(diff));
+}
+
+// 渲染日历
+function renderCalendar() {
+    // 清空现有内容
+    const daySlots = document.querySelectorAll('.day-slot');
+    daySlots.forEach(slot => {
+        slot.innerHTML = '';
+    });
+    
+    // 渲染面试事件
+    interviews.forEach(interview => {
+        if (interview.status === 'scheduled') {
+            renderInterviewEvent(interview);
+        }
+    });
+}
+
+// 渲染面试事件
+function renderInterviewEvent(interview) {
+    const interviewDate = new Date(interview.date);
+    const startOfWeek = getStartOfWeek(currentWeek);
+    const dayDiff = Math.floor((interviewDate - startOfWeek) / (1000 * 60 * 60 * 24));
+    
+    if (dayDiff >= 0 && dayDiff < 7) {
+        const hour = parseInt(interview.start_time.split(':')[0]);
+        const daySlot = document.querySelector(`[data-day="${dayDiff}"][data-hour="${hour}"]`);
+        
+        if (daySlot) {
+            const eventElement = document.createElement('div');
+            eventElement.className = 'interview-event';
+            eventElement.innerHTML = `
+                <div class="event-title">${interview.candidate_name}</div>
+                <div class="event-position">${interview.position}</div>
+                <div class="event-time">${interview.start_time}</div>
+            `;
+            eventElement.onclick = () => viewInterview(interview.id);
+            daySlot.appendChild(eventElement);
+        }
+    }
+}
+
+// 加载面试数据
+function loadInterviews() {
+    // 模拟数据 - 实际应用中应该从后端获取
+    interviews = [
+        {
+            id: 1,
+            candidate_name: '张三',
+            candidate_email: 'zhangsan@example.com',
+            position: '前端工程师',
+            interviewer_name: '王经理',
+            date: '2024-01-15',
+            start_time: '10:00',
+            end_time: '11:00',
+            method: 'online',
+            status: 'scheduled'
+        },
+        {
+            id: 2,
+            candidate_name: '李四',
+            candidate_email: 'lisi@example.com',
+            position: '后端工程师',
+            interviewer_name: '李总监',
+            date: '2024-01-16',
+            start_time: '14:00',
+            end_time: '15:00',
+            method: 'offline',
+            status: 'completed'
+        }
+    ];
+    
+    renderInterviewsTable();
+}
+
+// 渲染面试表格
+function renderInterviewsTable() {
+    const tbody = document.querySelector('#interviews-table tbody');
+    tbody.innerHTML = '';
+    
+    interviews.forEach(interview => {
+        const row = document.createElement('tr');
+        row.className = 'interview-row';
+        row.dataset.id = interview.id;
+        row.dataset.status = interview.status;
+        
+        row.innerHTML = `
+            <td class="candidate-cell">
+                <div class="candidate-info">
+                    <div class="candidate-avatar">
+                        <div class="avatar-placeholder">
+                            ${interview.candidate_name[0].toUpperCase()}
+                        </div>
+                    </div>
+                    <div class="candidate-details">
+                        <div class="candidate-name">${interview.candidate_name}</div>
+                        <div class="candidate-email">${interview.candidate_email}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="position-cell">${interview.position}</td>
+            <td class="interviewer-cell">${interview.interviewer_name}</td>
+            <td class="time-cell">
+                <div class="interview-time">
+                    <div class="date">${interview.date}</div>
+                    <div class="time">${interview.start_time} - ${interview.end_time}</div>
+                </div>
+            </td>
+            <td class="method-cell">
+                <span class="method-badge ${interview.method}">
+                    ${interview.method === 'online' ? '线上' : '线下'}
+                </span>
+            </td>
+            <td class="status-cell">
+                <span class="status-badge ${interview.status}">
+                    ${getStatusText(interview.status)}
+                </span>
+            </td>
+            <td class="actions-cell">
+                <div class="action-buttons">
+                    <button class="btn-action" onclick="viewInterview(${interview.id})" title="查看">
+                        <i class="uil uil-eye"></i>
+                    </button>
+                    <button class="btn-action" onclick="editInterview(${interview.id})" title="编辑">
+                        <i class="uil uil-edit"></i>
+                    </button>
+                    <button class="btn-action" onclick="addFeedback(${interview.id})" title="添加反馈">
+                        <i class="uil uil-comment-plus"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+}
+
+// 获取状态文本
+function getStatusText(status) {
+    const statusMap = {
+        'scheduled': '已安排',
+        'completed': '已完成',
+        'cancelled': '已取消',
+        'pending': '待安排'
+    };
+    return statusMap[status] || status;
+}
+
+// 筛选面试
+function filterInterviews() {
+    const statusFilter = document.getElementById('status-filter').value;
+    const rows = document.querySelectorAll('.interview-row');
+    
+    rows.forEach(row => {
+        const status = row.dataset.status;
+        if (!statusFilter || status === statusFilter) {
+            row.style.display = 'table-row';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// 模态框操作
+function openScheduleModal() {
+    document.getElementById('schedule-modal').style.display = 'block';
+    // 设置默认日期为今天
+    document.getElementById('interview-date').value = new Date().toISOString().split('T')[0];
+}
+
+function closeScheduleModal() {
+    document.getElementById('schedule-modal').style.display = 'none';
+    document.getElementById('schedule-form').reset();
+}
+
+function closeFeedbackModal() {
+    document.getElementById('feedback-modal').style.display = 'none';
+}
+
+// 处理面试安排表单提交
+function handleScheduleSubmit(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    const interviewData = {
+        id: Date.now(), // 临时ID
+        candidate_name: getCandidateName(formData.get('candidate')),
+        candidate_email: getCandidateEmail(formData.get('candidate')),
+        position: getCandidatePosition(formData.get('candidate')),
+        interviewer_name: getInterviewerName(formData.get('interviewer')),
+        date: formData.get('date'),
+        start_time: formData.get('time'),
+        end_time: calculateEndTime(formData.get('time'), formData.get('duration')),
+        method: formData.get('method'),
+        location: formData.get('location'),
+        notes: formData.get('notes'),
+        status: 'scheduled'
+    };
+    
+    // 添加到面试列表
+    interviews.push(interviewData);
+    
+    // 更新显示
+    renderInterviewsTable();
+    renderCalendar();
+    
+    // 关闭模态框
+    closeScheduleModal();
+    
+    // 显示成功消息
+    alert('面试安排成功！');
+}
+
+// 辅助函数
+function getCandidateName(candidateId) {
+    // 实际应用中应该从候选人数据中获取
+    return '新候选人';
+}
+
+function getCandidateEmail(candidateId) {
+    return 'candidate@example.com';
+}
+
+function getCandidatePosition(candidateId) {
+    return '待定职位';
+}
+
+function getInterviewerName(interviewerId) {
+    const interviewerMap = {
+        'wang': '王经理',
+        'li': '李总监',
+        'zhang': '张HR'
+    };
+    return interviewerMap[interviewerId] || '未知面试官';
+}
+
+function calculateEndTime(startTime, duration) {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const startMinutes = hours * 60 + minutes;
+    const endMinutes = startMinutes + parseInt(duration);
+    const endHours = Math.floor(endMinutes / 60);
+    const endMins = endMinutes % 60;
+    return `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
+}
+
+// 面试操作功能
+function viewInterview(id) {
+    const interview = interviews.find(i => i.id === id);
+    if (interview) {
+        alert(`查看面试详情：${interview.candidate_name} - ${interview.position}`);
+        // 这里可以打开详情模态框
+    }
+}
+
+function editInterview(id) {
+    const interview = interviews.find(i => i.id === id);
+    if (interview) {
+        alert(`编辑面试：${interview.candidate_name} - ${interview.position}`);
+        // 这里可以打开编辑模态框
+    }
+}
+
+function addFeedback(id) {
+    const interview = interviews.find(i => i.id === id);
+    if (interview) {
+        // 打开反馈模态框
+        document.getElementById('feedback-modal').style.display = 'block';
+        
+        // 生成反馈模板
+        const feedbackContent = document.getElementById('feedback-content');
+        feedbackContent.innerHTML = generateFeedbackTemplate(interview);
+    }
+}
+
+// 生成反馈模板
+function generateFeedbackTemplate(interview) {
+    return `
+        <div class="feedback-template">
+            <div class="interview-info">
+                <h4>面试信息</h4>
+                <p><strong>候选人：</strong>${interview.candidate_name}</p>
+                <p><strong>职位：</strong>${interview.position}</p>
+                <p><strong>面试官：</strong>${interview.interviewer_name}</p>
+                <p><strong>面试时间：</strong>${interview.date} ${interview.start_time}</p>
+            </div>
+            
+            <form class="feedback-form">
+                <div class="form-group">
+                    <label>技术能力评分</label>
+                    <select name="technical_score" required>
+                        <option value="">请选择</option>
+                        <option value="5">5分 - 优秀</option>
+                        <option value="4">4分 - 良好</option>
+                        <option value="3">3分 - 一般</option>
+                        <option value="2">2分 - 较差</option>
+                        <option value="1">1分 - 很差</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>沟通能力评分</label>
+                    <select name="communication_score" required>
+                        <option value="">请选择</option>
+                        <option value="5">5分 - 优秀</option>
+                        <option value="4">4分 - 良好</option>
+                        <option value="3">3分 - 一般</option>
+                        <option value="2">2分 - 较差</option>
+                        <option value="1">1分 - 很差</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>团队协作评分</label>
+                    <select name="teamwork_score" required>
+                        <option value="">请选择</option>
+                        <option value="5">5分 - 优秀</option>
+                        <option value="4">4分 - 良好</option>
+                        <option value="3">3分 - 一般</option>
+                        <option value="2">2分 - 较差</option>
+                        <option value="1">1分 - 很差</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>总体评价</label>
+                    <textarea name="overall_feedback" rows="4" placeholder="请详细描述候选人的表现、优缺点、是否推荐等"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>面试结果</label>
+                    <select name="interview_result" required>
+                        <option value="">请选择</option>
+                        <option value="pass">通过</option>
+                        <option value="fail">不通过</option>
+                        <option value="pending">待定</option>
+                    </select>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeFeedbackModal()">取消</button>
+                    <button type="submit" class="btn-primary">提交反馈</button>
+                </div>
+            </form>
+        </div>
+    `;
+}
+
+// 导出日程
+function exportSchedule() {
+    alert('导出功能开发中...');
+}
+
+// 添加反馈表单样式
+const feedbackStyles = `
+<style>
+.feedback-template {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.interview-info {
+    background: var(--ios-bg);
+    padding: 20px;
+    border-radius: var(--ios-radius);
+    border: 1px solid var(--ios-border);
+}
+
+.interview-info h4 {
+    margin: 0 0 16px 0;
+    color: var(--ios-text);
+    font-size: 18px;
+}
+
+.interview-info p {
+    margin: 8px 0;
+    color: var(--ios-text);
+}
+
+.feedback-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.feedback-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.feedback-form .form-group label {
+    font-weight: 500;
+    color: var(--ios-text);
+    font-size: 14px;
+}
+
+.feedback-form .form-group select,
+.feedback-form .form-group textarea {
+    padding: 12px;
+    border: 1px solid var(--ios-border);
+    border-radius: var(--ios-radius);
+    background: var(--ios-card);
+    color: var(--ios-text);
+    font-size: 14px;
+}
+
+.feedback-form .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.feedback-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid var(--ios-border);
+}
+</style>
+`;
+
+// 注入反馈样式
+document.head.insertAdjacentHTML('beforeend', feedbackStyles);
+</script>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}面试安排 - 调试版{% endblock %}
+
+{% block content %}
+<div class="interviews-debug">
+    <h1>面试安排页面</h1>
+    
+    <div class="debug-info">
+        <h2>调试信息</h2>
+        <p>候选人数量: {{ candidates|length if candidates else 0 }}</p>
+        <p>面试数量: {{ interviews|length if interviews else 0 }}</p>
+    </div>
+    
+    <div class="candidates-section">
+        <h2>候选人列表</h2>
+        {% if candidates %}
+            <ul>
+            {% for candidate in candidates %}
+                <li>{{ candidate.first_name }} {{ candidate.last_name }} - {{ candidate.position }}</li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>没有候选人数据</p>
+        {% endif %}
+    </div>
+    
+    <div class="interviews-section">
+        <h2>面试列表</h2>
+        {% if interviews %}
+            <ul>
+            {% for interview in interviews %}
+                <li>{{ interview.candidate_name }} - {{ interview.position }} - {{ interview.status }}</li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>没有面试数据</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.interviews-debug {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.debug-info {
+    background: #f0f0f0;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.candidates-section, .interviews-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+</style>
+{% endblock %}

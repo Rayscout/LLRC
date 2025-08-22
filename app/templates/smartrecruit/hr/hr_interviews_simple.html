@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}面试安排{% endblock %}
+
+{% block content %}
+<div class="interviews-management">
+    <div class="page-header">
+        <h1>面试安排</h1>
+        <p>管理面试日程和安排</p>
+    </div>
+    
+    <div class="content-section">
+        <h2>面试列表</h2>
+        {% if interviews %}
+            <div class="interviews-list">
+                {% for interview in interviews %}
+                <div class="interview-item">
+                    <h3>{{ interview.candidate_name }}</h3>
+                    <p>职位: {{ interview.position }}</p>
+                    <p>面试官: {{ interview.interviewer_name }}</p>
+                    <p>时间: {{ interview.date }} {{ interview.start_time }}</p>
+                    <p>状态: {{ interview.status }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>暂无面试安排</p>
+        {% endif %}
+    </div>
+    
+    <div class="content-section">
+        <h2>候选人列表</h2>
+        {% if candidates %}
+            <div class="candidates-list">
+                {% for candidate in candidates %}
+                <div class="candidate-item">
+                    <h3>{{ candidate.first_name }} {{ candidate.last_name }}</h3>
+                    <p>职位: {{ candidate.position }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>暂无候选人</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.interviews-management {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.page-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+}
+
+.page-header p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.content-section {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content-section h2 {
+    margin: 0 0 20px 0;
+    color: #333;
+}
+
+.interview-item, .candidate-item {
+    border: 1px solid #e5e5ea;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background: #f9f9f9;
+}
+
+.interview-item h3, .candidate-item h3 {
+    margin: 0 0 10px 0;
+    color: #007aff;
+}
+
+.interview-item p, .candidate-item p {
+    margin: 5px 0;
+    color: #666;
+}
+</style>
+{% endblock %}

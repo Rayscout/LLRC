@@ -6,6 +6,11 @@ from app.models import User, Job, Application, db
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
+@dashboard_bp.route('/test')
+def test():
+    """测试路由"""
+    return "测试路由工作正常！"
+
 @dashboard_bp.route('/hr_dashboard')
 def hr_dashboard():
     """HR仪表盘"""
@@ -98,33 +103,111 @@ def candidates():
                     candidates_data.append({
                         'id': user.id,
                         'user': user,
-                        'application': app,
-                        'job': job,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'email': user.email,
+                        'profile_photo': user.profile_photo,
                         'position': job.title if job else '未知职位',
                         'skills_match': skills_match,
                         'status': app.status,
                         'applied_date': applied_date,
-                        'last_updated': last_updated,
-                        'experience_years': calculate_experience_years(user.birthday) if user.birthday else 0,
-                        'education': get_education_level(user),  # 这里可以根据实际需求扩展
-                        'phone': user.phone_number,
-                        'cv_file': user.cv_file,
-                        'profile_photo': user.profile_photo
+                        'last_updated': last_updated
                     })
-            
-            # 如果没有申请数据，提供一些示例数据
-            if not candidates_data:
-                candidates_data = get_sample_candidates_data()
-            
         except Exception as e:
-            logging.error(f"查询候选人失败: {e}")
-            candidates_data = get_sample_candidates_data()
+            logging.error(f"查询候选人数据失败: {e}")
+            candidates_data = []
         
         return render_template('smartrecruit/hr/hr_candidates.html', candidates=candidates_data)
     except Exception as e:
         logging.error(f"候选人管理页面加载失败: {e}")
         flash('加载候选人管理页面时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_candidates.html', candidates=get_sample_candidates_data())
+        return render_template('smartrecruit/hr/hr_candidates.html', candidates=[])
+
+@dashboard_bp.route('/interviews')
+def interviews():
+    """面试安排管理"""
+    try:
+        print("开始加载面试安排页面")  # 调试信息
+        
+        if g.user is None:
+            print("用户未登录")  # 调试信息
+            flash('请先登录。', 'danger')
+            return redirect(url_for('common.auth.sign'))
+        
+        if not getattr(g.user, 'is_hr', False):
+            print("用户不是HR")  # 调试信息
+            flash('只有HR用户才能访问此页面。', 'danger')
+            return redirect(url_for('common.auth.sign'))
+        
+        print(f"用户ID: {g.user.id}")  # 调试信息
+        
+        # 获取所有候选人（用于面试安排表单）
+        try:
+            print("开始查询候选人数据")  # 调试信息
+            hr_jobs = Job.query.filter_by(user_id=g.user.id).all()
+            print(f"找到职位数量: {len(hr_jobs)}")  # 调试信息
+            
+            job_ids = [job.id for job in hr_jobs]
+            applications = Application.query.filter(Application.job_id.in_(job_ids)).all()
+            print(f"找到申请数量: {len(applications)}")  # 调试信息
+            
+            candidates_data = []
+            for app in applications:
+                user = User.query.get(app.user_id)
+                if user:
+                    candidates_data.append({
+                        'id': user.id,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'position': Job.query.get(app.job_id).title if Job.query.get(app.job_id) else '未知职位'
+                    })
+            
+            print(f"构建候选人数据: {len(candidates_data)}")  # 调试信息
+            
+        except Exception as e:
+            print(f"查询候选人数据失败: {e}")  # 调试信息
+            logging.error(f"查询候选人数据失败: {e}")
+            candidates_data = []
+        
+        # 模拟面试数据（实际应用中应该从数据库获取）
+        interviews_data = [
+            {
+                'id': 1,
+                'candidate_name': '张三',
+                'candidate_email': 'zhangsan@example.com',
+                'position': '前端工程师',
+                'interviewer_name': '王经理',
+                'date': '2024-01-15',
+                'start_time': '10:00',
+                'end_time': '11:00',
+                'method': 'online',
+                'status': 'scheduled'
+            },
+            {
+                'id': 2,
+                'candidate_name': '李四',
+                'candidate_email': 'lisi@example.com',
+                'position': '后端工程师',
+                'interviewer_name': '李总监',
+                'date': '2024-01-16',
+                'start_time': '14:00',
+                'end_time': '15:00',
+                'method': 'offline',
+                'status': 'completed'
+            }
+        ]
+        
+        print("准备渲染模板")  # 调试信息
+        return render_template('smartrecruit/hr/hr_interviews_new.html', 
+                             candidates=candidates_data,
+                             interviews=interviews_data)
+    except Exception as e:
+        print(f"面试安排页面加载失败: {e}")  # 调试信息
+        logging.error(f"面试安排页面加载失败: {e}")
+        flash('加载面试安排页面时出现错误，请稍后重试。', 'danger')
+        return render_template('smartrecruit/hr/hr_interviews_new.html', 
+                             candidates=[],
+                             interviews=[])
 
 def calculate_skills_match(user, job):
     """计算技能匹配度"""
@@ -242,27 +325,6 @@ def get_sample_candidates_data():
             'email': 'zhaoliu@email.com'
         }
     ]
-
-@dashboard_bp.route('/interviews')
-def interviews():
-    """面试安排"""
-    try:
-        if g.user is None:
-            flash('请先登录。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        if not getattr(g.user, 'is_hr', False):
-            flash('只有HR用户才能访问此页面。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        # 获取面试数据（这里可以扩展为真实的面试管理）
-        interviews = []
-        
-        return render_template('smartrecruit/hr/hr_interviews.html', interviews=interviews)
-    except Exception as e:
-        logging.error(f"面试安排页面加载失败: {e}")
-        flash('加载面试安排页面时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_interviews.html', interviews=[])
 
 @dashboard_bp.route('/reports')
 def reports():
