@@ -167,6 +167,15 @@ body.dark .nav-links li a:hover .link-name{
 .menu-items .logout-mode{
     padding-top: 10px;
     border-top: 1px solid var(--border-color);
+    display:flex;
+    flex-direction: column;
+    align-items: stretch; /* 占满横向，方便居中 */
+    gap:8px;
+}
+.menu-items .logout-mode li{ width:100%; }
+.menu-items .logout-mode li a{
+    display:flex; align-items:center; gap:8px; justify-content:center; width:100%;
+    padding:8px 0;
 }
 .menu-items .mode{
     display: flex;
@@ -226,9 +235,10 @@ nav.close ~ .dashboard{
     left: 250px;
     display: flex;
     width: calc(100% - 250px);
-    justify-content: space-between;
+    justify-content: flex-end; /* 右对齐 */
     align-items: center;
     padding: 10px 14px;
+    gap: 10px;
     background-color: var(--panel-color);
     transition: var(--tran-05);
     z-index: 10;
@@ -237,11 +247,7 @@ nav.close ~ .dashboard .top{
     left: 73px;
     width: calc(100% - 73px);
 }
-.dashboard .top .sidebar-toggle{
-    font-size: 26px;
-    color: var(--text-color);
-    cursor: pointer;
-}
+.dashboard .top .sidebar-toggle{ order: -1; margin-right:auto; font-size:26px; color:var(--text-color); cursor:pointer }
 .dashboard .top .search-box{
     position: relative;
     height: 45px;
