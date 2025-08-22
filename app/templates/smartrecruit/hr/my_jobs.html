@@ -1,118 +1,709 @@
 {% extends 'base.html' %}
 
-{% block title %}我的职位{% endblock %}
+{% block title %}已发布招聘{% endblock %}
 
 {% block content %}
 <style>
-    /* Light Mode */
-.page-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-    background: #f9f9f9; /* Light background */
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Lighter shadow */
-}
+    /* iOS风格变量 */
+    :root {
+        --ios-primary: #007AFF;
+        --ios-secondary: #5856D6;
+        --ios-success: #34C759;
+        --ios-warning: #FF9500;
+        --ios-danger: #FF3B30;
+        --ios-gray-1: #8E8E93;
+        --ios-gray-2: #AEAEB2;
+        --ios-gray-3: #C7C7CC;
+        --ios-gray-4: #D1D1D6;
+        --ios-gray-5: #E5E5EA;
+        --ios-gray-6: #F2F2F7;
+        --ios-background: rgba(255, 255, 255, 0.8);
+        --ios-card-background: rgba(255, 255, 255, 0.9);
+        --ios-border: rgba(0, 0, 0, 0.1);
+        --ios-shadow: rgba(0, 0, 0, 0.08);
+        --ios-text-primary: #000000;
+        --ios-text-secondary: #3C3C43;
+        --ios-text-tertiary: #787880;
+    }
 
-.page-header .icon {
-    font-size: 24px;
-    color: #ffaf00; /* Icon color */
-    margin-right: 10px;
-}
+    /* 磨砂毛玻璃效果 */
+    .glass-effect {
+        background: var(--ios-background);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--ios-border);
+        box-shadow: 0 8px 32px var(--ios-shadow);
+    }
 
-.page-header .page-title {
-    font-size: 28px;
-    color: #333; /* Dark text color for readability */
-    margin: 0;
-}
-/* Dark Mode */
-body.dark .page-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-    background: #444; /* Dark background */
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
+    .glass-card {
+        background: var(--ios-card-background);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--ios-border);
+        box-shadow: 0 4px 16px var(--ios-shadow);
+    }
 
-body.dark .page-header .icon {
-    font-size: 24px;
-    color: #ffaf00; /* Icon color */
-    margin-right: 10px;
-}
+    /* 主容器 */
+    .jobs-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #F2F2F7 0%, #FFFFFF 100%);
+    }
 
-body.dark .page-header .page-title {
-    font-size: 28px;
-    color: #fff; /* Light text color for readability */
-    margin: 0;
-}
+    /* 页面标题 */
+    .page-header {
+        text-align: center;
+        margin-bottom: 32px;
+        padding: 32px;
+        background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(88, 86, 214, 0.1) 100%);
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+    }
 
-/* Additional Styles */
-.job-actions {
-    margin-top: 10px;
-}
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--ios-background);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 1px solid var(--ios-border);
+    }
 
-.job-actions a,
-.job-actions button {
-    margin-right: 10px;
-}
+    .page-header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header h1 {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--ios-text-primary);
+        margin: 0 0 8px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+    }
+
+    .page-header p {
+        font-size: 18px;
+        color: var(--ios-text-secondary);
+        margin: 0;
+        font-weight: 400;
+    }
+
+    .header-icon {
+        font-size: 40px;
+        color: var(--ios-primary);
+        background: linear-gradient(135deg, var(--ios-primary), var(--ios-secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* 搜索和操作栏 */
+    .actions-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 32px;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .search-container {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 16px 20px 16px 48px;
+        border: none;
+        border-radius: 16px;
+        background: var(--ios-card-background);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--ios-border);
+        font-size: 16px;
+        color: var(--ios-text-primary);
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--ios-primary);
+        box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .search-input::placeholder {
+        color: var(--ios-text-tertiary);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ios-text-tertiary);
+        font-size: 20px;
+    }
+
+    .add-job-btn {
+        padding: 16px 24px;
+        background: linear-gradient(135deg, var(--ios-primary), var(--ios-secondary));
+        color: white;
+        border: none;
+        border-radius: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+    }
+
+    .add-job-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
+    }
+
+    /* 职位卡片网格 */
+    .jobs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 32px;
+        margin-bottom: 32px;
+    }
+
+    .job-card {
+        background: var(--ios-card-background);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--ios-border);
+        border-radius: 20px;
+        padding: 32px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        min-height: 280px;
+    }
+
+    .job-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--ios-primary), var(--ios-secondary));
+        border-radius: 20px 20px 0 0;
+    }
+
+    .job-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px var(--ios-shadow);
+        border-color: var(--ios-primary);
+    }
+
+    .job-header {
+        margin-bottom: 24px;
+    }
+
+    .job-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--ios-text-primary);
+        margin: 0 0 12px 0;
+        line-height: 1.3;
+    }
+
+    .job-status {
+        display: inline-block;
+        padding: 8px 16px;
+        background: rgba(52, 199, 89, 0.1);
+        color: var(--ios-success);
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .job-details {
+        margin-bottom: 28px;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 16px;
+        font-size: 15px;
+        color: var(--ios-text-secondary);
+        line-height: 1.4;
+    }
+
+    .detail-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .detail-icon {
+        width: 24px;
+        margin-right: 16px;
+        color: var(--ios-text-tertiary);
+        font-size: 18px;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        margin-right: 12px;
+        min-width: 90px;
+        flex-shrink: 0;
+    }
+
+    .detail-value {
+        color: var(--ios-text-primary);
+        flex: 1;
+        word-wrap: break-word;
+    }
+
+    .job-actions {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-top: auto;
+    }
+
+    .action-btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 90px;
+        justify-content: center;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .btn-edit {
+        background: rgba(0, 122, 255, 0.1);
+        color: var(--ios-primary);
+        border: 1px solid rgba(0, 122, 255, 0.2);
+    }
+
+    .btn-edit:hover {
+        background: var(--ios-primary);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-delete {
+        background: rgba(255, 59, 48, 0.1);
+        color: var(--ios-danger);
+        border: 1px solid rgba(255, 59, 48, 0.2);
+    }
+
+    .btn-delete:hover {
+        background: var(--ios-danger);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-candidates {
+        background: rgba(88, 86, 214, 0.1);
+        color: var(--ios-secondary);
+        border: 1px solid rgba(88, 86, 214, 0.2);
+    }
+
+    .btn-candidates:hover {
+        background: var(--ios-secondary);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    /* 空状态 */
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--ios-text-tertiary);
+    }
+
+    .empty-icon {
+        font-size: 64px;
+        margin-bottom: 24px;
+        opacity: 0.5;
+    }
+
+    .empty-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: var(--ios-text-secondary);
+    }
+
+    .empty-description {
+        font-size: 16px;
+        margin-bottom: 32px;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 1200px) {
+        .jobs-grid {
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 28px;
+        }
+        
+        .job-card {
+            padding: 28px;
+            min-height: 260px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .jobs-container {
+            padding: 16px;
+        }
+
+        .page-header {
+            padding: 24px 20px;
+            margin-bottom: 24px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+        }
+
+        .actions-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-container {
+            max-width: none;
+        }
+
+        .jobs-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .job-card {
+            padding: 24px;
+            min-height: auto;
+        }
+
+        .job-title {
+            font-size: 20px;
+        }
+
+        .detail-item {
+            font-size: 14px;
+            margin-bottom: 14px;
+        }
+
+        .detail-icon {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .detail-label {
+            min-width: 80px;
+        }
+
+        .job-actions {
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 14px 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-header h1 {
+            font-size: 24px;
+        }
+
+        .page-header p {
+            font-size: 16px;
+        }
+
+        .job-card {
+            padding: 20px;
+        }
+
+        .job-title {
+            font-size: 18px;
+        }
+
+        .detail-item {
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .detail-icon {
+            width: 18px;
+            margin-right: 10px;
+            font-size: 15px;
+        }
+
+        .detail-label {
+            min-width: 70px;
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .jobs-container {
+            padding: 12px;
+        }
+
+        .page-header {
+            padding: 20px 16px;
+        }
+
+        .job-card {
+            padding: 16px;
+        }
+
+        .job-title {
+            font-size: 16px;
+        }
+
+        .detail-item {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .action-btn {
+            padding: 12px 16px;
+            font-size: 13px;
+        }
+    }
+
+    /* 高分辨率屏幕优化 */
+    @media (min-width: 1400px) {
+        .jobs-container {
+            max-width: 1400px;
+        }
+
+        .jobs-grid {
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 40px;
+        }
+
+        .job-card {
+            padding: 36px;
+            min-height: 300px;
+        }
+
+        .job-title {
+            font-size: 24px;
+        }
+
+        .detail-item {
+            font-size: 16px;
+            margin-bottom: 18px;
+        }
+    }
+
+    /* 横屏模式优化 */
+    @media (orientation: landscape) and (max-height: 600px) {
+        .jobs-container {
+            padding: 16px;
+        }
+
+        .page-header {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+        }
+
+        .page-header p {
+            font-size: 16px;
+        }
+
+        .job-card {
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .job-details {
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            margin-bottom: 12px;
+        }
+    }
 </style>
 
-<div class="jobs-wrapper">
+<div class="jobs-container">
+    <!-- 页面标题 -->
     <div class="page-header">
-        <i class="uil uil-briefcase icon"></i>
-        <h1 class="page-title">我的职位</h1>
+        <div class="page-header-content">
+            <h1>
+                <i class="uil uil-briefcase header-icon"></i>
+                已发布招聘
+            </h1>
+            <p>管理您的招聘职位，跟踪申请状态，优化招聘流程</p>
+        </div>
     </div>
-    <div class="header-bar">
-        <input type="text" placeholder="搜索职位..." class="search-input" id="search-input">
-                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="add-job-button">添加新职位</a>
+
+    <!-- 搜索和操作栏 -->
+    <div class="actions-bar">
+        <div class="search-container">
+            <i class="uil uil-search search-icon"></i>
+            <input type="text" placeholder="搜索职位名称、地点或描述..." class="search-input" id="search-input">
+        </div>
+        <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="add-job-btn">
+            <i class="uil uil-plus"></i>
+            发布新职位
+        </a>
     </div>
-    <div class="jobs-list" id="jobs-list">
-        {% for job in jobs %}
-        <div class="job-card" data-title="{{ job.title | lower }}">
-            <div class="job-title">
-                <h2>{{ job.title }}</h2>
-            </div>
-            <div class="job-details">
-                <p><strong>工作地点:</strong> {{ job.location }}</p>
-                <p><strong>职位描述:</strong> {{ job.description | truncate(100) }}</p>
-                <p><strong>薪资:</strong> {{ job.salary }}</p>
-                <p><strong>发布日期:</strong> {{ job.date_posted.strftime('%Y-%m-%d') }}</p>
+
+    <!-- 职位列表 -->
+    <div class="jobs-grid" id="jobs-grid">
+        {% if jobs %}
+            {% for job in jobs %}
+            <div class="job-card" data-title="{{ job.title | lower }}" data-location="{{ job.location | lower }}" data-description="{{ job.description | lower }}">
+                <div class="job-header">
+                    <h2 class="job-title">{{ job.title }}</h2>
+                    <span class="job-status">招聘中</span>
+                </div>
+                
+                <div class="job-details">
+                    <div class="detail-item">
+                        <i class="uil uil-map-marker detail-icon"></i>
+                        <span class="detail-label">工作地点:</span>
+                        <span class="detail-value">{{ job.location }}</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <i class="uil uil-money-bill detail-icon"></i>
+                        <span class="detail-label">薪资范围:</span>
+                        <span class="detail-value">{{ job.salary }}</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <i class="uil uil-calendar-alt detail-icon"></i>
+                        <span class="detail-label">发布日期:</span>
+                        <span class="detail-value">{{ job.date_posted.strftime('%Y年%m月%d日') }}</span>
+                    </div>
+                    
+                    <div class="detail-item">
+                        <i class="uil uil-file-alt detail-icon"></i>
+                        <span class="detail-label">职位描述:</span>
+                        <span class="detail-value">{{ job.description | truncate(80) }}</span>
+                    </div>
+                </div>
+                
                 <div class="job-actions">
-                    <a href="{{ url_for('smartrecruit.hr.recruitment.edit_job', job_id=job.id) }}" class="edit-button">编辑</a>
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.edit_job', job_id=job.id) }}" class="action-btn btn-edit">
+                        <i class="uil uil-edit"></i>
+                        编辑
+                    </a>
+                    
                     <form action="{{ url_for('smartrecruit.hr.recruitment.delete_job', job_id=job.id) }}" method="POST" class="delete-form" style="display:inline;">
-                        <button type="submit" class="delete-button">删除</button>
+                        <button type="submit" class="action-btn btn-delete" onclick="return confirm('确定要删除这个职位吗？')">
+                            <i class="uil uil-trash-alt"></i>
+                            删除
+                        </button>
                     </form>
-                    <a href="{{ url_for('smartrecruit.hr.candidates.view_candidates', job_id=job.id) }}" class="view-candidates-button">查看候选人</a>
+                    
+                    <a href="{{ url_for('smartrecruit.hr.candidates.view_candidates', job_id=job.id) }}" class="action-btn btn-candidates">
+                        <i class="uil uil-users-alt"></i>
+                        候选人
+                    </a>
                 </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="uil uil-briefcase empty-icon"></i>
+                <h3 class="empty-title">暂无招聘职位</h3>
+                <p class="empty-description">开始发布您的第一个招聘职位，吸引优秀人才加入团队</p>
+                <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="add-job-btn">
+                    <i class="uil uil-plus"></i>
+                    发布第一个职位
+                </a>
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('search-input');
-        const jobsList = document.getElementById('jobs-list');
-        const jobCards = jobsList.getElementsByClassName('job-card');
-    
+        const jobsGrid = document.getElementById('jobs-grid');
+        const jobCards = jobsGrid.getElementsByClassName('job-card');
+
+        // 搜索功能
         searchInput.addEventListener('input', function() {
             const query = searchInput.value.toLowerCase();
-    
+            
             Array.from(jobCards).forEach(card => {
-                const title = card.getAttribute('data-title');
-    
-                if (title.includes(query)) {
+                const title = card.getAttribute('data-title') || '';
+                const location = card.getAttribute('data-location') || '';
+                const description = card.getAttribute('data-description') || '';
+                
+                const matches = title.includes(query) || 
+                              location.includes(query) || 
+                              description.includes(query);
+                
+                if (matches) {
                     card.style.display = 'block';
+                    card.style.animation = 'fadeIn 0.3s ease';
                 } else {
                     card.style.display = 'none';
                 }
             });
+        });
+
+        // 添加淡入动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 为所有卡片添加初始动画
+        Array.from(jobCards).forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+            card.style.animation = 'fadeIn 0.5s ease forwards';
+            card.style.opacity = '0';
         });
     });
 </script>

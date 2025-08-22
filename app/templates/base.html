@@ -46,9 +46,13 @@
                     <i class="uil uil-calendar-alt"></i>
                     <span class="link-name">面试安排</span>
                 </a></li>
+                <li><a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}">
+                    <i class="uil uil-chart-pie"></i>
+                    <span class="link-name">报表与分析</span>
+                </a></li>
                 <li><a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}">
                     <i class="uil uil-list-ul"></i>
-                    <span class="link-name">我的职位</span>
+                    <span class="link-name">已发布招聘</span>
                 </a></li>
                 {% else %}
                 <!-- 求职者菜单 -->

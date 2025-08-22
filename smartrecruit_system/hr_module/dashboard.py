@@ -347,21 +347,51 @@ def reports():
             jobs = []
             applications = []
         
+        # 计算招聘周期（从职位发布到入职的平均天数）
+        recruitment_cycle = calculate_recruitment_cycle(jobs, applications)
+        
+        # 计算招聘成本（模拟数据）
+        recruitment_cost = calculate_recruitment_cost(len(jobs), len(applications))
+        
+        # 计算Offer接受率
+        offer_acceptance_rate = calculate_offer_acceptance_rate(applications)
+        
+        # 漏斗数据
+        funnel_data = calculate_funnel_data(applications)
+        
+        # 团队绩效数据
+        team_performance = calculate_team_performance(jobs, applications)
+        
+        # 月度趋势数据
+        monthly_trends = calculate_monthly_trends(jobs, applications)
+        
         report_data = {
             'total_jobs': len(jobs),
             'total_applications': len(applications),
             'avg_applications_per_job': len(applications) / len(jobs) if jobs else 0,
+            'recruitment_cycle': recruitment_cycle,
+            'recruitment_cost': recruitment_cost,
+            'offer_acceptance_rate': offer_acceptance_rate,
+            'funnel_data': funnel_data,
+            'team_performance': team_performance,
+            'monthly_trends': monthly_trends,
             'jobs_by_status': {}
         }
         
-        return render_template('smartrecruit/hr/hr_reports.html', report_data=report_data)
+        return render_template('smartrecruit/hr/hr_reports_simple.html', report_data=report_data)
     except Exception as e:
         logging.error(f"数据报告页面加载失败: {e}")
         flash('加载数据报告页面时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_reports.html', report_data={
+        return render_template('smartrecruit/hr/hr_reports_simple.html', report_data={
             'total_jobs': 0,
             'total_applications': 0,
             'avg_applications_per_job': 0,
+            'recruitment_cycle': 30,
+            'recruitment_cost': 0,
+            'offer_acceptance_rate': 0,
+            'funnel_data': {},
+            'team_performance': [],
+            'monthly_trends': [],
             'jobs_by_status': {}
         })
 
@@ -393,3 +423,123 @@ def insights():
             'trending_positions': [],
             'candidate_quality_score': 0
         })
+
+def calculate_recruitment_cycle(jobs, applications):
+    """计算平均招聘周期"""
+    if not jobs or not applications:
+        return 30  # 默认30天
+    
+    total_days = 0
+    count = 0
+    
+    for job in jobs:
+        job_applications = [app for app in applications if app.job_id == job.id and app.status == 'hired']
+        if job_applications:
+            # 计算从职位发布到入职的天数
+            for app in job_applications:
+                if job.date_posted and app.timestamp:
+                    days = (app.timestamp - job.date_posted).days
+                    if days > 0:
+                        total_days += days
+                        count += 1
+    
+    return round(total_days / count, 1) if count > 0 else 30
+
+def calculate_recruitment_cost(total_jobs, total_applications):
+    """计算招聘成本（模拟数据）"""
+    # 基础成本：每个职位1000元
+    base_cost = total_jobs * 1000
+    
+    # 面试成本：每次面试200元
+    interview_cost = total_applications * 200
+    
+    # 其他成本：每个职位500元
+    other_cost = total_jobs * 500
+    
+    total_cost = base_cost + interview_cost + other_cost
+    return round(total_cost, 2)
+
+def calculate_offer_acceptance_rate(applications):
+    """计算Offer接受率"""
+    if not applications:
+        return 0
+    
+    offer_count = len([app for app in applications if app.status == 'offer'])
+    hired_count = len([app for app in applications if app.status == 'hired'])
+    
+    total_offers = offer_count + hired_count
+    if total_offers == 0:
+        return 0
+    
+    return round((hired_count / total_offers) * 100, 1)
+
+def calculate_funnel_data(applications):
+    """计算漏斗数据"""
+    if not applications:
+        return {
+            'applied': 0,
+            'screened': 0,
+            'interview': 0,
+            'offer': 0,
+            'hired': 0
+        }
+    
+    status_counts = {}
+    for app in applications:
+        status = app.status
+        status_counts[status] = status_counts.get(status, 0) + 1
+    
+    return {
+        'applied': status_counts.get('applied', 0),
+        'screened': status_counts.get('screened', 0),
+        'interview': status_counts.get('interview', 0),
+        'offer': status_counts.get('offer', 0),
+        'hired': status_counts.get('hired', 0)
+    }
+
+def calculate_team_performance(jobs, applications):
+    """计算团队绩效"""
+    # 模拟招聘人员数据
+    recruiters = [
+        {'name': '张HR', 'id': 'zhang'},
+        {'name': '李HR', 'id': 'li'},
+        {'name': '王HR', 'id': 'wang'}
+    ]
+    
+    performance_data = []
+    for recruiter in recruiters:
+        # 模拟数据
+        interview_count = random.randint(10, 50)
+        hire_count = random.randint(2, 15)
+        hire_rate = round((hire_count / interview_count) * 100, 1) if interview_count > 0 else 0
+        
+        performance_data.append({
+            'name': recruiter['name'],
+            'interview_count': interview_count,
+            'hire_count': hire_count,
+            'hire_rate': hire_rate
+        })
+    
+    return performance_data
+
+def calculate_monthly_trends(jobs, applications):
+    """计算月度趋势"""
+    # 模拟月度数据
+    months = ['1月', '2月', '3月', '4月', '5月', '6月']
+    job_trends = [random.randint(5, 20) for _ in months]
+    application_trends = [random.randint(20, 80) for _ in months]
+    interview_trends = [random.randint(10, 40) for _ in months]
+    offer_trends = [random.randint(5, 20) for _ in months]
+    hire_trends = [random.randint(2, 10) for _ in months]
+    
+    return [
+        {
+            'month': month,
+            'jobs': job_trends[i],
+            'applications': application_trends[i],
+            'interviews': interview_trends[i],
+            'offers': offer_trends[i],
+            'hires': hire_trends[i]
+        }
+        for i, month in enumerate(months)
+    ]
