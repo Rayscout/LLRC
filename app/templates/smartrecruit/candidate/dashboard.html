@@ -1,8 +1,17 @@
-{% extends 'base.html' %}
+{% extends "smartrecruit/candidate/base_ios.html" %}
 
-{% block title %}职位仪表盘{% endblock %}
+{% block title %}个人资料{% endblock %}
 
 {% block content %}
+<section class="section" id="profile">
+    <div style="width: 100%; max-width: 1200px;">
+        <div class="card animate-fade-in-up">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(135deg, var(--accent-color), var(--accent-hover)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    👤 个人资料
+                </h1>
+                <p style="font-size: 1.1rem; color: var(--text-secondary);">管理您的个人信息和求职偏好</p>
+            </div>
 <style>
     /* Page Header Styling */
     .dashboard-header {

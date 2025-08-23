@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能学习推荐 - 员工仪表板</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .dashboard-container {
+            padding: 2rem 0;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+        }
+        
+        .skill-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.25rem;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+        
+        .skill-badge.missing {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+        
+        .skill-badge.matched {
+            background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
+        }
+        
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+        }
+        
+        .progress-ring circle {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+        }
+        
+        .progress-ring .bg {
+            stroke: #e9ecef;
+        }
+        
+        .progress-ring .progress {
+            stroke: #667eea;
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        
+        .course-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .course-level {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .level-beginner { background: #28a745; color: white; }
+        .level-intermediate { background: #ffc107; color: black; }
+        .level-advanced { background: #dc3545; color: white; }
+        
+        .stats-card {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stats-label {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+        
+        .nav-pills .nav-link {
+            border-radius: 25px;
+            margin: 0.25rem;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .nav-pills .nav-link.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="container">
+            <!-- 页面标题 -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h2 class="mb-0">
+                                        <i class="fas fa-graduation-cap me-2"></i>
+                                        智能学习推荐
+                                    </h2>
+                                    <p class="mb-0 mt-2">为 {{ user.username }} 量身定制的职业发展计划</p>
+                                </div>
+                                <div class="text-end">
+                                    <a href="{{ url_for('talent_management.employee_manager.learning_recommendation.courses') }}" class="btn btn-light">
+                                        <i class="fas fa-book me-2"></i>查看所有课程
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 技能概览 -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card stats-card">
+                        <div class="stats-number">{{ user_skills|length }}</div>
+                        <div class="stats-label">已掌握技能</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stats-card">
+                        <div class="stats-number">{{ job_recommendations|length }}</div>
+                        <div class="stats-label">推荐职位</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stats-card">
+                        <div class="stats-number">
+                            {% set total_courses = 0 %}
+                            {% for rec in job_recommendations %}
+                                {% set total_courses = total_courses + rec.learning_plan.recommended_courses|length %}
+                            {% endfor %}
+                            {{ total_courses }}
+                        </div>
+                        <div class="stats-label">推荐课程</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 当前技能 -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="fas fa-user-check me-2"></i>
+                                当前技能概览
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            {% if user_skills %}
+                                <div class="mb-3">
+                                    <h6>已掌握技能：</h6>
+                                    {% for skill in user_skills %}
+                                        <span class="skill-badge matched">{{ skill }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    请完善个人资料以获取更准确的技能分析
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 职位推荐和学习计划 -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="fas fa-briefcase me-2"></i>
+                                职位推荐与学习路径
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            {% if job_recommendations %}
+                                <div class="nav nav-pills mb-4" id="job-tabs" role="tablist">
+                                    {% for rec in job_recommendations %}
+                                        <button class="nav-link {% if loop.first %}active{% endif %}" 
+                                                id="job-{{ loop.index }}-tab" 
+                                                data-bs-toggle="pill" 
+                                                data-bs-target="#job-{{ loop.index }}-content" 
+                                                type="button" 
+                                                role="tab">
+                                            {{ rec.job.title }}
+                                        </button>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="tab-content" id="job-tabs-content">
+                                    {% for rec in job_recommendations %}
+                                        <div class="tab-pane fade {% if loop.first %}show active{% endif %}" 
+                                             id="job-{{ loop.index }}-content" 
+                                             role="tabpanel">
+                                            
+                                            <!-- 职位信息 -->
+                                            <div class="row mb-4">
+                                                <div class="col-md-8">
+                                                    <h5>{{ rec.job.title }}</h5>
+                                                    <p class="text-muted">{{ rec.job.company_name }}</p>
+                                                    <p>{{ rec.job.description[:200] }}...</p>
+                                                </div>
+                                                <div class="col-md-4 text-center">
+                                                    <div class="progress-ring">
+                                                        <svg width="120" height="120">
+                                                            <circle class="bg" cx="60" cy="60" r="45"></circle>
+                                                            <circle class="progress" cx="60" cy="60" r="45" 
+                                                                    style="stroke-dashoffset: {{ (1 - rec.learning_plan.current_status.match_rate) * 283 }}"></circle>
+                                                        </svg>
+                                                    </div>
+                                                    <div class="mt-2">
+                                                        <strong>{{ "%.1f"|format(rec.learning_plan.current_status.match_rate * 100) }}%</strong>
+                                                        <div class="text-muted">技能匹配度</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- 技能分析 -->
+                                            <div class="row mb-4">
+                                                <div class="col-md-6">
+                                                    <h6>匹配的技能：</h6>
+                                                    {% for skill in rec.learning_plan.current_status.matched_skills %}
+                                                        <span class="skill-badge matched">{{ skill }}</span>
+                                                    {% else %}
+                                                        <span class="text-muted">暂无匹配技能</span>
+                                                    {% endfor %}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6>需要提升的技能：</h6>
+                                                    {% for skill in rec.learning_plan.current_status.missing_skills %}
+                                                        <span class="skill-badge missing">{{ skill }}</span>
+                                                    {% else %}
+                                                        <span class="text-success">所有技能都已掌握！</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+
+                                            <!-- 推荐课程 -->
+                                            {% if rec.learning_plan.recommended_courses %}
+                                                <h6>推荐学习课程：</h6>
+                                                <div class="row">
+                                                    {% for course_rec in rec.learning_plan.recommended_courses[:3] %}
+                                                        <div class="col-md-4">
+                                                            <div class="course-card position-relative">
+                                                                <span class="course-level level-{{ course_rec.course.level }}">
+                                                                    {{ course_rec.course.level }}
+                                                                </span>
+                                                                <h6>{{ course_rec.course.name }}</h6>
+                                                                <p class="text-muted mb-2">
+                                                                    <i class="fas fa-clock me-1"></i>
+                                                                    {{ course_rec.course.duration }}
+                                                                </p>
+                                                                <p class="text-muted mb-3">
+                                                                    <i class="fas fa-bullseye me-1"></i>
+                                                                    目标技能: {{ course_rec.target_skill }}
+                                                                </p>
+                                                                <button class="btn btn-custom btn-sm w-100">
+                                                                    <i class="fas fa-play me-1"></i>
+                                                                    开始学习
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% else %}
+                                                <div class="alert alert-success">
+                                                    <i class="fas fa-check-circle me-2"></i>
+                                                    恭喜！您已经具备该职位所需的所有技能。
+                                                </div>
+                                            {% endif %}
+
+                                            <!-- 学习目标 -->
+                                            {% if rec.learning_plan.learning_objectives %}
+                                                <div class="mt-4">
+                                                    <h6>学习目标：</h6>
+                                                    <ul class="list-unstyled">
+                                                        {% for objective in rec.learning_plan.learning_objectives %}
+                                                            <li class="mb-2">
+                                                                <i class="fas fa-target me-2 text-primary"></i>
+                                                                {{ objective }}
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    暂无推荐职位，请完善个人资料或等待系统分析。
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快速分析 -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="fas fa-search me-2"></i>
+                                快速技能分析
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <textarea class="form-control" id="job-description" rows="4" 
+                                              placeholder="粘贴职位描述，系统将自动分析所需技能并推荐学习课程..."></textarea>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-custom w-100 mb-2" onclick="analyzeJobDescription()">
+                                        <i class="fas fa-magic me-2"></i>
+                                        智能分析
+                                    </button>
+                                    <button class="btn btn-outline-secondary w-100" onclick="clearAnalysis()">
+                                        <i class="fas fa-eraser me-2"></i>
+                                        清空
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="analysis-result" class="mt-3" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function analyzeJobDescription() {
+            const jobDescription = document.getElementById('job-description').value.trim();
+            if (!jobDescription) {
+                alert('请输入职位描述');
+                return;
+            }
+
+            fetch('{{ url_for("talent_management.employee_manager.learning_recommendation.api_skill_analysis") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    job_description: jobDescription
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayAnalysisResult(data);
+                } else {
+                    alert('分析失败: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('分析失败，请重试');
+            });
+        }
+
+        function displayAnalysisResult(data) {
+            const resultDiv = document.getElementById('analysis-result');
+            const matchRate = (data.learning_plan.current_status.match_rate * 100).toFixed(1);
+            
+            resultDiv.innerHTML = `
+                <div class="alert alert-info">
+                    <h6>分析结果：</h6>
+                    <p><strong>技能匹配度：</strong> ${matchRate}%</p>
+                    <p><strong>匹配技能：</strong> ${data.learning_plan.current_status.matched_skills.join(', ') || '无'}</p>
+                    <p><strong>缺失技能：</strong> ${data.learning_plan.current_status.missing_skills.join(', ') || '无'}</p>
+                </div>
+                ${data.learning_plan.recommended_courses.length > 0 ? `
+                    <h6>推荐课程：</h6>
+                    <div class="row">
+                        ${data.learning_plan.recommended_courses.slice(0, 3).map(course => `
+                            <div class="col-md-4">
+                                <div class="course-card">
+                                    <h6>${course.course.name}</h6>
+                                    <p class="text-muted">${course.course.duration} | ${course.course.level}</p>
+                                    <p class="text-muted">目标技能: ${course.target_skill}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : '<div class="alert alert-success">恭喜！您已经具备该职位所需的所有技能。</div>'}
+            `;
+            resultDiv.style.display = 'block';
+        }
+
+        function clearAnalysis() {
+            document.getElementById('job-description').value = '';
+            document.getElementById('analysis-result').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

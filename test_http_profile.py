@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+测试HTTP请求到个人资料页面
+"""
+
+import requests
+import json
+
+def test_profile_page():
+    """测试个人资料页面"""
+    print("🔍 测试HTTP请求到个人资料页面...")
+    print("=" * 50)
+    
+    base_url = "http://localhost:5000"
+    
+    try:
+        # 测试1: 检查应用是否响应
+        print("\n1. 检查应用响应...")
+        response = requests.get(f"{base_url}/", timeout=5)
+        print(f"   ✅ 应用响应正常: {response.status_code}")
+        
+        # 测试2: 测试个人资料页面（应该重定向到登录页面）
+        print("\n2. 测试个人资料页面...")
+        profile_url = f"{base_url}/talent/employee_manager/profile/"
+        response = requests.get(profile_url, timeout=5, allow_redirects=False)
+        print(f"   📋 状态码: {response.status_code}")
+        print(f"   📋 响应头: {dict(response.headers)}")
+        
+        if response.status_code == 302:  # 重定向
+            print("   ✅ 正确重定向到登录页面")
+            print(f"   📋 重定向到: {response.headers.get('Location', '未知')}")
+        elif response.status_code == 500:
+            print("   ❌ 内部服务器错误")
+            print(f"   📋 响应内容: {response.text[:500]}...")
+        else:
+            print(f"   ⚠️ 意外状态码: {response.status_code}")
+            print(f"   📋 响应内容: {response.text[:200]}...")
+        
+        # 测试3: 测试学习推荐页面
+        print("\n3. 测试学习推荐页面...")
+        learning_url = f"{base_url}/talent/employee_manager/learning_recommendation/dashboard"
+        response = requests.get(learning_url, timeout=5, allow_redirects=False)
+        print(f"   📋 状态码: {response.status_code}")
+        
+        if response.status_code == 302:  # 重定向
+            print("   ✅ 正确重定向到登录页面")
+            print(f"   📋 重定向到: {response.headers.get('Location', '未知')}")
+        elif response.status_code == 500:
+            print("   ❌ 内部服务器错误")
+            print(f"   📋 响应内容: {response.text[:500]}...")
+        else:
+            print(f"   ⚠️ 意外状态码: {response.status_code}")
+            print(f"   📋 响应内容: {response.text[:200]}...")
+        
+        print("\n✅ HTTP测试完成")
+        return True
+        
+    except requests.exceptions.ConnectionError:
+        print("❌ 无法连接到Flask应用，请确保应用正在运行")
+        return False
+    except requests.exceptions.Timeout:
+        print("❌ 请求超时")
+        return False
+    except Exception as e:
+        print(f"❌ 测试失败: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+if __name__ == "__main__":
+    test_profile_page()

@@ -1,496 +1,128 @@
-{% extends "base.html" %}
+{% extends "smartrecruit/candidate/base_ios.html" %}
 
 {% block title %}智能岗位搜索{% endblock %}
 
 {% block content %}
-<div class="job-search-container">
-    <div class="search-header">
-        <h1>🔍 智能岗位搜索</h1>
-        <p>基于您的技能和偏好，找到最适合的职位</p>
-    </div>
+<section class="section" id="job-search">
+    <div style="width: 100%; max-width: 1200px;">
+        <div class="card animate-fade-in-up">
+            <div class="search-header" style="text-align: center; margin-bottom: 30px;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(135deg, var(--accent-color), var(--accent-hover)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    🔍 智能岗位搜索
+                </h1>
+                <p style="font-size: 1.1rem; color: var(--text-secondary);">基于您的技能和偏好，找到最适合的职位</p>
+            </div>
 
-    <!-- 搜索过滤器 -->
-    <div class="search-filters">
-        <div class="filter-row">
-            <div class="filter-group">
-                <label for="searchQuery">关键词搜索</label>
-                <input type="text" id="searchQuery" placeholder="职位名称、技能、公司名称...">
-            </div>
-            <div class="filter-group">
-                <label for="locationFilter">工作地点</label>
-                <input type="text" id="locationFilter" placeholder="城市、地区...">
-            </div>
-        </div>
-        
-        <div class="filter-row">
-            <div class="filter-group">
-                <label for="salaryMin">最低薪资</label>
-                <input type="number" id="salaryMin" placeholder="最低薪资">
-            </div>
-            <div class="filter-group">
-                <label for="salaryMax">最高薪资</label>
-                <input type="number" id="salaryMax" placeholder="最高薪资">
-            </div>
-            <div class="filter-group">
-                <label for="jobTypeFilter">工作类型</label>
-                <select id="jobTypeFilter">
-                    <option value="">全部类型</option>
-                    <option value="全职">全职</option>
-                    <option value="兼职">兼职</option>
-                    <option value="实习">实习</option>
-                    <option value="远程">远程</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="experienceFilter">经验要求</label>
-                <select id="experienceFilter">
-                    <option value="">全部级别</option>
-                    <option value="初级">初级</option>
-                    <option value="中级">中级</option>
-                    <option value="高级">高级</option>
-                    <option value="专家">专家</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="filter-actions">
-            <button class="btn-search" onclick="searchJobs()"><span class="btn-ico">🔍</span> 搜索</button>
-            <button class="btn-clear" onclick="clearFilters()"><span class="btn-ico">🔄</span> 清除筛选</button>
-        </div>
-    </div>
-
-    <!-- 用户技能展示 -->
-    <div class="user-skills" id="userSkillsSection" style="display: none;">
-        <h3>🎯 您的技能匹配</h3>
-        <div class="skills-tags" id="skillsTags"></div>
-    </div>
-
-    <!-- 搜索结果 -->
-    <div class="search-results" id="searchResults" style="display: none;">
-        <div class="results-header">
-            <h3>📋 搜索结果</h3>
-            <span class="results-count" id="resultsCount"></span>
-        </div>
-        <div class="jobs-grid" id="searchResultsGrid"></div>
-    </div>
-
-    <!-- 相关内容推荐（页面底部留白区） -->
-    <section class="related-section" id="relatedSection">
-        <h3>你可能还想看看</h3>
-        <div class="related-grid">
-            <div class="related-card">
-                <h4>热门关键词</h4>
-                <div class="related-tags">
-                    <a href="#" class="rt">Python</a>
-                    <a href="#" class="rt">数据分析</a>
-                    <a href="#" class="rt">算法工程师</a>
-                    <a href="#" class="rt">DevOps</a>
-                    <a href="#" class="rt">前端</a>
+            <!-- 搜索过滤器 -->
+            <div class="search-filters" style="margin-bottom: 30px;">
+                <div class="grid grid-2" style="margin-bottom: 20px;">
+                    <div class="filter-group">
+                        <label for="searchQuery" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">关键词搜索</label>
+                        <input type="text" id="searchQuery" placeholder="职位名称、技能、公司名称..." 
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                    </div>
+                    <div class="filter-group">
+                        <label for="locationFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">工作地点</label>
+                        <input type="text" id="locationFilter" placeholder="城市、地区..." 
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                    </div>
+                </div>
+                
+                <div class="grid grid-4" style="margin-bottom: 20px;">
+                    <div class="filter-group">
+                        <label for="salaryMin" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">最低薪资</label>
+                        <input type="number" id="salaryMin" placeholder="最低薪资" 
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                    </div>
+                    <div class="filter-group">
+                        <label for="salaryMax" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">最高薪资</label>
+                        <input type="number" id="salaryMax" placeholder="最高薪资" 
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                    </div>
+                    <div class="filter-group">
+                        <label for="jobTypeFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">工作类型</label>
+                        <select id="jobTypeFilter" 
+                                style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                            <option value="">全部类型</option>
+                            <option value="全职">全职</option>
+                            <option value="兼职">兼职</option>
+                            <option value="实习">实习</option>
+                            <option value="远程">远程</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="experienceFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">经验要求</label>
+                        <select id="experienceFilter" 
+                                style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                            <option value="">全部级别</option>
+                            <option value="初级">初级</option>
+                            <option value="中级">中级</option>
+                            <option value="高级">高级</option>
+                            <option value="专家">专家</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-actions" style="text-align: center;">
+                    <button class="btn" onclick="searchJobs()" style="margin-right: 15px;">
+                        <i class="fas fa-search"></i> 搜索
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearFilters()">
+                        <i class="fas fa-redo"></i> 清除筛选
+                    </button>
                 </div>
             </div>
-            <div class="related-card">
-                <h4>快捷筛选</h4>
-                <div class="related-actions">
-                    <button class="quick-btn" data-type="remote">远程/混合办公</button>
-                    <button class="quick-btn" data-type="junior">应届/初级</button>
-                    <button class="quick-btn" data-type="hot">高薪职位</button>
-                </div>
-                <small>点击即可填充筛选条件</small>
+
+            <!-- 用户技能展示 -->
+            <div class="user-skills" id="userSkillsSection" style="display: none; margin-bottom: 30px;">
+                <h3 style="margin-bottom: 15px; color: var(--text-primary);">🎯 您的技能匹配</h3>
+                <div class="skills-tags" id="skillsTags"></div>
             </div>
-            <div class="related-card">
-                <h4>求职建议</h4>
-                <ul class="tips">
-                    <li>完善技能标签，获得更精准推荐</li>
-                    <li>设置最低薪资与城市，缩小搜索范围</li>
-                    <li>收藏感兴趣职位，稍后统一投递</li>
-                </ul>
+
+            <!-- 搜索结果 -->
+            <div class="search-results" id="searchResults" style="display: none;">
+                <div class="results-header" style="margin-bottom: 20px;">
+                    <h3 style="color: var(--text-primary);">📋 搜索结果</h3>
+                    <span class="results-count" id="resultsCount" style="color: var(--text-secondary);"></span>
+                </div>
+                <div class="jobs-grid" id="searchResultsGrid"></div>
+            </div>
+
+            <!-- 相关内容推荐 -->
+            <div class="related-section" id="relatedSection" style="margin-top: 40px;">
+                <h3 style="text-align: center; margin-bottom: 30px; color: var(--text-primary);">你可能还想看看</h3>
+                <div class="grid grid-3">
+                    <div class="card" style="text-align: center;">
+                        <h4 style="margin-bottom: 15px; color: var(--text-primary);">热门关键词</h4>
+                        <div class="related-tags">
+                            <span class="tag" style="cursor: pointer;" onclick="setSearchQuery('Python')">Python</span>
+                            <span class="tag" style="cursor: pointer;" onclick="setSearchQuery('数据分析')">数据分析</span>
+                            <span class="tag" style="cursor: pointer;" onclick="setSearchQuery('算法工程师')">算法工程师</span>
+                            <span class="tag" style="cursor: pointer;" onclick="setSearchQuery('DevOps')">DevOps</span>
+                            <span class="tag" style="cursor: pointer;" onclick="setSearchQuery('前端')">前端</span>
+                        </div>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <h4 style="margin-bottom: 15px; color: var(--text-primary);">快捷筛选</h4>
+                        <div class="related-actions">
+                            <button class="btn btn-secondary" style="margin: 5px;" data-type="remote" onclick="quickFilter('remote')">远程/混合办公</button>
+                            <button class="btn btn-secondary" style="margin: 5px;" data-type="junior" onclick="quickFilter('junior')">应届/初级</button>
+                            <button class="btn btn-secondary" style="margin: 5px;" data-type="hot" onclick="quickFilter('hot')">高薪职位</button>
+                        </div>
+                        <small style="color: var(--text-secondary);">点击即可填充筛选条件</small>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <h4 style="margin-bottom: 15px; color: var(--text-primary);">推荐职位</h4>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">基于您的技能推荐</p>
+                        <a href="{{ url_for('smartrecruit.candidate.home') }}" class="btn">
+                            <i class="fas fa-star"></i> 查看推荐
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
-    </section>
-</div>
-
-<style>
-.job-search-container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.search-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.search-header h1 {
-    color: #2c3e50;
-    margin-bottom: 10px;
-    font-size: 2.5em;
-}
-
-.search-header p {
-    color: #7f8c8d;
-    font-size: 1.1em;
-}
-
-.search-filters {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.filter-row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.filter-group {
-    flex: 1;
-    min-width: 200px;
-}
-
-.filter-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.filter-group input,
-.filter-group select {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #e1e8ed;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
-}
-
-.filter-group input:focus,
-.filter-group select:focus {
-    outline: none;
-    border-color: #3498db;
-}
-
-.filter-actions {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.btn-search,
-.btn-clear {
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 14px;
-}
-
-.btn-ico {
-    display: inline-block;
-    margin-right: 6px;
-    filter: grayscale(1) contrast(.7) opacity(.6);
-}
-
-.btn-search {
-    background: #ecf0f1;
-    color: #2c3e50;
-}
-
-.btn-search:hover {
-    background: #d5dbdb;
-}
-
-.btn-clear {
-    background: #ecf0f1;
-    color: #2c3e50;
-}
-
-.btn-clear:hover {
-    background: #d5dbdb;
-}
-
-.user-skills {
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.skills-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.skill-tag {
-    background: rgba(255,255,255,.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.search-results {
-    background: white;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* 相关内容推荐区域 - 与页面背景契合的浅色卡片 */
-.related-section{
-    background: transparent;
-    margin-top: 10px;
-    padding-bottom: 40px;
-}
-.related-section h3{ color:#2c3e50; margin: 10px 0 16px 0; font-size: 20px; }
-.related-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:16px; }
-.related-card{
-    background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 20px rgba(0,0,0,.08);
-}
-.related-card h4{ margin:0 0 10px 0; color:#2c3e50; }
-.related-tags{ display:flex; flex-wrap:wrap; gap:8px; }
-.related-tags .rt{ display:inline-block; padding:6px 10px; border-radius:999px; background:#ecf0f1; color:#2c3e50; text-decoration:none; font-size:12px; }
-.related-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
-.quick-btn{ padding:8px 12px; border:1px solid rgba(51,51,51,.15); background:rgba(255,255,255,.6); border-radius:10px; cursor:pointer; }
-.quick-btn:hover{ background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.06); }
-.tips{ margin:0; padding-left:18px; color:#7f8c8d; }
-
-@media (max-width: 768px){
-    .related-grid{ grid-template-columns: 1fr; }
-}
-
-.results-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.results-count {
-    color: #7f8c8d;
-    font-size: 14px;
-}
-
-.jobs-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    align-items: stretch;
-    justify-content: flex-start;
-}
-
-.jobs-grid .job-card {
-    flex: 0 1 calc(33.333% - 16px);
-}
-
-.job-card {
-    border: 2px solid #e1e8ed;
-    border-radius: 12px;
-    padding: 16px;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    background: #fff;
-}
-
-.job-card:hover {
-    border-color: #3498db;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.job-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: rgba(255,255,255,.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-.job-title {
-    font-size: 1.2em;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 8px;
-    line-height: 1.3;
-}
-
-.job-header {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 6px;
-}
-
-.job-company {
-    color: #3498db;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.icon-text {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #2c3e50;
-}
-
-.icon-text i {
-    color: #7f8c8d;
-}
-
-.job-location {
-    color: #7f8c8d;
-    font-size: 14px;
-    margin-bottom: 12px;
-}
-
-.job-salary {
-    font-weight: 700;
-    color: #27ae60;
-    margin-bottom: 12px;
-}
-
-.job-description {
-    color: #2c3e50;
-    line-height: 1.5;
-    margin-bottom: 15px;
-    font-size: 14px;
-}
-
-.job-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.job-type,
-.job-experience {
-    background: #ecf0f1;
-    color: #2c3e50;
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.pill {
-    background: #ecf0f1;
-    color: #2c3e50;
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.match-score {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(255,255,255,.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 15px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.job-actions {
-    display: flex;
-    gap: 10px;
-}
-
-
-.btn-apply,
-.btn-view {
-    flex: 1;
-    padding: 10px;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    font-size: 14px;
-    text-decoration: none;
-    text-align: center;
-    background: rgba(255,255,255,.35) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(51,51,51,.15) !important;
-    color: #333 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06) !important;
-}
-
-.btn-apply:hover,
-.btn-view:hover {
-    background: rgba(255,255,255,.5) !important;
-    box-shadow: 0 4px 16px rgba(0,0,0,.08) !important;
-}
-
-.btn-apply:active,
-.btn-view:active {
-    transform: translateY(1px);
-}
-
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: #7f8c8d;
-    font-size: 16px;
-}
-
-.no-results {
-    text-align: center;
-    padding: 40px;
-    color: #7f8c8d;
-}
-
-.no-results h4 {
-    margin-bottom: 10px;
-    color: #2c3e50;
-}
-
-@media (max-width: 768px) {
-    .filter-row {
-        flex-direction: column;
-    }
-    
-    .filter-group {
-        min-width: auto;
-    }
-    
-    .jobs-grid .job-card { flex: 0 1 100%; }
-    
-    .filter-actions {
-        flex-direction: column;
-    }
-}
-
-@media (max-width: 1200px) and (min-width: 769px) {
-    .jobs-grid .job-card { flex: 0 1 calc(50% - 16px); }
-}
-</style>
+    </div>
+</section>
 
 <script>
 let currentSearchResults = [];
@@ -513,8 +145,6 @@ function displayUserSkills() {
         skillsSection.style.display = 'block';
     }
 }
-
-
 
 // 搜索职位
 async function searchJobs() {
@@ -569,22 +199,29 @@ function displayJobs(jobs, container) {
         const exp = job.experience_level || '不限';
         const desc = job.description || '';
         return `
-        <div class="job-card">
-            <div class="match-score">${job.match_score}% 匹配</div>
+        <div class="job-card animate-slide-in-left">
             <div class="job-header">
-                <div class="job-title">${job.title}</div>
-                <div class="job-company">${company}</div>
+                <div>
+                    <div class="job-title">${job.title}</div>
+                    <div class="company-name">${company}</div>
+                </div>
+                <span class="job-badge">${job.match_score}% 匹配</span>
             </div>
-            <div class="icon-text"><i class="uil uil-location-point"></i><span>${location}</span></div>
-            <div class="icon-text"><i class="uil uil-money-bill"></i><span class="job-salary">${salary}</span></div>
-            <div class="job-description">${desc}</div>
             <div class="job-meta">
-                <span class="pill">${jobType}</span>
-                <span class="pill">${exp}</span>
+                <span><i class="fas fa-map-marker-alt"></i> ${location}</span>
+                <span><i class="fas fa-dollar-sign"></i> ${salary}</span>
+                <span><i class="fas fa-clock"></i> ${jobType}</span>
             </div>
-            <div class="job-actions">
-                <a href="${'{{ url_for("smartrecruit.candidate.jobs.job_detail", job_id=0) }}'.replace('0', job.id)}" class="btn-view">查看详情</a>
-                <a href="${'{{ url_for("smartrecruit.candidate.applications.apply", job_id=0) }}'.replace('0', job.id)}" class="btn-apply">立即申请</a>
+            <div class="job-tags">
+                <span class="tag">${exp}</span>
+            </div>
+            <div class="job-actions" style="margin-top: 15px;">
+                <a href="${'{{ url_for("smartrecruit.candidate.jobs.job_detail", job_id=0) }}'.replace('0', job.id)}" class="btn btn-secondary" style="margin-right: 10px;">
+                    <i class="fas fa-eye"></i> 查看详情
+                </a>
+                <a href="${'{{ url_for("smartrecruit.candidate.applications.apply", job_id=0) }}'.replace('0', job.id)}" class="btn">
+                    <i class="fas fa-paper-plane"></i> 立即申请
+                </a>
             </div>
         </div>`;
     }).join('');
@@ -601,6 +238,29 @@ function clearFilters() {
     
     // 隐藏搜索结果
     document.getElementById('searchResults').style.display = 'none';
+}
+
+// 设置搜索关键词
+function setSearchQuery(query) {
+    document.getElementById('searchQuery').value = query;
+    searchJobs();
+}
+
+// 快捷筛选
+function quickFilter(type) {
+    clearFilters();
+    switch(type) {
+        case 'remote':
+            document.getElementById('jobTypeFilter').value = '远程';
+            break;
+        case 'junior':
+            document.getElementById('experienceFilter').value = '初级';
+            break;
+        case 'hot':
+            document.getElementById('salaryMin').value = '20000';
+            break;
+    }
+    searchJobs();
 }
 
 // 回车键搜索

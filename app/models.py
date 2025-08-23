@@ -15,6 +15,17 @@ class User(db.Model):
     profile_photo = db.Column(db.String(120))
     cv_data = db.Column(db.LargeBinary)  # 可选的简历二进制
     is_hr = db.Column(db.Boolean, default=False)  # HR标识
+    user_type = db.Column(db.String(20), default='candidate')  # candidate, employee, supervisor, executive
+    # 员工和高管相关字段
+    department = db.Column(db.String(100))  # 部门
+    employee_id = db.Column(db.String(50), unique=True)  # 员工编号
+    supervisor_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # 主管ID
+    hire_date = db.Column(db.Date)  # 入职日期
+    # 个人资料相关字段
+    bio = db.Column(db.Text)  # 个人简介
+    skills = db.Column(db.Text)  # 技能标签（JSON格式存储）
+    education = db.Column(db.Text)  # 教育经历
+    experience = db.Column(db.Text)  # 工作经历
 
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -52,5 +63,5 @@ class Application(db.Model):
 
     user = db.relationship('User', backref=db.backref('applications', lazy=True))
     job = db.relationship('Job', backref=db.backref('applications', lazy=True))
-
     __table_args__ = (db.UniqueConstraint('user_id', 'job_id', name='unique_user_job_application'),)
+

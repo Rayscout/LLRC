@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>员工仪表板 - 人才管理系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card i {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .action-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-card h3 i {
+            color: #667eea;
+        }
+        
+        .action-card p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .logout-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        .recent-activity {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .recent-activity h3 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+        }
+        
+        .activity-content h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .activity-content p {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .activity-time {
+            color: #999;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="{{ url_for('common.auth.logout') }}" class="btn logout-btn">
+                <i class="fas fa-sign-out-alt"></i> 退出登录
+            </a>
+            <h1><i class="fas fa-user-tie"></i> 员工仪表板</h1>
+            <p>欢迎回来，{{ user.username }}！今天是 {{ current_date }}</p>
+        </div>
+        
+        <div class="content">
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-trophy"></i>
+                    <div class="stat-value">4.8</div>
+                    <div class="stat-label">绩效评分</div>
+                </div>
+                
+                <div class="stat-card">
+                    <i class="fas fa-book"></i>
+                    <div class="stat-value">75%</div>
+                    <div class="stat-label">学习进度</div>
+                </div>
+                
+                <div class="stat-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <div class="stat-value">12/15</div>
+                    <div class="stat-label">任务完成</div>
+                </div>
+                
+                <div class="stat-card">
+                    <i class="fas fa-star"></i>
+                    <div class="stat-value">8.5</div>
+                    <div class="stat-label">综合评分</div>
+                </div>
+            </div>
+            
+            <!-- 快速操作 -->
+            <div class="actions-grid">
+                <div class="action-card">
+                    <h3><i class="fas fa-user"></i> 个人资料</h3>
+                    <p>查看和管理您的个人信息、技能和经验记录。</p>
+                    <a href="{{ url_for('talent_management.employee_management.profile.profile_dashboard') }}" class="btn">
+                        查看资料
+                    </a>
+                </div>
+                
+                <div class="action-card">
+                    <h3><i class="fas fa-chart-line"></i> 绩效分析</h3>
+                    <p>查看详细的绩效报告和分析，了解工作表现和改进方向。</p>
+                    <a href="{{ url_for('talent_management.employee_management.performance.performance_dashboard') }}" class="btn">
+                        查看报告
+                    </a>
+                </div>
+                
+                <div class="action-card">
+                    <h3><i class="fas fa-graduation-cap"></i> 学习中心</h3>
+                    <p>制定个性化学习计划，提升技能水平，实现职业发展目标。</p>
+                    <a href="{{ url_for('talent_management.employee_management.learning_recommendation.dashboard') }}" class="btn">
+                        开始学习
+                    </a>
+                </div>
+                
+                <div class="action-card">
+                    <h3><i class="fas fa-bullseye"></i> 目标设定</h3>
+                    <p>设定SMART目标，跟踪进度，实现个人和职业发展。</p>
+                    <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="btn">
+                        设定目标
+                    </a>
+                </div>
+                
+                <div class="action-card">
+                    <h3><i class="fas fa-comments"></i> 反馈请求</h3>
+                    <p>主动请求同事和主管的反馈，持续改进工作表现。</p>
+                    <a href="{{ url_for('talent_management.employee_management.feedback.request_feedback') }}" class="btn">
+                        请求反馈
+                    </a>
+                </div>
+                
+                <div class="action-card">
+                    <h3><i class="fas fa-project-diagram"></i> 项目经验</h3>
+                    <p>记录和管理您的项目经验，展示专业能力和成就。</p>
+                    <a href="{{ url_for('talent_management.employee_management.projects.projects_dashboard') }}" class="btn">
+                        查看项目
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 最近活动 -->
+            <div class="recent-activity">
+                <h3><i class="fas fa-clock"></i> 最近活动</h3>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>完成Python进阶课程</h4>
+                        <p>成功完成了Python高级编程课程的学习</p>
+                    </div>
+                    <div class="activity-time">2小时前</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>绩效评估更新</h4>
+                        <p>主管更新了您的月度绩效评估结果</p>
+                    </div>
+                    <div class="activity-time">1天前</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>目标进度更新</h4>
+                        <p>您的"提升数据分析技能"目标进度达到75%</p>
+                    </div>
+                    <div class="activity-time">3天前</div>
+                </div>
+                
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>收到同事反馈</h4>
+                        <p>张经理对您的团队协作能力给予了积极评价</p>
+                    </div>
+                    <div class="activity-time">1周前</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

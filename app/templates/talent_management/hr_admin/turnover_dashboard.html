@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人才流失预警系统 - HR管理</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #F2F2F7;
+            --bg-secondary: rgba(255, 255, 255, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --text-tertiary: #C7C7CC;
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-orange: #FF9500;
+            --accent-red: #FF3B30;
+            --accent-purple: #AF52DE;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius: 16px;
+            --border-radius-large: 24px;
+            --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            --transition-fast: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-secondary: rgba(44, 44, 46, 0.8);
+            --bg-card: rgba(44, 44, 46, 0.9);
+            --text-primary: #FFFFFF;
+            --text-secondary: #EBEBF5;
+            --text-tertiary: #8E8E93;
+            --accent-blue: #0A84FF;
+            --accent-green: #30D158;
+            --accent-orange: #FF9F0A;
+            --accent-red: #FF453A;
+            --accent-purple: #BF5AF2;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInDown 0.8s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent-red) 0%, #FF6B6B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition-fast);
+            text-align: center;
+            animation: slideInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            margin: 0 auto 15px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInRight 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .chart-card:nth-child(1) { animation-delay: 0.3s; }
+        .chart-card:nth-child(2) { animation-delay: 0.4s; }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .analysis-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInUp 0.8s ease-out;
+            animation-delay: 0.5s;
+            animation-fill-mode: both;
+        }
+
+        .analysis-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .risk-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: var(--transition-fast);
+        }
+
+        .risk-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-red);
+        }
+
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .risk-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .risk-score {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .risk-high {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--accent-red);
+        }
+
+        .risk-medium {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .risk-low {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--accent-green);
+        }
+
+        .risk-reasons {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .recommendations-section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInUp 0.8s ease-out;
+            animation-delay: 0.6s;
+            animation-fill-mode: both;
+        }
+
+        .recommendation-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--accent-orange);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: var(--transition-fast);
+        }
+
+        .recommendation-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .recommendation-issue {
+            font-weight: 600;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+            margin-left: 15px;
+        }
+
+        .priority-high {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--accent-red);
+        }
+
+        .priority-medium {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .recommendation-text {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .action-items {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-tag {
+            background: var(--accent-blue);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition-fast);
+            animation: slideInLeft 0.6s ease-out;
+            animation-delay: 0.1s;
+            animation-fill-mode: both;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            animation: slideInUp 0.8s ease-out;
+            animation-delay: 0.7s;
+            animation-fill-mode: both;
+        }
+
+        .action-btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .action-btn:hover {
+            background: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+        }
+
+        .action-btn.secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .action-btn.secondary:hover {
+            background: var(--bg-card);
+        }
+
+        @media (max-width: 1200px) {
+            .charts-grid,
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .action-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> 返回高管首页
+        </a>
+
+        <div class="header">
+            <h1><i class="fas fa-exclamation-triangle"></i> 人才流失预警系统</h1>
+            <p>实时监控离职趋势，识别高风险岗位，生成预警报告，预防人才流失</p>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--accent-blue);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value">{{ dashboard_data.overall_stats.total_employees }}</div>
+                <div class="stat-label">总员工数</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--accent-red);">
+                    <i class="fas fa-user-times"></i>
+                </div>
+                <div class="stat-value">{{ dashboard_data.overall_stats.total_turnover }}</div>
+                <div class="stat-label">离职人数</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--accent-orange);">
+                    <i class="fas fa-percentage"></i>
+                </div>
+                <div class="stat-value">{{ "%.1f"|format(dashboard_data.overall_stats.turnover_rate * 100) }}%</div>
+                <div class="stat-label">整体离职率</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="background: var(--accent-purple);">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-value">{{ dashboard_data.overall_stats.high_risk_count }}</div>
+                <div class="stat-label">高风险项目</div>
+            </div>
+        </div>
+
+        <!-- 操作栏 -->
+        <div class="action-bar">
+            <button class="action-btn" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i> 刷新数据
+            </button>
+            <button class="action-btn secondary" onclick="generateReport()">
+                <i class="fas fa-file-alt"></i> 生成预警报告
+            </button>
+            <button class="action-btn secondary" onclick="exportData()">
+                <i class="fas fa-download"></i> 导出数据
+            </button>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-line"></i> 部门离职趋势
+                </h3>
+                <div class="chart-container">
+                    <canvas id="departmentTrendsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-pie"></i> 离职原因分析
+                </h3>
+                <div class="chart-container">
+                    <canvas id="causesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分析区域 -->
+        <div class="analysis-grid">
+            <div class="analysis-card">
+                <h3 class="analysis-title">
+                    <i class="fas fa-exclamation-triangle"></i> 高风险岗位
+                </h3>
+                <div class="risk-list">
+                    {% for position, analysis in dashboard_data.position_analysis.items() %}
+                        {% if analysis.turnover_risk > 0.6 %}
+                            <div class="risk-item">
+                                <div class="risk-header">
+                                    <span class="risk-name">{{ position }}</span>
+                                    <span class="risk-score risk-high">
+                                        {{ "%.1f"|format(analysis.turnover_risk * 100) }}%
+                                    </span>
+                                </div>
+                                <div class="risk-reasons">
+                                    {% for reason in analysis.main_reasons %}
+                                        • {{ reason }}<br>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="analysis-card">
+                <h3 class="analysis-title">
+                    <i class="fas fa-user-shield"></i> 高风险员工
+                </h3>
+                <div class="risk-list">
+                    {% for employee in dashboard_data.high_risk_employees[:5] %}
+                        <div class="risk-item">
+                            <div class="risk-header">
+                                <span class="risk-name">{{ employee.name }} ({{ employee.department }})</span>
+                                <span class="risk-score risk-high">
+                                    {{ "%.1f"|format(employee.risk_score * 100) }}%
+                                </span>
+                            </div>
+                            <div class="risk-reasons">
+                                岗位: {{ employee.position }} | 任职: {{ "%.1f"|format(employee.tenure) }}年
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 预防建议 -->
+        <div class="recommendations-section">
+            <h3 class="analysis-title">
+                <i class="fas fa-lightbulb"></i> 预防建议
+            </h3>
+            {% for recommendation in prevention_recommendations %}
+                <div class="recommendation-item">
+                    <div class="recommendation-header">
+                        <div class="recommendation-issue">{{ recommendation.issue }}</div>
+                        <span class="priority-badge priority-{{ recommendation.priority }}">
+                            {{ '高优先级' if recommendation.priority == 'high' else '中优先级' }}
+                        </span>
+                    </div>
+                    <div class="recommendation-text">{{ recommendation.recommendation }}</div>
+                    <div class="action-items">
+                        {% for action in recommendation.action_items %}
+                            <span class="action-tag">{{ action }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后的动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化图表
+            initializeCharts();
+            
+            // 加载数据
+            loadChartData();
+        });
+
+        // 初始化图表
+        function initializeCharts() {
+            // 部门离职趋势图表
+            const trendsCtx = document.getElementById('departmentTrendsChart').getContext('2d');
+            window.departmentTrendsChart = new Chart(trendsCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '部门离职率趋势'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '离职率 (%)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 离职原因分析图表
+            const causesCtx = document.getElementById('causesChart').getContext('2d');
+            window.causesChart = new Chart(causesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['薪资不足', '技能发展', '工作压力', '职业发展', '其他原因'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: [
+                            '#FF6B6B',
+                            '#4ECDC4',
+                            '#45B7D1',
+                            '#96CEB4',
+                            '#FFEAA7'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: '离职原因分布'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 加载图表数据
+        function loadChartData() {
+            // 加载部门趋势数据
+            fetch('/talent/hr_admin/turnover_alert/api/department_trends')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateTrendsChart(data.months, data.trends);
+                    }
+                })
+                .catch(error => console.error('加载趋势数据失败:', error));
+
+            // 加载风险分析数据
+            fetch('/talent/hr_admin/turnover_alert/api/risk_analysis')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateCausesChart();
+                    }
+                })
+                .catch(error => console.error('加载风险数据失败:', error));
+        }
+
+        // 更新趋势图表
+        function updateTrendsChart(months, trends) {
+            const datasets = [];
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+            
+            Object.keys(trends).forEach((dept, index) => {
+                datasets.push({
+                    label: dept,
+                    data: trends[dept],
+                    borderColor: colors[index % colors.length],
+                    backgroundColor: colors[index % colors.length] + '20',
+                    tension: 0.4
+                });
+            });
+
+            window.departmentTrendsChart.data.labels = months;
+            window.departmentTrendsChart.data.datasets = datasets;
+            window.departmentTrendsChart.update();
+        }
+
+        // 更新原因分析图表
+        function updateCausesChart() {
+            const causesData = {{ causes_analysis | tojson }};
+            const data = [
+                causesData.salary.percentage,
+                causesData.skill_development.percentage,
+                causesData.workload.percentage,
+                causesData.career_growth.percentage,
+                causesData.culture.percentage
+            ];
+
+            window.causesChart.data.datasets[0].data = data;
+            window.causesChart.update();
+        }
+
+        // 刷新数据
+        function refreshData() {
+            const btn = event.target.closest('button');
+            if (btn) {
+                btn.style.transform = 'rotate(180deg)';
+                setTimeout(() => {
+                    btn.style.transform = 'rotate(0deg)';
+                }, 300);
+            }
+            
+            loadChartData();
+        }
+
+        // 生成预警报告
+        function generateReport() {
+            const btn = event.target.closest('button');
+            if (btn) {
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 150);
+            }
+            
+            fetch('/talent/hr_admin/turnover_alert/api/generate_report')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('预警报告已生成！报告ID: ' + data.report.report_id);
+                        // 这里可以添加报告下载或预览功能
+                    }
+                })
+                .catch(error => console.error('生成报告失败:', error));
+        }
+
+        // 导出数据
+        function exportData() {
+            const btn = event.target.closest('button');
+            if (btn) {
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 150);
+            }
+            
+            // 这里可以实现数据导出功能
+            alert('数据导出功能开发中...');
+        }
+    </script>
+</body>
+</html>

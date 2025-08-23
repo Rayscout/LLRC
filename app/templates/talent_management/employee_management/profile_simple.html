@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人资料 - 员工仪表板</title>
+</head>
+<body>
+    <h1>个人资料</h1>
+    <p>用户ID: {{ user.id }}</p>
+    <p>姓名: {{ user.first_name }} {{ user.last_name }}</p>
+    <p>邮箱: {{ user.email }}</p>
+    <p>类型: {{ user.user_type }}</p>
+    <p>部门: {{ user.department or '未设置' }}</p>
+    <p>职位: {{ user.position or '未设置' }}</p>
+    <p>员工编号: {{ user.employee_id or '未设置' }}</p>
+    <p>入职日期: {{ user.hire_date or '未设置' }}</p>
+    <p>工作年限: {{ work_years }} 年</p>
+    <p>技能数量: {{ user_skills|length }}</p>
+</body>
+</html>

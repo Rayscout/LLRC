@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高管首页 - 人才发展大盘 - 人才管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='executive_ios_style.css') }}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="executive-nav" id="executiveNav">
+        <div class="executive-nav-container">
+            <a href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}" class="executive-nav-brand">
+                <div class="executive-nav-brand-icon">
+                    <i class="uil uil-chart-line"></i>
+                </div>
+                <span>高管人才发展</span>
+            </a>
+            
+            <ul class="executive-nav-menu">
+                <li class="executive-nav-item">
+                    <a href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}" class="executive-nav-link">
+                        <i class="uil uil-exclamation-triangle executive-nav-icon"></i>
+                        <span>人才流失预警</span>
+                    </a>
+                </li>
+                <li class="executive-nav-item">
+                    <a href="{{ url_for('talent_management.hr_admin.salary_analysis.salary_dashboard') }}" class="executive-nav-link">
+                        <i class="uil uil-money-bill executive-nav-icon"></i>
+                        <span>薪酬分析</span>
+                    </a>
+                </li>
+                <li class="executive-nav-item">
+                    <a href="{{ url_for('talent_management.hr_admin.org_health.org_health_dashboard') }}" class="executive-nav-link">
+                        <i class="uil uil-heart executive-nav-icon"></i>
+                        <span>组织健康度</span>
+                    </a>
+                </li>
+                <li class="executive-nav-item">
+                    <a href="{{ url_for('talent_management.hr_admin.career_tracking.career_tracking_dashboard') }}" class="executive-nav-link">
+                        <i class="uil uil-graph-bar executive-nav-icon"></i>
+                        <span>职业发展追踪</span>
+                    </a>
+                </li>
+                <li class="executive-nav-item">
+                    <a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_dashboard') }}" class="executive-nav-link">
+                        <i class="uil uil-comment-dots executive-nav-icon"></i>
+                        <span>团队成员反馈</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="executive-nav-actions">
+                <button class="executive-nav-button" data-action="notifications">
+                    <i class="uil uil-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                
+                <button class="theme-toggle" id="themeToggle" title="切换深色模式">
+                    <i class="uil uil-moon"></i>
+                </button>
+                
+                <button class="executive-nav-button" data-action="profile">
+                    <i class="uil uil-user"></i>
+                    <span>{{ user.first_name if user else '高管' }}</span>
+                </button>
+                
+                <a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="executive-nav-button">
+                    <i class="uil uil-signout"></i>
+                    <span>退出</span>
+                </a>
+            </div>
+            
+            <!-- 移动端菜单切换按钮 -->
+            <button class="executive-nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- 视差背景 -->
+    <div class="executive-parallax-bg" id="parallaxBg"></div>
+    
+    <!-- 滚动容器 -->
+    <div class="executive-scroll-container">
+        <!-- 欢迎Section -->
+        <section class="executive-section">
+            <div class="executive-container">
+                <h1 class="executive-title executive-fade-in">人才发展大盘</h1>
+                <p class="executive-subtitle executive-fade-in">战略决策支持系统 - {{ user.first_name }} {{ user.last_name }} ({{ user.position }})</p>
+                
+                <!-- 关键指标 -->
+                <div class="executive-grid executive-grid-4 executive-fade-in-up">
+                    <div class="executive-card executive-metric">
+                        <div class="executive-metric-value">{{ subordinates|length if subordinates else 0 }}</div>
+                        <div class="executive-metric-label">团队成员</div>
+                    </div>
+                    
+                    <div class="executive-card executive-metric">
+                        <div class="executive-metric-value">85%</div>
+                        <div class="executive-metric-label">人才保留率</div>
+                    </div>
+                    
+                    <div class="executive-card executive-metric">
+                        <div class="executive-metric-value">92%</div>
+                        <div class="executive-metric-label">满意度指数</div>
+                    </div>
+                    
+                    <div class="executive-card executive-metric">
+                        <div class="executive-metric-value">78%</div>
+                        <div class="executive-metric-label">技能匹配度</div>
+                    </div>
+        </div>
+        
+                <!-- 快速操作 -->
+                <div class="executive-fade-in-up" style="text-align: center; margin-top: var(--ios-spacing-xxl);">
+                    <div class="executive-grid executive-grid-3" style="max-width: 800px; margin: 0 auto;">
+                        <a href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}" class="executive-button large">
+                            <i class="uil uil-exclamation-triangle"></i>
+                            人才流失预警
+                        </a>
+                        <a href="{{ url_for('talent_management.hr_admin.salary_analysis.salary_dashboard') }}" class="executive-button large secondary">
+                            <i class="uil uil-money-bill"></i>
+                            薪酬分析
+                        </a>
+                        <a href="{{ url_for('talent_management.hr_admin.org_health.org_health_dashboard') }}" class="executive-button large secondary">
+                            <i class="uil uil-heart"></i>
+                            组织健康度
+                        </a>
+            </div>
+            </div>
+            </div>
+        </section>
+
+        <!-- 人才发展趋势Section -->
+        <section class="executive-section">
+            <div class="executive-container">
+                <h2 class="executive-title executive-fade-in">人才发展趋势分析</h2>
+                <p class="executive-subtitle executive-fade-in">实时监控人才变化趋势，为战略决策提供数据支持</p>
+                
+                <div class="executive-grid executive-grid-2">
+                    <div class="executive-card executive-slide-in-left">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
+                            <i class="uil uil-chart-line" style="color: var(--ios-blue); margin-right: var(--ios-spacing-sm);"></i>
+                            年度人才变化趋势
+                        </h3>
+                        <div style="height: 400px;">
+                            <canvas id="talentTrendChart"></canvas>
+            </div>
+        </div>
+        
+                    <div class="executive-card executive-slide-in-right">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
+                            <i class="uil uil-money-bill" style="color: var(--ios-green); margin-right: var(--ios-spacing-sm);"></i>
+                            薪酬分析概览
+                        </h3>
+                        <div class="executive-grid executive-grid-2" style="gap: var(--ios-spacing-md);">
+                            <div style="text-align: center; padding: var(--ios-spacing-md);">
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--ios-blue); margin-bottom: var(--ios-spacing-sm);">¥15,800</div>
+                                <div style="color: var(--ios-text-secondary);">部门平均薪酬</div>
+                            </div>
+                            <div style="text-align: center; padding: var(--ios-spacing-md);">
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--ios-green); margin-bottom: var(--ios-spacing-sm);">+12%</div>
+                                <div style="color: var(--ios-text-secondary);">市场竞争力</div>
+                            </div>
+                            <div style="text-align: center; padding: var(--ios-spacing-md);">
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--ios-orange); margin-bottom: var(--ios-spacing-sm);">78%</div>
+                                <div style="color: var(--ios-text-secondary);">薪酬满意度</div>
+                            </div>
+                            <div style="text-align: center; padding: var(--ios-spacing-md);">
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--ios-red); margin-bottom: var(--ios-spacing-sm);">需关注</div>
+                                <div style="color: var(--ios-text-secondary);">调薪建议</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 薪酬对比分析Section -->
+        <section class="executive-section">
+            <div class="executive-container">
+                <h2 class="executive-title executive-fade-in">薪酬对比分析</h2>
+                <p class="executive-subtitle executive-fade-in">公司与行业薪酬对比，识别竞争力差距</p>
+                
+                <div class="executive-grid executive-grid-2">
+                    <div class="executive-card executive-slide-in-left">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
+                            <i class="uil uil-chart-bar" style="color: var(--ios-purple); margin-right: var(--ios-spacing-sm);"></i>
+                            公司与行业薪酬对比
+                        </h3>
+                        <div style="height: 300px;">
+                            <canvas id="salaryComparisonChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="executive-card executive-slide-in-right">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
+                            <i class="uil uil-trending-up" style="color: var(--ios-pink); margin-right: var(--ios-spacing-sm);"></i>
+                            未来6个月供需趋势
+                        </h3>
+                        <div style="height: 300px;">
+                            <canvas id="supplyDemandChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 离职风险分析Section -->
+        <section class="executive-section">
+            <div class="executive-container">
+                <h2 class="executive-title executive-fade-in">离职风险分析</h2>
+                <p class="executive-subtitle executive-fade-in">识别高风险岗位，制定预防措施</p>
+                
+                <div class="executive-grid executive-grid-3">
+                    <div class="executive-card executive-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-red);">
+                            <i class="uil uil-exclamation-triangle"></i>
+                            高风险岗位 (3个)
+                        </h3>
+                        <div style="margin-bottom: var(--ios-spacing-md);">
+                            <strong>高级工程师</strong>: 离职风险 85%<br>
+                            主要原因：薪资竞争力不足、职业发展受限
+                        </div>
+                        <div style="margin-bottom: var(--ios-spacing-md);">
+                            <strong>产品经理</strong>: 离职风险 72%<br>
+                            主要原因：工作压力大、缺乏资源支持
+                        </div>
+                        <div style="margin-bottom: var(--ios-spacing-lg);">
+                            <strong>销售总监</strong>: 离职风险 68%<br>
+                            主要原因：业绩压力、激励机制不完善
+                        </div>
+                        <a href="#" class="executive-button secondary">
+                            <i class="uil uil-eye"></i>
+                            查看详情
+                        </a>
+                    </div>
+                    
+                    <div class="executive-card executive-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-orange);">
+                            <i class="uil uil-exclamation-circle"></i>
+                            中等风险岗位 (5个)
+                        </h3>
+                        <div style="margin-bottom: var(--ios-spacing-md);">
+                            <strong>UI设计师</strong>: 离职风险 45%<br>
+                            主要原因：技能发展瓶颈
+                        </div>
+                        <div style="margin-bottom: var(--ios-spacing-md);">
+                            <strong>市场专员</strong>: 离职风险 38%<br>
+                            主要原因：薪酬水平偏低
+                        </div>
+                        <div style="margin-bottom: var(--ios-spacing-lg);">
+                            <strong>人事专员</strong>: 离职风险 35%<br>
+                            主要原因：工作内容单一
+                        </div>
+                        <a href="#" class="executive-button secondary">
+                            <i class="uil uil-graduation-cap"></i>
+                            制定培训计划
+                        </a>
+        </div>
+        
+                    <div class="executive-card executive-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-green);">
+                            <i class="uil uil-check-circle"></i>
+                            低风险岗位 (12个)
+                        </h3>
+                        <div style="margin-bottom: var(--ios-spacing-lg);">
+                            大部分岗位处于稳定状态，建议继续保持良好的工作环境和激励机制。
+                        </div>
+                        <a href="#" class="executive-button secondary">
+                            <i class="uil uil-chart-line"></i>
+                            查看详情
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 战略建议Section -->
+        <section class="executive-section">
+            <div class="executive-container">
+                <h2 class="executive-title executive-fade-in">战略决策建议</h2>
+                <p class="executive-subtitle executive-fade-in">基于数据分析的战略建议，助力人才发展</p>
+                
+                <div class="executive-grid executive-grid-3">
+                    <div class="executive-card executive-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-md); color: var(--ios-green);">
+                            <i class="uil uil-heart"></i>
+                            人才保留策略
+                        </h3>
+                        <p style="color: var(--ios-text-secondary); line-height: 1.6;">
+                            建议增加关键岗位的薪酬竞争力，提供更多职业发展机会，建立完善的激励机制。
+                        </p>
+                    </div>
+                    
+                    <div class="executive-card executive-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-md); color: var(--ios-blue);">
+                            <i class="uil uil-graduation-cap"></i>
+                            技能发展计划
+                        </h3>
+                        <p style="color: var(--ios-text-secondary); line-height: 1.6;">
+                            针对技能缺口，建议制定系统性的培训计划，引入外部专家，建立内部知识分享机制。
+                        </p>
+                    </div>
+                    
+                    <div class="executive-card executive-fade-in-up">
+                        <h3 style="margin-bottom: var(--ios-spacing-md); color: var(--ios-orange);">
+                            <i class="uil uil-setting"></i>
+                            组织优化建议
+                        </h3>
+                        <p style="color: var(--ios-text-secondary); line-height: 1.6;">
+                            建议优化组织架构，明确职责分工，提升管理效率，减少人才流失风险。
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div style="text-align: center; margin-top: var(--ios-spacing-xxl);">
+                    <button class="executive-button large" onclick="generatePDFReport()">
+                        <i class="uil uil-file-graph"></i>
+                        生成PDF报告
+                    </button>
+                    <button class="executive-button large secondary" onclick="refreshData()" style="margin-left: var(--ios-spacing-md);">
+                        <i class="uil uil-refresh"></i>
+                        刷新数据
+                    </button>
+            </div>
+        </div>
+        </section>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 主题切换功能
+            const themeToggle = document.getElementById('themeToggle');
+            const body = document.body;
+            
+            // 检查本地存储的主题设置
+            const currentTheme = localStorage.getItem('executive-theme');
+            if (currentTheme === 'dark') {
+                body.classList.add('dark');
+                themeToggle.classList.add('active');
+            }
+            
+            themeToggle.addEventListener('click', function() {
+                body.classList.toggle('dark');
+                themeToggle.classList.toggle('active');
+                
+                // 保存主题设置
+                const isDark = body.classList.contains('dark');
+                localStorage.setItem('executive-theme', isDark ? 'dark' : 'light');
+            });
+            
+            // 导航栏滚动效果
+            const nav = document.getElementById('executiveNav');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    nav.style.background = body.classList.contains('dark') 
+                        ? 'rgba(28, 28, 30, 0.95)' 
+                        : 'rgba(255, 255, 255, 0.95)';
+                } else {
+                    nav.style.background = body.classList.contains('dark') 
+                        ? 'rgba(28, 28, 30, 0.8)' 
+                        : 'rgba(255, 255, 255, 0.8)';
+                }
+            });
+            
+            // 移动端导航切换
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.querySelector('.executive-nav-menu');
+            
+            navToggle.addEventListener('click', function() {
+                navMenu.classList.toggle('active');
+                navToggle.classList.toggle('active');
+            });
+            
+            // 人才发展趋势图表
+            const ctx = document.getElementById('talentTrendChart').getContext('2d');
+            const talentTrendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                    datasets: [{
+                        label: '人才数量',
+                        data: [45, 47, 48, 46, 49, 51, 50, 52, 54, 53, 55, 57],
+                        borderColor: '#007AFF',
+                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: '离职人数',
+                        data: [2, 1, 3, 2, 1, 2, 3, 1, 2, 1, 2, 1],
+                        borderColor: '#FF3B30',
+                        backgroundColor: 'rgba(255, 59, 48, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: '新入职人数',
+                        data: [4, 2, 3, 2, 4, 4, 3, 3, 4, 1, 4, 3],
+                        borderColor: '#34C759',
+                        backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-text-primary')
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-border-secondary')
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-text-secondary')
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-border-secondary')
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-text-secondary')
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 薪酬对比图表
+            const salaryCtx = document.getElementById('salaryComparisonChart').getContext('2d');
+            const salaryComparisonChart = new Chart(salaryCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['技术', '管理', '销售', '行政'],
+                    datasets: [{
+                        label: '公司薪酬',
+                        data: [18000, 25000, 12000, 8000],
+                        backgroundColor: '#007AFF',
+                    }, {
+                        label: '行业平均',
+                        data: [16700, 25000, 12600, 7800],
+                        backgroundColor: '#AF52DE',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-text-primary')
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-border-secondary')
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-text-secondary')
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-border-secondary')
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-text-secondary')
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 供需趋势图表
+            const supplyCtx = document.getElementById('supplyDemandChart').getContext('2d');
+            const supplyDemandChart = new Chart(supplyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '人才需求',
+                        data: [100, 110, 125, 135, 150, 175],
+                        borderColor: '#34C759',
+                        backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: '人才供给',
+                        data: [90, 95, 100, 105, 110, 115],
+                        borderColor: '#FF3B30',
+                        backgroundColor: 'rgba(255, 59, 48, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-text-primary')
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-border-secondary')
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-text-secondary')
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-border-secondary')
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--ios-text-secondary')
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 页面加载动画
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationDelay = '0s';
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.executive-fade-in, .executive-fade-in-up, .executive-slide-in-left, .executive-slide-in-right').forEach(el => {
+                observer.observe(el);
+            });
+
+            console.log('高管首页已加载');
+        });
+
+        // PDF报告生成功能
+        function generatePDFReport() {
+            alert('正在生成PDF报告...');
+            
+            // 创建表单并提交
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ url_for("talent_management.hr_admin.pdf_report.generate_executive_report") }}';
+            form.target = '_blank';
+            
+            // 添加CSRF令牌（如果需要）
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrf_token';
+                csrfInput.value = csrfToken.getAttribute('content');
+                form.appendChild(csrfInput);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+
+        // 刷新数据功能
+        function refreshData() {
+            alert('正在刷新数据...');
+            location.reload();
+        }
+    </script>
+</body>
+</html>

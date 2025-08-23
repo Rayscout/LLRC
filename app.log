@@ -1,0 +1,148 @@
+2025-08-23 11:31:50,846 - __main__ - INFO - Python¬∑æ∂“—…Ë÷√: C:\Users\24621\Desktop\code4\LLRC
+2025-08-23 11:31:50,849 - __main__ - INFO - ’˝‘⁄µº»Î”¶”√...
+2025-08-23 11:31:51,791 - pymongo.connection - DEBUG - {"clientId": {"$oid": "68a9362756554513c5b6caed"}, "message": "Connection pool created", "serverHost": "localhost", "serverPort": 27017}
+2025-08-23 11:31:51,794 - app - INFO - MongoDB connected successfully.
+2025-08-23 11:31:51,794 - __main__ - INFO - ’˝‘⁄¥¥Ω®”¶”√...
+2025-08-23 11:31:51,817 - app - INFO - SQLAlchemy initialized successfully
+2025-08-23 11:31:51,820 - app - INFO - Flask-Migrate initialized successfully
+2025-08-23 11:31:51,860 - app - INFO - Flask-Session initialized successfully
+2025-08-23 11:31:52,523 - app - INFO - Upload folders created successfully
+2025-08-23 11:31:52,541 - app - INFO - Common blueprint imported successfully
+2025-08-23 11:31:52,553 - app - INFO - SmartRecruit blueprint imported successfully
+2025-08-23 11:31:52,564 - app - INFO - Talent management blueprint imported successfully
+2025-08-23 11:31:52,568 - app - INFO - Common blueprint registered successfully
+2025-08-23 11:31:52,581 - app - INFO - SmartRecruit blueprint registered successfully
+2025-08-23 11:31:52,583 - app - INFO - Talent management blueprint registered successfully
+2025-08-23 11:31:52,584 - app - INFO - Application created successfully
+2025-08-23 11:31:52,587 - __main__ - INFO - ’˝‘⁄≤‚ ‘ ˝æ›ø‚¡¨Ω”...
+2025-08-23 11:31:52,599 - __main__ - ERROR - Traceback (most recent call last):
+  File "C:\Users\24621\Desktop\code4\LLRC\run_app.py", line 47, in main
+    db.session.execute('SELECT 1')
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "D:\Python\Lib\site-packages\sqlalchemy\orm\scoping.py", line 779, in execute
+    return self._proxied.execute(
+           ~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Python\Lib\site-packages\sqlalchemy\orm\session.py", line 2365, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "D:\Python\Lib\site-packages\sqlalchemy\orm\session.py", line 2149, in _execute_internal
+    statement = coercions.expect(roles.StatementRole, statement)
+  File "D:\Python\Lib\site-packages\sqlalchemy\sql\coercions.py", line 395, in expect
+    resolved = impl._literal_coercion(
+        element, argname=argname, **kw
+    )
+  File "D:\Python\Lib\site-packages\sqlalchemy\sql\coercions.py", line 621, in _literal_coercion
+    return self._text_coercion(element, argname, **kw)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Python\Lib\site-packages\sqlalchemy\sql\coercions.py", line 614, in _text_coercion
+    return _no_text_coercion(element, argname)
+  File "D:\Python\Lib\site-packages\sqlalchemy\sql\coercions.py", line 584, in _no_text_coercion
+    raise exc_cls(
+    ...<7 lines>...
+    ) from err
+sqlalchemy.exc.ArgumentError: Textual SQL expression 'SELECT 1' should be explicitly declared as text('SELECT 1')
+
+2025-08-23 11:31:52,600 - __main__ - INFO - ’˝‘⁄∆Ù∂ØFlask”¶”√...
+2025-08-23 11:31:52,601 - __main__ - INFO - ”¶”√Ω´‘⁄ http://localhost:5000 …œ‘À––
+2025-08-23 11:31:52,601 - __main__ - INFO - ∞¥ Ctrl+C Õ£÷π”¶”√
+2025-08-23 11:31:52,660 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.26.58.204:5000
+2025-08-23 11:31:52,660 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-23 11:33:36,745 - __main__ - INFO - ”¶”√“—Õ£÷π
+2025-08-23 13:31:02,832 - __main__ - INFO - Python¬∑æ∂“—…Ë÷√: C:\Users\24621\Desktop\code4\LLRC
+2025-08-23 13:31:02,832 - __main__ - INFO - ’˝‘⁄µº»Î”¶”√...
+2025-08-23 13:31:03,795 - pymongo.connection - DEBUG - {"clientId": {"$oid": "68a952173eeb125baf529b5f"}, "message": "Connection pool created", "serverHost": "localhost", "serverPort": 27017}
+2025-08-23 13:31:03,799 - app - INFO - MongoDB connected successfully.
+2025-08-23 13:31:03,799 - __main__ - INFO - ’˝‘⁄¥¥Ω®”¶”√...
+2025-08-23 13:31:03,819 - app - INFO - SQLAlchemy initialized successfully
+2025-08-23 13:31:03,822 - app - INFO - Flask-Migrate initialized successfully
+2025-08-23 13:31:03,864 - app - INFO - Flask-Session initialized successfully
+2025-08-23 13:31:04,644 - app - INFO - Upload folders created successfully
+2025-08-23 13:31:04,667 - app - INFO - Common blueprint imported successfully
+2025-08-23 13:31:04,713 - app - INFO - SmartRecruit blueprint imported successfully
+2025-08-23 13:31:04,747 - app - INFO - Talent management blueprint imported successfully
+2025-08-23 13:31:04,751 - app - INFO - Common blueprint registered successfully
+2025-08-23 13:31:04,763 - app - INFO - SmartRecruit blueprint registered successfully
+2025-08-23 13:31:04,765 - app - INFO - Talent management blueprint registered successfully
+2025-08-23 13:31:04,766 - app - INFO - Application created successfully
+2025-08-23 13:31:04,768 - __main__ - INFO - ’˝‘⁄≤‚ ‘ ˝æ›ø‚¡¨Ω”...
+2025-08-23 13:31:04,770 - __main__ - INFO -  ˝æ›ø‚¡¨Ω”’˝≥£
+2025-08-23 13:31:04,771 - __main__ - INFO - ’˝‘⁄∆Ù∂ØFlask”¶”√...
+2025-08-23 13:31:04,771 - __main__ - INFO - ”¶”√Ω´‘⁄ http://localhost:5000 …œ‘À––
+2025-08-23 13:31:04,771 - __main__ - INFO - ∞¥ Ctrl+C Õ£÷π”¶”√
+2025-08-23 13:31:04,815 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.26.58.204:5000
+2025-08-23 13:31:04,815 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-23 13:31:58,356 - __main__ - INFO - ”¶”√“—Õ£÷π
+2025-08-23 13:55:42,183 - __main__ - INFO - Python¬∑æ∂“—…Ë÷√: C:\Users\24621\Desktop\code4\LLRC
+2025-08-23 13:55:42,184 - __main__ - INFO - ’˝‘⁄µº»Î”¶”√...
+2025-08-23 13:55:43,669 - pymongo.connection - DEBUG - {"clientId": {"$oid": "68a957dffbb019d67b597898"}, "message": "Connection pool created", "serverHost": "localhost", "serverPort": 27017}
+2025-08-23 13:55:43,673 - app - INFO - MongoDB connected successfully.
+2025-08-23 13:55:43,673 - __main__ - INFO - ’˝‘⁄¥¥Ω®”¶”√...
+2025-08-23 13:55:43,705 - app - INFO - SQLAlchemy initialized successfully
+2025-08-23 13:55:43,708 - app - INFO - Flask-Migrate initialized successfully
+2025-08-23 13:55:43,761 - app - INFO - Flask-Session initialized successfully
+2025-08-23 13:55:44,891 - app - INFO - Upload folders created successfully
+2025-08-23 13:55:44,918 - app - INFO - Common blueprint imported successfully
+2025-08-23 13:55:44,944 - app - INFO - SmartRecruit blueprint imported successfully
+2025-08-23 13:55:44,973 - app - INFO - Talent management blueprint imported successfully
+2025-08-23 13:55:44,983 - app - INFO - Common blueprint registered successfully
+2025-08-23 13:55:45,016 - app - INFO - SmartRecruit blueprint registered successfully
+2025-08-23 13:55:45,027 - app - INFO - Talent management blueprint registered successfully
+2025-08-23 13:55:45,031 - app - INFO - Application created successfully
+2025-08-23 13:55:45,038 - __main__ - INFO - ’˝‘⁄≤‚ ‘ ˝æ›ø‚¡¨Ω”...
+2025-08-23 13:55:45,042 - __main__ - INFO -  ˝æ›ø‚¡¨Ω”’˝≥£
+2025-08-23 13:55:45,043 - __main__ - INFO - ’˝‘⁄∆Ù∂ØFlask”¶”√...
+2025-08-23 13:55:45,044 - __main__ - INFO - ”¶”√Ω´‘⁄ http://localhost:5000 …œ‘À––
+2025-08-23 13:55:45,044 - __main__ - INFO - ∞¥ Ctrl+C Õ£÷π”¶”√
+2025-08-23 13:55:45,098 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.26.58.204:5000
+2025-08-23 13:55:45,099 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-23 13:56:24,934 - __main__ - INFO - ”¶”√“—Õ£÷π
+2025-08-23 14:35:01,037 - __main__ - INFO - Python¬∑æ∂“—…Ë÷√: C:\Users\24621\Desktop\code4\LLRC
+2025-08-23 14:35:01,038 - __main__ - INFO - ’˝‘⁄µº»Î”¶”√...
+2025-08-23 14:35:02,646 - pymongo.connection - DEBUG - {"clientId": {"$oid": "68a961161df9072287176df1"}, "message": "Connection pool created", "serverHost": "localhost", "serverPort": 27017}
+2025-08-23 14:35:02,651 - app - INFO - MongoDB connected successfully.
+2025-08-23 14:35:02,652 - __main__ - INFO - ’˝‘⁄¥¥Ω®”¶”√...
+2025-08-23 14:35:02,687 - app - INFO - SQLAlchemy initialized successfully
+2025-08-23 14:35:02,691 - app - INFO - Flask-Migrate initialized successfully
+2025-08-23 14:35:02,753 - app - INFO - Flask-Session initialized successfully
+2025-08-23 14:35:03,891 - app - INFO - Upload folders created successfully
+2025-08-23 14:35:03,907 - app - INFO - Common blueprint imported successfully
+2025-08-23 14:35:03,921 - app - INFO - SmartRecruit blueprint imported successfully
+2025-08-23 14:35:03,934 - app - INFO - Talent management blueprint imported successfully
+2025-08-23 14:35:03,939 - app - INFO - Common blueprint registered successfully
+2025-08-23 14:35:03,960 - app - INFO - SmartRecruit blueprint registered successfully
+2025-08-23 14:35:03,969 - app - INFO - Talent management blueprint registered successfully
+2025-08-23 14:35:03,970 - app - INFO - Application created successfully
+2025-08-23 14:35:03,973 - __main__ - INFO - ’˝‘⁄≤‚ ‘ ˝æ›ø‚¡¨Ω”...
+2025-08-23 14:35:03,976 - __main__ - INFO -  ˝æ›ø‚¡¨Ω”’˝≥£
+2025-08-23 14:35:03,976 - __main__ - INFO - ’˝‘⁄∆Ù∂ØFlask”¶”√...
+2025-08-23 14:35:03,976 - __main__ - INFO - ”¶”√Ω´‘⁄ http://localhost:5000 …œ‘À––
+2025-08-23 14:35:03,977 - __main__ - INFO - ∞¥ Ctrl+C Õ£÷π”¶”√
+2025-08-23 14:35:04,022 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://172.26.58.204:5000
+2025-08-23 14:35:04,022 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-08-23 14:40:00,457 - __main__ - INFO - ”¶”√“—Õ£÷π

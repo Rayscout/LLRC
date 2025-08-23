@@ -41,28 +41,39 @@ def settings():
             if file and file.filename:
                 allowed_extensions = get_allowed_cv_extensions()
                 if allowed_file(file.filename, allowed_extensions):
-                    filename = secure_filename(file.filename)
-                    filepath = os.path.join(current_app.config['UPLOAD_FOLDER_CV'], filename)
-                    file.save(filepath)
+                    try:
+                        filename = secure_filename(file.filename)
+                        # 添加时间戳避免文件名冲突
+                        import time
+                        timestamp = int(time.time())
+                        name, ext = os.path.splitext(filename)
+                        filename = f"{name}_{timestamp}{ext}"
+                        
+                        filepath = os.path.join(current_app.config['UPLOAD_FOLDER_CV'], filename)
+                        file.save(filepath)
 
-                    # 视频与文档分别处理：视频不入库二进制，避免数据库膨胀
-                    ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
-                    video_exts = {'mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'}
+                        # 视频与文档分别处理：视频不入库二进制，避免数据库膨胀
+                        file_ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+                        video_exts = {'mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'}
 
-                    cv_data = None
-                    if ext not in video_exts:
-                        try:
-                            file.seek(0)
-                            cv_data = file.read()
-                        except Exception:
-                            cv_data = None
+                        cv_data = None
+                        if file_ext not in video_exts:
+                            try:
+                                file.seek(0)
+                                cv_data = file.read()
+                            except Exception as e:
+                                flash(f'简历文本提取失败：{str(e)}', 'warning')
+                                cv_data = None
 
-                    g.user.cv_file = filename
-                    g.user.cv_data = cv_data
-                    db.session.commit()
+                        g.user.cv_file = filename
+                        g.user.cv_data = cv_data
+                        db.session.commit()
 
-                    flash('简历上传成功！' if ext not in video_exts else '视频简历上传成功！', 'success')
-                    return redirect(url_for('smartrecruit.candidate.profile.settings'))
+                        flash('简历上传成功！' if file_ext not in video_exts else '视频简历上传成功！', 'success')
+                        return redirect(url_for('smartrecruit.candidate.profile.settings'))
+                    except Exception as e:
+                        flash(f'简历上传失败：{str(e)}', 'danger')
+                        return redirect(url_for('smartrecruit.candidate.profile.settings'))
                 else:
                     flash(f'不支持的文件格式。支持格式：{", ".join(allowed_extensions)}', 'danger')
                     return redirect(url_for('smartrecruit.candidate.profile.settings'))
@@ -78,13 +89,26 @@ def settings():
         g.user.birthday = request.form.get('birthday', g.user.birthday)
         g.user.position = request.form.get('position', g.user.position or '')
 
-        # 可选：同时处理头像上传
+        # 处理头像上传
         photo_file = request.files.get('profile_photo')
-        if photo_file and photo_file.filename and allowed_file(photo_file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
-            photo_name = secure_filename(photo_file.filename)
-            photo_path = os.path.join(current_app.config['UPLOAD_FOLDER_PHOTOS'], photo_name)
-            photo_file.save(photo_path)
-            g.user.profile_photo = photo_name
+        if photo_file and photo_file.filename:
+            if allowed_file(photo_file.filename, {'png', 'jpg', 'jpeg', 'gif'}):
+                try:
+                    photo_name = secure_filename(photo_file.filename)
+                    # 添加时间戳避免文件名冲突
+                    import time
+                    timestamp = int(time.time())
+                    name, ext = os.path.splitext(photo_name)
+                    photo_name = f"{name}_{timestamp}{ext}"
+                    
+                    photo_path = os.path.join(current_app.config['UPLOAD_FOLDER_PHOTOS'], photo_name)
+                    photo_file.save(photo_path)
+                    g.user.profile_photo = photo_name
+                    flash('头像上传成功！', 'success')
+                except Exception as e:
+                    flash(f'头像上传失败：{str(e)}', 'danger')
+            else:
+                flash('不支持的头像格式。支持格式：PNG, JPG, JPEG, GIF', 'danger')
 
         db.session.commit()
         flash('个人信息更新成功！', 'success')
@@ -98,5 +122,23 @@ def career_path():
     if g.user is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
-
+    
     return render_template('smartrecruit/candidate/career_path.html', user=g.user)
+
+@profile_bp.route('/resume_builder')
+def resume_builder():
+    """简历构建器"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    
+    return render_template('smartrecruit/candidate/resume_builder.html', user=g.user)
+
+@profile_bp.route('/skills_assessment')
+def skills_assessment():
+    """技能评估"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    
+    return render_template('smartrecruit/candidate/skills_assessment.html', user=g.user)

@@ -1,6 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, g, current_app, jsonify
 from app.models import Job, db
 import logging
+from .recommendation_config import (
+    RECOMMENDATION_WEIGHTS, SKILL_CATEGORIES, CHINESE_SKILLS, 
+    EXPERIENCE_LEVELS, RECOMMENDATION_PARAMS, COMPANY_SKILL_MAPPING,
+    OPTIMIZATION_CONFIG
+)
 
 jobs_bp = Blueprint('jobs', __name__, url_prefix='/jobs')
 
@@ -214,18 +219,98 @@ def get_job_recommendations(user):
         job_matches = []
         for job in all_jobs:
             match_score = calculate_job_match(user, job)
-            job_matches.append({
-                'job': job,
-                'match_score': match_score
-            })
+            
+            # 应用优化因子
+            optimized_score = apply_optimization_factors(user, job, match_score)
+            
+            # 只推荐匹配度达到最小要求的职位
+            if optimized_score >= RECOMMENDATION_PARAMS['min_match_score']:
+                job_matches.append({
+                    'job': job,
+                    'match_score': optimized_score
+                })
         
-        # 按匹配度排序，取前5个
+        # 按匹配度排序，取前N个
         job_matches.sort(key=lambda x: x['match_score'], reverse=True)
-        return job_matches[:5]
+        return job_matches[:RECOMMENDATION_PARAMS['max_recommendations']]
         
     except Exception as e:
         logging.error(f"获取职位推荐失败: {e}")
         return []
+
+def apply_optimization_factors(user, job, base_score):
+    """应用优化因子"""
+    try:
+        optimized_score = base_score
+        
+        # 新职位提升（7天内发布的职位）
+        if OPTIMIZATION_CONFIG['enable_fresh_job_boost']:
+            from datetime import datetime, timedelta
+            if job.date_posted and (datetime.utcnow() - job.date_posted).days <= 7:
+                optimized_score *= RECOMMENDATION_PARAMS['fresh_job_boost']
+        
+        # 公司类型匹配提升
+        if OPTIMIZATION_CONFIG['enable_company_type_boost']:
+            company_boost = calculate_company_type_boost(user, job)
+            optimized_score *= company_boost
+        
+        # 技能匹配提升
+        if OPTIMIZATION_CONFIG['enable_skill_boost']:
+            skill_boost = calculate_skill_boost(user, job)
+            optimized_score *= skill_boost
+        
+        return min(100, optimized_score)  # 确保不超过100分
+        
+    except Exception as e:
+        logging.error(f"应用优化因子失败: {e}")
+        return base_score
+
+def calculate_company_type_boost(user, job):
+    """计算公司类型匹配提升"""
+    try:
+        user_company = getattr(user, 'company_name', '').lower()
+        job_company = getattr(job, 'company_name', '').lower()
+        
+        for company_type, config in COMPANY_SKILL_MAPPING.items():
+            # 检查用户公司类型
+            user_company_match = any(keyword in user_company for keyword in config['keywords'])
+            # 检查职位公司类型
+            job_company_match = any(keyword in job_company for keyword in config['keywords'])
+            
+            if user_company_match and job_company_match:
+                return 1.1  # 相同公司类型提升10%
+        
+        return 1.0
+        
+    except Exception as e:
+        logging.error(f"计算公司类型提升失败: {e}")
+        return 1.0
+
+def calculate_skill_boost(user, job):
+    """计算技能匹配提升"""
+    try:
+        user_skills = extract_user_skills(user)
+        job_keywords = extract_job_keywords(job.description)
+        
+        if not user_skills or not job_keywords:
+            return 1.0
+        
+        # 计算技能匹配数量
+        matched_skills = 0
+        for skill in user_skills:
+            if any(keyword.lower() in skill.lower() for keyword in job_keywords):
+                matched_skills += 1
+        
+        # 如果匹配的技能超过50%，给予提升
+        match_ratio = matched_skills / len(user_skills)
+        if match_ratio > 0.5:
+            return RECOMMENDATION_PARAMS['skill_boost_factor']
+        
+        return 1.0
+        
+    except Exception as e:
+        logging.error(f"计算技能提升失败: {e}")
+        return 1.0
 
 def calculate_job_match(user, job):
     """计算职位匹配度"""
@@ -244,15 +329,85 @@ def calculate_job_match(user, job):
             if any(keyword.lower() in skill.lower() for keyword in job_keywords):
                 matched_skills += 1
         
-        # 计算匹配百分比
-        match_percentage = (matched_skills / len(user_skills)) * 100
+        # 基础匹配分数
+        skill_match_score = (matched_skills / len(user_skills)) * 100 * RECOMMENDATION_WEIGHTS['skill_match']
+        
+        # 经验匹配分数
+        experience_score = calculate_experience_match(user, job) * RECOMMENDATION_WEIGHTS['experience_match']
+        
+        # 薪资匹配分数
+        salary_score = calculate_salary_match(user, job) * RECOMMENDATION_WEIGHTS['salary_match']
+        
+        # 地理位置匹配分数
+        location_score = calculate_location_match(user, job) * RECOMMENDATION_WEIGHTS['location_match']
+        
+        # 综合匹配分数
+        total_score = skill_match_score + experience_score + salary_score + location_score
         
         # 确保在0-100范围内
-        return max(0, min(100, int(match_percentage)))
+        return max(0, min(100, int(total_score)))
         
     except Exception as e:
         logging.error(f"计算职位匹配度失败: {e}")
         return 50
+
+def calculate_experience_match(user, job):
+    """计算经验匹配度"""
+    try:
+        # 从用户职位推断经验水平
+        user_position = getattr(user, 'position', '').lower()
+        job_experience = getattr(job, 'experience_level', '').lower()
+        
+        # 推断用户经验水平
+        user_level = 2  # 默认中级
+        for level_name, config in EXPERIENCE_LEVELS.items():
+            if any(keyword in user_position for keyword in config['keywords']):
+                user_level = config['level']
+                break
+        
+        # 获取职位要求经验水平
+        job_level = 2  # 默认中级
+        for level_name, config in EXPERIENCE_LEVELS.items():
+            if any(keyword in job_experience for keyword in config['keywords']):
+                job_level = config['level']
+                break
+        
+        # 计算匹配度（返回0-100的分数）
+        level_diff = abs(user_level - job_level)
+        if level_diff == 0:
+            return 100  # 完全匹配
+        elif level_diff == 1:
+            return 75   # 接近匹配
+        elif level_diff == 2:
+            return 50   # 部分匹配
+        else:
+            return 25   # 低匹配
+        
+    except Exception as e:
+        logging.error(f"计算经验匹配度失败: {e}")
+        return 50
+
+def calculate_salary_match(user, job):
+    """计算薪资匹配度"""
+    try:
+        # 这里可以根据用户的薪资期望和职位薪资计算匹配度
+        # 目前返回默认分数（返回0-100的分数）
+        return 80  # 默认80%匹配度
+        
+    except Exception as e:
+        logging.error(f"计算薪资匹配度失败: {e}")
+        return 80
+
+def calculate_location_match(user, job):
+    """计算地理位置匹配度"""
+    try:
+        # 这里可以根据用户位置和职位位置计算匹配度
+        # 目前返回默认分数（返回0-100的分数）
+        return 80  # 默认80%匹配度
+        
+    except Exception as e:
+        logging.error(f"计算地理位置匹配度失败: {e}")
+        return 80
 
 def extract_user_skills(user):
     """提取用户技能"""
@@ -268,15 +423,33 @@ def extract_user_skills(user):
         if hasattr(user, 'position') and user.position:
             skills.append(user.position)
         
+        # 从公司名称推断技能
+        if hasattr(user, 'company_name') and user.company_name:
+            company_skills = infer_skills_from_company(user.company_name)
+            skills.extend(company_skills)
+        
         # 如果没有技能，返回默认技能
         if not skills:
-            skills = ['计算机科学', '编程', '软件开发']
+            skills = ['计算机科学', '编程', '软件开发', '项目管理', '团队协作']
         
-        return skills
+        # 去重并返回
+        return list(set(skills))
         
     except Exception as e:
         logging.error(f"提取用户技能失败: {e}")
-        return ['计算机科学', '编程', '软件开发']
+        return ['计算机科学', '编程', '软件开发', '项目管理', '团队协作']
+
+def infer_skills_from_company(company_name):
+    """从公司名称推断技能"""
+    company_lower = company_name.lower()
+    skills = []
+    
+    # 使用配置文件中的公司类型技能映射
+    for company_type, config in COMPANY_SKILL_MAPPING.items():
+        if any(keyword in company_lower for keyword in config['keywords']):
+            skills.extend(config['skills'])
+    
+    return skills
 
 def extract_job_keywords(description):
     """从职位描述中提取关键词"""
@@ -284,22 +457,33 @@ def extract_job_keywords(description):
         if not description:
             return []
         
-        # 简单的关键词提取（可以后续优化为NLP）
+        # 使用配置文件中的技能分类
         keywords = []
-        common_skills = [
-            'python', 'java', 'javascript', 'react', 'vue', 'angular',
-            'node.js', 'spring', 'django', 'flask', 'mysql', 'mongodb',
-            'docker', 'kubernetes', 'aws', 'azure', 'git', 'agile',
-            'scrum', 'ui/ux', 'design', 'marketing', 'sales', 'management'
-        ]
-        
         description_lower = description.lower()
-        for skill in common_skills:
-            if skill in description_lower:
-                keywords.append(skill)
         
-        return keywords
+        # 从英文技能分类中提取
+        for category, skills in SKILL_CATEGORIES.items():
+            for skill in skills:
+                if skill in description_lower:
+                    keywords.append(skill)
+        
+        # 从中文技能分类中提取
+        for category, skills in CHINESE_SKILLS.items():
+            for skill in skills:
+                if skill in description_lower:
+                    keywords.append(skill)
+        
+        return list(set(keywords))  # 去重
         
     except Exception as e:
         logging.error(f"提取职位关键词失败: {e}")
         return []
+
+def get_user_saved_jobs_count(user_id):
+    """获取用户收藏职位数量"""
+    try:
+        # 这里可以添加实际的数据库查询逻辑
+        # 目前返回模拟数据
+        return 3  # 模拟数据
+    except Exception:
+        return 0

@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>员工登录 & 注册 - 人才管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth_sign.css') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        .alert-container{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:90%;max-width:500px;z-index:1000}
+        .alert{padding:12px 14px;margin:8px 0;border-radius:10px;color:#fff;display:flex;align-items:center;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+        .alert.alert-danger{background:#dc3545}
+        .alert.alert-success{background:#1a9d1a}
+        .alert.alert-info{background:#2563eb}
+        .hero-bg{background-image:url("{{ url_for('static', filename='Images/background.jpg') }}");}
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .role-badge.supervisor {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .role-badge.employee {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Flash Messages -->
+    <div class="alert-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="#home" class="brand" data-scroll>
+                <img src="https://mcp-media.8n6n.com/img/2025/08/20/c0ce9b147f51df7246a8d9ffb6a64012" alt="林理人才 Logo" />
+                <span class="brand-text">林理人才</span>
+            </a>
+            <nav class="nav md-nav" aria-label="Primary">
+                <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" id="navToggle">☰</button>
+                <ul class="nav-list" id="navList">
+                    <li><a href="#home" data-scroll data-section="home">主页</a></li>
+                    <li><a href="#services" data-scroll data-section="services">功能</a></li>
+                    <li><a href="#contact" data-scroll data-section="contact">联系</a></li>
+                    <li class="hire"><a href="#" class="auth-trigger" data-auth="signin">登录</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <section id="home" class="section hero">
+            <div class="hero-bg"></div>
+            <div class="container hero-content">
+                <div class="hero-left">
+                    <h1>人才管理系统 - 员工端</h1>
+                    <p>提升个人能力、跟踪职业发展、参与团队协作，实现职业目标。</p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary auth-trigger" href="#" data-auth="signin">员工登录 <span class="icon">→</span></a>
+                        <a class="btn btn-ghost auth-trigger" href="#" data-auth="signup">员工注册</a>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="avatar">
+                        <img src="{{ url_for('static', filename='Images/job-seeker.svg') }}" alt="Employee" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services -->
+        <section id="services" class="section">
+            <div class="container">
+                <div class="section-head">
+                    <span class="pill">个人功能</span>
+                    <h2>员工能做什么</h2>
+                    <p class="muted">全面的个人发展工具，助力您实现职业目标。</p>
+                </div>
+                <div class="grid grid-3 mt-12">
+                    <article class="card">
+                        <div class="card-head">
+                            <div class="icon-badge">📋</div>
+                            <h3>个人档案</h3>
+                        </div>
+                        <p class="card-desc">管理个人信息、技能证书、工作经历等档案信息。</p>
+                        <ul class="list">
+                            <li>个人信息维护</li>
+                            <li>技能证书管理</li>
+                            <li>工作经历记录</li>
+                        </ul>
+                    </article>
+                    <article class="card">
+                        <div class="card-head">
+                            <div class="icon-badge">📈</div>
+                            <h3>绩效跟踪</h3>
+                        </div>
+                        <p class="card-desc">查看个人绩效表现、KPI达成情况、获得反馈。</p>
+                        <ul class="list">
+                            <li>绩效指标查看</li>
+                            <li>KPI达成跟踪</li>
+                            <li>反馈意见接收</li>
+                        </ul>
+                    </article>
+                    <article class="card">
+                        <div class="card-head">
+                            <div class="icon-badge">🎓</div>
+                            <h3>培训发展</h3>
+                        </div>
+                        <p class="card-desc">参与培训课程、技能提升、职业发展规划。</p>
+                        <ul class="list">
+                            <li>培训课程参与</li>
+                            <li>技能提升计划</li>
+                            <li>职业发展指导</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section id="contact" class="section">
+            <div class="container">
+                <div class="section-head">
+                    <span class="pill">联系</span>
+                    <h2>取得联系</h2>
+                    <p class="muted">如有问题，请联系您的主管或系统管理员。</p>
+                </div>
+                <div class="grid grid-2 mt-12">
+                    <article class="info-card">
+                        <div class="icon-badge">👥</div>
+                        <h3>联系主管</h3>
+                        <p class="muted">直接联系您的主管获取帮助</p>
+                        <p class="muted">工作日 9:00 - 18:00</p>
+                    </article>
+                    <article class="info-card">
+                        <div class="icon-badge">✉️</div>
+                        <h3>技术支持</h3>
+                        <a href="mailto:support@ll-talent.cn" class="link">support@ll-talent.cn</a>
+                        <p class="muted">24 小时内回复</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div class="left">
+                <a class="brand" href="#home" data-scroll><img src="https://mcp-media.8n6n.com/img/2025/08/20/c0ce9b147f51df7246a8d9ffb6a64012" alt="林理人才开发团队" /></a>
+                <p class="muted">© <span id="year"></span> 林理人才开发团队（北京林业大学）. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 登录/注册弹窗 -->
+    <div class="modal" id="authModal" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="modal-backdrop" data-modal-close></div>
+        <div class="modal-dialog" role="document" style="padding:0;overflow:hidden">
+            <button class="modal-close" aria-label="Close" data-modal-close>✕</button>
+            <div style="display:flex;height:560px">
+                <!-- 左侧介绍 -->
+                <aside style="flex:1;height:100%;padding:40px;background:linear-gradient(135deg,#f093fb,#f5576c);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
+                    <div class="left-signup" style="text-align:center">
+                        <h2 style="font-size:32px;margin:0 0 16px">加入团队！</h2>
+                        <p style="opacity:.95;max-width:280px">成为人才管理系统的一员，开启职业发展新篇章</p>
+                        <span class="role-badge employee" style="margin:20px 0">员工</span>
+                        <button class="btn" id="toSignin" style="margin-top:20px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)">已有账号？ 去登录</button>
+                    </div>
+                    <div class="left-signin" style="text-align:center;display:none">
+                        <h2 style="font-size:32px;margin:0 0 16px">欢迎回来！</h2>
+                        <p style="opacity:.95;max-width:280px">很高兴再次见到你！ 欢迎回到员工系统。</p>
+                        <span class="role-badge employee" style="margin:20px 0">员工</span>
+                        <button class="btn" id="toSignup" style="margin-top:20px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)">还没有账号？ 去注册</button>
+                    </div>
+                </aside>
+                <!-- 右侧表单容器 -->
+                <section style="flex:1;height:100%;padding:32px 24px;overflow:auto;display:flex;flex-direction:column;gap:16px">
+                    <div class="section-head" style="margin-bottom:12px">
+                        <h2 id="authTitle">员工注册</h2>
+                    </div>
+                    <!-- 注册表单（默认显示） -->
+                    <form id="signupForm" class="form" method="post" action="{{ url_for('talent_management.employee_auth.employee_auth') }}" style="padding-top:8px">
+                        <input type="hidden" name="action" value="signup" />
+                        <input type="hidden" name="user_type" value="employee" />
+                        <div class="grid grid-2 gap-6">
+                            <label class="field">
+                                <span class="label">名</span>
+                                <input type="text" name="first_name" placeholder="名" required />
+                            </label>
+                            <label class="field">
+                                <span class="label">姓</span>
+                                <input type="text" name="last_name" placeholder="姓" required />
+                            </label>
+                        </div>
+                        <label class="field">
+                            <span class="label">公司名称</span>
+                            <input type="text" name="company_name" placeholder="公司名称" required />
+                        </label>
+                        <label class="field">
+                            <span class="label">部门</span>
+                            <input type="text" name="department" placeholder="部门名称" required />
+                        </label>
+                        <label class="field">
+                            <span class="label">职位</span>
+                            <input type="text" name="position" placeholder="员工职位" required />
+                        </label>
+                        <label class="field">
+                            <span class="label">员工编号</span>
+                            <input type="text" name="employee_id" placeholder="员工编号" required />
+                        </label>
+                        <label class="field">
+                                                    <span class="label">高管邮箱</span>
+                        <input type="email" name="supervisor_email" placeholder="高管邮箱" required />
+                        </label>
+                        <label class="field">
+                            <span class="label">入职日期</span>
+                            <input type="date" name="hire_date" required />
+                        </label>
+                        <label class="field">
+                            <span class="label">邮箱</span>
+                            <input type="email" name="email" placeholder="邮箱" required />
+                        </label>
+                        <div class="grid grid-2 gap-6">
+                            <label class="field">
+                                <span class="label">手机号</span>
+                                <input type="tel" name="phone_number" placeholder="手机号" required />
+                            </label>
+                            <label class="field">
+                                <span class="label">生日</span>
+                                <input type="date" name="birthday" required />
+                            </label>
+                        </div>
+                        <div class="grid grid-2 gap-6">
+                            <label class="field">
+                                <span class="label">密码</span>
+                                <input type="password" name="password" placeholder="密码" required />
+                            </label>
+                            <label class="field">
+                                <span class="label">确认密码</span>
+                                <input type="password" name="confirm_password" placeholder="确认密码" required />
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%">注册</button>
+                    </form>
+                    <!-- 登录表单 -->
+                    <form id="signinForm" class="form" method="post" action="{{ url_for('talent_management.employee_auth.employee_auth') }}" style="display:none;padding-top:8px">
+                        <input type="hidden" name="action" value="signin" />
+                        <input type="hidden" name="user_type" value="employee" />
+                        <label class="field">
+                            <span class="label">邮箱</span>
+                            <input type="email" name="email" placeholder="邮箱" required />
+                        </label>
+                        <label class="field">
+                            <span class="label">密码</span>
+                            <input type="password" name="password" placeholder="密码" required />
+                        </label>
+                        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px; color: black;">登录</button>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll To Top -->
+    <button id="scrollTop" class="scroll-top" aria-label="Scroll to top">↑</button>
+
+    <script src="{{ url_for('static', filename='auth_sign.js') }}"></script>
+    <script>
+        // 轻量初始化：显示页面渐入
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.style.opacity = '1';
+            
+            // 设置年份
+            document.getElementById('year').textContent = new Date().getFullYear();
+            
+            // 切换登录/注册表单
+            const toSignin = document.getElementById('toSignin');
+            const toSignup = document.getElementById('toSignup');
+            const signupForm = document.getElementById('signupForm');
+            const signinForm = document.getElementById('signinForm');
+            const authTitle = document.getElementById('authTitle');
+            const leftSignup = document.querySelector('.left-signup');
+            const leftSignin = document.querySelector('.left-signin');
+            
+            toSignin.addEventListener('click', (e) => {
+                e.preventDefault();
+                signupForm.style.display = 'none';
+                signinForm.style.display = 'block';
+                authTitle.textContent = '员工登录';
+                leftSignup.style.display = 'none';
+                leftSignin.style.display = 'block';
+            });
+            
+            toSignup.addEventListener('click', (e) => {
+                e.preventDefault();
+                signinForm.style.display = 'none';
+                signupForm.style.display = 'block';
+                authTitle.textContent = '员工注册';
+                leftSignin.style.display = 'none';
+                leftSignup.style.display = 'block';
+            });
+            
+            // 弹窗触发
+            const authTriggers = document.querySelectorAll('.auth-trigger');
+            const authModal = document.getElementById('authModal');
+            const modalClose = document.querySelector('[data-modal-close]');
+            
+            authTriggers.forEach(trigger => {
+                trigger.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const authType = trigger.getAttribute('data-auth');
+                    if (authType === 'signin') {
+                        signupForm.style.display = 'none';
+                        signinForm.style.display = 'block';
+                        authTitle.textContent = '员工登录';
+                        leftSignup.style.display = 'none';
+                        leftSignin.style.display = 'block';
+                    } else {
+                        signinForm.style.display = 'none';
+                        signupForm.style.display = 'block';
+                        authTitle.textContent = '员工注册';
+                        leftSignin.style.display = 'none';
+                        leftSignup.style.display = 'block';
+                    }
+                    authModal.setAttribute('aria-hidden', 'false');
+                    authModal.style.display = 'flex';
+                });
+            });
+            
+            modalClose.addEventListener('click', () => {
+                authModal.setAttribute('aria-hidden', 'true');
+                authModal.style.display = 'none';
+            });
+            
+            // 点击背景关闭弹窗
+            authModal.addEventListener('click', (e) => {
+                if (e.target === authModal) {
+                    authModal.setAttribute('aria-hidden', 'true');
+                    authModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

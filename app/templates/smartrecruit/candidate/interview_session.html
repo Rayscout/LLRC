@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI虚拟面试 - 智能招聘系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_unified_style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <div class="ios-nav-brand">
+                <i class="fas fa-microphone"></i>
+                <span>AI虚拟面试</span>
+            </div>
+            
+            <h1 class="ios-nav-title">{{ job.title }}</h1>
+            
+            <div class="ios-nav-actions">
+                <div class="ios-progress">
+                    <span class="ios-progress-text">第 {{ question_number }} 题 / 共 {{ total_questions }} 题</span>
+                    <div class="ios-progress-bar">
+                        <div class="ios-progress-fill" style="width: {{ (question_number / total_questions) * 100 }}%"></div>
+                    </div>
+                </div>
+                
+                <button class="theme-toggle" id="themeToggle" title="切换主题">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="ios-main">
+        <section class="ios-section">
+            <div class="ios-container">
+                <!-- 面试问题卡片 -->
+                <div class="ios-card ios-fade-in">
+                    <div class="ios-card-header">
+                        <h2 class="ios-title">面试问题</h2>
+                        <span class="ios-badge ios-badge-primary">第 {{ question_number }} 题</span>
+                    </div>
+                    
+                    <div class="ios-card-content">
+                        <div class="ios-question">
+                            <p class="ios-question-text">{{ current_question }}</p>
+                        </div>
+                        
+                        <div class="ios-answer-form">
+                            <label for="answerText" class="ios-label">您的回答：</label>
+                            <textarea 
+                                id="answerText" 
+                                class="ios-textarea" 
+                                rows="6" 
+                                placeholder="请详细回答这个问题，展示您的专业能力和经验..."
+                                maxlength="1000"
+                            ></textarea>
+                            <div class="ios-textarea-counter">
+                                <span id="charCount">0</span> / 1000 字符
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-card-actions">
+                        <button class="ios-button ios-button-secondary" onclick="skipQuestion()">
+                            <i class="fas fa-forward"></i>
+                            跳过此题
+                        </button>
+                        <button class="ios-button ios-button-primary" onclick="submitAnswer()" id="submitBtn">
+                            <i class="fas fa-paper-plane"></i>
+                            提交答案
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 面试提示 -->
+                <div class="ios-card ios-fade-in">
+                    <div class="ios-card-header">
+                        <h3><i class="fas fa-lightbulb"></i> 答题提示</h3>
+                    </div>
+                    
+                    <div class="ios-card-content">
+                        <ul class="ios-tips">
+                            <li>用具体的例子和项目经验来支撑您的回答</li>
+                            <li>突出您的核心技能和解决问题的能力</li>
+                            <li>保持回答的结构化和逻辑性</li>
+                            <li>量化您的成果和贡献</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 加载模态框 -->
+    <div id="loadingModal" class="ios-modal" style="display: none;">
+        <div class="ios-modal-content">
+            <div class="ios-modal-body">
+                <div class="ios-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>AI正在分析您的答案...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 反馈模态框 -->
+    <div id="feedbackModal" class="ios-modal" style="display: none;">
+        <div class="ios-modal-content">
+            <div class="ios-modal-header">
+                <h3>AI反馈</h3>
+                <button class="ios-modal-close" onclick="closeFeedbackModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="ios-modal-body">
+                <div id="feedbackContent"></div>
+            </div>
+            
+            <div class="ios-modal-footer">
+                <button class="ios-button ios-button-primary" onclick="nextQuestion()">
+                    下一题
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 主题切换
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // 检查本地存储的主题设置
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        // 字符计数
+        const answerText = document.getElementById('answerText');
+        const charCount = document.getElementById('charCount');
+        
+        answerText.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+
+        // 提交答案
+        function submitAnswer() {
+            const answer = answerText.value.trim();
+            if (!answer) {
+                alert('请输入您的答案');
+                return;
+            }
+            
+            // 显示加载模态框
+            document.getElementById('loadingModal').style.display = 'flex';
+            document.getElementById('submitBtn').disabled = true;
+            
+            // 发送答案
+            const formData = new FormData();
+            formData.append('answer', answer);
+            
+            fetch(`/smartrecruit/candidate/interview/answer/{{ session_id }}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingModal').style.display = 'none';
+                
+                if (data.success) {
+                    if (data.completed) {
+                        // 面试完成，跳转到结果页面
+                        window.location.href = `/smartrecruit/candidate/interview/result/{{ session_id }}`;
+                    } else {
+                        // 显示反馈并准备下一题
+                        showFeedback(data.feedback, data.next_question);
+                    }
+                } else {
+                    alert('提交答案失败：' + data.error);
+                    document.getElementById('submitBtn').disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('网络错误，请稍后重试');
+                document.getElementById('loadingModal').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+            });
+        }
+
+        // 跳过问题
+        function skipQuestion() {
+            if (confirm('确定要跳过这道题吗？')) {
+                submitAnswer();
+            }
+        }
+
+        // 显示反馈
+        function showFeedback(feedback, nextQuestion) {
+            document.getElementById('feedbackContent').innerHTML = `
+                <div class="ios-feedback">
+                    <div class="ios-feedback-text">
+                        <h4>AI反馈：</h4>
+                        <p>${feedback}</p>
+                    </div>
+                    ${nextQuestion ? `
+                    <div class="ios-next-question">
+                        <h4>下一题：</h4>
+                        <p>${nextQuestion}</p>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            document.getElementById('feedbackModal').style.display = 'flex';
+        }
+
+        // 关闭反馈模态框
+        function closeFeedbackModal() {
+            document.getElementById('feedbackModal').style.display = 'none';
+        }
+
+        // 下一题
+        function nextQuestion() {
+            document.getElementById('feedbackModal').style.display = 'none';
+            // 页面会自动刷新显示下一题
+            window.location.reload();
+        }
+
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.ios-fade-in');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+            
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+
+        // 键盘快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                submitAnswer();
+            }
+        });
+    </script>
+</body>
+</html>

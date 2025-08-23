@@ -1,8 +1,17 @@
-{% extends 'base.html' %}
+{% extends "smartrecruit/candidate/base_ios.html" %}
 
-{% block title %}查看申请{% endblock %}
+{% block title %}我的申请{% endblock %}
 
 {% block content %}
+<section class="section" id="applications">
+    <div style="width: 100%; max-width: 1200px;">
+        <div class="card animate-fade-in-up">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(135deg, var(--accent-color), var(--accent-hover)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    📄 我的申请
+                </h1>
+                <p style="font-size: 1.1rem; color: var(--text-secondary);">查看和管理您的职位申请状态</p>
+            </div>
 <style>
     /* Light Mode */
     .page-header {

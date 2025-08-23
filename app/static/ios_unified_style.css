@@ -1,0 +1,459 @@
+/* Unified iOS Style for Employee and Job Seeker Interfaces */
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Pro+Text:wght@300;400;500;600&display=swap');
+
+:root {
+    /* iOS System Colors */
+    --ios-blue: #007AFF;
+    --ios-blue-dark: #0056CC;
+    --ios-blue-dark-mode: #0A84FF;
+    --ios-green: #34C759;
+    --ios-orange: #FF9500;
+    --ios-red: #FF3B30;
+    --ios-purple: #AF52DE;
+    
+    /* Light Mode Colors */
+    --ios-bg-primary: #F2F2F7;
+    --ios-bg-secondary: #FFFFFF;
+    --ios-bg-tertiary: #F9F9F9;
+    --ios-text-primary: #000000;
+    --ios-text-secondary: #3C3C43;
+    --ios-text-tertiary: #8E8E93;
+    --ios-border-primary: #D1D1D6;
+    --ios-border-secondary: #E5E5EA;
+    
+    /* Dark Mode Colors */
+    --ios-dark-bg-primary: #000000;
+    --ios-dark-bg-secondary: #1C1C1E;
+    --ios-dark-bg-tertiary: #2C2C2E;
+    --ios-dark-text-primary: #FFFFFF;
+    --ios-dark-text-secondary: #EBEBF5;
+    --ios-dark-text-tertiary: #8E8E93;
+    --ios-dark-border-primary: #38383A;
+    --ios-dark-border-secondary: #48484A;
+    
+    /* Shadows */
+    --ios-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --ios-shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --ios-shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.2);
+    --ios-shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.3);
+    
+    /* Border Radius */
+    --ios-radius-small: 8px;
+    --ios-radius-medium: 12px;
+    --ios-radius-large: 16px;
+    --ios-radius-xl: 20px;
+    
+    /* Spacing */
+    --ios-spacing-xs: 4px;
+    --ios-spacing-sm: 8px;
+    --ios-spacing-md: 16px;
+    --ios-spacing-lg: 24px;
+    --ios-spacing-xl: 32px;
+    --ios-spacing-xxl: 48px;
+    
+    /* Transitions */
+    --ios-transition-fast: 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+    --ios-transition-medium: 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    --ios-transition-slow: 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Manual Dark Mode Control */
+body.dark {
+    --ios-bg-primary: var(--ios-dark-bg-primary);
+    --ios-bg-secondary: var(--ios-dark-bg-secondary);
+    --ios-bg-tertiary: var(--ios-dark-bg-tertiary);
+    --ios-text-primary: var(--ios-dark-text-primary);
+    --ios-text-secondary: var(--ios-dark-text-secondary);
+    --ios-text-tertiary: var(--ios-dark-text-tertiary);
+    --ios-border-primary: var(--ios-dark-border-primary);
+    --ios-border-secondary: var(--ios-dark-border-secondary);
+    --ios-blue: var(--ios-blue-dark-mode);
+}
+
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--ios-bg-primary);
+    color: var(--ios-text-primary);
+    line-height: 1.5;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color var(--ios-transition-medium), color var(--ios-transition-medium);
+}
+
+/* Top Navigation Bar */
+.ios-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--ios-border-secondary);
+    transition: all var(--ios-transition-medium);
+}
+
+body.dark .ios-nav {
+    background: rgba(28, 28, 30, 0.8);
+    border-bottom-color: var(--ios-dark-border-primary);
+}
+
+.ios-nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--ios-spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+}
+
+.ios-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--ios-spacing-md);
+    text-decoration: none;
+    color: var(--ios-text-primary);
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.ios-nav-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ios-text-primary);
+    text-align: center;
+    flex: 1;
+}
+
+.ios-nav-menu {
+    display: flex;
+    gap: var(--ios-spacing-lg);
+    list-style: none;
+}
+
+.ios-nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--ios-spacing-sm);
+    padding: var(--ios-spacing-sm) var(--ios-spacing-md);
+    text-decoration: none;
+    color: var(--ios-text-secondary);
+    font-weight: 500;
+    border-radius: var(--ios-radius-medium);
+    transition: all var(--ios-transition-fast);
+}
+
+.ios-nav-link:hover,
+.ios-nav-link.active {
+    color: var(--ios-blue);
+    background: rgba(0, 122, 255, 0.1);
+}
+
+.ios-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--ios-spacing-md);
+}
+
+.ios-nav-button {
+    background: none;
+    border: none;
+    padding: var(--ios-spacing-sm) var(--ios-spacing-md);
+    border-radius: var(--ios-radius-medium);
+    color: var(--ios-text-secondary);
+    cursor: pointer;
+    transition: all var(--ios-transition-fast);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ios-spacing-sm);
+}
+
+.ios-nav-button:hover {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--ios-blue);
+}
+
+.ios-nav-button.primary {
+    background: var(--ios-blue);
+    color: white;
+}
+
+.ios-nav-button.primary:hover {
+    background: var(--ios-blue-dark);
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    position: relative;
+    width: 50px;
+    height: 28px;
+    background: var(--ios-border-primary);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all var(--ios-transition-medium);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ios-text-secondary);
+}
+
+.theme-toggle.active {
+    background: var(--ios-blue);
+    color: white;
+}
+
+.theme-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    transition: all var(--ios-transition-medium);
+}
+
+.theme-toggle.active::after {
+    transform: translateX(22px);
+}
+
+/* Main Content */
+.ios-main {
+    margin-top: 70px;
+    min-height: calc(100vh - 70px);
+}
+
+/* Section Container */
+.ios-section {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--ios-spacing-xxl) var(--ios-spacing-lg);
+    position: relative;
+    scroll-snap-align: start;
+}
+
+.ios-container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Typography */
+.ios-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: var(--ios-spacing-lg);
+    background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.ios-subtitle {
+    font-size: 1.5rem;
+    color: var(--ios-text-secondary);
+    text-align: center;
+    margin-bottom: var(--ios-spacing-xxl);
+    max-width: 600px;
+}
+
+.ios-section-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: var(--ios-spacing-xl);
+    color: var(--ios-text-primary);
+}
+
+/* Cards */
+.ios-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--ios-radius-large);
+    padding: var(--ios-spacing-xl);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: var(--ios-shadow-medium);
+    transition: all var(--ios-transition-medium);
+}
+
+.ios-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--ios-shadow-heavy);
+}
+
+body.dark .ios-card {
+    background: rgba(44, 44, 46, 0.9);
+    border: 1px solid rgba(72, 72, 74, 0.3);
+    box-shadow: var(--ios-shadow-dark);
+}
+
+body.dark .ios-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Grid Layouts */
+.ios-grid {
+    display: grid;
+    gap: var(--ios-spacing-lg);
+}
+
+.ios-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.ios-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.ios-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Buttons */
+.ios-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ios-spacing-sm);
+    padding: var(--ios-spacing-md) var(--ios-spacing-lg);
+    background: var(--ios-blue);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--ios-radius-medium);
+    font-weight: 600;
+    transition: all var(--ios-transition-fast);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.ios-button:hover {
+    background: var(--ios-blue-dark);
+    transform: translateY(-2px);
+}
+
+.ios-button.secondary {
+    background: transparent;
+    color: var(--ios-blue);
+    border: 2px solid var(--ios-blue);
+}
+
+.ios-button.secondary:hover {
+    background: var(--ios-blue);
+    color: white;
+}
+
+/* Form Elements */
+.ios-input {
+    width: 100%;
+    padding: var(--ios-spacing-md);
+    border: 2px solid var(--ios-border-primary);
+    border-radius: var(--ios-radius-medium);
+    background: var(--ios-bg-secondary);
+    color: var(--ios-text-primary);
+    font-size: 1rem;
+    transition: all var(--ios-transition-fast);
+    font-family: inherit;
+}
+
+.ios-input:focus {
+    outline: none;
+    border-color: var(--ios-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+body.dark .ios-input {
+    background: var(--ios-dark-bg-secondary);
+    border-color: var(--ios-dark-border-primary);
+    color: var(--ios-dark-text-primary);
+}
+
+/* Animations */
+.ios-fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ios-nav-menu {
+        display: none;
+    }
+    
+    .ios-grid-2,
+    .ios-grid-3,
+    .ios-grid-4 {
+        grid-template-columns: 1fr;
+    }
+    
+    .ios-title {
+        font-size: 2.5rem;
+    }
+    
+    .ios-subtitle {
+        font-size: 1.25rem;
+    }
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.mb-lg { margin-bottom: var(--ios-spacing-lg); }
+.mb-xl { margin-bottom: var(--ios-spacing-xl); }
+.mt-lg { margin-top: var(--ios-spacing-lg); }
+.mt-xl { margin-top: var(--ios-spacing-xl); }
+
+/* Dark Mode Theme Toggle Icon */
+body.dark .theme-toggle i::before {
+    content: "\ea4c"; /* sun icon */
+}
+
+.theme-toggle i::before {
+    content: "\ea4a"; /* moon icon */
+}
+
+/* Dark Mode Button Styles */
+body.dark .ios-button.secondary {
+    border-color: var(--ios-blue);
+    color: var(--ios-blue);
+}
+
+body.dark .ios-button.secondary:hover {
+    background: var(--ios-blue);
+    color: white;
+}
+
+/* Dark Mode Navigation Text */
+body.dark .ios-nav-brand,
+body.dark .ios-nav-link {
+    color: var(--ios-text-primary);
+}
+
+body.dark .ios-nav-button {
+    color: var(--ios-text-secondary);
+}

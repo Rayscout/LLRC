@@ -14,6 +14,10 @@ from app.utils import (
 )
 from app import applications_collection
 from datetime import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, flash, g, current_app
+from app.models import User, db
+from sqlalchemy import text
+import os
 
 applications_bp = Blueprint('applications', __name__, url_prefix='/applications')
 
@@ -122,10 +126,15 @@ def apply(job_id):
 
     job = Job.query.get_or_404(job_id)
 
-    # 重复申请拦截
-    existing_application_sqlite = Application.query.filter_by(user_id=g.user.id, job_id=job_id).first()
-    if existing_application_sqlite:
-        flash('你已申请过该职位。', 'info')
+    # 检查是否有活跃的申请（未撤销的申请）
+    existing_active_application = Application.query.filter_by(
+        user_id=g.user.id, 
+        job_id=job_id, 
+        is_active=True
+    ).first()
+    
+    if existing_active_application:
+        flash('你已申请过该职位，请等待处理结果。', 'info')
         return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
 
     if request.method == 'GET':
@@ -171,7 +180,8 @@ def apply(job_id):
             user_id=g.user.id,
             job_id=job_id,
             status='submitted',
-            message=message
+            message=message,
+            is_active=True
         )
         db.session.add(application)
         db.session.commit()
@@ -271,8 +281,8 @@ def generate_feedbacks():
 
     # 保存到数据库
     try:
-        # SQLite：若已存在待处理，则更新；否则创建
-        application = Application.query.filter_by(user_id=g.user.id, job_id=job_id).first()
+        # SQLite：若已存在活跃申请，则更新；否则创建
+        application = Application.query.filter_by(user_id=g.user.id, job_id=job_id, is_active=True).first()
         if application:
             application.status = 'Completed'
             application.message = f'相似度: {similarity_score:.2f}%, 面试得分: {final_score:.1f}%'
@@ -281,7 +291,8 @@ def generate_feedbacks():
                 user_id=g.user.id,
                 job_id=job_id,
                 status='Completed',
-                message=f'相似度: {similarity_score:.2f}%, 面试得分: {final_score:.1f}%'
+                message=f'相似度: {similarity_score:.2f}%, 面试得分: {final_score:.1f}%',
+                is_active=True
             )
             db.session.add(application)
         db.session.commit()
@@ -325,8 +336,8 @@ def my_applications():
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
 
-    # 从SQLite获取申请
-    applications = Application.query.filter_by(user_id=g.user.id).all()
+    # 从SQLite获取活跃的申请
+    applications = Application.query.filter_by(user_id=g.user.id, is_active=True).order_by(Application.timestamp.desc()).all()
     
     # 获取职位信息
     applications_with_jobs = []
@@ -343,29 +354,33 @@ def my_applications():
 
 @applications_bp.route('/withdraw/<int:application_id>', methods=['POST', 'GET'])
 def withdraw(application_id: int):
-    """撤销当前用户的一条申请（软撤销：更新状态为 withdrawn）。"""
+    """撤销当前用户的一条申请（软撤销：设置is_active为False，允许重新申请）。"""
     if g.user is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
 
-    app_obj = Application.query.filter_by(id=application_id, user_id=g.user.id).first()
+    app_obj = Application.query.filter_by(id=application_id, user_id=g.user.id, is_active=True).first()
     if app_obj is None:
         flash('未找到该申请或无权限操作。', 'warning')
         return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
 
     try:
-        # 改为硬删除，确保列表立即移除且可再次申请
-        db.session.delete(app_obj)
+        # 软删除：设置is_active为False，保留历史记录
+        app_obj.is_active = False
+        app_obj.status = 'Withdrawn'
+        app_obj.message = f'{app_obj.message} (已撤销)'
         db.session.commit()
+        
         # 可选：从 Mongo 清理对应记录（忽略异常）
         try:
             applications_collection.delete_many({'user_id': str(g.user.id), 'job_id': str(app_obj.job_id)})
         except Exception:
             pass
+            
         # AJAX 请求直接返回 JSON，页面立即更新而不重定向
         if request.args.get('ajax') == '1' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return jsonify({'success': True})
-        flash('已撤销该申请。', 'success')
+        flash('已撤销该申请，现在可以重新申请该职位。', 'success')
     except Exception as e:
         db.session.rollback()
         logging.error(f'撤销申请失败: {e}')
@@ -373,3 +388,38 @@ def withdraw(application_id: int):
             return jsonify({'success': False, 'message': '撤销失败，请稍后重试。'}), 500
         flash('撤销失败，请稍后重试。', 'danger')
     return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
+
+@applications_bp.route('/view_applications')
+def view_applications():
+    """查看申请列表"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    
+    # 这里可以添加获取用户申请列表的逻辑
+    # 目前返回模拟数据
+    return render_template('smartrecruit/candidate/view_applications.html', user=g.user)
+
+@applications_bp.route('/apply_job/<int:job_id>', methods=['GET', 'POST'])
+def apply_job(job_id):
+    """申请职位"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    
+    if request.method == 'POST':
+        # 处理职位申请逻辑
+        flash('职位申请已提交！', 'success')
+        return redirect(url_for('smartrecruit.candidate.applications.view_applications'))
+    
+    # 显示申请表单
+    return render_template('smartrecruit/candidate/apply_job.html', job_id=job_id, user=g.user)
+
+def get_user_applications_count(user_id):
+    """获取用户申请数量"""
+    try:
+        # 获取活跃的申请数量
+        count = Application.query.filter_by(user_id=user_id, is_active=True).count()
+        return count
+    except Exception:
+        return 0

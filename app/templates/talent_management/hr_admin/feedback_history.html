@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>反馈历史记录 - 团队成员反馈系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth_sign.css') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .page-header h1 {
+            margin: 0 0 15px 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-section h3 {
+            margin: 0 0 20px 0;
+            color: var(--dark-color);
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            color: var(--dark-color);
+            font-size: 0.9em;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            min-width: 150px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 500;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .feedback-records {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .records-header {
+            background: var(--light-color);
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .records-header h3 {
+            margin: 0;
+            color: var(--dark-color);
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .records-count {
+            margin-top: 10px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .feedback-item {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+            transition: var(--transition);
+        }
+
+        .feedback-item:hover {
+            background: #f8f9fa;
+        }
+
+        .feedback-item:last-child {
+            border-bottom: none;
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .feedback-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .feedback-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .feedback-icon.skill { background: var(--success-color); }
+        .feedback-icon.communication { background: var(--info-color); }
+        .feedback-icon.performance { background: var(--warning-color); }
+
+        .feedback-info h4 {
+            margin: 0 0 5px 0;
+            color: var(--dark-color);
+            font-size: 1.2em;
+        }
+
+        .feedback-recipient {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .feedback-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .priority-badge.high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .priority-badge.medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .priority-badge.low {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .feedback-type-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .feedback-content {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .feedback-text {
+            color: var(--dark-color);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .feedback-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .feedback-date {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .feedback-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.8em;
+            font-weight: 500;
+            transition: var(--transition);
+            border: 1px solid #ddd;
+            background: white;
+            color: #666;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 10px 0;
+            color: var(--dark-color);
+            font-size: 1.3em;
+        }
+
+        .empty-state p {
+            margin: 0 0 20px 0;
+            color: #666;
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--danger-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--info-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .feedback-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .feedback-status {
+                justify-content: flex-start;
+            }
+            
+            .feedback-footer {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in-up {
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_dashboard') }}" class="back-btn">返回反馈系统</a>
+    <a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="logout-btn">退出登录</a>
+    
+    <div class="container">
+        <!-- 页面头部 -->
+        <div class="page-header fade-in">
+            <h1>反馈历史记录</h1>
+            <p>查看和管理您发送给团队成员的所有反馈记录</p>
+        </div>
+
+        <!-- 筛选区域 -->
+        <div class="filter-section fade-in">
+            <h3>🔍 筛选反馈记录</h3>
+            <form method="GET" class="filter-controls">
+                <div class="filter-group">
+                    <label for="category">反馈分类</label>
+                    <select id="category" name="category">
+                        <option value="">全部分类</option>
+                        {% for category_key, category in feedback_categories.items() %}
+                        <option value="{{ category_key }}" {% if category_filter == category_key %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="recipient">接收者</label>
+                    <input type="text" id="recipient" name="recipient" value="{{ recipient_filter }}" placeholder="输入姓名搜索">
+                </div>
+                <div class="filter-group">
+                    <label for="date">发送日期</label>
+                    <input type="date" id="date" name="date" value="{{ date_filter }}">
+                </div>
+                <button type="submit" class="btn btn-primary">🔍 应用筛选</button>
+                <a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_history') }}" class="btn btn-outline">🔄 重置筛选</a>
+            </form>
+        </div>
+
+        <!-- 反馈记录列表 -->
+        <div class="feedback-records slide-in-up">
+            <div class="records-header">
+                <h3>
+                    <div style="width: 24px; height: 24px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">📝</div>
+                    反馈记录
+                </h3>
+                <div class="records-count">
+                    共找到 {{ feedback_records|length }} 条反馈记录
+                </div>
+            </div>
+
+            {% if feedback_records %}
+                {% for record in feedback_records %}
+                <div class="feedback-item">
+                    <div class="feedback-header">
+                        <div class="feedback-meta">
+                            <div class="feedback-icon {{ record.category }}">
+                                {% if record.category == 'skill' %}🚀
+                                {% elif record.category == 'communication' %}💬
+                                {% else %}📈{% endif %}
+                            </div>
+                            <div class="feedback-info">
+                                <h4>{{ record.recipient_name }}</h4>
+                                <div class="feedback-recipient">
+                                    {{ team_members[record.recipient_name].position }} · {{ team_members[record.recipient_name].department }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feedback-status">
+                            <span class="priority-badge {{ record.priority }}">
+                                {% if record.priority == 'high' %}高优先级
+                                {% elif record.priority == 'medium' %}中优先级
+                                {% else %}低优先级{% endif %}
+                            </span>
+                            <span class="feedback-type-badge">
+                                {% if record.feedback_type == 'positive' %}正面反馈
+                                {% elif record.feedback_type == 'constructive' %}建设性反馈
+                                {% elif record.feedback_type == 'improvement' %}改进建议
+                                {% else %}认可表扬{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="feedback-content">
+                        <div class="feedback-text">{{ record.content }}</div>
+                        <div style="font-size: 0.9em; color: #666;">
+                            <strong>分类：</strong>{{ feedback_categories[record.category].name }}
+                        </div>
+                    </div>
+                    
+                    <div class="feedback-footer">
+                        <div class="feedback-date">
+                            <span>📅</span>
+                            <span>{{ record.created_at.strftime('%Y年%m月%d日 %H:%M') }}</span>
+                        </div>
+                        <div class="feedback-actions">
+                            <a href="#" class="action-btn" onclick="viewFeedback('{{ record.id }}')">👁️ 查看详情</a>
+                            <a href="#" class="action-btn" onclick="editFeedback('{{ record.id }}')">✏️ 编辑</a>
+                            <a href="#" class="action-btn" onclick="deleteFeedback('{{ record.id }}')">🗑️ 删除</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <h3>暂无反馈记录</h3>
+                    <p>您还没有发送过任何反馈，开始为团队成员提供建设性反馈吧！</p>
+                    <a href="{{ url_for('talent_management.hr_admin.feedback_system.send_feedback') }}" class="btn btn-primary">
+                        ✉️ 发送第一条反馈
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 页面加载动画
+            const elements = document.querySelectorAll('.fade-in, .slide-in-up');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            console.log('反馈历史记录页面已加载');
+        });
+
+        // 查看反馈详情
+        function viewFeedback(feedbackId) {
+            alert('查看反馈详情功能开发中...\n反馈ID: ' + feedbackId);
+        }
+
+        // 编辑反馈
+        function editFeedback(feedbackId) {
+            alert('编辑反馈功能开发中...\n反馈ID: ' + feedbackId);
+        }
+
+        // 删除反馈
+        function deleteFeedback(feedbackId) {
+            if (confirm('确定要删除这条反馈吗？此操作不可撤销。')) {
+                alert('删除反馈功能开发中...\n反馈ID: ' + feedbackId);
+            }
+        }
+    </script>
+</body>
+</html>

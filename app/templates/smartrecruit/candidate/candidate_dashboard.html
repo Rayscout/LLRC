@@ -1,0 +1,583 @@
+{% extends 'base.html' %}
+
+{% block title %}求职者仪表盘 - 智能招聘系统{% endblock %}
+
+{% block content %}
+<div class="candidate-dashboard">
+    <!-- 欢迎横幅 -->
+    <div class="welcome-banner">
+        <div class="welcome-content">
+            <h1>🎉 欢迎回来，{{ user.first_name }} {{ user.last_name }}！</h1>
+            <p>基于您的技能为您推荐匹配职位，管理您的求职申请</p>
+            <div class="quick-stats">
+                <div class="stat-item">
+                    <span class="stat-number">{{ applications_count|default(0) }}</span>
+                    <span class="stat-label">申请数量</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ saved_jobs_count|default(0) }}</span>
+                    <span class="stat-label">收藏职位</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ profile_completion|default(0) }}%</span>
+                    <span class="stat-label">资料完整度</span>
+                </div>
+            </div>
+        </div>
+        <div class="welcome-actions">
+            <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="btn btn-primary">🔍 搜索职位</a>
+            <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="btn btn-secondary">⚙️ 个人设置</a>
+        </div>
+    </div>
+
+    <!-- 为您推荐区域 -->
+    <div class="recommended-section">
+        <div class="section-header">
+            <h2>💡 为您推荐</h2>
+            <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="view-all">查看全部</a>
+        </div>
+
+        <!-- 用户技能展示 -->
+        <div class="user-skills" id="userSkillsSection">
+            <h3>🎯 您的技能匹配</h3>
+            <div class="skills-tags" id="skillsTags">
+                {% if user_skills %}
+                    {% for skill in user_skills %}
+                        <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">数据分析</span>
+                    <span class="skill-tag">机器学习</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 推荐职位网格 -->
+        <div class="jobs-grid" id="recommendedJobs">
+            <div class="loading">正在加载推荐职位...</div>
+        </div>
+    </div>
+
+    <!-- 快速操作区域 -->
+    <div class="quick-actions-section">
+        <h2>🚀 快速操作</h2>
+        <div class="actions-grid">
+            <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="action-card">
+                <div class="action-icon">🔍</div>
+                <h3>搜索职位</h3>
+                <p>基于技能和偏好找到最适合的职位</p>
+            </a>
+            <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="action-card">
+                <div class="action-icon">📝</div>
+                <h3>上传简历</h3>
+                <p>支持多种格式：PDF、Word、图片、视频</p>
+            </a>
+            <a href="{{ url_for('smartrecruit.candidate.applications.view_applications') }}" class="action-card">
+                <div class="action-icon">📋</div>
+                <h3>我的申请</h3>
+                <p>查看和管理所有职位申请状态</p>
+            </a>
+            <a href="{{ url_for('smartrecruit.candidate.profile.career_path') }}" class="action-card">
+                <div class="action-icon">🎯</div>
+                <h3>职业发展</h3>
+                <p>技能差距分析和学习建议</p>
+            </a>
+        </div>
+    </div>
+
+    <!-- 最近活动 -->
+    <div class="recent-activity-section">
+        <h2>📊 最近活动</h2>
+        <div class="activity-list" id="recentActivity">
+            <div class="activity-item">
+                <div class="activity-icon">📝</div>
+                <div class="activity-content">
+                    <h4>简历更新</h4>
+                    <p>您的简历信息已更新</p>
+                    <span class="activity-time">刚刚</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">🔍</div>
+                <div class="activity-content">
+                    <h4>职位搜索</h4>
+                    <p>搜索了"Python开发工程师"相关职位</p>
+                    <span class="activity-time">2小时前</span>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon">📤</div>
+                <div class="activity-content">
+                    <h4>申请提交</h4>
+                    <p>向"ABC科技有限公司"提交了职位申请</p>
+                    <span class="activity-time">1天前</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.candidate-dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* 欢迎横幅 */
+.welcome-banner {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.welcome-content h1 {
+    margin: 0 0 10px 0;
+    font-size: 2.2em;
+    font-weight: 700;
+}
+
+.welcome-content p {
+    margin: 0 0 20px 0;
+    opacity: 0.9;
+    font-size: 1.1em;
+}
+
+.quick-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.8em;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.welcome-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.btn-primary:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-2px);
+}
+
+/* 为您推荐区域 */
+.recommended-section {
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.8);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.section-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.6em;
+    font-weight: 600;
+}
+
+.view-all {
+    color: #667eea;
+    text-decoration: none;
+    border: 1px solid #667eea;
+    border-radius: 25px;
+    padding: 8px 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.view-all:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* 用户技能 */
+.user-skills {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.user-skills h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skill-tag {
+    background: #667eea;
+    color: white;
+    padding: 6px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+/* 职位网格 */
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.job-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 20px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.job-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.job-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.job-company {
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.job-location {
+    color: #888;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+}
+
+.job-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.job-tag {
+    background: #f0f0f0;
+    color: #666;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8em;
+}
+
+.job-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.job-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.job-btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.job-btn-primary:hover {
+    background: #5a6fd8;
+}
+
+.job-btn-secondary {
+    background: #f0f0f0;
+    color: #666;
+    border: 1px solid #e0e0e0;
+}
+
+.job-btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+/* 快速操作区域 */
+.quick-actions-section {
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.8);
+}
+
+.quick-actions-section h2 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 1.6em;
+    font-weight: 600;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.action-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 25px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    border-color: #667eea;
+}
+
+.action-icon {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+}
+
+.action-card h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.action-card p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+/* 最近活动 */
+.recent-activity-section {
+    background: rgba(255,255,255,0.95);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.8);
+}
+
+.recent-activity-section h2 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 1.6em;
+    font-weight: 600;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.activity-icon {
+    font-size: 1.5em;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #667eea;
+    color: white;
+    border-radius: 50%;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-content h4 {
+    margin: 0 0 5px 0;
+    color: #333;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.activity-content p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.activity-time {
+    color: #999;
+    font-size: 0.8em;
+}
+
+/* 加载状态 */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 1.1em;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .welcome-banner {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .quick-stats {
+        justify-content: center;
+    }
+    
+    .welcome-actions {
+        justify-content: center;
+    }
+    
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .jobs-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 模拟加载推荐职位
+    setTimeout(function() {
+        const recommendedJobs = document.getElementById('recommendedJobs');
+        recommendedJobs.innerHTML = `
+            <div class="job-card">
+                <div class="job-title">Python开发工程师</div>
+                <div class="job-company">ABC科技有限公司</div>
+                <div class="job-location">📍 北京 · 远程</div>
+                <div class="job-tags">
+                    <span class="job-tag">Python</span>
+                    <span class="job-tag">Django</span>
+                    <span class="job-tag">MySQL</span>
+                </div>
+                <div class="job-actions">
+                    <a href="#" class="job-btn job-btn-primary">立即申请</a>
+                    <a href="#" class="job-btn job-btn-secondary">收藏</a>
+                </div>
+            </div>
+            <div class="job-card">
+                <div class="job-title">数据分析师</div>
+                <div class="job-company">XYZ数据公司</div>
+                <div class="job-location">📍 上海 · 混合办公</div>
+                <div class="job-tags">
+                    <span class="job-tag">Python</span>
+                    <span class="job-tag">Pandas</span>
+                    <span class="job-tag">SQL</span>
+                </div>
+                <div class="job-actions">
+                    <a href="#" class="job-btn job-btn-primary">立即申请</a>
+                    <a href="#" class="job-btn job-btn-secondary">收藏</a>
+                </div>
+            </div>
+            <div class="job-card">
+                <div class="job-title">机器学习工程师</div>
+                <div class="job-company">AI创新科技</div>
+                <div class="job-location">📍 深圳 · 全职</div>
+                <div class="job-tags">
+                    <span class="job-tag">Python</span>
+                    <span class="job-tag">TensorFlow</span>
+                    <span class="job-tag">深度学习</span>
+                </div>
+                <div class="job-actions">
+                    <a href="#" class="job-btn job-btn-primary">立即申请</a>
+                    <a href="#" class="job-btn job-btn-secondary">收藏</a>
+                </div>
+            </div>
+        `;
+    }, 1000);
+});
+</script>
+{% endblock %}

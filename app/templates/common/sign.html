@@ -375,6 +375,32 @@
                             <span class="label">公司名称</span>
                             <input type="text" name="company_name" placeholder="公司名称" required />
                         </label>
+                        <!-- 主管和员工专用字段 -->
+                        <div id="supervisor-employee-fields" style="display: none;">
+                            <label class="field">
+                                <span class="label">部门</span>
+                                <input type="text" name="department" placeholder="部门名称" />
+                            </label>
+                            <label class="field">
+                                <span class="label">职位</span>
+                                <input type="text" name="position" placeholder="职位" />
+                            </label>
+                        </div>
+                        <!-- 员工专用字段 -->
+                        <div id="employee-fields" style="display: none;">
+                            <label class="field">
+                                <span class="label">员工编号</span>
+                                <input type="text" name="employee_id" placeholder="员工编号" />
+                            </label>
+                            <label class="field">
+                                                        <span class="label">高管邮箱</span>
+                        <input type="email" name="supervisor_email" placeholder="高管邮箱" />
+                            </label>
+                            <label class="field">
+                                <span class="label">入职日期</span>
+                                <input type="date" name="hire_date" />
+                            </label>
+                        </div>
                         <label class="field">
                             <span class="label">邮箱</span>
                             <input type="email" name="email" placeholder="邮箱" required />
@@ -400,10 +426,12 @@
                             </label>
                         </div>
                         <div class="field" style="margin-top:8px">
-                            <span class="label">身份选择</span>
+                            <span class="label">身份选择 <span style="color: red;">*</span></span>
                             <div class="role-row">
-                                <label><input type="radio" name="role" value="candidate" checked /> 求职者</label>
-                                <label><input type="radio" name="role" value="recruiter" /> 招聘者（HR）</label>
+                                <label><input type="radio" name="role" value="candidate" required /> 求职者</label>
+                                <label><input type="radio" name="role" value="recruiter" required /> 招聘者（HR）</label>
+                                <label><input type="radio" name="role" value="executive" required /> 高管</label>
+                                <label><input type="radio" name="role" value="employee" required /> 员工</label>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width:100%">注册</button>
@@ -420,10 +448,12 @@
                             <input type="password" name="password" placeholder="密码" required />
                         </label>
                         <div class="field" style="margin-top:8px">
-                            <span class="label">以身份登录</span>
+                            <span class="label">以身份登录 <span style="color: red;">*</span></span>
                             <div class="role-row">
-                                <label><input type="radio" name="role" value="candidate" checked /> 求职者</label>
-                                <label><input type="radio" name="role" value="recruiter" /> 招聘者（HR）</label>
+                                <label><input type="radio" name="role" value="candidate" required /> 求职者</label>
+                                <label><input type="radio" name="role" value="recruiter" required /> 招聘者（HR）</label>
+                                <label><input type="radio" name="role" value="executive" required /> 高管</label>
+                                <label><input type="radio" name="role" value="employee" required /> 员工</label>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px; color: black;">登录</button>
@@ -447,6 +477,79 @@
         // 轻量初始化：显示页面渐入
         document.addEventListener('DOMContentLoaded', () => {
             document.body.style.opacity = '1';
+            
+            // 动态显示/隐藏字段
+            const roleInputs = document.querySelectorAll('input[name="role"]');
+            const supervisorEmployeeFields = document.getElementById('supervisor-employee-fields');
+            const employeeFields = document.getElementById('employee-fields');
+            
+            function toggleFields() {
+                const selectedRole = document.querySelector('input[name="role"]:checked').value;
+                
+                if (selectedRole === 'executive') {
+                    supervisorEmployeeFields.style.display = 'block';
+                    employeeFields.style.display = 'none';
+                    // 设置高管字段为必填
+                    supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = true;
+                    });
+                    employeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = false;
+                    });
+                } else if (selectedRole === 'employee') {
+                    supervisorEmployeeFields.style.display = 'block';
+                    employeeFields.style.display = 'block';
+                    // 设置所有字段为必填
+                    supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = true;
+                    });
+                    employeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = true;
+                    });
+                } else {
+                    supervisorEmployeeFields.style.display = 'none';
+                    employeeFields.style.display = 'none';
+                    // 设置字段为非必填
+                    supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = false;
+                    });
+                    employeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = false;
+                    });
+                }
+            }
+            
+            // 监听角色选择变化
+            roleInputs.forEach(input => {
+                input.addEventListener('change', toggleFields);
+            });
+            
+            // 初始化字段状态
+            toggleFields();
+            
+            // 表单验证
+            const signupForm = document.getElementById('signupForm');
+            const signinForm = document.getElementById('signinForm');
+            
+            // 注册表单验证
+            signupForm.addEventListener('submit', function(e) {
+                const selectedRole = document.querySelector('input[name="role"]:checked');
+                if (!selectedRole) {
+                    e.preventDefault();
+                    alert('请选择注册身份！');
+                    return false;
+                }
+            });
+            
+            // 登录表单验证
+            signinForm.addEventListener('submit', function(e) {
+                const selectedRole = document.querySelector('input[name="role"]:checked');
+                if (!selectedRole) {
+                    e.preventDefault();
+                    alert('请选择登录身份！');
+                    return false;
+                }
+            });
         });
     </script>
 </body>

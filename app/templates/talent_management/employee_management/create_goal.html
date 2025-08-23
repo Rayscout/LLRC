@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建SMART目标 - 员工仪表板</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #F2F2F7;
+            --bg-secondary: rgba(255, 255, 255, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --text-tertiary: #C7C7CC;
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-orange: #FF9500;
+            --accent-red: #FF3B30;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius: 16px;
+            --border-radius-large: 24px;
+            --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            --transition-fast: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-secondary: rgba(44, 44, 46, 0.8);
+            --bg-card: rgba(44, 44, 46, 0.9);
+            --text-primary: #FFFFFF;
+            --text-secondary: #EBEBF5;
+            --text-tertiary: #8E8E93;
+            --accent-blue: #0A84FF;
+            --accent-green: #30D158;
+            --accent-orange: #FF9F0A;
+            --accent-red: #FF453A;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent-green) 0%, #30D158 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+        }
+
+        .form-container {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 40px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1em;
+            transition: var(--transition-fast);
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .smart-principle {
+            background: rgba(0, 122, 255, 0.05);
+            border: 1px solid rgba(0, 122, 255, 0.2);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .smart-principle h4 {
+            color: var(--accent-blue);
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .smart-principle p {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .smart-principle .example {
+            font-size: 0.8em;
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            border: none;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition-fast);
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 2px solid var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+            transition: var(--transition-fast);
+        }
+
+        .progress-circle.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        .progress-circle.completed {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+        .progress-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: var(--text-tertiary);
+            z-index: 1;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-blue);
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .progress-indicator {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('talent_management.employee_manager.smart_goals.goals_dashboard') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> 返回目标管理
+        </a>
+
+        <div class="header">
+            <h1><i class="fas fa-plus-circle"></i> 创建SMART目标</h1>
+            <p>制定具体、可衡量、可实现、相关性强、有时限的目标</p>
+        </div>
+
+        <div class="form-container">
+            <!-- 进度指示器 -->
+            <div class="progress-indicator">
+                <div class="progress-line">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div class="progress-step">
+                    <div class="progress-circle active" id="step1">1</div>
+                    <div class="progress-label">基本信息</div>
+                </div>
+                <div class="progress-step">
+                    <div class="progress-circle" id="step2">2</div>
+                    <div class="progress-label">SMART原则</div>
+                </div>
+                <div class="progress-step">
+                    <div class="progress-circle" id="step3">3</div>
+                    <div class="progress-label">完成设置</div>
+                </div>
+            </div>
+
+            <form id="smartGoalForm" method="POST">
+                <!-- 第一步：基本信息 -->
+                <div class="form-section" id="step1Content">
+                    <h2 class="section-title">
+                        <i class="fas fa-info-circle"></i> 基本信息
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">目标标题 *</label>
+                        <input type="text" class="form-input" name="title" required 
+                               placeholder="例如：掌握Python高级特性">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">目标类别</label>
+                            <select class="form-select" name="category">
+                                <option value="technical">技术技能</option>
+                                <option value="soft_skills">软技能</option>
+                                <option value="business">业务技能</option>
+                                <option value="custom">自定义</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">优先级</label>
+                            <select class="form-select" name="priority">
+                                <option value="high">高</option>
+                                <option value="medium" selected>中</option>
+                                <option value="low">低</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">目标日期 *</label>
+                            <input type="date" class="form-input" name="target_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">预计学习时间（小时）</label>
+                            <input type="number" class="form-input" name="estimated_hours" 
+                                   placeholder="例如：80" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第二步：SMART原则 -->
+                <div class="form-section" id="step2Content" style="display: none;">
+                    <h2 class="section-title">
+                        <i class="fas fa-bullseye"></i> SMART原则
+                    </h2>
+
+                    <div class="smart-principle">
+                        <h4>S - Specific（具体的）</h4>
+                        <p>目标应该具体明确，避免模糊不清的描述。</p>
+                        <div class="example">示例：不是"学习编程"，而是"掌握Python面向对象编程"</div>
+                        <div class="form-group">
+                            <label class="form-label">具体目标描述 *</label>
+                            <textarea class="form-textarea" name="specific" required 
+                                      placeholder="详细描述您要达成的具体目标..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="smart-principle">
+                        <h4>M - Measurable（可衡量的）</h4>
+                        <p>目标应该有明确的衡量标准，能够量化进度。</p>
+                        <div class="example">示例：不是"提高技能"，而是"完成3个项目并通过技能测试"</div>
+                        <div class="form-group">
+                            <label class="form-label">衡量标准 *</label>
+                            <textarea class="form-textarea" name="measurable" required 
+                                      placeholder="如何衡量目标的完成情况..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="smart-principle">
+                        <h4>A - Achievable（可实现的）</h4>
+                        <p>目标应该在能力范围内，具有挑战性但可实现。</p>
+                        <div class="example">示例：考虑时间、资源和个人能力的限制</div>
+                        <div class="form-group">
+                            <label class="form-label">实现计划 *</label>
+                            <textarea class="form-textarea" name="achievable" required 
+                                      placeholder="描述如何实现这个目标..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="smart-principle">
+                        <h4>R - Relevant（相关的）</h4>
+                        <p>目标应该与职业发展、工作需求或个人成长相关。</p>
+                        <div class="example">示例：与当前工作或未来职业规划相关</div>
+                        <div class="form-group">
+                            <label class="form-label">相关性说明 *</label>
+                            <textarea class="form-textarea" name="relevant" required 
+                                      placeholder="说明这个目标与您的职业发展的关系..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="smart-principle">
+                        <h4>T - Time-bound（有时限的）</h4>
+                        <p>目标应该有明确的时间限制，避免无限期拖延。</p>
+                        <div class="example">示例：不是"尽快完成"，而是"3个月内完成"</div>
+                        <div class="form-group">
+                            <label class="form-label">时间框架 *</label>
+                            <textarea class="form-textarea" name="time_bound" required 
+                                      placeholder="明确的时间限制和里程碑..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 第三步：完成设置 -->
+                <div class="form-section" id="step3Content" style="display: none;">
+                    <h2 class="section-title">
+                        <i class="fas fa-check-circle"></i> 完成设置
+                    </h2>
+                    
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-bullseye" style="font-size: 4em; color: var(--accent-green); margin-bottom: 20px;"></i>
+                        <h3>目标设置完成！</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 30px;">
+                            请检查您的SMART目标设置，确认无误后点击创建按钮。
+                        </p>
+                        
+                        <div id="goalSummary" style="text-align: left; background: var(--bg-secondary); padding: 20px; border-radius: var(--border-radius); margin-bottom: 20px;">
+                            <!-- 目标摘要将在这里显示 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                        <i class="fas fa-arrow-left"></i> 上一步
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextBtn">
+                        下一步 <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn" style="display: none;">
+                        <i class="fas fa-check"></i> 创建目标
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // 设置默认日期为3个月后
+        document.querySelector('input[name="target_date"]').value = 
+            new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        function updateProgress() {
+            const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // 更新步骤状态
+            for (let i = 1; i <= totalSteps; i++) {
+                const circle = document.getElementById(`step${i}`);
+                if (i < currentStep) {
+                    circle.className = 'progress-circle completed';
+                } else if (i === currentStep) {
+                    circle.className = 'progress-circle active';
+                } else {
+                    circle.className = 'progress-circle';
+                }
+            }
+        }
+
+        function showStep(step) {
+            // 隐藏所有步骤内容
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step${i}Content`).style.display = 'none';
+            }
+            
+            // 显示当前步骤
+            document.getElementById(`step${step}Content`).style.display = 'block';
+            
+            // 更新按钮状态
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (step === 1) {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'inline-flex';
+                submitBtn.style.display = 'none';
+            } else if (step === totalSteps) {
+                prevBtn.style.display = 'inline-flex';
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'inline-flex';
+                generateSummary();
+            } else {
+                prevBtn.style.display = 'inline-flex';
+                nextBtn.style.display = 'inline-flex';
+                submitBtn.style.display = 'none';
+            }
+            
+            updateProgress();
+        }
+
+        function generateSummary() {
+            const form = document.getElementById('smartGoalForm');
+            const formData = new FormData(form);
+            
+            const summary = `
+                <h4>目标摘要</h4>
+                <p><strong>标题：</strong>${formData.get('title')}</p>
+                <p><strong>类别：</strong>${formData.get('category')}</p>
+                <p><strong>优先级：</strong>${formData.get('priority')}</p>
+                <p><strong>目标日期：</strong>${formData.get('target_date')}</p>
+                <p><strong>预计时间：</strong>${formData.get('estimated_hours')} 小时</p>
+                <hr style="margin: 15px 0; border: none; border-top: 1px solid rgba(255,255,255,0.1);">
+                <p><strong>具体目标：</strong>${formData.get('specific')}</p>
+                <p><strong>衡量标准：</strong>${formData.get('measurable')}</p>
+                <p><strong>实现计划：</strong>${formData.get('achievable')}</p>
+                <p><strong>相关性：</strong>${formData.get('relevant')}</p>
+                <p><strong>时间框架：</strong>${formData.get('time_bound')}</p>
+            `;
+            
+            document.getElementById('goalSummary').innerHTML = summary;
+        }
+
+        function validateStep(step) {
+            const form = document.getElementById('smartGoalForm');
+            const formData = new FormData(form);
+            
+            if (step === 1) {
+                return formData.get('title') && formData.get('target_date');
+            } else if (step === 2) {
+                return formData.get('specific') && formData.get('measurable') && 
+                       formData.get('achievable') && formData.get('relevant') && 
+                       formData.get('time_bound');
+            }
+            return true;
+        }
+
+        // 事件监听器
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (validateStep(currentStep)) {
+                currentStep++;
+                showStep(currentStep);
+            } else {
+                alert('请填写所有必填字段');
+            }
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            currentStep--;
+            showStep(currentStep);
+        });
+
+        document.getElementById('smartGoalForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('目标创建成功！');
+                    window.location.href = '{{ url_for("talent_management.employee_manager.smart_goals.goals_dashboard") }}';
+                } else {
+                    alert('创建失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('创建失败，请稍后重试');
+            });
+        });
+
+        // 初始化
+        showStep(1);
+    </script>
+</body>
+</html>

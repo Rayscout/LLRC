@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑个人资料 - 员工仪表板</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            margin: 0 10px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .back-link i {
+            margin-right: 8px;
+        }
+        
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .help-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .section-title {
+            color: #333;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e1e5e9;
+            font-size: 1.3em;
+        }
+        
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .flash-message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .flash-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .flash-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .flash-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-edit"></i> 编辑个人资料</h1>
+            <p>更新您的个人信息、技能和经验记录</p>
+        </div>
+        
+        <div class="content">
+            <a href="{{ url_for('talent_management.employee_manager.profile.profile_dashboard') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i> 返回个人资料
+            </a>
+            
+            <!-- Flash Messages -->
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+            
+            <form method="POST" action="{{ url_for('talent_management.employee_manager.profile.edit_profile') }}">
+                <!-- 基本信息 -->
+                <h3 class="section-title"><i class="fas fa-user"></i> 基本信息</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">姓名 *</label>
+                        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">姓氏 *</label>
+                        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="phone_number">手机号码</label>
+                        <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="birthday">生日</label>
+                        <input type="date" id="birthday" name="birthday" value="{{ user.birthday }}">
+                    </div>
+                </div>
+                
+                <!-- 专业信息 -->
+                <h3 class="section-title"><i class="fas fa-briefcase"></i> 专业信息</h3>
+                
+                <div class="form-group">
+                    <label for="bio">个人简介</label>
+                    <textarea id="bio" name="bio" placeholder="请简要介绍您的专业背景、职业目标和个人特点...">{{ user.bio or '' }}</textarea>
+                    <div class="help-text">这将帮助系统更好地了解您的专业背景和技能</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="skills">技能标签</label>
+                    <textarea id="skills" name="skills" placeholder="请输入您的技能，用逗号分隔，例如：Python, JavaScript, 项目管理...">{{ user.skills or '' }}</textarea>
+                    <div class="help-text">系统将根据这些技能为您推荐相关培训和发展机会</div>
+                </div>
+                
+                <!-- 教育经历 -->
+                <h3 class="section-title"><i class="fas fa-graduation-cap"></i> 教育经历</h3>
+                
+                <div class="form-group">
+                    <label for="education">教育背景</label>
+                    <textarea id="education" name="education" placeholder="请详细描述您的教育经历，包括学校、专业、学位等信息...">{{ user.education or '' }}</textarea>
+                    <div class="help-text">格式建议：学校名称 - 专业 - 学位 - 毕业年份</div>
+                </div>
+                
+                <!-- 工作经历 -->
+                <h3 class="section-title"><i class="fas fa-briefcase"></i> 工作经历</h3>
+                
+                <div class="form-group">
+                    <label for="experience">工作经验</label>
+                    <textarea id="experience" name="experience" placeholder="请详细描述您的工作经历，包括公司、职位、工作内容、成就等...">{{ user.experience or '' }}</textarea>
+                    <div class="help-text">这将帮助系统分析您的职业发展轨迹和技能成长</div>
+                </div>
+                
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 保存更改
+                    </button>
+                    <a href="{{ url_for('talent_management.employee_manager.profile.profile_dashboard') }}" class="btn btn-outline">
+                        <i class="fas fa-times"></i> 取消
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 自动调整文本框高度
+        document.querySelectorAll('textarea').forEach(textarea => {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            });
+        });
+        
+        // 技能标签输入提示
+        document.getElementById('skills').addEventListener('input', function() {
+            const value = this.value;
+            if (value && !value.includes(',')) {
+                this.placeholder = '建议用逗号分隔多个技能，例如：Python, JavaScript, 项目管理';
+            }
+        });
+    </script>
+</body>
+</html>

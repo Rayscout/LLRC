@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>薪酬管理 - 员工仪表板</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #F2F2F7;
+            --bg-secondary: rgba(255, 255, 255, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --text-tertiary: #C7C7CC;
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-orange: #FF9500;
+            --accent-red: #FF3B30;
+            --accent-purple: #AF52DE;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius: 16px;
+            --border-radius-large: 24px;
+            --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            --transition-fast: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-secondary: rgba(44, 44, 46, 0.8);
+            --bg-card: rgba(44, 44, 46, 0.9);
+            --text-primary: #FFFFFF;
+            --text-secondary: #EBEBF5;
+            --text-tertiary: #8E8E93;
+            --accent-blue: #0A84FF;
+            --accent-green: #30D158;
+            --accent-orange: #FF9F0A;
+            --accent-red: #FF453A;
+            --accent-purple: #BF5AF2;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, #5856D6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition-fast);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            font-size: 1em;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .change-positive {
+            color: var(--accent-green);
+        }
+
+        .change-negative {
+            color: var(--accent-red);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .content-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table th {
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .comparison-table td {
+            color: var(--text-primary);
+        }
+
+        .percentile-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .percentile-top {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--accent-green);
+        }
+
+        .percentile-high {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .percentile-medium {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .percentile-low {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--accent-red);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sidebar-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .recommendation-item {
+            background: rgba(0, 122, 255, 0.05);
+            border: 1px solid rgba(0, 122, 255, 0.2);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .recommendation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .priority-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 500;
+        }
+
+        .priority-high {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--accent-red);
+        }
+
+        .priority-medium {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .priority-low {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--accent-green);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition-fast);
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        .growth-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .growth-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .growth-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('talent_management.employee_auth.employee_dashboard') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> 返回仪表板
+        </a>
+
+        <div class="header">
+            <h1><i class="fas fa-money-bill-wave"></i> 薪酬管理</h1>
+            <p>查看您的薪酬信息、部门对比和公司百分位分析</p>
+        </div>
+
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">基本工资</div>
+                    <div class="stat-icon" style="background: var(--accent-blue);">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+                <div class="stat-value">¥{{ "{:,}".format(user_compensation.base_salary) }}</div>
+                <div class="stat-label">月基本工资</div>
+                <div class="stat-change">
+                    {% if department_comparison.comparison.base_salary_diff > 0 %}
+                        <i class="fas fa-arrow-up"></i>
+                        <span class="change-positive">+¥{{ "{:,}".format(department_comparison.comparison.base_salary_diff) }}</span>
+                    {% else %}
+                        <i class="fas fa-arrow-down"></i>
+                        <span class="change-negative">¥{{ "{:,}".format(department_comparison.comparison.base_salary_diff) }}</span>
+                    {% endif %}
+                    <span>vs 部门平均</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">奖金</div>
+                    <div class="stat-icon" style="background: var(--accent-green);">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                </div>
+                <div class="stat-value">¥{{ "{:,}".format(user_compensation.bonus) }}</div>
+                <div class="stat-label">月奖金</div>
+                <div class="stat-change">
+                    {% if department_comparison.comparison.bonus_diff > 0 %}
+                        <i class="fas fa-arrow-up"></i>
+                        <span class="change-positive">+¥{{ "{:,}".format(department_comparison.comparison.bonus_diff) }}</span>
+                    {% else %}
+                        <i class="fas fa-arrow-down"></i>
+                        <span class="change-negative">¥{{ "{:,}".format(department_comparison.comparison.bonus_diff) }}</span>
+                    {% endif %}
+                    <span>vs 部门平均</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">总薪酬</div>
+                    <div class="stat-icon" style="background: var(--accent-purple);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="stat-value">¥{{ "{:,}".format(user_compensation.total) }}</div>
+                <div class="stat-label">月总薪酬</div>
+                <div class="stat-change">
+                    {% if department_comparison.comparison.total_diff > 0 %}
+                        <i class="fas fa-arrow-up"></i>
+                        <span class="change-positive">+¥{{ "{:,}".format(department_comparison.comparison.total_diff) }}</span>
+                    {% else %}
+                        <i class="fas fa-arrow-down"></i>
+                        <span class="change-negative">¥{{ "{:,}".format(department_comparison.comparison.total_diff) }}</span>
+                    {% endif %}
+                    <span>vs 部门平均</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-title">公司百分位</div>
+                    <div class="stat-icon" style="background: var(--accent-orange);">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                </div>
+                <div class="stat-value">{{ company_percentile.percentile }}%</div>
+                <div class="stat-label">{{ company_percentile.percentile_label }}</div>
+                <div class="stat-change">
+                    <span>公司排名</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- 主要内容 -->
+            <div class="main-content">
+                <!-- 薪酬趋势图 -->
+                <div class="content-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-line"></i> 薪酬趋势图
+                    </h2>
+                    <div class="chart-container">
+                        <canvas id="salaryTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 部门对比 -->
+                <div class="content-card">
+                    <h2 class="section-title">
+                        <i class="fas fa-balance-scale"></i> 部门薪酬对比
+                    </h2>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>项目</th>
+                                <th>您的薪酬</th>
+                                <th>部门平均</th>
+                                <th>差异</th>
+                                <th>百分位</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>基本工资</td>
+                                <td>¥{{ "{:,}".format(department_comparison.user_data.base_salary) }}</td>
+                                <td>¥{{ "{:,}".format(department_comparison.department_avg.base_salary) }}</td>
+                                <td>
+                                    {% if department_comparison.comparison.base_salary_diff > 0 %}
+                                        <span class="change-positive">+¥{{ "{:,}".format(department_comparison.comparison.base_salary_diff) }}</span>
+                                    {% else %}
+                                        <span class="change-negative">¥{{ "{:,}".format(department_comparison.comparison.base_salary_diff) }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="percentile-badge 
+                                        {% if department_comparison.comparison.base_salary_percentile >= 80 %}percentile-top
+                                        {% elif department_comparison.comparison.base_salary_percentile >= 60 %}percentile-high
+                                        {% elif department_comparison.comparison.base_salary_percentile >= 40 %}percentile-medium
+                                        {% else %}percentile-low{% endif %}">
+                                        {{ "%.1f"|format(department_comparison.comparison.base_salary_percentile) }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>奖金</td>
+                                <td>¥{{ "{:,}".format(department_comparison.user_data.bonus) }}</td>
+                                <td>¥{{ "{:,}".format(department_comparison.department_avg.bonus) }}</td>
+                                <td>
+                                    {% if department_comparison.comparison.bonus_diff > 0 %}
+                                        <span class="change-positive">+¥{{ "{:,}".format(department_comparison.comparison.bonus_diff) }}</span>
+                                    {% else %}
+                                        <span class="change-negative">¥{{ "{:,}".format(department_comparison.comparison.bonus_diff) }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="percentile-badge 
+                                        {% if department_comparison.comparison.bonus_percentile >= 80 %}percentile-top
+                                        {% elif department_comparison.comparison.bonus_percentile >= 60 %}percentile-high
+                                        {% elif department_comparison.comparison.bonus_percentile >= 40 %}percentile-medium
+                                        {% else %}percentile-low{% endif %}">
+                                        {{ "%.1f"|format(department_comparison.comparison.bonus_percentile) }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>总薪酬</td>
+                                <td>¥{{ "{:,}".format(department_comparison.user_data.total) }}</td>
+                                <td>¥{{ "{:,}".format(department_comparison.department_avg.total) }}</td>
+                                <td>
+                                    {% if department_comparison.comparison.total_diff > 0 %}
+                                        <span class="change-positive">+¥{{ "{:,}".format(department_comparison.comparison.total_diff) }}</span>
+                                    {% else %}
+                                        <span class="change-negative">¥{{ "{:,}".format(department_comparison.comparison.total_diff) }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <!-- 薪酬结构分析 -->
+                <div class="sidebar-card">
+                    <h3 class="section-title">
+                        <i class="fas fa-pie-chart"></i> 薪酬结构
+                    </h3>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="compensationStructureChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 公司百分位分析 -->
+                <div class="sidebar-card">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-bar"></i> 公司百分位
+                    </h3>
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>您的薪酬</span>
+                            <span>¥{{ "{:,}".format(company_percentile.total_compensation) }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>公司平均</span>
+                            <span>¥{{ "{:,}".format(company_percentile.company_avg) }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>公司中位数</span>
+                            <span>¥{{ "{:,}".format(company_percentile.company_median) }}</span>
+                        </div>
+                    </div>
+                    <div class="growth-indicator">
+                        <span>排名</span>
+                        <div class="growth-bar">
+                            <div class="growth-fill" style="width: {{ company_percentile.percentile }}%"></div>
+                        </div>
+                        <span>{{ company_percentile.percentile }}%</span>
+                    </div>
+                </div>
+
+                <!-- 薪酬建议 -->
+                <div class="sidebar-card">
+                    <h3 class="section-title">
+                        <i class="fas fa-lightbulb"></i> 薪酬建议
+                    </h3>
+                    {% if compensation_structure.recommendations %}
+                        {% for recommendation in compensation_structure.recommendations %}
+                            <div class="recommendation-item">
+                                <div class="recommendation-header">
+                                    <div class="recommendation-title">{{ recommendation.title }}</div>
+                                    <span class="priority-badge priority-{{ recommendation.priority }}">
+                                        {{ recommendation.priority|title }}
+                                    </span>
+                                </div>
+                                <p style="font-size: 0.9em; color: var(--text-secondary);">
+                                    {{ recommendation.description }}
+                                </p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: var(--text-secondary); text-align: center; padding: 20px;">
+                            暂无薪酬建议
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 薪酬趋势图
+        const trendCtx = document.getElementById('salaryTrendChart').getContext('2d');
+        const trendData = {{ salary_trends | tojson }};
+        
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: trendData.map(item => item.month),
+                datasets: [
+                    {
+                        label: '基本工资',
+                        data: trendData.map(item => item.base_salary),
+                        borderColor: '#007AFF',
+                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: '奖金',
+                        data: trendData.map(item => item.bonus),
+                        borderColor: '#34C759',
+                        backgroundColor: 'rgba(52, 199, 89, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: '总薪酬',
+                        data: trendData.map(item => item.total),
+                        borderColor: '#AF52DE',
+                        backgroundColor: 'rgba(175, 82, 222, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary')
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary')
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
+                            callback: function(value) {
+                                return '¥' + value.toLocaleString();
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // 薪酬结构饼图
+        const structureCtx = document.getElementById('compensationStructureChart').getContext('2d');
+        
+        new Chart(structureCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['基本工资', '奖金'],
+                datasets: [{
+                    data: [
+                        {{ compensation_structure.base_salary_ratio }},
+                        {{ compensation_structure.bonus_ratio }}
+                    ],
+                    backgroundColor: [
+                        '#007AFF',
+                        '#34C759'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary'),
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+
+        // 自动刷新数据
+        function refreshData() {
+            fetch('/talent/employee_manager/compensation/api/compensation_analysis')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('薪酬数据已更新');
+                    }
+                })
+                .catch(error => {
+                    console.error('数据更新失败:', error);
+                });
+        }
+
+        // 每5分钟刷新一次数据
+        setInterval(refreshData, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绩效记录 - 员工仪表板</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .performance-container {
+            padding: 2rem 0;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+        }
+        
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(#667eea 0deg, #667eea var(--score), #e9ecef var(--score), #e9ecef 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        .score-text {
+            position: relative;
+            z-index: 1;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            border-radius: 5px;
+            background: #e9ecef;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+        
+        .goal-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-ongoing { background: #fff3cd; color: #856404; }
+        .status-pending { background: #f8d7da; color: #721c24; }
+        
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .skill-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .skill-name {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .skill-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="performance-container">
+        <div class="container">
+            <!-- 页面标题 -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h2 class="mb-0">
+                                        <i class="fas fa-chart-line me-2"></i>
+                                        绩效记录
+                                    </h2>
+                                    <p class="mb-0 mt-2">查看您的绩效表现和成长轨迹</p>
+                                </div>
+                                <div class="text-end">
+                                    <a href="{{ url_for('talent_management.employee_manager.performance.performance_history') }}" class="btn btn-light">
+                                        <i class="fas fa-history me-2"></i>历史记录
+                                    </a>
+                                    <a href="{{ url_for('talent_management.employee_auth.employee_dashboard') }}" class="btn btn-outline-light ms-2">
+                                        <i class="fas fa-arrow-left me-2"></i>返回仪表板
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 综合评分 -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h4 class="mb-3">综合评分</h4>
+                            <div class="score-circle" style="--score: {{ performance_data.overall_score * 3.6 }}deg">
+                                <div class="score-text">{{ performance_data.overall_score }}</div>
+                            </div>
+                            <p class="text-muted mt-3">满分 100 分</p>
+                            <div class="mt-3">
+                                <span class="badge bg-primary">{{ performance_data.current_month }}月</span>
+                                <span class="badge bg-success">{{ performance_data.current_year }}年</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="fas fa-tasks me-2"></i>
+                                月度目标完成情况
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            {% for goal in performance_data.monthly_goals %}
+                                <div class="metric-card">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">{{ goal.name }}</h6>
+                                        <span class="goal-status status-{{ goal.status }}">
+                                            {{ goal.status }}
+                                        </span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ goal.progress }}%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <small class="text-muted">完成进度: {{ goal.progress }}%</small>
+                                        <small class="text-muted">截止日期: {{ goal.deadline }}</small>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 绩效指标 -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                绩效指标详情
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">基础绩效指标</h6>
+                                    {% for metric, score in performance_data.base_performance.items() %}
+                                        <div class="skill-score">
+                                            <span class="skill-name">
+                                                {% if metric == 'work_quality' %}工作质量
+                                                {% elif metric == 'work_efficiency' %}工作效率
+                                                {% elif metric == 'teamwork' %}团队协作
+                                                {% elif metric == 'initiative' %}主动性
+                                                {% elif metric == 'learning_ability' %}学习能力
+                                                {% else %}{{ metric }}{% endif %}
+                                            </span>
+                                            <span class="skill-value">{{ score }}分</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{ score }}%"></div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">技能评估</h6>
+                                    {% for skill, score in performance_data.skill_assessment.items() %}
+                                        <div class="skill-score">
+                                            <span class="skill-name">
+                                                {% if skill == 'technical_skills' %}技术技能
+                                                {% elif skill == 'communication' %}沟通能力
+                                                {% elif skill == 'leadership' %}领导力
+                                                {% elif skill == 'problem_solving' %}问题解决
+                                                {% elif skill == 'adaptability' %}适应能力
+                                                {% else %}{{ skill }}{% endif %}
+                                            </span>
+                                            <span class="skill-value">{{ score }}分</span>
+                                        </div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{ score }}%"></div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 绩效趋势 -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="fas fa-trending-up me-2"></i>
+                                绩效趋势分析
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <h5 class="text-primary">{{ performance_data.base_performance.work_quality }}</h5>
+                                        <p class="text-muted">工作质量</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <h5 class="text-success">{{ performance_data.base_performance.teamwork }}</h5>
+                                        <p class="text-muted">团队协作</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <h5 class="text-warning">{{ performance_data.base_performance.initiative }}</h5>
+                                        <p class="text-muted">主动性</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="text-center">
+                                        <h5 class="text-info">{{ performance_data.base_performance.learning_ability }}</h5>
+                                        <p class="text-muted">学习能力</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h6>绩效建议：</h6>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    基于您的绩效表现，建议重点关注工作效率的提升，可以通过参加相关培训课程来增强技能。
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 快速操作 -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="fas fa-rocket me-2"></i>
+                                快速操作
+                            </h4>
+                        </div>
+                        <div class="card-body text-center">
+                            <a href="{{ url_for('talent_management.employee_manager.learning_recommendation.dashboard') }}" class="btn btn-custom me-3">
+                                <i class="fas fa-graduation-cap me-2"></i>查看学习推荐
+                            </a>
+                            <a href="{{ url_for('talent_management.employee_manager.projects.projects_dashboard') }}" class="btn btn-outline-primary me-3">
+                                <i class="fas fa-project-diagram me-2"></i>项目经验
+                            </a>
+                            <a href="{{ url_for('talent_management.employee_manager.profile.profile_dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-user me-2"></i>个人资料
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
