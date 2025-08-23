@@ -3,7 +3,7 @@
 {% block title %}设置{% endblock %}
 
 {% block content %}
-<div class="page-header" style="background: rgba(255,255,255,.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color:#333; border:1px solid rgba(255,255,255,.2);">
+<div class="page-header" style="background: linear-gradient(135deg,#667eea 0%, #764ba2 100%); color:#fff;">
     <i class="uil uil-setting icon" style="color:#fff;"></i>
     <h1 class="page-title" style="color:#fff;">账户设置</h1>
             <div style="margin-left:auto; display:flex; gap:8px;">
@@ -92,17 +92,17 @@
                         </div>
                         <div class="cv-actions">
                             <!-- 在线预览 -->
-                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" target="_blank" class="glass-btn">
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" target="_blank" class="btn btn-primary">
                                 <i class="fas fa-eye"></i> 在线预览
                             </a>
                             
                             <!-- 下载文件 -->
-                            <a href="{{ url_for('common.files.download_file', filename=user.cv_file) }}" class="glass-btn">
+                            <a href="{{ url_for('common.files.download_file', filename=user.cv_file) }}" class="btn btn-success">
                                 <i class="fas fa-download"></i> 下载文件
                             </a>
                             
                             <!-- 备用下载 -->
-                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="glass-btn">
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="btn btn-secondary">
                                 <i class="fas fa-download"></i> 备用下载
                             </a>
                         </div>
@@ -151,17 +151,17 @@
                         </div>
                         <div class="cv-actions">
                             <!-- 在线预览 -->
-                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" target="_blank" class="glass-btn">
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" target="_blank" class="btn btn-primary">
                                 <i class="fas fa-eye"></i> 在线预览
                             </a>
                             
                             <!-- 下载文件 -->
-                            <a href="{{ url_for('common.files.download_file', filename=user.cv_file) }}" class="glass-btn">
+                            <a href="{{ url_for('common.files.download_file', filename=user.cv_file) }}" class="btn btn-success">
                                 <i class="fas fa-download"></i> 下载文件
                             </a>
                             
                             <!-- 备用下载 -->
-                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="glass-btn">
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="btn btn-secondary">
                                 <i class="fas fa-download"></i> 备用下载
                             </a>
                         </div>
@@ -187,17 +187,17 @@
                         </div>
                         <div class="cv-actions">
                             <!-- 主要下载方式：使用专用下载路由 -->
-                            <a href="{{ url_for('common.files.download_video', filename=user.cv_file) }}" class="glass-btn">
+                            <a href="{{ url_for('common.files.download_video', filename=user.cv_file) }}" class="btn btn-warning">
                                 <i class="fas fa-download"></i> 下载视频文件 ({{ ext.upper() }})
                             </a>
                             
                             <!-- 简单下载方式 -->
-                            <a href="{{ url_for('common.files.simple_video_download', filename=user.cv_file) }}" class="glass-btn">
+                            <a href="{{ url_for('common.files.simple_video_download', filename=user.cv_file) }}" class="btn btn-success">
                                 <i class="fas fa-download"></i> 简单下载 ({{ ext.upper() }})
                             </a>
                             
                             <!-- 备用下载方式：使用静态文件路由 -->
-                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="glass-btn">
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="btn btn-secondary">
                                 <i class="fas fa-download"></i> 备用下载 ({{ ext.upper() }})
                             </a>
                         </div>
@@ -219,17 +219,17 @@
                         </div>
                         <div class="cv-actions">
                             <!-- 主要下载方式：使用专用下载路由 -->
-                            <a href="{{ url_for('common.files.download_video', filename=user.cv_file) }}" class="glass-btn">
+                            <a href="{{ url_for('common.files.download_video', filename=user.cv_file) }}" class="btn btn-warning">
                                 <i class="fas fa-download"></i> 下载视频文件 ({{ ext.upper() }})
                             </a>
                             
                             <!-- 简单下载方式 -->
-                            <a href="{{ url_for('common.files.simple_video_download', filename=user.cv_file) }}" class="glass-btn">
+                            <a href="{{ url_for('common.files.simple_video_download', filename=user.cv_file) }}" class="btn btn-success">
                                 <i class="fas fa-download"></i> 简单下载 ({{ ext.upper() }})
                             </a>
                             
                             <!-- 备用下载方式：使用静态文件路由 -->
-                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="glass-btn">
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="btn btn-secondary">
                                 <i class="fas fa-download"></i> 备用下载 ({{ ext.upper() }})
                             </a>
                         </div>
@@ -354,10 +354,15 @@
 }
 
 .settings-section button {
+<<<<<<< HEAD
     background: rgba(255,255,255,.5);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     color: #000;
+=======
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+>>>>>>> 0c1a8164980c3c64a222c904ce2402def3fc7a6f
     border: none;
     padding: 12px 20px;
     border-radius: 10px;
@@ -713,16 +718,5 @@
         margin-bottom: 10px;
     }
 }
-</style>
-<style>
-  .glass-btn{
-    display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;
-    background: rgba(255,255,255,.35);color:#111;text-decoration:none;border:1px solid rgba(51,51,51,.15);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 2px 8px rgba(0,0,0,.06); transition: all .2s ease;
-  }
-  .glass-btn:hover{ background: rgba(255,255,255,.5); box-shadow:0 4px 16px rgba(0,0,0,.08); }
-  .glass-btn i{ filter: grayscale(1) opacity(.7); }
-  .glass-btn:active{ transform: translateY(1px); }
 </style>
 {% endblock %}

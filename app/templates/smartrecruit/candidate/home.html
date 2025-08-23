@@ -143,6 +143,7 @@
     </div>
 </section>
 
+<<<<<<< HEAD
 <!-- 快速操作Section -->
 <section class="section" id="quick-actions">
     <div style="width: 100%; max-width: 1200px;">
@@ -178,6 +179,372 @@
                 </a>
             </div>
         </div>
+=======
+<style>
+.home-container {
+    padding: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* 欢迎横幅 */
+.welcome-banner {
+    background: linear-gradient(135deg, #333, #666);
+    color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.welcome-content h1 {
+    margin: 0 0 8px 0;
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+.welcome-content p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1em;
+}
+
+/* 为您推荐区域 */
+.recommended-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    /* 固定卡片尺寸：按断点精确控制，保持方形且一致 */
+    --card-size: 360px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.section-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.view-all {
+    color: #333;
+    text-decoration: none;
+    border: 2px solid #333;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.view-all:hover {
+    background: #333;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* 用户技能 */
+.user-skills {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    border-left: 4px solid #333;
+}
+
+.user-skills h3 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-size: 0.95em;
+    font-weight: 600;
+}
+
+.skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.skill-tag {
+    background: #333;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* 职位网格 */
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--card-size), var(--card-size)));
+    gap: 12px;
+    align-items: start;
+    justify-content: center;
+}
+
+.job-card {
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+    position: relative;
+    width: var(--card-size);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.job-card:hover {
+    border-color: #333;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.job-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 3px;
+    background: #333;
+    border-radius: 8px 8px 0 0;
+}
+
+.job-title {
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 6px;
+    font-size: 1.1em;
+    line-height: 1.3;
+}
+
+.job-company {
+    color: #666;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.icon-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #555;
+    font-size: 0.9em;
+    margin-bottom: 4px;
+}
+
+.icon-text i {
+    color: #999;
+    font-size: 12px;
+}
+
+.job-description {
+    color: #666;
+    font-size: 0.92em;
+    line-height: 1.5;
+    margin: 8px 0;
+    flex: 1 1 auto;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.pill {
+    background: #f0f0f0;
+    color: #555;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.match-score {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #333;
+    color: #fff;
+    border-radius: 12px;
+    font-size: 11px;
+    padding: 4px 10px;
+    font-weight: 700;
+}
+
+.job-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.btn-view, .btn-apply {
+    flex: 1;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    padding: 10px;
+    font-weight: 600;
+    font-size: 0.95em;
+    transition: all 0.2s ease;
+}
+
+.btn-view {
+    background: #f0f0f0;
+    color: #555;
+    border: 1px solid #ddd;
+}
+
+.btn-view:hover {
+    background: #e0e0e0;
+    border-color: #ccc;
+}
+
+.btn-apply {
+    background: #333;
+    color: #fff;
+}
+
+.btn-apply:hover {
+    background: #555;
+    transform: translateY(-1px);
+}
+
+.loading, .no-results {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    grid-column: 1 / -1;
+}
+
+.no-results {
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px dashed #ddd;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .home-container {
+        padding: 12px;
+    }
+    
+    .recommended-section { --card-size: 320px; }
+    .jobs-grid { gap: 10px; }
+    
+    .welcome-banner {
+        padding: 10px;
+    }
+    
+    .welcome-content h1 {
+        font-size: 1.5em;
+    }
+    
+    .recommended-section {
+        padding: 16px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+    .recommended-section { --card-size: 340px; }
+    .jobs-grid { gap: 12px; }
+}
+
+@media (max-width: 420px) {
+    .recommended-section { --card-size: 300px; }
+}
+</style>
+<style>
+/* 深色模式 */
+body.dark .welcome-banner{ background: linear-gradient(135deg,#1f2937,#374151); color:#e5e7eb }
+body.dark .recommended-section{ background:#111827; box-shadow: 0 2px 12px rgba(0,0,0,.6) }
+body.dark .section-header h2{ color:#e5e7eb }
+body.dark .view-all{ color:#e5e7eb; border-color:#e5e7eb }
+body.dark .view-all:hover{ background:#e5e7eb; color:#111827 }
+body.dark .user-skills{ background:#0f172a; border-left-color:#9ca3af }
+body.dark .skill-tag{ background:#374151; color:#e5e7eb }
+body.dark .job-card{ background:#0f172a; border-color:#374151; box-shadow: 0 1px 3px rgba(0,0,0,.6) }
+body.dark .job-card::before{ background:#9ca3af }
+body.dark .job-title{ color:#e5e7eb }
+body.dark .job-company{ color:#9ca3af }
+body.dark .icon-text{ color:#d1d5db }
+body.dark .icon-text i{ color:#9ca3af }
+body.dark .job-description{ color:#e5e7eb }
+body.dark .pill{ background:#374151; color:#e5e7eb }
+body.dark .match-score{ background:#9ca3af; color:#111827 }
+body.dark .btn-view{ background:#1f2937; color:#e5e7eb; border-color:#374151 }
+body.dark .btn-view:hover{ background:#374151 }
+body.dark .btn-apply{ background:#e5e7eb; color:#111827 }
+body.dark .btn-apply:hover{ background:#d1d5db }
+body.dark .no-results{ background:#111827; border-color:#374151; color:#e5e7eb }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  displayUserSkills();
+  loadRecommendedJobs();
+});
+
+function displayUserSkills() {
+  const skills = {{ user_skills | tojson }};
+  const skillsSection = document.getElementById('userSkillsSection');
+  const tags = document.getElementById('skillsTags');
+  if (Array.isArray(skills) && skills.length > 0) {
+    tags.innerHTML = skills.map(s => `<span class="skill-tag">${s}</span>`).join('');
+    skillsSection.style.display = 'block';
+  }
+}
+
+async function loadRecommendedJobs() {
+  const container = document.getElementById('recommendedJobs');
+  try {
+    const res = await fetch('{{ url_for("smartrecruit.candidate.jobs.job_recommendations") }}');
+    const data = await res.json();
+    if (data.success && Array.isArray(data.recommendations) && data.recommendations.length) {
+      renderJobs(data.recommendations, container);
+    } else {
+      container.innerHTML = '<div class="no-results">暂无推荐职位，请完善您的个人资料</div>';
+    }
+  } catch (e) {
+    container.innerHTML = '<div class="no-results">加载失败，请稍后重试</div>';
+  }
+}
+
+function renderJobs(jobs, container) {
+  container.innerHTML = jobs.map(job => {
+    const location = job.location || '未注明';
+    const salary = job.salary || '薪资面议';
+    const company = job.company_name || '';
+    const jobType = job.job_type || '全职';
+    const exp = job.experience_level || '不限';
+    const desc = job.description || '';
+    return `
+    <div class="job-card">
+      <div class="match-score">${job.match_score}% 匹配</div>
+      <div class="job-title">${job.title}</div>
+      <div class="job-company">${company}</div>
+      <div class="icon-text"><i class="uil uil-location-point"></i><span>${location}</span></div>
+      <div class="icon-text"><i class="uil uil-money-bill"></i><span>${salary}</span></div>
+      <div class="job-description">${desc}</div>
+      <div class="icon-text"><span class="pill">${jobType}</span><span class="pill">${exp}</span></div>
+      <div class="job-actions">
+        <a class="btn-view" href="${'{{ url_for("smartrecruit.candidate.jobs.job_detail", job_id=0) }}'.replace('0', job.id)}">查看详情</a>
+        <a class="btn-apply" href="${'{{ url_for("smartrecruit.candidate.applications.apply", job_id=0) }}'.replace('0', job.id)}">立即申请</a>
+>>>>>>> 0c1a8164980c3c64a222c904ce2402def3fc7a6f
       </div>
 </section>
 {% endblock %}
