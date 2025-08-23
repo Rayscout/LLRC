@@ -6,19 +6,19 @@
 <style>
     .vi-container { max-width: 1000px; margin: 20px auto; }
     .vi-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-    .vi-card { background: rgba(255,255,255,.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.08); padding: 16px; }
+    .vi-card { background: #fff; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.08); padding: 16px; }
     .vi-video { width: 100%; aspect-ratio: 16 / 9; background: #111; border-radius: 10px; overflow: hidden; display: grid; place-items: center; color: #aaa; }
     .vi-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
     .vi-btns { display: flex; gap: 10px; }
-    .vi-btn { padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); background: #666666; color:#fff; }
-    .vi-btn.primary { background: #666666; color: #fff; }
-    .vi-btn.danger { background: #666666; color: #fff; }
-    .vi-btn.neutral { background: #666666; color: #fff; }
+    .vi-btn { padding: 10px 14px; border-radius: 8px; border: none; cursor: pointer; }
+    .vi-btn.primary { background: #2563eb; color: #fff; }
+    .vi-btn.danger { background: #ef4444; color: #fff; }
+    .vi-btn.neutral { background: #f3f4f6; color: #111; }
     .vi-status { font-size: 14px; color: #6b7280; }
     .vi-panel h3 { margin: 0 0 8px; }
     .vi-qa { display: grid; gap: 8px; }
-    .vi-q { background: rgba(255,255,255,.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 8px; padding: 10px; font-size: 14px; }
-    .vi-q.active { border: 1px solid #333333; background: rgba(245,245,245,.6); }
+    .vi-q { background: #f9fafb; border-radius: 8px; padding: 10px; font-size: 14px; }
+    .vi-q.active { border: 1px solid #2563eb; background: #eff6ff; }
     .vi-timer { font-variant-numeric: tabular-nums; font-weight: 600; }
     .vi-progress { height: 8px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
     .vi-progress > div { height: 100%; background: linear-gradient(90deg,#22c55e,#16a34a); width: 0%; }

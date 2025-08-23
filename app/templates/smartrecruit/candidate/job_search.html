@@ -54,8 +54,8 @@
         </div>
         
         <div class="filter-actions">
-            <button class="btn-search" onclick="searchJobs()"><span class="btn-ico">🔍</span> 搜索</button>
-            <button class="btn-clear" onclick="clearFilters()"><span class="btn-ico">🔄</span> 清除筛选</button>
+            <button class="btn-search" onclick="searchJobs()">🔍 搜索职位</button>
+            <button class="btn-clear" onclick="clearFilters()">🔄 清除筛选</button>
         </div>
     </div>
 
@@ -73,40 +73,6 @@
         </div>
         <div class="jobs-grid" id="searchResultsGrid"></div>
     </div>
-
-    <!-- 相关内容推荐（页面底部留白区） -->
-    <section class="related-section" id="relatedSection">
-        <h3>你可能还想看看</h3>
-        <div class="related-grid">
-            <div class="related-card">
-                <h4>热门关键词</h4>
-                <div class="related-tags">
-                    <a href="#" class="rt">Python</a>
-                    <a href="#" class="rt">数据分析</a>
-                    <a href="#" class="rt">算法工程师</a>
-                    <a href="#" class="rt">DevOps</a>
-                    <a href="#" class="rt">前端</a>
-                </div>
-            </div>
-            <div class="related-card">
-                <h4>快捷筛选</h4>
-                <div class="related-actions">
-                    <button class="quick-btn" data-type="remote">远程/混合办公</button>
-                    <button class="quick-btn" data-type="junior">应届/初级</button>
-                    <button class="quick-btn" data-type="hot">高薪职位</button>
-                </div>
-                <small>点击即可填充筛选条件</small>
-            </div>
-            <div class="related-card">
-                <h4>求职建议</h4>
-                <ul class="tips">
-                    <li>完善技能标签，获得更精准推荐</li>
-                    <li>设置最低薪资与城市，缩小搜索范围</li>
-                    <li>收藏感兴趣职位，稍后统一投递</li>
-                </ul>
-            </div>
-        </div>
-    </section>
 </div>
 
 <style>
@@ -193,19 +159,14 @@
     font-size: 14px;
 }
 
-.btn-ico {
-    display: inline-block;
-    margin-right: 6px;
-    filter: grayscale(1) contrast(.7) opacity(.6);
-}
-
 .btn-search {
-    background: #ecf0f1;
-    color: #2c3e50;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
 }
 
 .btn-search:hover {
-    background: #d5dbdb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
 }
 
 .btn-clear {
@@ -233,9 +194,7 @@
 }
 
 .skill-tag {
-    background: rgba(255,255,255,.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 8px 16px;
     border-radius: 20px;
@@ -249,29 +208,6 @@
     padding: 25px;
     margin-bottom: 30px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* 相关内容推荐区域 - 与页面背景契合的浅色卡片 */
-.related-section{
-    background: transparent;
-    margin-top: 10px;
-    padding-bottom: 40px;
-}
-.related-section h3{ color:#2c3e50; margin: 10px 0 16px 0; font-size: 20px; }
-.related-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap:16px; }
-.related-card{
-    background:#fff; border-radius:12px; padding:16px; box-shadow:0 4px 20px rgba(0,0,0,.08);
-}
-.related-card h4{ margin:0 0 10px 0; color:#2c3e50; }
-.related-tags{ display:flex; flex-wrap:wrap; gap:8px; }
-.related-tags .rt{ display:inline-block; padding:6px 10px; border-radius:999px; background:#ecf0f1; color:#2c3e50; text-decoration:none; font-size:12px; }
-.related-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
-.quick-btn{ padding:8px 12px; border:1px solid rgba(51,51,51,.15); background:rgba(255,255,255,.6); border-radius:10px; cursor:pointer; }
-.quick-btn:hover{ background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.06); }
-.tips{ margin:0; padding-left:18px; color:#7f8c8d; }
-
-@media (max-width: 768px){
-    .related-grid{ grid-template-columns: 1fr; }
 }
 
 .results-header {
@@ -321,9 +257,7 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: rgba(255,255,255,.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .job-title {
@@ -407,9 +341,7 @@
     position: absolute;
     top: 15px;
     right: 15px;
-    background: rgba(255,255,255,.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 6px 12px;
     border-radius: 15px;
@@ -422,35 +354,36 @@
     gap: 10px;
 }
 
-
 .btn-apply,
 .btn-view {
     flex: 1;
     padding: 10px;
-    border-radius: 10px;
+    border: none;
+    border-radius: 8px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.3s ease;
     font-size: 14px;
     text-decoration: none;
     text-align: center;
-    background: rgba(255,255,255,.35) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(51,51,51,.15) !important;
-    color: #333 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06) !important;
 }
 
-.btn-apply:hover,
+.btn-apply {
+    background: #27ae60;
+    color: white;
+}
+
+.btn-apply:hover {
+    background: #229954;
+}
+
+.btn-view {
+    background: #ecf0f1;
+    color: #2c3e50;
+}
+
 .btn-view:hover {
-    background: rgba(255,255,255,.5) !important;
-    box-shadow: 0 4px 16px rgba(0,0,0,.08) !important;
-}
-
-.btn-apply:active,
-.btn-view:active {
-    transform: translateY(1px);
+    background: #d5dbdb;
 }
 
 .loading {
