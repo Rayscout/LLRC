@@ -17,6 +17,10 @@ from .smart_goals import smart_goals_bp
 from .compensation import compensation_bp
 from .feedback import feedback_bp
 
+# 导入调试和状态检查工具
+from .status_check import employee_interface_status
+from .debug_tools import debug_employee_errors, debug_employee_routes, debug_employee_auth
+
 # 注册子蓝图到employee_manager_bp
 employee_manager_bp.register_blueprint(profile_bp)
 employee_manager_bp.register_blueprint(performance_bp)

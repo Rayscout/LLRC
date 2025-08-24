@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}HR个人资料{% endblock %}
+
+{% block content %}
+<div class="hr-profile-page">
+    <div class="page-header">
+        <h1><i class="uil uil-user"></i> HR个人资料</h1>
+        <p>管理您的个人信息和账户设置</p>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-section">
+            <h2>基本信息</h2>
+            <div class="profile-info">
+                <div class="info-item">
+                    <label>姓名：</label>
+                    <span>{{ user.first_name }} {{ user.last_name }}</span>
+                </div>
+                <div class="info-item">
+                    <label>邮箱：</label>
+                    <span>{{ user.email }}</span>
+                </div>
+                <div class="info-item">
+                    <label>电话：</label>
+                    <span>{{ user.phone_number }}</span>
+                </div>
+                <div class="info-item">
+                    <label>公司：</label>
+                    <span>{{ user.company_name }}</span>
+                </div>
+                <div class="info-item">
+                    <label>职位：</label>
+                    <span>{{ user.position or 'HR专员' }}</span>
+                </div>
+                <div class="info-item">
+                    <label>用户类型：</label>
+                    <span class="badge hr-badge">HR用户</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h2>账户信息</h2>
+            <div class="profile-info">
+                <div class="info-item">
+                    <label>用户ID：</label>
+                    <span>{{ user.id }}</span>
+                </div>
+                <div class="info-item">
+                    <label>注册时间：</label>
+                    <span>{{ user.created_at.strftime('%Y-%m-%d %H:%M') if user.created_at else '未知' }}</span>
+                </div>
+                <div class="info-item">
+                    <label>最后登录：</label>
+                    <span>{{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else '未知' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-actions">
+            <a href="{{ url_for('smartrecruit.hr.profile.hr_settings') }}" class="btn btn-primary">
+                <i class="uil uil-setting"></i> 编辑设置
+            </a>
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="btn btn-secondary">
+                <i class="uil uil-arrow-left"></i> 返回仪表板
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.hr-profile-page {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.page-header p {
+    color: #666;
+    font-size: 16px;
+}
+
+.profile-content {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.profile-section {
+    margin-bottom: 30px;
+}
+
+.profile-section h2 {
+    color: #333;
+    border-bottom: 2px solid #007AFF;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.profile-info {
+    display: grid;
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #007AFF;
+}
+
+.info-item label {
+    font-weight: 600;
+    color: #333;
+    min-width: 100px;
+    margin-right: 15px;
+}
+
+.info-item span {
+    color: #666;
+    flex: 1;
+}
+
+.badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.hr-badge {
+    background: #007AFF;
+    color: white;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #007AFF;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0056CC;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+    transform: translateY(-2px);
+}
+
+/* 深色模式支持 */
+body.dark .profile-content {
+    background: #1f2937;
+    color: #f9fafb;
+}
+
+body.dark .profile-section h2 {
+    color: #f9fafb;
+}
+
+body.dark .info-item {
+    background: #374151;
+}
+
+body.dark .info-item label {
+    color: #f9fafb;
+}
+
+body.dark .info-item span {
+    color: #d1d5db;
+}
+</style>
+{% endblock %}

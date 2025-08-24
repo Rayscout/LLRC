@@ -79,7 +79,16 @@ def logout():
     session.pop('user_type', None)
     session.clear()
     flash('您已退出登录。', 'success')
-    return redirect(url_for('common.auth.sign'))
+    return redirect(url_for('common.auth.logout'))
+
+@candidate_bp.route('/settings')
+def settings():
+    """求职者设置页面"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    
+    return render_template('smartrecruit/candidate/settings.html', user=g.user)
 
 # 注册求职者子蓝图
 candidate_bp.register_blueprint(profile_bp)

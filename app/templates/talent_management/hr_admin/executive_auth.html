@@ -14,7 +14,7 @@
         .alert.alert-danger{background:#dc3545}
         .alert.alert-success{background:#1a9d1a}
         .alert.alert-info{background:#2563eb}
-        .hero-bg{background-image:url("{{ url_for('static', filename='Images/background.jpg') }}");}
+        .hero-bg{background:linear-gradient(135deg, #667eea, #764ba2);}
         .role-badge {
             display: inline-block;
             padding: 4px 12px;
@@ -80,7 +80,10 @@
                 </div>
                 <div class="hero-right">
                     <div class="avatar">
-                        <img src="{{ url_for('static', filename='Images/job-seeker.svg') }}" alt="Supervisor" />
+                        <div style="width: 200px; height: 200px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px; font-weight: bold; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                            👔
+                        </div>
+                        <p style="text-align: center; margin-top: 20px; color: white; font-size: 18px; font-weight: 600;">Supervisor</p>
                     </div>
                 </div>
             </div>
@@ -201,6 +204,7 @@
                     <form id="signupForm" class="form" method="post" action="{{ url_for('talent_management.executive_auth.executive_auth') }}" style="padding-top:8px">
                         <input type="hidden" name="action" value="signup" />
                         <input type="hidden" name="user_type" value="executive" />
+                        <input type="hidden" name="is_hr" value="false" />
                         <div class="grid grid-2 gap-6">
                             <label class="field">
                                 <span class="label">名</span>

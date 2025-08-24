@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from app.models import User, db
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 executive_auth_bp = Blueprint('executive_auth', __name__, url_prefix='/executive')
@@ -19,6 +20,12 @@ def executive_auth():
             phone_number = request.form['phone_number']
             birthday = request.form['birthday']
             password = request.form['password']
+            confirm_password = request.form.get('confirm_password', '')
+            
+            # 验证密码确认
+            if password != confirm_password:
+                flash('两次输入的密码不一致。', 'danger')
+                return redirect(url_for('talent_management.executive_auth.executive_auth'))
             
             # 检查邮箱是否已存在
             existing_user = User.query.filter_by(email=email).first()
@@ -36,7 +43,7 @@ def executive_auth():
                 email=email,
                 phone_number=phone_number,
                 birthday=birthday,
-                password=password,
+                password=generate_password_hash(password),
                 user_type='executive',
                 is_hr=False
             )
@@ -50,8 +57,8 @@ def executive_auth():
             email = request.form['email']
             password = request.form['password']
             
-            user = User.query.filter_by(email=email, password=password, user_type='executive').first()
-            if user:
+            user = User.query.filter_by(email=email, user_type='executive').first()
+            if user and check_password_hash(user.password, password):
                 session['user_id'] = user.id
                 session['user_type'] = 'executive'
                 flash('登录成功！', 'success')
@@ -80,7 +87,5 @@ def executive_dashboard():
 
 @executive_auth_bp.route('/logout')
 def executive_logout():
-    session.pop('user_id', None)
-    session.pop('user_type', None)
-    flash('您已退出登录。', 'success')
-    return redirect(url_for('talent_management.executive_auth.executive_auth'))
+    """高管退出登录 - 重定向到通用退出登录"""
+    return redirect(url_for('common.auth.logout'))

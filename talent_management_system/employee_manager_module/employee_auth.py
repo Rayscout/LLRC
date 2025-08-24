@@ -127,8 +127,5 @@ def employee_dashboard():
 
 @employee_auth_bp.route('/logout')
 def employee_logout():
-    """员工登出"""
-    session.pop('user_id', None)
-    session.pop('user_type', None)
-    flash('您已退出登录。', 'success')
-    return redirect(url_for('talent_management.employee_auth.employee_auth'))
+    """员工退出登录 - 重定向到通用退出登录"""
+    return redirect(url_for('common.auth.logout'))

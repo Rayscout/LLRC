@@ -303,27 +303,65 @@ class IOSHRInterface {
         const profileMenu = document.createElement('div');
         profileMenu.className = 'ios-profile-menu';
         profileMenu.innerHTML = `
-            <div class="ios-profile-menu-item">
+            <div class="ios-profile-menu-item" data-action="profile">
                 <i class="fas fa-user"></i>
                 <span>个人资料</span>
             </div>
-            <div class="ios-profile-menu-item">
+            <div class="ios-profile-menu-item" data-action="settings">
                 <i class="fas fa-cog"></i>
                 <span>设置</span>
             </div>
-            <div class="ios-profile-menu-item">
+            <div class="ios-profile-menu-item" data-action="logout">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>退出登录</span>
             </div>
         `;
         
+        // 添加点击事件
+        const menuItems = profileMenu.querySelectorAll('.ios-profile-menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const action = item.getAttribute('data-action');
+                this.handleProfileMenuAction(action);
+                profileMenu.remove();
+            });
+        });
+        
         // 添加到页面
         document.body.appendChild(profileMenu);
         
-        // 3秒后自动移除
+        // 点击其他地方关闭菜单
+        const closeMenu = (e) => {
+            if (!profileMenu.contains(e.target)) {
+                profileMenu.remove();
+                document.removeEventListener('click', closeMenu);
+            }
+        };
+        
+        // 延迟添加事件监听器，避免立即触发
         setTimeout(() => {
-            profileMenu.remove();
-        }, 3000);
+            document.addEventListener('click', closeMenu);
+        }, 100);
+    }
+    
+    // 处理个人资料菜单操作
+    handleProfileMenuAction(action) {
+        switch (action) {
+            case 'profile':
+                window.location.href = '/smartrecruit/hr/profile/hr_profile';
+                break;
+            case 'settings':
+                window.location.href = '/smartrecruit/hr/profile/hr_settings';
+                break;
+            case 'logout':
+                if (confirm('确定要退出登录吗？')) {
+                    window.location.href = '/auth/logout';
+                }
+                break;
+            default:
+                console.log('未知操作:', action);
+        }
     }
 
     // 显示通知

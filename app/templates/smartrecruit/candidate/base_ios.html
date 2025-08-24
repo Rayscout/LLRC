@@ -49,8 +49,19 @@
                 🌙
             </button>
             <div class="user-menu">
-                <div class="user-avatar" title="{{ user.first_name if user else '用户' }}">
+                <div class="user-avatar" onclick="toggleUserMenu()" title="{{ user.first_name if user else '用户' }}">
                     {{ user.first_name[0] if user and user.first_name else 'U' }}
+                </div>
+                <div class="user-dropdown-menu" id="userDropdownMenu">
+                    <a href="{{ url_for('smartrecruit.candidate.dashboard') }}" class="dropdown-item">
+                        <i class="fas fa-user"></i> 个人资料
+                    </a>
+                    <a href="{{ url_for('smartrecruit.candidate.settings') }}" class="dropdown-item">
+                        <i class="fas fa-cog"></i> 设置
+                    </a>
+                    <a href="{{ url_for('common.auth.logout') }}" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i> 退出登录
+                    </a>
                 </div>
             </div>
         </div>
@@ -78,9 +89,116 @@
                 opacity: 0;
             }
         }
+        
+        /* 用户下拉菜单样式 */
+        .user-menu {
+            position: relative;
+        }
+        
+        .user-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--ios-card-bg);
+            border: 1px solid var(--ios-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+        }
+        
+        .user-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--ios-text);
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid var(--ios-border);
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--ios-hover);
+        }
+        
+        .dropdown-item i {
+            margin-right: 12px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        /* 深色模式支持 */
+        body.dark .user-dropdown-menu {
+            background: var(--ios-card-bg-dark);
+            border-color: var(--ios-border-dark);
+        }
+        
+        body.dark .dropdown-item {
+            color: var(--ios-text-dark);
+        }
+        
+        body.dark .dropdown-item:hover {
+            background-color: var(--ios-hover-dark);
+        }
     </style>
 
     <script src="{{ url_for('static', filename='candidate_ios_script.js') }}"></script>
+    
+    <script>
+        // 用户下拉菜单功能
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdownMenu');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+        
+        // 点击外部关闭下拉菜单
+        document.addEventListener('click', function(event) {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('userDropdownMenu');
+            
+            if (dropdown && userMenu && !userMenu.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
+        // 主题切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.querySelector('.theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    document.body.classList.toggle('dark');
+                    const isDark = document.body.classList.contains('dark');
+                    themeToggle.textContent = isDark ? '☀️' : '🌙';
+                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                });
+                
+                // 恢复保存的主题
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.body.classList.add('dark');
+                    themeToggle.textContent = '☀️';
+                }
+            }
+        });
+    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html>
