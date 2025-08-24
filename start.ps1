@@ -11,7 +11,7 @@ pip install -r requirements_simple.txt
 
 # 启动应用
 Write-Host "启动应用..." -ForegroundColor Yellow
-python run.py
+python run_app.py
 
 Read-Host "按回车键退出"
 

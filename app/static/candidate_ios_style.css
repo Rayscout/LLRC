@@ -129,9 +129,12 @@ body {
     font-size: 0.95rem;
     padding: 8px 16px;
     border-radius: var(--button-radius);
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .nav-link::before {
@@ -152,7 +155,12 @@ body {
 .nav-link:hover {
     color: var(--accent-color);
     background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
+}
+
+.nav-link:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
 }
 
 .nav-link.active {
@@ -212,6 +220,18 @@ body {
 .user-avatar:hover {
     transform: scale(1.1);
     border-color: var(--accent-color);
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .nav-link {
+        padding: 12px 20px; /* 增加触摸区域 */
+        min-height: 44px; /* 确保触摸区域足够大 */
+    }
+    
+    .nav-link:hover {
+        transform: none; /* 触摸设备上禁用悬停效果 */
+    }
 }
 
 /* 主要内容区域 */

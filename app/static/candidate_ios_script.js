@@ -99,9 +99,37 @@ function initNavbar() {
     const currentPath = window.location.pathname;
     
     navLinks.forEach(link => {
-        if (link.getAttribute('href') === currentPath) {
+        // 移除所有active类
+        link.classList.remove('active');
+        
+        // 检查当前路径是否匹配
+        const href = link.getAttribute('href');
+        if (href && (currentPath === href || currentPath.startsWith(href.replace('/smartrecruit/candidate', '')))) {
             link.classList.add('active');
         }
+    });
+    
+    // 添加导航链接点击反馈
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // 添加点击反馈
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+            
+            // 调试信息
+            console.log('导航链接点击:', this.textContent.trim(), 'href:', this.getAttribute('href'));
+            
+            // 确保链接正常工作
+            if (this.getAttribute('href') && this.getAttribute('href') !== '#') {
+                // 链接有效，允许正常跳转
+                console.log('允许跳转到:', this.getAttribute('href'));
+            } else {
+                e.preventDefault();
+                console.warn('导航链接无效:', this.getAttribute('href'));
+            }
+        });
     });
 }
 

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 import os
 import logging
-from app.models import Job, Application, db
+from app.models import Job, Application, User, db
 from app.utils import (
     evaluate_cv,
     generate_interview_questions,
@@ -14,10 +14,7 @@ from app.utils import (
 )
 from app import applications_collection
 from datetime import datetime
-from flask import Blueprint, render_template, request, redirect, url_for, flash, g, current_app
-from app.models import User, db
 from sqlalchemy import text
-import os
 
 applications_bp = Blueprint('applications', __name__, url_prefix='/applications')
 
@@ -404,16 +401,72 @@ def view_applications():
 def apply_job(job_id):
     """申请职位"""
     if g.user is None:
+        if request.headers.get('Content-Type') == 'application/json':
+            return jsonify({'success': False, 'message': '请先登录'}), 401
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
     
-    if request.method == 'POST':
-        # 处理职位申请逻辑
-        flash('职位申请已提交！', 'success')
-        return redirect(url_for('smartrecruit.candidate.applications.view_applications'))
+    # 检查职位是否存在
+    job = Job.query.get(job_id)
+    if not job:
+        if request.headers.get('Content-Type') == 'application/json':
+            return jsonify({'success': False, 'message': '职位不存在'}), 404
+        flash('职位不存在。', 'danger')
+        return redirect(url_for('smartrecruit.candidate.jobs.search'))
     
-    # 显示申请表单
-    return render_template('smartrecruit/candidate/apply_job.html', job_id=job_id, user=g.user)
+    if request.method == 'POST':
+        try:
+            # 检查是否已经申请过这个职位
+            existing_application = Application.query.filter_by(
+                user_id=g.user.id, 
+                job_id=job_id
+            ).first()
+            
+            if existing_application:
+                if existing_application.is_active:
+                    if request.headers.get('Content-Type') == 'application/json':
+                        return jsonify({'success': False, 'message': '您已经申请过这个职位'}), 400
+                    flash('您已经申请过这个职位。', 'warning')
+                    return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
+                else:
+                    # 如果之前撤销过，重新激活申请
+                    existing_application.is_active = True
+                    existing_application.status = 'Pending'
+                    existing_application.timestamp = datetime.utcnow()
+                    existing_application.message = '重新申请'
+                    db.session.commit()
+                    
+                    if request.headers.get('Content-Type') == 'application/json':
+                        return jsonify({'success': True, 'message': '申请已重新提交'})
+                    flash('申请已重新提交！', 'success')
+                    return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
+            
+            # 创建新的申请
+            new_application = Application(
+                user_id=g.user.id,
+                job_id=job_id,
+                message=f'申请职位：{job.title}',
+                status='Pending'
+            )
+            
+            db.session.add(new_application)
+            db.session.commit()
+            
+            if request.headers.get('Content-Type') == 'application/json':
+                return jsonify({'success': True, 'message': '申请提交成功'})
+            flash('职位申请已提交！', 'success')
+            return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
+            
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f'申请职位失败: {e}')
+            if request.headers.get('Content-Type') == 'application/json':
+                return jsonify({'success': False, 'message': '申请失败，请稍后重试'}), 500
+            flash('申请失败，请稍后重试。', 'danger')
+            return redirect(url_for('smartrecruit.candidate.jobs.search'))
+    
+    # GET 请求显示申请表单
+    return render_template('smartrecruit/candidate/apply_job.html', job_id=job_id, user=g.user, job=job)
 
 def get_user_applications_count(user_id):
     """获取用户申请数量"""

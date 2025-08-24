@@ -13,7 +13,6 @@
                 <p style="font-size: 1.1rem; color: var(--text-secondary);">基于您的技能和偏好，找到最适合的职位</p>
             </div>
 
-<<<<<<< HEAD
             <!-- 搜索过滤器 -->
             <div class="search-filters" style="margin-bottom: 30px;">
                 <div class="grid grid-2" style="margin-bottom: 20px;">
@@ -124,72 +123,6 @@
         </div>
     </div>
 </section>
-=======
-    <!-- 搜索过滤器 -->
-    <div class="search-filters">
-        <div class="filter-row">
-            <div class="filter-group">
-                <label for="searchQuery">关键词搜索</label>
-                <input type="text" id="searchQuery" placeholder="职位名称、技能、公司名称...">
-            </div>
-            <div class="filter-group">
-                <label for="locationFilter">工作地点</label>
-                <input type="text" id="locationFilter" placeholder="城市、地区...">
-            </div>
-        </div>
-        
-        <div class="filter-row">
-            <div class="filter-group">
-                <label for="salaryMin">最低薪资</label>
-                <input type="number" id="salaryMin" placeholder="最低薪资">
-            </div>
-            <div class="filter-group">
-                <label for="salaryMax">最高薪资</label>
-                <input type="number" id="salaryMax" placeholder="最高薪资">
-            </div>
-            <div class="filter-group">
-                <label for="jobTypeFilter">工作类型</label>
-                <select id="jobTypeFilter">
-                    <option value="">全部类型</option>
-                    <option value="全职">全职</option>
-                    <option value="兼职">兼职</option>
-                    <option value="实习">实习</option>
-                    <option value="远程">远程</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="experienceFilter">经验要求</label>
-                <select id="experienceFilter">
-                    <option value="">全部级别</option>
-                    <option value="初级">初级</option>
-                    <option value="中级">中级</option>
-                    <option value="高级">高级</option>
-                    <option value="专家">专家</option>
-                </select>
-            </div>
-        </div>
-        
-        <div class="filter-actions">
-            <button class="btn-search" onclick="searchJobs()">🔍 搜索职位</button>
-            <button class="btn-clear" onclick="clearFilters()">🔄 清除筛选</button>
-        </div>
-    </div>
-
-    <!-- 用户技能展示 -->
-    <div class="user-skills" id="userSkillsSection" style="display: none;">
-        <h3>🎯 您的技能匹配</h3>
-        <div class="skills-tags" id="skillsTags"></div>
-    </div>
-
-    <!-- 搜索结果 -->
-    <div class="search-results" id="searchResults" style="display: none;">
-        <div class="results-header">
-            <h3>📋 搜索结果</h3>
-            <span class="results-count" id="resultsCount"></span>
-        </div>
-        <div class="jobs-grid" id="searchResultsGrid"></div>
-    </div>
-</div>
 
 <style>
 .job-search-container {
@@ -198,132 +131,84 @@
     margin: 0 auto;
 }
 
-.search-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.search-header h1 {
-    color: #2c3e50;
-    margin-bottom: 10px;
-    font-size: 2.5em;
-}
-
-.search-header p {
-    color: #7f8c8d;
-    font-size: 1.1em;
-}
-
 .search-filters {
-    background: white;
-    border-radius: 15px;
+    background: var(--bg-card);
     padding: 25px;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
     margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.filter-row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
 }
 
 .filter-group {
-    flex: 1;
-    min-width: 200px;
+    margin-bottom: 15px;
 }
 
 .filter-group label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--text-primary);
 }
 
 .filter-group input,
 .filter-group select {
     width: 100%;
     padding: 12px;
-    border: 2px solid #e1e8ed;
-    border-radius: 8px;
-    font-size: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--button-radius);
+    background: var(--bg-card);
+    color: var(--text-primary);
     transition: border-color 0.3s ease;
 }
 
 .filter-group input:focus,
 .filter-group select:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.1);
 }
 
 .filter-actions {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
+    text-align: center;
     margin-top: 20px;
 }
 
-.btn-search,
-.btn-clear {
+.filter-actions .btn {
+    margin: 0 10px;
     padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
+    border-radius: var(--button-radius);
     font-weight: 600;
-    cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 14px;
-}
-
-.btn-search {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.btn-search:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-}
-
-.btn-clear {
-    background: #ecf0f1;
-    color: #2c3e50;
-}
-
-.btn-clear:hover {
-    background: #d5dbdb;
 }
 
 .user-skills {
-    background: white;
-    border-radius: 15px;
+    background: var(--bg-card);
     padding: 20px;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
     margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .skills-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 15px;
 }
 
 .skill-tag {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
     color: white;
     padding: 8px 16px;
     border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .search-results {
-    background: white;
-    border-radius: 15px;
+    background: var(--bg-card);
     padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
 }
 
 .results-header {
@@ -331,216 +216,156 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-}
-
-.results-count {
-    color: #7f8c8d;
-    font-size: 14px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .jobs-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    align-items: stretch;
-    justify-content: flex-start;
-}
-
-.jobs-grid .job-card {
-    flex: 0 1 calc(33.333% - 16px);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 20px;
 }
 
 .job-card {
-    border: 2px solid #e1e8ed;
-    border-radius: 12px;
-    padding: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--card-radius);
+    padding: 20px;
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    background: #fff;
+    cursor: pointer;
 }
 
 .job-card:hover {
-    border-color: #3498db;
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.job-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.job-title {
-    font-size: 1.2em;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 8px;
-    line-height: 1.3;
+    box-shadow: var(--card-shadow);
+    border-color: var(--accent-color);
 }
 
 .job-header {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 6px;
-}
-
-.job-company {
-    color: #3498db;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.icon-text {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #2c3e50;
-}
-
-.icon-text i {
-    color: #7f8c8d;
-}
-
-.job-location {
-    color: #7f8c8d;
-    font-size: 14px;
-    margin-bottom: 12px;
-}
-
-.job-salary {
-    font-weight: 700;
-    color: #27ae60;
-    margin-bottom: 12px;
-}
-
-.job-description {
-    color: #2c3e50;
-    line-height: 1.5;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 15px;
-    font-size: 14px;
+}
+
+.job-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.company-name {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.job-badge {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .job-meta {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
     margin-bottom: 15px;
 }
 
-.job-type,
-.job-experience {
-    background: #ecf0f1;
-    color: #2c3e50;
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.pill {
-    background: #ecf0f1;
-    color: #2c3e50;
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.match-score {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 15px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.job-actions {
+.job-meta span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 5px;
 }
 
-.btn-apply,
-.btn-view {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
+.job-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.tag {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
     transition: all 0.3s ease;
-    font-size: 14px;
-    text-decoration: none;
-    text-align: center;
 }
 
-.btn-apply {
-    background: #27ae60;
+.tag:hover {
+    background: var(--accent-color);
     color: white;
 }
 
-.btn-apply:hover {
-    background: #229954;
+.related-section {
+    margin-top: 40px;
 }
 
-.btn-view {
-    background: #ecf0f1;
-    color: #2c3e50;
+.related-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
 }
 
-.btn-view:hover {
-    background: #d5dbdb;
+.related-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
 }
 
 .loading {
     text-align: center;
     padding: 40px;
-    color: #7f8c8d;
-    font-size: 16px;
+    color: var(--text-secondary);
 }
 
 .no-results {
     text-align: center;
     padding: 40px;
-    color: #7f8c8d;
+    color: var(--text-secondary);
 }
 
 .no-results h4 {
     margin-bottom: 10px;
-    color: #2c3e50;
+    color: var(--text-primary);
 }
 
 @media (max-width: 768px) {
-    .filter-row {
-        flex-direction: column;
+    .jobs-grid {
+        grid-template-columns: 1fr;
     }
     
-    .filter-group {
-        min-width: auto;
+    .filter-actions .btn {
+        margin: 5px;
+        width: 100%;
     }
     
-    .jobs-grid .job-card { flex: 0 1 100%; }
-    
-    .filter-actions {
+    .job-meta {
         flex-direction: column;
+        gap: 8px;
+    }
+    
+    .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
 }
 
-@media (max-width: 1200px) and (min-width: 769px) {
+@media (max-width: 480px) {
     .jobs-grid .job-card { flex: 0 1 calc(50% - 16px); }
 }
 </style>
->>>>>>> 0c1a8164980c3c64a222c904ce2402def3fc7a6f
 
 <script>
 let currentSearchResults = [];
@@ -637,11 +462,12 @@ function displayJobs(jobs, container) {
                 <a href="${'{{ url_for("smartrecruit.candidate.jobs.job_detail", job_id=0) }}'.replace('0', job.id)}" class="btn btn-secondary" style="margin-right: 10px;">
                     <i class="fas fa-eye"></i> 查看详情
                 </a>
-                <a href="${'{{ url_for("smartrecruit.candidate.applications.apply", job_id=0) }}'.replace('0', job.id)}" class="btn">
+                <button class="btn" onclick="applyForJob(${job.id})">
                     <i class="fas fa-paper-plane"></i> 立即申请
-                </a>
+                </button>
             </div>
-        </div>`;
+        </div>
+        `;
     }).join('');
 }
 
@@ -654,8 +480,8 @@ function clearFilters() {
     document.getElementById('jobTypeFilter').value = '';
     document.getElementById('experienceFilter').value = '';
     
-    // 隐藏搜索结果
-    document.getElementById('searchResults').style.display = 'none';
+    const searchResults = document.getElementById('searchResults');
+    searchResults.style.display = 'none';
 }
 
 // 设置搜索关键词
@@ -667,6 +493,7 @@ function setSearchQuery(query) {
 // 快捷筛选
 function quickFilter(type) {
     clearFilters();
+    
     switch(type) {
         case 'remote':
             document.getElementById('jobTypeFilter').value = '远程';
@@ -675,17 +502,42 @@ function quickFilter(type) {
             document.getElementById('experienceFilter').value = '初级';
             break;
         case 'hot':
-            document.getElementById('salaryMin').value = '20000';
+            document.getElementById('salaryMin').value = '15000';
             break;
     }
+    
     searchJobs();
 }
 
-// 回车键搜索
-document.getElementById('searchQuery').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        searchJobs();
+// 申请职位
+async function applyForJob(jobId) {
+    try {
+        // 构建正确的URL，包含job_id参数
+        const applyUrl = `/smartrecruit/candidate/applications/apply_job/${jobId}`;
+        
+        const response = await fetch(applyUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                job_id: jobId
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('申请成功！');
+            // 可以跳转到申请详情页面
+            window.location.href = '{{ url_for("smartrecruit.candidate.applications.my_applications") }}';
+        } else {
+            alert('申请失败：' + data.message);
+        }
+    } catch (error) {
+        console.error('申请失败:', error);
+        alert('申请失败，请稍后重试');
     }
-});
+}
 </script>
 {% endblock %}
