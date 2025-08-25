@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, g
 from ..models import User, db
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -81,7 +80,7 @@ def sign():
                         email=email,
                         phone_number=phone_number,
                         birthday=birthday,
-                        password=generate_password_hash(password),
+                        password=password,
                         user_type='employee',
                         is_hr=False
                     )
@@ -96,7 +95,7 @@ def sign():
                         email=email,
                         phone_number=phone_number,
                         birthday=birthday,
-                        password=generate_password_hash(password),
+                        password=password,
                         user_type='executive',
                         is_hr=False
                     )
@@ -109,7 +108,7 @@ def sign():
                     email=email,
                     phone_number=phone_number,
                     birthday=birthday,
-                    password=generate_password_hash(password),
+                    password=password,
                     is_hr=(role == 'recruiter'),
                     user_type=role
                 )
@@ -129,8 +128,8 @@ def sign():
                 flash('请选择登录身份。', 'danger')
                 return redirect(url_for('common.auth.sign'))
             
-            user = User.query.filter_by(email=email).first()
-            if user and check_password_hash(user.password, password):
+            user = User.query.filter_by(email=email, password=password).first()
+            if user:
                 # 检查用户是否有user_type字段，如果没有则设置默认值
                 if not hasattr(user, 'user_type') or user.user_type is None:
                     # 根据is_hr字段设置默认用户类型
@@ -161,7 +160,67 @@ def sign():
             else:
                 flash('邮箱或密码错误。', 'danger')
 
-    return render_template('common/sign.html')
+    # 按你的要求使用简化版首页（无需模板），保证稳定可用
+    return (
+        """
+        <!doctype html>
+        <meta charset="utf-8" />
+        <title>登录 / 注册</title>
+        <div style="max-width:520px;margin:48px auto;font-family:Arial,sans-serif">
+          <h2 style="margin-bottom:12px">智能招聘系统 · 简化版</h2>
+          <p style="color:#555;margin:0 0 16px">请选择登录身份并输入邮箱与密码。</p>
+          <form method="post" action="/auth/sign" style="padding:16px;border:1px solid #e5e7eb;border-radius:10px;background:#fff">
+            <input type="hidden" name="action" value="signin" />
+            <div style="margin:10px 0">
+              <label>邮箱</label><br/>
+              <input name="email" type="email" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px" />
+            </div>
+            <div style="margin:10px 0">
+              <label>密码</label><br/>
+              <input name="password" type="password" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px" />
+            </div>
+            <div style="margin:10px 0">
+              <label>以身份登录</label><br/>
+              <label style="margin-right:10px"><input type="radio" name="role" value="candidate" required /> 求职者</label>
+              <label style="margin-right:10px"><input type="radio" name="role" value="recruiter" /> HR</label>
+              <label style="margin-right:10px"><input type="radio" name="role" value="executive" /> 高管</label>
+              <label style="margin-right:10px"><input type="radio" name="role" value="employee" /> 员工</label>
+            </div>
+            <button type="submit" style="width:100%;padding:12px;border:none;border-radius:8px;background:#2563eb;color:#fff">登录</button>
+          </form>
+
+          <details style="margin-top:16px">
+            <summary>没有账号？点此注册</summary>
+            <form method="post" action="/auth/sign" style="margin-top:12px;padding:16px;border:1px solid #e5e7eb;border-radius:10px;background:#fff">
+              <input type="hidden" name="action" value="signup" />
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div><label>名</label><br/><input name="first_name" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px" /></div>
+                <div><label>姓</label><br/><input name="last_name" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px" /></div>
+              </div>
+              <div style="margin-top:10px"><label>公司名称</label><br/><input name="company_name" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px" /></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+                <div><label>手机号</label><br/><input name="phone_number" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px" /></div>
+                <div><label>生日</label><br/><input name="birthday" type="date" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px" /></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+                <div><label>密码</label><br/><input name="password" type="password" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px" /></div>
+                <div><label>确认密码</label><br/><input name="confirm_password" type="password" required style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px" /></div>
+              </div>
+              <div style="margin-top:10px">
+                <label>注册身份</label><br/>
+                <label style="margin-right:10px"><input type="radio" name="role" value="candidate" required /> 求职者</label>
+                <label style="margin-right:10px"><input type="radio" name="role" value="recruiter" /> HR</label>
+                <label style="margin-right:10px"><input type="radio" name="role" value="executive" /> 高管</label>
+                <label style="margin-right:10px"><input type="radio" name="role" value="employee" /> 员工</label>
+              </div>
+              <button type="submit" style="width:100%;margin-top:12px;padding:12px;border:none;border-radius:8px;background:#059669;color:#fff">注册</button>
+            </form>
+          </details>
+        </div>
+        """,
+        200,
+        {"Content-Type": "text/html; charset=utf-8"},
+    )
 
 @auth_bp.route('/logout')
 def logout():

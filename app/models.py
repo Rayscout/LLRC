@@ -26,8 +26,6 @@ class User(db.Model):
     skills = db.Column(db.Text)  # 技能标签（JSON格式存储）
     education = db.Column(db.Text)  # 教育经历
     experience = db.Column(db.Text)  # 工作经历
-    # 同步相关字段
-    cv_last_synced = db.Column(db.DateTime)  # 简历最后同步时间
 
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -54,8 +52,6 @@ class Job(db.Model):
     contact_phone = db.Column(db.String(15))
     application_deadline = db.Column(db.DateTime)
     department = db.Column(db.String(100))
-    # 同步相关字段
-    last_synced = db.Column(db.DateTime)  # 最后同步时间
 
 class Application(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -65,8 +61,6 @@ class Application(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), nullable=False, default='Pending')
     is_active = db.Column(db.Boolean, default=True)  # 添加活跃状态字段
-    # 同步相关字段
-    last_synced = db.Column(db.DateTime)  # 最后同步时间
 
     user = db.relationship('User', backref=db.backref('applications', lazy=True))
     job = db.relationship('Job', backref=db.backref('applications', lazy=True))

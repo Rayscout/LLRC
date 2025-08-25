@@ -10,6 +10,7 @@ from .config import Config
 import logging
 import sys
 import os
+from jinja2 import ChoiceLoader, FileSystemLoader
 
 # 配置日志
 logging.basicConfig(level=logging.DEBUG)
@@ -26,20 +27,32 @@ mongo_client = None
 mongodb = None
 applications_collection = None
 try:
-    mongo_client = MongoClient('mongodb://localhost:27017/', serverSelectionTimeoutMS=5000)
-    # 测试连接
-    mongo_client.admin.command('ping')
+    mongo_client = MongoClient('mongodb://localhost:27017/')
     mongodb = mongo_client['applications']
     applications_collection = mongodb['applications']
     logger.info("MongoDB connected successfully.")
 except Exception as e:
     logger.warning(f"Could not connect to MongoDB: {e}. MongoDB features will be disabled.")
-    mongo_client = None
-    mongodb = None
-    applications_collection = None
 
 def create_app():
-    app = Flask(__name__)
+    # 显式指定模板与静态资源目录，避免路径解析异常导致找不到模板
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    templates_dir = os.path.join(base_dir, 'templates')
+    static_dir = os.path.join(base_dir, 'static')
+    app = Flask(__name__, template_folder=templates_dir, static_folder=static_dir)
+    # 兼容多种工作目录的模板搜索路径
+    try:
+        search_paths = [
+            templates_dir,
+            os.path.join(os.getcwd(), 'LLRC', 'app', 'templates'),
+            os.path.join(os.getcwd(), 'app', 'templates'),
+        ]
+        app.jinja_loader = ChoiceLoader([
+            FileSystemLoader(path) for path in search_paths if os.path.isdir(path)
+        ])
+        logger.debug(f"Jinja search paths: {search_paths}")
+    except Exception as e:
+        logger.warning(f"Failed to set custom Jinja loader: {e}")
     app.config.from_object(Config)
 
     # 初始化扩展
@@ -61,7 +74,6 @@ def create_app():
         try:
             session_dir = app.config.get('SESSION_FILE_DIR')
             if session_dir:
-                import os
                 os.makedirs(session_dir, exist_ok=True)
             sess.init_app(app)
             logger.info("Flask-Session initialized successfully")
@@ -129,6 +141,12 @@ def create_app():
             from flask import redirect, url_for
             return redirect(url_for('common.auth.sign'))
         
+        # 避免浏览器请求 /favicon.ico 导致 404 噪音
+        @app.route('/favicon.ico')
+        def favicon():
+            from flask import Response
+            return Response(status=204)
+
         # 添加全局模板助手
         @app.context_processor
         def inject_user():
