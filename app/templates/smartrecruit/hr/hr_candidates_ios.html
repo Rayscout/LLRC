@@ -106,18 +106,20 @@
         .ios-filter-item {
             display: flex;
             flex-direction: column;
-            gap: var(--ios-spacing-xs);
+            gap: 6px;
         }
         
         .ios-filter-label {
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             color: var(--ios-text-secondary);
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: .2px;
         }
         
         .ios-search-box {
             position: relative;
-            max-width: 400px;
+            max-width: 520px;
+            flex: 1 1 320px;
         }
         
         .ios-search-box .ios-input {
@@ -131,6 +133,34 @@
             transform: translateY(-50%);
             color: var(--ios-text-tertiary);
             font-size: 1.125rem;
+        }
+
+        /* 统一控件高度与边框，接近表单搜索条风格 */
+        .ios-input {
+            height: 58px;
+            border-radius: 16px;
+            border: 1px solid var(--ios-border-secondary);
+            background: var(--ios-bg-secondary);
+            color: var(--ios-text-primary);
+        }
+        .ios-input:focus{
+            outline: none;
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 3px rgba(0,122,255,.12);
+        }
+        .ios-input::placeholder{ color: var(--ios-text-quaternary); }
+
+        /* 统一 select 的外观、字体与边框颜色 */
+        select.ios-input{
+            color: var(--ios-text-primary);
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 18px 18px;
+            padding-right: 40px;
         }
         
         .ios-stats-grid {
@@ -171,7 +201,7 @@
                 <div class="ios-nav-brand-icon">
                     <i class="uil uil-briefcase"></i>
                 </div>
-                <span>HR智能招聘</span>
+                <span>智能招聘系统-HR</span>
             </a>
             
             <ul class="ios-nav-menu">
@@ -226,11 +256,8 @@
                 </div>
                 
                 <div class="ios-nav-divider"></div>
+                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
                 
-                <button class="ios-nav-button secondary" data-action="notifications">
-                    <i class="uil uil-bell"></i>
-                    <span class="ios-nav-badge">3</span>
-                </button>
                 
                 <button class="ios-nav-button" data-action="profile">
                     <i class="uil uil-user"></i>
@@ -329,7 +356,7 @@
                         
                         <div class="ios-filter-item">
                             <label class="ios-filter-label">状态筛选</label>
-                            <select class="ios-input" id="statusFilter" style="min-width: 120px;">
+                            <select class="ios-input" id="statusFilter" style="min-width: 170px;">
                                 <option value="">全部状态</option>
                                 <option value="pending">待处理</option>
                                 <option value="interview">面试中</option>
@@ -340,7 +367,7 @@
                         
                         <div class="ios-filter-item">
                             <label class="ios-filter-label">职位筛选</label>
-                            <select class="ios-input" id="jobFilter" style="min-width: 150px;">
+                            <select class="ios-input" id="jobFilter" style="min-width: 210px;">
                                 <option value="">全部职位</option>
                                 {% for job in available_jobs %}
                                 <option value="{{ job.id }}">{{ job.title }}</option>
@@ -350,7 +377,7 @@
                         
                         <div class="ios-filter-item">
                             <label class="ios-filter-label">排序方式</label>
-                            <select class="ios-input" id="sortFilter" style="min-width: 120px;">
+                            <select class="ios-input" id="sortFilter" style="min-width: 170px;">
                                 <option value="date_desc">申请时间 ↓</option>
                                 <option value="date_asc">申请时间 ↑</option>
                                 <option value="name_asc">姓名 A-Z</option>
@@ -447,5 +474,23 @@
     </div>
 
     <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+    <script>
+      (function(){
+        var btn = document.getElementById('iosThemeToggle');
+        if(!btn) return;
+        function apply(theme){
+          document.body.classList.toggle('dark', theme==='dark');
+          btn.classList.toggle('active', theme==='dark');
+        }
+        var saved = localStorage.getItem('theme');
+        if(!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){ saved='dark'; }
+        apply(saved||'light');
+        btn.addEventListener('click', function(){
+          var next = document.body.classList.contains('dark') ? 'light' : 'dark';
+          localStorage.setItem('theme', next);
+          apply(next);
+        });
+      })();
+    </script>
 </body>
 </html>

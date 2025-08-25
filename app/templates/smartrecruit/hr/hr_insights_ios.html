@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI洞察 - iOS风格</title>
+    <title>AI洞察 - 智能招聘系统-HR</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
-        .ios-insights-hero { background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-purple) 100%); }
+        .ios-insights-hero { background: var(--ios-bg-secondary); }
         .ios-trends-section { background: var(--ios-bg-secondary); }
         .ios-skills-section { background: var(--ios-bg-tertiary); }
         .ios-predictions-section { background: var(--ios-bg-secondary); }
@@ -325,7 +325,7 @@
                 <div class="ios-nav-brand-icon">
                     <i class="uil uil-briefcase"></i>
                 </div>
-                <span>HR智能招聘</span>
+                <span>智能招聘系统-HR</span>
             </a>
             
             <ul class="ios-nav-menu">
@@ -381,10 +381,8 @@
                 
                 <div class="ios-nav-divider"></div>
                 
-                <button class="ios-nav-button secondary" data-action="notifications">
-                    <i class="uil uil-bell"></i>
-                    <span class="ios-nav-badge">3</span>
-                </button>
+                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
+                
                 
                 <button class="ios-nav-button" data-action="profile">
                     <i class="uil uil-user"></i>
@@ -407,7 +405,7 @@
         <!-- 欢迎Section -->
         <section class="ios-section ios-insights-hero">
             <div class="ios-container">
-                <h1 class="ios-title ios-fade-in">AI洞察</h1>
+                <h1 class="ios-title ios-fade-in">智能招聘系统-HR</h1>
                 <p class="ios-subtitle ios-fade-in">智能分析招聘趋势，预测人才需求，优化招聘策略</p>
                 
                 <div class="ios-quick-actions ios-fade-in-up">
@@ -579,6 +577,24 @@
             </div>
         </section>
     </div>    <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+    <script>
+      (function(){
+        var btn = document.getElementById('iosThemeToggle');
+        if(!btn) return;
+        function apply(theme){
+          document.body.classList.toggle('dark', theme==='dark');
+          btn.classList.toggle('active', theme==='dark');
+        }
+        var saved = localStorage.getItem('theme');
+        if(!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){ saved='dark'; }
+        apply(saved||'light');
+        btn.addEventListener('click', function(){
+          var next = document.body.classList.contains('dark') ? 'light' : 'dark';
+          localStorage.setItem('theme', next);
+          apply(next);
+        });
+      })();
+    </script>
     
     <script>
         // AI洞察相关JavaScript功能

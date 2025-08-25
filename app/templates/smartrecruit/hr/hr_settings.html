@@ -12,7 +12,7 @@
     <div class="settings-content">
         <div class="settings-section">
             <h2>账户设置</h2>
-            <div class="settings-form">
+            <div class="settings-form settings-grid-2">
                 <div class="form-group">
                     <label for="email">邮箱地址</label>
                     <input type="email" id="email" value="{{ user.email }}" readonly>
@@ -33,7 +33,7 @@
 
         <div class="settings-section">
             <h2>通知设置</h2>
-            <div class="settings-form">
+            <div class="settings-form settings-grid-2">
                 <div class="form-group checkbox-group">
                     <label class="checkbox-label">
                         <input type="checkbox" id="emailNotifications" checked>
@@ -70,7 +70,7 @@
 
         <div class="settings-section">
             <h2>安全设置</h2>
-            <div class="settings-form">
+            <div class="settings-form settings-grid-2">
                 <div class="form-group">
                     <label for="currentPassword">当前密码</label>
                     <input type="password" id="currentPassword" placeholder="输入当前密码">
@@ -147,6 +147,14 @@
     gap: 20px;
 }
 
+/* 两列栅格：大屏两列，小屏一列 */
+.settings-grid-2{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-width: 900px){
+    .settings-grid-2{ grid-template-columns: 1fr; }
+}
+
 .form-group {
     display: flex;
     flex-direction: column;
@@ -162,7 +170,7 @@
 .form-group input[type="email"],
 .form-group input[type="tel"],
 .form-group input[type="password"] {
-    padding: 12px 16px;
+    padding: 10px 14px;
     border: 2px solid #e1e5e9;
     border-radius: 8px;
     font-size: 16px;
@@ -189,6 +197,10 @@
     flex-direction: row;
     align-items: center;
 }
+
+/* 卡片化每一节，减少“长条空白”感 */
+.settings-section{ background:#fff; border:1px solid #eef2f7; border-radius:14px; padding:20px; box-shadow:0 4px 14px rgba(0,0,0,.04) }
+body.dark .settings-section{ background:#1f2937; border-color:#2b3441 }
 
 .checkbox-label {
     display: flex;

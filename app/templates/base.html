@@ -294,11 +294,24 @@
 
         applyTheme(initialTheme());
 
+        // 同步导航上的 iOS 风格按钮（若存在）
+        var iosToggles = document.querySelectorAll('#iosThemeToggle');
+        iosToggles.forEach(function(btn){
+            btn.classList.toggle('active', body.classList.contains('dark'));
+            btn.addEventListener('click', function(){
+                var next = body.classList.contains('dark') ? 'light' : 'dark';
+                applyTheme(next);
+                try { localStorage.setItem('theme', next); } catch(e){}
+                iosToggles.forEach(function(b){ b.classList.toggle('active', next==='dark'); });
+            });
+        });
+
         // 监听切换（侧边开关）
         toggle.addEventListener('change', function(){
             var theme = this.checked ? 'dark' : 'light';
             applyTheme(theme);
             try { localStorage.setItem('theme', theme); } catch(e){}
+            iosToggles.forEach(function(b){ b.classList.toggle('active', theme==='dark'); });
         });
         
         // HR下拉菜单功能
@@ -340,6 +353,7 @@
                 var toDark = !body.classList.contains('dark');
                 applyTheme(toDark ? 'dark' : 'light');
                 try { localStorage.setItem('theme', toDark ? 'dark' : 'light'); } catch(e){}
+                iosToggles.forEach(function(b){ b.classList.toggle('active', toDark); });
             });
         }
     })();
