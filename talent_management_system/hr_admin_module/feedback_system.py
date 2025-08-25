@@ -5,56 +5,52 @@
 """
 
 from flask import Blueprint, render_template, request, jsonify, session, flash, redirect, url_for
-from app.models import User, db
+from app.models import User, Feedback, FeedbackNotification, db
 from datetime import datetime
 import uuid
 import json
 
 feedback_system_bp = Blueprint('feedback_system', __name__, url_prefix='/feedback_system')
 
-# 模拟反馈数据存储（实际项目中应使用数据库）
-feedback_records = {}
-feedback_notifications = {}
-
-def generate_team_members():
-    """生成团队成员列表"""
-    return {
-        '张工程师': {
-            'id': '001',
-            'position': '高级软件工程师',
-            'department': '技术部',
-            'email': 'zhang.engineer@company.com',
-            'avatar': '👨‍💻'
-        },
-        '李产品经理': {
-            'id': '002',
-            'position': '产品经理',
-            'department': '产品部',
-            'email': 'li.pm@company.com',
-            'avatar': '👩‍💼'
-        },
-        '王设计师': {
-            'id': '003',
-            'position': 'UI/UX设计师',
-            'department': '设计部',
-            'email': 'wang.designer@company.com',
-            'avatar': '🎨'
-        },
-        '陈运营': {
-            'id': '004',
-            'position': '运营专员',
-            'department': '运营部',
-            'email': 'chen.ops@company.com',
-            'avatar': '📊'
-        },
-        '刘销售': {
-            'id': '005',
-            'position': '销售代表',
-            'department': '销售部',
-            'email': 'liu.sales@company.com',
-            'avatar': '💼'
-        }
-    }
+def get_team_members(executive_id):
+    """获取高管的团队成员列表"""
+    try:
+        # 获取高管信息
+        executive = User.query.get(executive_id)
+        if not executive:
+            return {}
+        
+        # 根据高管类型获取团队成员
+        if executive.user_type == 'executive':
+            # 高管可以看到所有员工
+            team_members = User.query.filter(
+                User.user_type.in_(['employee', 'supervisor']),
+                User.id != executive_id
+            ).all()
+        else:
+            # 主管只能看到其下属
+            team_members = User.query.filter(
+                User.supervisor_id == executive_id,
+                User.user_type == 'employee'
+            ).all()
+        
+        # 转换为字典格式
+        members_dict = {}
+        for member in team_members:
+            members_dict[f"{member.first_name} {member.last_name}"] = {
+                'id': member.id,
+                'position': member.position or '未知职位',
+                'department': member.department or '未知部门',
+                'email': member.email,
+                'avatar': '👨‍💻' if member.user_type == 'employee' else '👩‍💼',
+                'user_type': member.user_type,
+                'employee_id': member.employee_id
+            }
+        
+        return members_dict
+    except Exception as e:
+        print(f"获取团队成员失败: {e}")
+        return {}
 
 def get_feedback_categories():
     """获取反馈分类"""
@@ -99,6 +95,25 @@ def get_feedback_templates():
         ]
     }
 
+def create_feedback_notification(feedback_id, recipient_id, sender_name, category, feedback_type, priority):
+    """创建反馈通知"""
+    try:
+        notification = FeedbackNotification(
+            user_id=recipient_id,
+            feedback_id=feedback_id,
+            notification_type='new_feedback',
+            title=f'来自{sender_name}的新反馈',
+            message=f'您收到了一个关于{category}的{feedback_type}反馈',
+            is_read=False
+        )
+        db.session.add(notification)
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(f"创建反馈通知失败: {e}")
+        db.session.rollback()
+        return False
+
 @feedback_system_bp.route('/dashboard')
 def feedback_dashboard():
     """反馈系统仪表板"""
@@ -106,21 +121,38 @@ def feedback_dashboard():
         return jsonify({'error': '请先登录'}), 401
     
     user = User.query.get(session['user_id'])
-    if not user or user.user_type != 'executive':
+    if not user or user.user_type not in ['executive', 'supervisor']:
         return jsonify({'error': '权限不足'}), 403
     
     # 获取数据
-    team_members = generate_team_members()
+    team_members = get_team_members(user.id)
     feedback_categories = get_feedback_categories()
     
     # 统计反馈数据
-    total_feedback = len(feedback_records)
-    recent_feedback = len([f for f in feedback_records.values() 
-                          if (datetime.now() - f['created_at']).days <= 7])
+    sent_feedback = Feedback.query.filter_by(sender_id=user.id).all()
+    total_feedback = len(sent_feedback)
+    recent_feedback = len([f for f in sent_feedback 
+                          if (datetime.now() - f.created_at).days <= 7])
     
     # 获取最近的反馈记录
-    recent_records = sorted(feedback_records.values(), 
-                           key=lambda x: x['created_at'], reverse=True)[:5]
+    recent_records = Feedback.query.filter_by(sender_id=user.id)\
+        .order_by(Feedback.created_at.desc()).limit(5).all()
+    
+    # 转换为字典格式用于模板渲染
+    recent_records_dict = []
+    for record in recent_records:
+        recipient = User.query.get(record.recipient_id)
+        recent_records_dict.append({
+            'id': record.id,
+            'sender_name': f"{user.first_name} {user.last_name}",
+            'recipient_name': f"{recipient.first_name} {recipient.last_name}" if recipient else '未知用户',
+            'category': record.category,
+            'feedback_type': record.feedback_type,
+            'content': record.content,
+            'priority': record.priority,
+            'status': record.status,
+            'created_at': record.created_at
+        })
     
     return render_template(
         'talent_management/hr_admin/feedback_dashboard.html',
@@ -129,7 +161,7 @@ def feedback_dashboard():
         feedback_categories=feedback_categories,
         total_feedback=total_feedback,
         recent_feedback=recent_feedback,
-        recent_records=recent_records
+        recent_records=recent_records_dict
     )
 
 @feedback_system_bp.route('/send_feedback', methods=['GET', 'POST'])
@@ -139,7 +171,7 @@ def send_feedback():
         return jsonify({'error': '请先登录'}), 401
     
     user = User.query.get(session['user_id'])
-    if not user or user.user_type != 'executive':
+    if not user or user.user_type not in ['executive', 'supervisor']:
         return jsonify({'error': '权限不足'}), 403
     
     if request.method == 'POST':
@@ -154,55 +186,47 @@ def send_feedback():
             flash('请填写完整的反馈信息', 'error')
             return redirect(url_for('talent_management.hr_admin.feedback_system.send_feedback'))
         
-        # 创建反馈记录
-        feedback_id = str(uuid.uuid4())
-        team_members = generate_team_members()
-        recipient_name = None
-        for name, member in team_members.items():
-            if member['id'] == recipient_id:
-                recipient_name = name
-                break
-        
-        if not recipient_name:
+        # 验证接收者是否存在
+        recipient = User.query.get(recipient_id)
+        if not recipient:
             flash('选择的团队成员不存在', 'error')
             return redirect(url_for('talent_management.hr_admin.feedback_system.send_feedback'))
         
-        # 保存反馈记录
-        feedback_records[feedback_id] = {
-            'id': feedback_id,
-            'sender_id': user.id,
-            'sender_name': f"{user.first_name} {user.last_name}",
-            'recipient_id': recipient_id,
-            'recipient_name': recipient_name,
-            'category': category,
-            'feedback_type': feedback_type,
-            'content': content,
-            'priority': priority,
-            'status': 'sent',
-            'created_at': datetime.now(),
-            'read_at': None
-        }
-        
-        # 创建通知
-        notification_id = str(uuid.uuid4())
-        feedback_notifications[notification_id] = {
-            'id': notification_id,
-            'feedback_id': feedback_id,
-            'recipient_id': recipient_id,
-            'recipient_name': recipient_name,
-            'sender_name': f"{user.first_name} {user.last_name}",
-            'category': category,
-            'feedback_type': feedback_type,
-            'priority': priority,
-            'is_read': False,
-            'created_at': datetime.now()
-        }
-        
-        flash(f'反馈已成功发送给 {recipient_name}', 'success')
-        return redirect(url_for('talent_management.hr_admin.feedback_system.feedback_dashboard'))
+        try:
+            # 创建反馈记录
+            feedback = Feedback(
+                sender_id=user.id,
+                recipient_id=recipient_id,
+                category=category,
+                feedback_type=feedback_type,
+                content=content,
+                priority=priority,
+                status='sent'
+            )
+            db.session.add(feedback)
+            db.session.commit()
+            
+            # 创建通知
+            sender_name = f"{user.first_name} {user.last_name}"
+            create_feedback_notification(
+                feedback.id, 
+                recipient_id, 
+                sender_name, 
+                category, 
+                feedback_type, 
+                priority
+            )
+            
+            flash(f'反馈已成功发送给 {recipient.first_name} {recipient.last_name}', 'success')
+            return redirect(url_for('talent_management.hr_admin.feedback_system.feedback_dashboard'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'发送反馈失败: {str(e)}', 'error')
+            return redirect(url_for('talent_management.hr_admin.feedback_system.send_feedback'))
     
     # GET请求显示发送反馈页面
-    team_members = generate_team_members()
+    team_members = get_team_members(user.id)
     feedback_categories = get_feedback_categories()
     feedback_templates = get_feedback_templates()
     
@@ -221,7 +245,7 @@ def feedback_history():
         return jsonify({'error': '请先登录'}), 401
     
     user = User.query.get(session['user_id'])
-    if not user or user.user_type != 'executive':
+    if not user or user.user_type not in ['executive', 'supervisor']:
         return jsonify({'error': '权限不足'}), 403
     
     # 获取筛选参数
@@ -229,34 +253,56 @@ def feedback_history():
     recipient_filter = request.args.get('recipient', '')
     date_filter = request.args.get('date', '')
     
-    # 筛选反馈记录
-    filtered_records = []
-    for record in feedback_records.values():
-        if record['sender_id'] == user.id:  # 只显示发送的反馈
-            include_record = True
-            
-            if category_filter and record['category'] != category_filter:
-                include_record = False
-            if recipient_filter and recipient_filter not in record['recipient_name']:
-                include_record = False
-            if date_filter:
-                record_date = record['created_at'].strftime('%Y-%m-%d')
-                if record_date != date_filter:
-                    include_record = False
-            
-            if include_record:
-                filtered_records.append(record)
+    # 构建查询
+    query = Feedback.query.filter_by(sender_id=user.id)
     
-    # 按时间排序
-    filtered_records.sort(key=lambda x: x['created_at'], reverse=True)
+    if category_filter:
+        query = query.filter_by(category=category_filter)
     
-    team_members = generate_team_members()
+    if recipient_filter:
+        # 通过接收者姓名筛选
+        recipients = User.query.filter(
+            User.first_name.contains(recipient_filter) | 
+            User.last_name.contains(recipient_filter)
+        ).all()
+        recipient_ids = [r.id for r in recipients]
+        query = query.filter(Feedback.recipient_id.in_(recipient_ids))
+    
+    if date_filter:
+        # 按日期筛选
+        from datetime import datetime, timedelta
+        start_date = datetime.strptime(date_filter, '%Y-%m-%d')
+        end_date = start_date + timedelta(days=1)
+        query = query.filter(Feedback.created_at >= start_date, Feedback.created_at < end_date)
+    
+    # 获取反馈记录
+    feedback_records = query.order_by(Feedback.created_at.desc()).all()
+    
+    # 转换为字典格式
+    records_dict = []
+    for record in feedback_records:
+        recipient = User.query.get(record.recipient_id)
+        records_dict.append({
+            'id': record.id,
+            'sender_name': f"{user.first_name} {user.last_name}",
+            'recipient_name': f"{recipient.first_name} {recipient.last_name}" if recipient else '未知用户',
+            'category': record.category,
+            'feedback_type': record.feedback_type,
+            'content': record.content,
+            'priority': record.priority,
+            'status': record.status,
+            'created_at': record.created_at,
+            'read_at': record.read_at,
+            'responded_at': record.responded_at
+        })
+    
+    team_members = get_team_members(user.id)
     feedback_categories = get_feedback_categories()
     
     return render_template(
         'talent_management/hr_admin/feedback_history.html',
         user=user,
-        feedback_records=filtered_records,
+        feedback_records=records_dict,
         team_members=team_members,
         feedback_categories=feedback_categories,
         category_filter=category_filter,
@@ -271,10 +317,10 @@ def api_team_members():
         return jsonify({'error': '请先登录'}), 401
     
     user = User.query.get(session['user_id'])
-    if not user or user.user_type != 'executive':
+    if not user or user.user_type not in ['executive', 'supervisor']:
         return jsonify({'error': '权限不足'}), 403
     
-    team_members = generate_team_members()
+    team_members = get_team_members(user.id)
     return jsonify(team_members)
 
 @feedback_system_bp.route('/api/feedback_categories')
@@ -284,7 +330,7 @@ def api_feedback_categories():
         return jsonify({'error': '请先登录'}), 401
     
     user = User.query.get(session['user_id'])
-    if not user or user.user_type != 'executive':
+    if not user or user.user_type not in ['executive', 'supervisor']:
         return jsonify({'error': '权限不足'}), 403
     
     feedback_categories = get_feedback_categories()
@@ -297,7 +343,7 @@ def api_feedback_templates(category):
         return jsonify({'error': '请先登录'}), 401
     
     user = User.query.get(session['user_id'])
-    if not user or user.user_type != 'executive':
+    if not user or user.user_type not in ['executive', 'supervisor']:
         return jsonify({'error': '权限不足'}), 403
     
     feedback_templates = get_feedback_templates()
@@ -313,26 +359,27 @@ def api_feedback_stats():
         return jsonify({'error': '请先登录'}), 401
     
     user = User.query.get(session['user_id'])
-    if not user or user.user_type != 'executive':
+    if not user or user.user_type not in ['executive', 'supervisor']:
         return jsonify({'error': '权限不足'}), 403
     
     # 统计数据
-    total_feedback = len(feedback_records)
-    recent_feedback = len([f for f in feedback_records.values() 
-                          if (datetime.now() - f['created_at']).days <= 7])
+    sent_feedback = Feedback.query.filter_by(sender_id=user.id).all()
+    total_feedback = len(sent_feedback)
+    recent_feedback = len([f for f in sent_feedback 
+                          if (datetime.now() - f.created_at).days <= 7])
     
     # 按分类统计
     category_stats = {}
     feedback_categories = get_feedback_categories()
     for category in feedback_categories:
-        category_stats[category] = len([f for f in feedback_records.values() 
-                                      if f['category'] == category])
+        category_stats[category] = len([f for f in sent_feedback 
+                                      if f.category == category])
     
     # 按优先级统计
     priority_stats = {
-        'high': len([f for f in feedback_records.values() if f['priority'] == 'high']),
-        'medium': len([f for f in feedback_records.values() if f['priority'] == 'medium']),
-        'low': len([f for f in feedback_records.values() if f['priority'] == 'low'])
+        'high': len([f for f in sent_feedback if f.priority == 'high']),
+        'medium': len([f for f in sent_feedback if f.priority == 'medium']),
+        'low': len([f for f in sent_feedback if f.priority == 'low'])
     }
     
     return jsonify({

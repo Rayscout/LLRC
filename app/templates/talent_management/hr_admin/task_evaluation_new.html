@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>创建绩效评价</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='executive_ios_style.css') }}">
+	<style>
+		:root {
+			--ev-bg: #F2F2F7;
+			--ev-card: #ffffff;
+			--ev-text: #1D1D1F;
+			--ev-subtext: #8E8E93;
+			--ev-primary: #0A84FF;
+			--ev-green: #30D158;
+			--ev-border: rgba(0,0,0,0.06);
+			--ev-shadow: 0 10px 30px rgba(0,0,0,0.08);
+		}
+
+		body { background: var(--ev-bg); }
+
+		.page-header {
+			text-align: center;
+			margin: 18px 0 8px;
+		}
+		.page-title {
+			font-size: 44px;
+			font-weight: 800;
+			letter-spacing: 1px;
+			background: linear-gradient(135deg, #5856D6 0%, #0A84FF 100%);
+			-webkit-background-clip: text; -webkit-text-fill-color: transparent;
+		}
+
+		.ev-wrapper { max-width: 1000px; margin: 0 auto; padding: 0 18px 36px; }
+		.ev-card { background: var(--ev-card); border: 1px solid var(--ev-border); box-shadow: var(--ev-shadow); border-radius: 20px; padding: 26px; }
+		.ev-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
+		.ev-field { grid-column: span 12; }
+		@media (min-width: 900px) { .ev-field.half { grid-column: span 6; } }
+
+		.ev-label { display: block; margin-bottom: 8px; color: var(--ev-subtext); font-weight: 600; }
+		.ev-input, .ev-select, .ev-textarea {
+			width: 100%;
+			border: 1px solid var(--ev-border);
+			border-radius: 12px;
+			background: #fff;
+			padding: 14px 14px;
+			font-size: 15px; color: var(--ev-text);
+			transition: box-shadow .2s ease, border-color .2s ease;
+		}
+		.ev-input:focus, .ev-select:focus, .ev-textarea:focus { outline: none; border-color: var(--ev-primary); box-shadow: 0 0 0 4px rgba(10,132,255,0.12); }
+		.ev-hint { margin-top: 6px; font-size: 12px; color: var(--ev-subtext); }
+
+		.ev-rating { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+		.ev-rating .ev-input { text-align: center; }
+
+		.ev-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+		.ev-btn { border: 0; border-radius: 12px; padding: 12px 20px; font-weight: 700; cursor: pointer; }
+		.ev-btn.primary { background: var(--ev-primary); color: #fff; }
+		.ev-btn.secondary { background: #fff; color: var(--ev-text); border: 1px solid var(--ev-border); }
+		.ev-btn.primary:hover { filter: brightness(0.98); }
+		.ev-btn.secondary:hover { background: #fafafa; }
+
+	</style>
+</head>
+<body>
+	<div class="ev-wrapper">
+		<div class="page-header">
+			<div class="page-title">创建绩效评价</div>
+			<div style="color:var(--ev-subtext); margin-top:6px;">请根据任务完成情况，给出客观、公正的评分与评语</div>
+		</div>
+		<form method="POST" class="ev-card">
+			<div class="ev-grid">
+				<div class="ev-field half">
+					<label class="ev-label">选择员工</label>
+					<select class="ev-select" name="employee_id" required>
+						<option value="">请选择</option>
+						{% for m in members %}
+						<option value="{{ m.id }}">{{ m.first_name }} {{ m.last_name }}（{{ m.department or '未知部门' }}）</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="ev-field half">
+					<label class="ev-label">任务名称</label>
+					<input class="ev-input" type="text" name="task_title" required placeholder="例如：版本发布、关键客户问题处理">
+				</div>
+				<div class="ev-field">
+					<label class="ev-label">任务描述</label>
+					<textarea class="ev-textarea" name="task_description" rows="4" placeholder="任务背景、目标与关键结果（OKR）、影响范围"></textarea>
+					<div class="ev-hint">尽量提供客观的任务事实，便于复盘</div>
+				</div>
+				<div class="ev-field">
+					<label class="ev-label">评分维度（1-5）</label>
+					<div class="ev-rating">
+						<input class="ev-input" type="number" name="score_quality" min="1" max="5" required placeholder="质量">
+						<input class="ev-input" type="number" name="score_efficiency" min="1" max="5" required placeholder="效率">
+						<input class="ev-input" type="number" name="score_collaboration" min="1" max="5" required placeholder="协作">
+					</div>
+					<div class="ev-hint">建议以 3 为达标、4 为超预期、5 为卓越标准</div>
+				</div>
+				<div class="ev-field">
+					<label class="ev-label">评价评语</label>
+					<textarea class="ev-textarea" name="comment" rows="4" placeholder="优势亮点、改进建议、下一步行动…"></textarea>
+				</div>
+			</div>
+			<div class="ev-actions">
+				<a href="{{ url_for('talent_management.hr_admin.task_evaluation.evaluation_dashboard') }}" class="ev-btn secondary">返回</a>
+				<button type="submit" class="ev-btn primary">提交评价</button>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

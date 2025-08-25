@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, g, send_file
 from app.models import User, db
+from app.models import TaskEvaluation
 from datetime import datetime
 import json
 import os
@@ -71,8 +72,21 @@ def profile_dashboard():
         education_history = parse_education_history(user.education)
         work_history = parse_work_history(user.experience)
         
-        # 获取绩效历史（模拟数据）
+        # 获取绩效历史（模拟数据 + 实际任务评价整合）
         performance_history = get_performance_history(user.id)
+        try:
+            evals = TaskEvaluation.query.filter_by(employee_id=user.id)\
+                .order_by(TaskEvaluation.created_at.desc()).all()
+            for ev in evals:
+                performance_history.insert(0, {
+                    'period': ev.created_at.strftime('%Y-%m-%d'),
+                    'score': ev.total_score,
+                    'level': '—',
+                    'evaluator': '管理层',
+                    'comments': f"{ev.task_title}｜质{ev.score_quality}/效{ev.score_efficiency}/协{ev.score_collaboration}｜{(ev.comment or '')[:60]}"
+                })
+        except Exception:
+            pass
         
         return render_template('talent_management/employee_management/profile_dashboard.html',
                              user=user,
@@ -132,6 +146,19 @@ def export_pdf():
         education_history = parse_education_history(user.education)
         work_history = parse_work_history(user.experience)
         performance_history = get_performance_history(user.id)
+        try:
+            evals = TaskEvaluation.query.filter_by(employee_id=user.id)\
+                .order_by(TaskEvaluation.created_at.desc()).all()
+            for ev in evals:
+                performance_history.insert(0, {
+                    'period': ev.created_at.strftime('%Y-%m-%d'),
+                    'score': ev.total_score,
+                    'level': '—',
+                    'evaluator': '管理层',
+                    'comments': f"{ev.task_title}｜质{ev.score_quality}/效{ev.score_efficiency}/协{ev.score_collaboration}｜{(ev.comment or '')[:60]}"
+                })
+        except Exception:
+            pass
         
         # 生成PDF
         pdf_path = generate_pdf_resume(user, user_skills, work_years, education_history, work_history, performance_history)

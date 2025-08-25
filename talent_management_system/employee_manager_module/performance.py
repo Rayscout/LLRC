@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, g
-from app.models import User, db
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from app.models import User, db, Job
+from app.models import TaskEvaluation
 from datetime import datetime, timedelta
 import random
 
@@ -25,9 +26,17 @@ def performance_dashboard():
     # 模拟绩效数据（实际项目中应该从数据库获取）
     performance_data = generate_mock_performance_data(user)
     
+    # 拉取员工的绩效评价（最新在前）
+    try:
+        evaluations = TaskEvaluation.query.filter_by(employee_id=user.id)\
+            .order_by(TaskEvaluation.created_at.desc()).all()
+    except Exception:
+        evaluations = []
+
     return render_template('talent_management/employee_management/performance_dashboard.html',
                          user=user,
-                         performance_data=performance_data)
+                         performance_data=performance_data,
+                         evaluations=evaluations)
 
 @performance_bp.route('/history')
 def performance_history():

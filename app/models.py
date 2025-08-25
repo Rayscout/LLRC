@@ -66,3 +66,54 @@ class Application(db.Model):
     job = db.relationship('Job', backref=db.backref('applications', lazy=True))
     __table_args__ = (db.UniqueConstraint('user_id', 'job_id', name='unique_user_job_application'),)
 
+class Feedback(db.Model):
+    """反馈系统数据模型"""
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    category = db.Column(db.String(50), nullable=False)  # skill, communication, performance
+    feedback_type = db.Column(db.String(50), nullable=False)  # positive, constructive, improvement
+    content = db.Column(db.Text, nullable=False)
+    priority = db.Column(db.String(20), default='medium')  # high, medium, low
+    status = db.Column(db.String(20), default='sent')  # sent, read, responded, archived
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    read_at = db.Column(db.DateTime)
+    responded_at = db.Column(db.DateTime)
+    
+    # 关系
+    sender = db.relationship('User', foreign_keys=[sender_id], backref=db.backref('sent_feedback', lazy=True))
+    recipient = db.relationship('User', foreign_keys=[recipient_id], backref=db.backref('received_feedback', lazy=True))
+
+class FeedbackNotification(db.Model):
+    """反馈通知数据模型"""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    feedback_id = db.Column(db.Integer, db.ForeignKey('feedback.id'), nullable=False)
+    notification_type = db.Column(db.String(50), nullable=False)  # new_feedback, feedback_read, feedback_responded
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # 关系
+    user = db.relationship('User', backref=db.backref('feedback_notifications', lazy=True))
+    feedback = db.relationship('Feedback', backref=db.backref('notifications', lazy=True))
+
+class TaskEvaluation(db.Model):
+    """任务绩效评价数据模型"""
+    id = db.Column(db.Integer, primary_key=True)
+    evaluator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # 评价人（高管/主管）
+    employee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)   # 被评价员工
+    task_title = db.Column(db.String(200), nullable=False)  # 任务名称
+    task_description = db.Column(db.Text)  # 任务描述
+    department = db.Column(db.String(100))  # 部门（冗余便于统计）
+    score_quality = db.Column(db.Integer, nullable=False)  # 质量评分 1-5
+    score_efficiency = db.Column(db.Integer, nullable=False)  # 效率评分 1-5
+    score_collaboration = db.Column(db.Integer, nullable=False)  # 协作评分 1-5
+    total_score = db.Column(db.Integer, nullable=False)  # 总分（可按权重计算）
+    comment = db.Column(db.Text)  # 评语
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    evaluator = db.relationship('User', foreign_keys=[evaluator_id], backref=db.backref('given_evaluations', lazy=True))
+    employee = db.relationship('User', foreign_keys=[employee_id], backref=db.backref('task_evaluations', lazy=True))
+

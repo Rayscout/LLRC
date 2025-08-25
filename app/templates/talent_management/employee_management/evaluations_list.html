@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>我的绩效评价</title>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		:root{
+			--bg:#F2F2F7;--card:#fff;--text:#1D1D1F;--sub:#8E8E93;--primary:#0A84FF;--shadow:0 10px 30px rgba(0,0,0,.06);--border:1px solid rgba(0,0,0,.06);
+		}
+		body{font-family:'Inter',sans-serif;background:var(--bg);margin:0;color:var(--text)}
+		.wrap{max-width:1100px;margin:0 auto;padding:24px}
+		.hero{background:var(--card);border:var(--border);box-shadow:var(--shadow);border-radius:20px;padding:28px;margin-bottom:18px}
+		.hero h1{margin:0 0 6px;font-size:28px}
+		.hero p{margin:0;color:var(--sub)}
+		.list{background:var(--card);border:var(--border);box-shadow:var(--shadow);border-radius:20px;overflow:hidden}
+		.row{display:grid;grid-template-columns:1fr auto;gap:16px;padding:18px 20px;border-bottom:1px solid rgba(0,0,0,.06);align-items:center;transition:background .15s ease}
+		.row:hover{background:#fafafa}
+		.row:last-child{border-bottom:0}
+		.title{font-weight:700;margin-bottom:6px}
+		.meta{color:var(--sub);font-size:13px}
+		.score{display:inline-flex;align-items:center;gap:8px}
+		.score-badge{background:#EEF4FF;color:#1B4DFF;border-radius:999px;padding:4px 10px;font-weight:700}
+		.action{color:var(--primary);text-decoration:none;font-weight:700}
+		.empty{padding:28px;text-align:center;color:var(--sub)}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<div class="hero">
+			<h1>我的绩效评价</h1>
+			<p>查看管理层针对您任务完成情况的评价</p>
+		</div>
+
+		<div class="list">
+			{% if records %}
+				{% for ev in records %}
+					<div class="row">
+						<div>
+							<div class="title">{{ ev.task_title }}</div>
+							<div class="meta">
+								{{ ev.created_at.strftime('%Y-%m-%d %H:%M') }} ｜
+								<span class="score">
+									<span class="score-badge">总分 {{ ev.total_score }}</span>
+									（质 {{ ev.score_quality }} ／ 效 {{ ev.score_efficiency }} ／ 协 {{ ev.score_collaboration }}）
+								</span>
+							</div>
+						</div>
+						<a class="action" href="{{ url_for('talent_management.employee_management.evaluations.view', eval_id=ev.id) }}">查看</a>
+					</div>
+				{% endfor %}
+			{% else %}
+				<div class="empty">暂无评价</div>
+			{% endif %}
+		</div>
+	</div>
+</body>
+</html>

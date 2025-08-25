@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>绩效评价详情</title>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<style>
+		body { font-family: 'Inter', sans-serif; background: #F2F2F7; margin: 0; }
+		.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+		.header, .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+		.grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; }
+		.badge { padding: 4px 10px; border-radius: 12px; background:#eef; color:#335; font-weight:600; }
+		.label { color:#666; font-size: 14px; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<h2>绩效评价详情</h2>
+			<div class="label">{{ record.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+		</div>
+		<div class="card">
+			<div class="grid">
+				<div><div class="label">任务名称</div><div>{{ record.task_title }}</div></div>
+				<div><div class="label">部门</div><div>{{ record.department or '未知' }}</div></div>
+				<div><div class="label">总分</div><div class="badge">{{ record.total_score }}</div></div>
+				<div><div class="label">质量</div><div>{{ record.score_quality }}</div></div>
+				<div><div class="label">效率</div><div>{{ record.score_efficiency }}</div></div>
+				<div><div class="label">协作</div><div>{{ record.score_collaboration }}</div></div>
+			</div>
+			<div style="margin-top:12px;">
+				<div class="label">任务描述</div>
+				<div>{{ record.task_description or '无' }}</div>
+			</div>
+			<div style="margin-top:12px;">
+				<div class="label">管理层评语</div>
+				<div>{{ record.comment or '无' }}</div>
+			</div>
+		</div>
+		<a href="{{ url_for('talent_management.employee_management.evaluations.list') }}" style="text-decoration:none; color:#007AFF; font-weight:600;">返回列表</a>
+	</div>
+</body>
+</html>
