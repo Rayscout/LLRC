@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>团队成员反馈系统 - 人才管理系统</title>
+    <title>团队管理 - 人才管理系统</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='auth_sign.css') }}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -414,7 +414,7 @@
     <div class="dashboard-container">
         <!-- 仪表盘头部 -->
         <div class="dashboard-header fade-in">
-            <h1>团队成员反馈系统</h1>
+            <h1>团队管理</h1>
             <p>为团队成员提供建设性反馈，促进个人成长和团队发展 - {{ user.first_name }} {{ user.last_name }} ({{ user.position }})</p>
             
             <div class="header-stats">
@@ -444,6 +444,12 @@
             </a>
             <a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_history') }}" class="btn btn-outline">
                 📋 反馈历史
+            </a>
+            <a href="{{ url_for('talent_management.hr_admin.task_evaluation.create_evaluation') }}" class="btn btn-primary">
+                📝 新建绩效评价
+            </a>
+            <a href="{{ url_for('talent_management.hr_admin.task_evaluation.evaluation_history') }}" class="btn btn-outline">
+                📚 评价历史
             </a>
             <button class="btn btn-success" onclick="refreshStats()">
                 🔄 刷新统计
@@ -476,6 +482,12 @@
                         </a>
                         <a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_history') }}" class="btn btn-outline" style="justify-content: center;">
                             📋 查看历史记录
+                        </a>
+                        <a href="{{ url_for('talent_management.hr_admin.task_evaluation.create_evaluation') }}" class="btn btn-primary" style="justify-content: center;">
+                            📝 新建绩效评价
+                        </a>
+                        <a href="{{ url_for('talent_management.hr_admin.task_evaluation.evaluation_history') }}" class="btn btn-outline" style="justify-content: center;">
+                            📚 查看评价历史
                         </a>
                     </div>
                 </div>

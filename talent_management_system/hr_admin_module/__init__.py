@@ -13,6 +13,7 @@ from .salary_analysis import salary_analysis_bp
 from .org_health import org_health_bp
 from .career_tracking import career_tracking_bp
 from .feedback_system import feedback_system_bp
+from .task_evaluation import task_evaluation_bp
 
 # 注册子蓝图
 hr_admin_bp.register_blueprint(turnover_alert_bp)
@@ -22,6 +23,7 @@ hr_admin_bp.register_blueprint(salary_analysis_bp)
 hr_admin_bp.register_blueprint(org_health_bp)
 hr_admin_bp.register_blueprint(career_tracking_bp)
 hr_admin_bp.register_blueprint(feedback_system_bp)
+hr_admin_bp.register_blueprint(task_evaluation_bp)
 
 # 高管仪表板路由
 @hr_admin_bp.route('/executive_dashboard')

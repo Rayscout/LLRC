@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, g, current_app, abort
 from app.models import Job, User, Application, db
 from app import applications_collection
-from app.sync_service import DataSyncService
 
 candidates_bp = Blueprint('candidates', __name__, url_prefix='/candidates')
 
@@ -92,9 +91,6 @@ def accept_application(application_id):
     application.status = 'accepted'
     db.session.commit()
     
-    # 同步申请状态更新
-    DataSyncService.sync_application_status_update(application.id)
-    
     flash('申请已接受！', 'success')
     return redirect(url_for('smartrecruit.hr.candidates.view_interview', application_id=application_id))
 
@@ -118,9 +114,6 @@ def reject_application(application_id):
     # 更新申请状态
     application.status = 'rejected'
     db.session.commit()
-    
-    # 同步申请状态更新
-    DataSyncService.sync_application_status_update(application.id)
     
     flash('申请已拒绝。', 'warning')
     return redirect(url_for('smartrecruit.hr.candidates.view_interview', application_id=application_id))

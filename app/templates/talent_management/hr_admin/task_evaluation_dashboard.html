@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>绩效评价</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='executive_ios_style.css') }}">
+</head>
+<body>
+	<nav class="executive-nav" id="executiveNav">
+		<div class="executive-nav-container">
+			<a href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}" class="executive-nav-brand">
+				<div class="executive-nav-brand-icon"><i class="uil uil-chart-line"></i></div>
+				<span>高管人才发展</span>
+			</a>
+			<ul class="executive-nav-menu">
+				<li class="executive-nav-item">
+					<a href="{{ url_for('talent_management.hr_admin.task_evaluation.evaluation_dashboard') }}" class="executive-nav-link active">
+						<i class="uil uil-clipboard-notes executive-nav-icon"></i>
+						<span>绩效评价</span>
+					</a>
+				</li>
+				<li class="executive-nav-item">
+					<a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_dashboard') }}" class="executive-nav-link">
+						<i class="uil uil-comment-dots executive-nav-icon"></i>
+						<span>团队管理</span>
+					</a>
+				</li>
+			</ul>
+			<div class="executive-nav-actions">
+				<a href="{{ url_for('talent_management.hr_admin.task_evaluation.create_evaluation') }}" class="executive-button">新建评价</a>
+			</div>
+		</div>
+	</nav>
+
+	<div class="executive-container" style="padding: 24px;">
+		<h1 class="executive-title">绩效评价</h1>
+		<div class="executive-grid executive-grid-2">
+			<div class="executive-card">
+				<h3>最近的评价</h3>
+				<div>
+					{% if recent_evals %}
+						{% for ev in recent_evals %}
+							<div class="executive-list-item">
+								<div>
+									<div style="font-weight:600;">{{ ev.task_title }} - {{ ev.employee.first_name }} {{ ev.employee.last_name }}</div>
+									<div style="color:var(--ios-text-secondary); font-size: 14px;">{{ ev.created_at.strftime('%Y-%m-%d %H:%M') }} ｜ 总分 {{ ev.total_score }}（质{{ ev.score_quality }} / 效{{ ev.score_efficiency }} / 协{{ ev.score_collaboration }}）</div>
+								</div>
+							</div>
+						{% endfor %}
+					{% else %}
+						<p>暂无评价记录</p>
+					{% endif %}
+				</div>
+			</div>
+			<div class="executive-card">
+				<h3>快速创建</h3>
+				<p>选择团队成员，快速创建绩效评价</p>
+				<a class="executive-button" href="{{ url_for('talent_management.hr_admin.task_evaluation.create_evaluation') }}">创建评价</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

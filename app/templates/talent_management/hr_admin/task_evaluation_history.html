@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>绩效评价历史</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='executive_ios_style.css') }}">
+</head>
+<body>
+	<div class="executive-container" style="padding: 24px;">
+		<h1 class="executive-title">绩效评价历史</h1>
+		<form class="executive-card" style="padding: 16px; margin-bottom: 16px;" method="get">
+			<div class="executive-grid executive-grid-3">
+				<div>
+					<label>员工</label>
+					<select name="employee_id">
+						<option value="">全部</option>
+						{% for m in members %}
+						<option value="{{ m.id }}" {% if employee_id and m.id|string == employee_id|string %}selected{% endif %}>{{ m.first_name }} {{ m.last_name }}</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div>
+					<label>部门</label>
+					<input type="text" name="department" value="{{ department }}" placeholder="例如：技术部">
+				</div>
+				<div>
+					<label>日期</label>
+					<input type="date" name="date" value="{{ date }}">
+				</div>
+			</div>
+			<div style="margin-top: 12px;">
+				<button class="executive-button" type="submit">筛选</button>
+				<a class="executive-button secondary" href="{{ url_for('talent_management.hr_admin.task_evaluation.evaluation_history') }}">重置</a>
+			</div>
+		</form>
+
+		<div class="executive-card">
+			{% if records %}
+				{% for ev in records %}
+					<div class="executive-list-item">
+						<div style="flex:1;">
+							<div style="font-weight:600;">{{ ev.task_title }} - {{ ev.employee.first_name }} {{ ev.employee.last_name }}</div>
+							<div style="color:var(--ios-text-secondary); font-size: 14px;">{{ ev.created_at.strftime('%Y-%m-%d %H:%M') }} ｜ 部门 {{ ev.department or '未知' }} ｜ 总分 {{ ev.total_score }}</div>
+							<div style="margin-top: 6px;">{{ ev.comment or '无评语' }}</div>
+						</div>
+					</div>
+				{% endfor %}
+			{% else %}
+				<p>暂无记录</p>
+			{% endif %}
+		</div>
+	</div>
+</body>
+</html>

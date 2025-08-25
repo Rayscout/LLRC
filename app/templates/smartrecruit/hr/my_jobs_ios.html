@@ -200,13 +200,13 @@
         }
         
         .ios-filter-section {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: var(--ios-radius-large);
-            padding: var(--ios-spacing-lg);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: var(--ios-spacing-md);
             margin-bottom: var(--ios-spacing-xl);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: var(--ios-shadow-light);
+            border: 1px solid var(--ios-border-secondary);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
         }
         
         .ios-filter-group {
@@ -219,18 +219,20 @@
         .ios-filter-item {
             display: flex;
             flex-direction: column;
-            gap: var(--ios-spacing-xs);
+            gap: 6px;
         }
         
         .ios-filter-label {
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             color: var(--ios-text-secondary);
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: .2px;
         }
         
         .ios-search-box {
             position: relative;
-            max-width: 400px;
+            max-width: 520px;
+            flex: 1 1 320px;
         }
         
         .ios-search-box .ios-input {
@@ -245,6 +247,34 @@
             color: var(--ios-text-tertiary);
             font-size: 1.125rem;
         }
+
+        /* 统一控件高度与边框，接近表单搜索条风格 */
+        .ios-input {
+            height: 58px;
+            border-radius: 16px;
+            border: 1px solid var(--ios-border-secondary);
+            background: var(--ios-bg-secondary);
+            color: var(--ios-text-primary);
+        }
+        .ios-input:focus{
+            outline: none;
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 3px rgba(0,122,255,.12);
+        }
+        .ios-input::placeholder{ color: var(--ios-text-quaternary); }
+        
+        /* 统一 select 的外观、字体与边框颜色 */
+        select.ios-input{
+            color: var(--ios-text-primary);
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 18px 18px;
+            padding-right: 40px;
+        }
     </style>
 </head>
 <body>
@@ -255,7 +285,7 @@
                 <div class="ios-nav-brand-icon">
                     <i class="uil uil-briefcase"></i>
                 </div>
-                <span>HR智能招聘</span>
+                <span>智能招聘系统-HR</span>
             </a>
             
             <ul class="ios-nav-menu">
@@ -310,11 +340,8 @@
                 </div>
                 
                 <div class="ios-nav-divider"></div>
+                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
                 
-                <button class="ios-nav-button secondary" data-action="notifications">
-                    <i class="uil uil-bell"></i>
-                    <span class="ios-nav-badge">3</span>
-                </button>
                 
                 <button class="ios-nav-button" data-action="profile">
                     <i class="uil uil-user"></i>
@@ -393,6 +420,8 @@
         <!-- 筛选Section -->
         <section class="ios-section ios-stats-section">
             <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">筛选与搜索</h2>
+                <p class="ios-subtitle ios-fade-in">快速找到符合要求的已发布职位</p>
                 <div class="ios-filter-section ios-fade-in-up">
                     <div class="ios-filter-group">
                         <div class="ios-search-box">
@@ -402,7 +431,7 @@
                         
                         <div class="ios-filter-item">
                             <label class="ios-filter-label">状态筛选</label>
-                            <select class="ios-input" id="statusFilter" style="min-width: 120px;">
+                            <select class="ios-input" id="statusFilter" style="min-width: 170px;">
                                 <option value="">全部状态</option>
                                 <option value="active">活跃</option>
                                 <option value="draft">草稿</option>
@@ -412,7 +441,7 @@
                         
                         <div class="ios-filter-item">
                             <label class="ios-filter-label">工作类型</label>
-                            <select class="ios-input" id="typeFilter" style="min-width: 120px;">
+                            <select class="ios-input" id="typeFilter" style="min-width: 170px;">
                                 <option value="">全部类型</option>
                                 <option value="全职">全职</option>
                                 <option value="兼职">兼职</option>
@@ -423,7 +452,7 @@
                         
                         <div class="ios-filter-item">
                             <label class="ios-filter-label">排序方式</label>
-                            <select class="ios-input" id="sortFilter" style="min-width: 120px;">
+                            <select class="ios-input" id="sortFilter" style="min-width: 170px;">
                                 <option value="date_desc">发布时间 ↓</option>
                                 <option value="date_asc">发布时间 ↑</option>
                                 <option value="title_asc">标题 A-Z</option>
@@ -548,6 +577,24 @@
             </div>
         </section>
     </div>    <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+    <script>
+      (function(){
+        var btn = document.getElementById('iosThemeToggle');
+        if(!btn) return;
+        function apply(theme){
+          document.body.classList.toggle('dark', theme==='dark');
+          btn.classList.toggle('active', theme==='dark');
+        }
+        var saved = localStorage.getItem('theme');
+        if(!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){ saved='dark'; }
+        apply(saved||'light');
+        btn.addEventListener('click', function(){
+          var next = document.body.classList.contains('dark') ? 'light' : 'dark';
+          localStorage.setItem('theme', next);
+          apply(next);
+        });
+      })();
+    </script>
     
     <script>
         // 职位管理相关JavaScript功能
@@ -555,7 +602,7 @@
         function closeJob(jobId) {
             if (confirm('确定要关闭这个职位吗？关闭后将不再接受新的申请。')) {
                 // 这里实现关闭职位的逻辑
-                alert(`职位 #${jobId} 已关闭`);
+                alert('职位 #' + jobId + ' 已关闭');
                 location.reload();
             }
         }
@@ -563,7 +610,7 @@
         function publishJob(jobId) {
             if (confirm('确定要发布这个职位吗？发布后将开始接受申请。')) {
                 // 这里实现发布职位的逻辑
-                alert(`职位 #${jobId} 已发布`);
+                alert('职位 #' + jobId + ' 已发布');
                 location.reload();
             }
         }
@@ -571,7 +618,7 @@
         function deleteJob(jobId) {
             if (confirm('确定要删除这个职位吗？删除后将无法恢复。')) {
                 // 这里实现删除职位的逻辑
-                alert(`职位 #${jobId} 已删除`);
+                alert('职位 #' + jobId + ' 已删除');
                 location.reload();
             }
         }

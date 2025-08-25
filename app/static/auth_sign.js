@@ -309,6 +309,35 @@
   onScroll();
   scrollTopBtn.addEventListener('click', ()=>window.scrollTo({top:0, behavior:'smooth'}));
 
+  // iOS-style Dark Mode: system + manual toggle with persistence
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+  const savedTheme = localStorage.getItem('theme');
+  function applyTheme(theme){
+    document.body.classList.toggle('dark', theme === 'dark');
+    const toggle = qs('.theme-toggle');
+    if(toggle){ toggle.classList.toggle('active', theme === 'dark'); }
+  }
+  function currentTheme(){
+    if(savedTheme === 'dark' || savedTheme === 'light') return savedTheme;
+    return prefersDark && prefersDark.matches ? 'dark' : 'light';
+  }
+  applyTheme(currentTheme());
+  if(prefersDark){
+    prefersDark.addEventListener('change', e =>{
+      if(!localStorage.getItem('theme')){
+        applyTheme(e.matches ? 'dark' : 'light');
+      }
+    });
+  }
+  const themeToggle = qs('.theme-toggle');
+  if(themeToggle){
+    themeToggle.addEventListener('click', ()=>{
+      const next = document.body.classList.contains('dark') ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    });
+  }
+
   // 背景动效系统
   function createFloatingShapes() {
     const shapesContainer = document.querySelector('.floating-shapes');

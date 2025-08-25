@@ -3,13 +3,13 @@
 {% block title %}HR个人资料{% endblock %}
 
 {% block content %}
-<div class="hr-profile-page">
-    <div class="page-header">
-        <h1><i class="uil uil-user"></i> HR个人资料</h1>
-        <p>管理您的个人信息和账户设置</p>
+<div class="hr-profile-page ios-container">
+    <div class="page-header ios-card">
+        <h1 class="ios-title"><i class="uil uil-user"></i> HR个人资料</h1>
+        <p class="ios-subtitle">管理您的个人信息和账户设置</p>
     </div>
 
-    <div class="profile-content">
+    <div class="profile-content ios-card">
         <div class="profile-section">
             <h2>基本信息</h2>
             <div class="profile-info">
@@ -72,7 +72,7 @@
 <style>
 .hr-profile-page {
     padding: 20px;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -92,10 +92,11 @@
 }
 
 .profile-content {
-    background: white;
-    border-radius: 12px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
     padding: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0,0,0,0.06);
 }
 
 .profile-section {
@@ -105,34 +106,34 @@
 .profile-section h2 {
     color: #333;
     border-bottom: 2px solid #007AFF;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
 }
 
 .profile-info {
     display: grid;
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
 }
 
 .info-item {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border-left: 4px solid #007AFF;
+    display: block;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid rgba(0,0,0,0.05);
 }
 
 .info-item label {
+    display: block;
     font-weight: 600;
-    color: #333;
-    min-width: 100px;
-    margin-right: 15px;
+    color: #374151;
+    font-size: 12px;
+    margin-bottom: 4px;
 }
 
 .info-item span {
-    color: #666;
-    flex: 1;
+    color: #111827;
 }
 
 .badge {
@@ -150,9 +151,9 @@
 
 .profile-actions {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     justify-content: center;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .btn {
@@ -177,18 +178,20 @@
 }
 
 .btn-secondary {
-    background: #6c757d;
-    color: white;
+    background: transparent;
+    color: #007AFF;
+    border: 1px solid #007AFF;
 }
 
 .btn-secondary:hover {
-    background: #545b62;
+    background: #007AFF;
+    color: #fff;
     transform: translateY(-2px);
 }
 
 /* 深色模式支持 */
 body.dark .profile-content {
-    background: #1f2937;
+    background: rgba(44,44,46,0.9);
     color: #f9fafb;
 }
 
@@ -197,7 +200,8 @@ body.dark .profile-section h2 {
 }
 
 body.dark .info-item {
-    background: #374151;
+    background: rgba(55,65,81,0.6);
+    border-color: rgba(255,255,255,0.08);
 }
 
 body.dark .info-item label {
@@ -205,7 +209,18 @@ body.dark .info-item label {
 }
 
 body.dark .info-item span {
-    color: #d1d5db;
+    color: #e5e7eb;
+}
+
+/* 更紧凑的按钮在窄屏上占满一行 */
+@media (max-width: 640px) {
+    .profile-actions {
+        flex-direction: column;
+    }
+    .profile-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
 }
 </style>
 {% endblock %}

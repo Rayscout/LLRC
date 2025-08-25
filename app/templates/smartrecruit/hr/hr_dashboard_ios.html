@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR智能仪表板 - iOS风格</title>
+    <title>智能招聘系统 - HR</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
@@ -31,6 +31,52 @@
         .ios-footer-section {
             background: var(--ios-bg-secondary);
             min-height: 60vh;
+        }
+
+        /* 优化“查看申请/评估候选人/安排面试”三步指引的排版（仅最近活动区域生效） */
+        .ios-recent-section .ios-step-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: var(--ios-spacing-lg);
+            margin: var(--ios-spacing-lg) 0 var(--ios-spacing-xl);
+        }
+        .ios-recent-section .ios-step {
+            display: flex;
+            align-items: flex-start;
+            text-align: left;
+            padding: var(--ios-spacing-lg);
+            gap: var(--ios-spacing-md);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+        }
+        .ios-recent-section .ios-step:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.12); }
+        .ios-recent-section .ios-step-number {
+            margin: 0;
+            flex: 0 0 44px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.05rem;
+            background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+            color: #fff;
+            box-shadow: 0 6px 14px rgba(0,122,255,0.25);
+        }
+        .ios-recent-section .ios-step-content h4 {
+            margin: 0 0 6px 0;
+            font-weight: 700;
+            color: var(--ios-text-primary);
+        }
+        .ios-recent-section .ios-step-content p {
+            margin: 0;
+            color: var(--ios-text-secondary);
+            line-height: 1.6;
+        }
+        @media (max-width: 768px) {
+            .ios-recent-section .ios-step-guide { grid-template-columns: 1fr; }
         }
         
         .ios-welcome-text {
@@ -149,7 +195,7 @@
                 <div class="ios-nav-brand-icon">
                     <i class="uil uil-briefcase"></i>
                 </div>
-                <span>HR智能招聘</span>
+                <span>智能招聘系统-HR</span>
             </a>
             
             <ul class="ios-nav-menu">
@@ -169,6 +215,12 @@
                     <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-nav-link">
                         <i class="ios-nav-icon uil uil-users-alt"></i>
                         <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-briefcase-alt"></i>
+                        <span class="ios-nav-text">已发布职位</span>
                     </a>
                 </li>
                 <li class="ios-nav-item">
@@ -199,10 +251,9 @@
                 
                 <div class="ios-nav-divider"></div>
                 
-                <button class="ios-nav-button secondary" data-action="notifications">
-                    <i class="uil uil-bell"></i>
-                    <span class="ios-nav-badge">3</span>
-                </button>
+                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
+                
+                
                 
                 <button class="ios-nav-button" data-action="profile">
                     <i class="uil uil-user"></i>
@@ -227,18 +278,18 @@
         <!-- 欢迎Section -->
         <section class="ios-section ios-hero-section">
             <div class="ios-container">
-                <h1 class="ios-title ios-fade-in">HR智能仪表板</h1>
-                <p class="ios-subtitle ios-fade-in">数据驱动的招聘决策与人才管理平台</p>
+                <h1 class="ios-title ios-fade-in">智能招聘系统-HR</h1>
+                <p class="ios-subtitle ios-fade-in">数据驱动的人才获取与招聘管理平台</p>
                 <p class="ios-welcome-text ios-fade-in">欢迎回来，{{ user.name if user else 'HR管理员' }}！</p>
                 
                 <!-- 功能引导卡片 -->
                 <div class="ios-feature-guide ios-fade-in-up">
                     <div class="ios-guide-header">
                         <i class="uil uil-lightbulb"></i>
-                        <h3>快速开始指南</h3>
+                        <h3>快速开始</h3>
                     </div>
                     <div class="ios-guide-content">
-                        <p>欢迎使用HR智能招聘系统！这里是您开始工作的快速指南：</p>
+                        <p>欢迎使用智能招聘系统-HR，这里是开始工作的快捷路径：</p>
                         <ul>
                             <li>📝 <strong>发布职位</strong> - 创建新的招聘需求，设置职位要求和截止日期</li>
                             <li>👥 <strong>管理候选人</strong> - 查看申请者简历，进行初步筛选和评估</li>
@@ -394,21 +445,21 @@
                 
                 <!-- 操作指引 -->
                 <div class="ios-step-guide" style="margin-bottom: var(--ios-spacing-xl);">
-                    <div class="ios-step">
+                    <div class="ios-step" data-static="true">
                         <div class="ios-step-number">1</div>
                         <div class="ios-step-content">
                             <h4>查看申请</h4>
                             <p>浏览最新的职位申请</p>
                         </div>
                     </div>
-                    <div class="ios-step">
+                    <div class="ios-step" data-static="true">
                         <div class="ios-step-number">2</div>
                         <div class="ios-step-content">
                             <h4>评估候选人</h4>
                             <p>查看简历并进行初步评估</p>
                         </div>
                     </div>
-                    <div class="ios-step">
+                    <div class="ios-step" data-static="true">
                         <div class="ios-step-number">3</div>
                         <div class="ios-step-content">
                             <h4>安排面试</h4>
@@ -639,5 +690,23 @@
 
     <!-- 引入iOS风格脚本 -->
     <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+    <script>
+      (function(){
+        var btn = document.getElementById('iosThemeToggle');
+        if(!btn) return;
+        function apply(theme){
+          document.body.classList.toggle('dark', theme==='dark');
+          btn.classList.toggle('active', theme==='dark');
+        }
+        var saved = localStorage.getItem('theme');
+        if(!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){ saved='dark'; }
+        apply(saved||'light');
+        btn.addEventListener('click', function(){
+          var next = document.body.classList.contains('dark') ? 'light' : 'dark';
+          localStorage.setItem('theme', next);
+          apply(next);
+        });
+      })();
+    </script>
 </body>
 </html>

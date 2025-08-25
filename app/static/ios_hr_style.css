@@ -66,9 +66,12 @@ body {
     color: var(--ios-text-primary);
     line-height: 1.5;
     overflow-x: hidden;
+    overflow-y: hidden; /* prevent outer scrollbar; use .ios-scroll-container instead */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+html { overflow: hidden; }
 
 /* 滚动条样式 */
 ::-webkit-scrollbar {
@@ -360,6 +363,15 @@ body {
     text-decoration: none;
 }
 
+/* 统一品牌标题为两行显示 */
+.ios-nav-brand span{
+    display: block;
+    width: 90px;
+    line-height: 1.1;
+    white-space: normal;
+    word-break: break-all;
+}
+
 .ios-nav-brand-icon {
     width: 32px;
     height: 32px;
@@ -633,7 +645,54 @@ body {
     scroll-snap-type: y mandatory;
     overflow-y: auto;
     height: 100vh;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
 }
+
+/* iOS theme toggle (shared with iOS pages) */
+.theme-toggle{position:relative;width:50px;height:28px;background:var(--ios-border-primary);border-radius:14px;cursor:pointer;transition:all var(--ios-transition-medium);border:none;display:inline-flex;align-items:center;justify-content:center;color:var(--ios-text-secondary)}
+.theme-toggle::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;background:#fff;border-radius:50%;transition:all var(--ios-transition-medium)}
+.theme-toggle.active{background:var(--ios-blue);color:#fff}
+.theme-toggle.active::after{transform:translateX(22px)}
+
+/* 手动深色模式变量映射 */
+body.dark{
+    --ios-bg-primary:#000000;
+    --ios-bg-secondary:#1C1C1E;
+    --ios-bg-tertiary:#2C2C2E;
+    --ios-text-primary:#FFFFFF;
+    --ios-text-secondary:#EBEBF5;
+    --ios-text-tertiary:#8E8E93;
+    --ios-border-primary:#38383A;
+    --ios-border-secondary:#48484A;
+}
+
+/* 深色模式下常见卡片与输入外观 */
+body.dark .ios-card,
+body.dark .ios-metric-card,
+body.dark .ios-feature-card,
+body.dark .ios-stat-card,
+body.dark .ios-quick-action-btn,
+body.dark .ios-job-stat-card,
+body.dark .ios-job-card,
+body.dark .ios-filter-section,
+body.dark .ios-candidate-card{
+    background: rgba(44,44,46,0.9);
+    border-color: rgba(72,72,74,0.3);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+body.dark .ios-input{
+    background: var(--ios-bg-secondary);
+    color: var(--ios-text-primary);
+    border: 1px solid var(--ios-border-primary);
+}
+
+/* 深色模式下导航 */
+body.dark .ios-nav{ background: rgba(28,28,30,0.85); border-bottom-color: var(--ios-border-primary); }
+body.dark .ios-nav-menu{ background: rgba(28,28,30,0.95); }
+body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
 
 /* 视差背景 */
 .ios-parallax-bg {

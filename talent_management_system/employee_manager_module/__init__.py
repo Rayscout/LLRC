@@ -16,6 +16,7 @@ from .learning_recommendation import learning_recommendation_bp
 from .smart_goals import smart_goals_bp
 from .compensation import compensation_bp
 from .feedback import feedback_bp
+from .evaluations import evaluations_bp
 
 # 导入调试和状态检查工具
 from .status_check import employee_interface_status
@@ -29,6 +30,7 @@ employee_manager_bp.register_blueprint(learning_recommendation_bp)
 employee_manager_bp.register_blueprint(smart_goals_bp)
 employee_manager_bp.register_blueprint(compensation_bp)
 employee_manager_bp.register_blueprint(feedback_bp)
+employee_manager_bp.register_blueprint(evaluations_bp)
 
 # 注册子蓝图到employee_management_bp (为了匹配模板中的路由)
 employee_management_bp.register_blueprint(profile_bp)
@@ -38,6 +40,7 @@ employee_management_bp.register_blueprint(learning_recommendation_bp)
 employee_management_bp.register_blueprint(smart_goals_bp)
 employee_management_bp.register_blueprint(compensation_bp)
 employee_management_bp.register_blueprint(feedback_bp)
+employee_management_bp.register_blueprint(evaluations_bp)
 
 # 员工仪表板路由 (添加到employee_management_bp中)
 @employee_management_bp.route('/employee_dashboard')

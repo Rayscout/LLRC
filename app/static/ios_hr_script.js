@@ -738,19 +738,22 @@ class IOSHRInterface {
     setupStepGuide() {
         const steps = document.querySelectorAll('.ios-step');
         steps.forEach((step, index) => {
-            // 添加点击事件，可以展开显示更多信息
-            step.addEventListener('click', () => {
-                this.showStepDetails(index);
-            });
-            
-            // 添加悬停效果
-            step.addEventListener('mouseenter', () => {
-                step.style.transform = 'translateY(-4px) scale(1.02)';
-            });
-            
-            step.addEventListener('mouseleave', () => {
-                step.style.transform = 'translateY(0) scale(1)';
-            });
+            const isStatic = step.getAttribute('data-static') === 'true';
+            if (!isStatic) {
+                // 添加点击事件，可以展开显示更多信息
+                step.addEventListener('click', () => {
+                    this.showStepDetails(index);
+                });
+                // 添加悬停效果
+                step.addEventListener('mouseenter', () => {
+                    step.style.transform = 'translateY(-4px) scale(1.02)';
+                });
+                step.addEventListener('mouseleave', () => {
+                    step.style.transform = 'translateY(0) scale(1)';
+                });
+            } else {
+                step.style.cursor = 'default';
+            }
         });
     }
 

@@ -544,9 +544,6 @@
 
         <!-- 操作栏 -->
         <div class="action-bar">
-            <a href="{{ url_for('talent_management.employee_manager.feedback.request_feedback') }}" class="action-btn">
-                <i class="fas fa-plus"></i> 请求反馈
-            </a>
             <button class="action-btn secondary" onclick="refreshNotifications()">
                 <i class="fas fa-sync-alt"></i> 刷新通知
             </button>
@@ -556,49 +553,73 @@
         </div>
 
         <div class="content-grid">
-            <!-- 我发送的反馈请求 -->
+            <!-- 收到的反馈 -->
             <div class="content-card">
                 <h2 class="section-title">
-                    <i class="fas fa-paper-plane"></i> 我发送的反馈请求
+                    <i class="fas fa-inbox"></i> 收到的反馈
                 </h2>
                 <div class="feedback-list">
-                    {% if user_requests %}
-                        {% for request in user_requests %}
+                    {% if received_feedback %}
+                        {% for feedback in received_feedback %}
                             <div class="feedback-item">
                                 <div class="feedback-header">
                                     <div class="feedback-info">
                                         <h4>
-                                            {{ request.feedback_type }}
-                                            <span class="priority-badge priority-{{ request.priority }}">
-                                                {{ request.priority|title }}
+                                            {% if feedback.category == 'skill' %}
+                                                🚀 技能发展
+                                            {% elif feedback.category == 'communication' %}
+                                                💬 沟通协作
+                                            {% elif feedback.category == 'performance' %}
+                                                📈 绩效表现
+                                            {% else %}
+                                                📝 {{ feedback.category }}
+                                            {% endif %}
+                                            <span class="priority-badge priority-{{ feedback.priority }}">
+                                                {% if feedback.priority == 'high' %}
+                                                    高优先级
+                                                {% elif feedback.priority == 'medium' %}
+                                                    中优先级
+                                                {% else %}
+                                                    低优先级
+                                                {% endif %}
                                             </span>
                                         </h4>
                                         <div class="feedback-meta">
-                                            发送给: {{ request.recipient_name }} ({{ request.recipient_email }})
+                                            来自: {{ feedback.sender.first_name }} {{ feedback.sender.last_name }} ({{ feedback.sender.position or '未知职位' }})
                                             <br>
-                                            {{ request.created_at[:10] }}
+                                            {{ feedback.created_at.strftime('%Y年%m月%d日 %H:%M') }}
                                         </div>
                                     </div>
-                                    <span class="feedback-status status-{{ request.status }}">
-                                        {% if request.has_response %}
+                                    <span class="feedback-status status-{{ feedback.status }}">
+                                        {% if feedback.status == 'sent' %}
+                                            未读
+                                        {% elif feedback.status == 'read' %}
+                                            已读
+                                        {% elif feedback.status == 'responded' %}
                                             已回复
-                                        {% else %}
-                                            待回复
+                                        {% elif feedback.status == 'archived' %}
+                                            已归档
                                         {% endif %}
                                     </span>
                                 </div>
                                 <div class="feedback-message">
-                                    {{ request.message }}
+                                    {{ feedback.content[:100] }}{% if feedback.content|length > 100 %}...{% endif %}
                                 </div>
                                 <div class="feedback-actions">
-                                    <a href="{{ url_for('talent_management.employee_manager.feedback.view_feedback', request_id=request.id) }}" 
+                                    <a href="{{ url_for('talent_management.employee_management.feedback.view_feedback', feedback_id=feedback.id) }}" 
                                        class="btn-small btn-primary">
                                         <i class="fas fa-eye"></i> 查看详情
                                     </a>
-                                    {% if request.status != 'archived' %}
-                                        <a href="{{ url_for('talent_management.employee_manager.feedback.archive_feedback', request_id=request.id) }}" 
+                                    {% if feedback.status == 'sent' %}
+                                        <a href="{{ url_for('talent_management.employee_management.feedback.respond_feedback', feedback_id=feedback.id) }}" 
+                                           class="btn-small btn-success">
+                                            <i class="fas fa-reply"></i> 回复
+                                        </a>
+                                    {% endif %}
+                                    {% if feedback.status != 'archived' %}
+                                        <a href="{{ url_for('talent_management.employee_management.feedback.archive_feedback', feedback_id=feedback.id) }}" 
                                            class="btn-small btn-warning"
-                                           onclick="return confirm('确定要归档这个反馈请求吗？')">
+                                           onclick="return confirm('确定要归档这个反馈吗？')">
                                             <i class="fas fa-archive"></i> 归档
                                         </a>
                                     {% endif %}
@@ -607,68 +628,9 @@
                         {% endfor %}
                     {% else %}
                         <div class="empty-state">
-                            <i class="fas fa-paper-plane"></i>
-                            <p>您还没有发送过反馈请求</p>
-                            <a href="{{ url_for('talent_management.employee_manager.feedback.request_feedback') }}" class="action-btn">
-                                发送第一个反馈请求
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- 收到的反馈请求 -->
-            <div class="content-card">
-                <h2 class="section-title">
-                    <i class="fas fa-inbox"></i> 收到的反馈请求
-                </h2>
-                <div class="feedback-list">
-                    {% if received_requests %}
-                        {% for request in received_requests %}
-                            <div class="feedback-item">
-                                <div class="feedback-header">
-                                    <div class="feedback-info">
-                                        <h4>
-                                            {{ request.feedback_type }}
-                                            <span class="priority-badge priority-{{ request.priority }}">
-                                                {{ request.priority|title }}
-                                            </span>
-                                        </h4>
-                                        <div class="feedback-meta">
-                                            来自: {{ request.requester_name }} ({{ request.requester_email }})
-                                            <br>
-                                            {{ request.created_at[:10] }}
-                                        </div>
-                                    </div>
-                                    <span class="feedback-status status-{{ request.status }}">
-                                        {% if request.has_response %}
-                                            已回复
-                                        {% else %}
-                                            待回复
-                                        {% endif %}
-                                    </span>
-                                </div>
-                                <div class="feedback-message">
-                                    {{ request.message }}
-                                </div>
-                                <div class="feedback-actions">
-                                    <a href="{{ url_for('talent_management.employee_manager.feedback.view_feedback', request_id=request.id) }}" 
-                                       class="btn-small btn-primary">
-                                        <i class="fas fa-eye"></i> 查看详情
-                                    </a>
-                                    {% if not request.has_response %}
-                                        <a href="{{ url_for('talent_management.employee_manager.feedback.respond_feedback', request_id=request.id) }}" 
-                                           class="btn-small btn-success">
-                                            <i class="fas fa-reply"></i> 回复反馈
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
                             <i class="fas fa-inbox"></i>
-                            <p>您还没有收到反馈请求</p>
+                            <p>您还没有收到任何反馈</p>
+                            <p class="text-muted">当管理层发送反馈时，您会在这里看到</p>
                         </div>
                     {% endif %}
                 </div>
@@ -676,44 +638,58 @@
         </div>
 
         <!-- 待回复的反馈 -->
-        {% if pending_responses %}
+        {% if unread_feedback %}
         <div class="content-card">
             <h2 class="section-title">
-                <i class="fas fa-exclamation-triangle"></i> 待回复的反馈
+                <i class="fas fa-exclamation-triangle"></i> 待处理的反馈
                 <span class="feedback-status status-pending" style="margin-left: 10px;">
-                    {{ pending_responses|length }} 个待回复
+                    {{ unread_feedback|length }} 个未读
                 </span>
             </h2>
             <div class="feedback-list">
-                {% for request in pending_responses %}
+                {% for feedback in unread_feedback %}
                     <div class="feedback-item">
                         <div class="feedback-header">
                             <div class="feedback-info">
                                 <h4>
-                                    {{ request.feedback_type }}
-                                    <span class="priority-badge priority-{{ request.priority }}">
-                                        {{ request.priority|title }}
+                                    {% if feedback.category == 'skill' %}
+                                        🚀 技能发展
+                                    {% elif feedback.category == 'communication' %}
+                                        💬 沟通协作
+                                    {% elif feedback.category == 'performance' %}
+                                        📈 绩效表现
+                                    {% else %}
+                                        📝 {{ feedback.category }}
+                                    {% endif %}
+                                    <span class="priority-badge priority-{{ feedback.priority }}">
+                                        {% if feedback.priority == 'high' %}
+                                            高优先级
+                                        {% elif feedback.priority == 'medium' %}
+                                            中优先级
+                                        {% else %}
+                                            低优先级
+                                        {% endif %}
                                     </span>
                                 </h4>
                                 <div class="feedback-meta">
-                                    来自: {{ request.requester_name }} ({{ request.requester_email }})
+                                    来自: {{ feedback.sender.first_name }} {{ feedback.sender.last_name }} ({{ feedback.sender.position or '未知职位' }})
                                     <br>
-                                    {{ request.created_at[:10] }}
+                                    {{ feedback.created_at.strftime('%Y年%m月%d日 %H:%M') }}
                                 </div>
                             </div>
                             <span class="feedback-status status-pending">
-                                待回复
+                                未读
                             </span>
                         </div>
                         <div class="feedback-message">
-                            {{ request.message }}
+                            {{ feedback.content[:100] }}{% if feedback.content|length > 100 %}...{% endif %}
                         </div>
                         <div class="feedback-actions">
-                            <a href="{{ url_for('talent_management.employee_manager.feedback.respond_feedback', request_id=request.id) }}" 
+                            <a href="{{ url_for('talent_management.employee_management.feedback.respond_feedback', feedback_id=feedback.id) }}" 
                                class="btn-small btn-success">
                                 <i class="fas fa-reply"></i> 立即回复
                             </a>
-                            <a href="{{ url_for('talent_management.employee_manager.feedback.view_feedback', request_id=request.id) }}" 
+                            <a href="{{ url_for('talent_management.employee_management.feedback.view_feedback', feedback_id=feedback.id) }}" 
                                class="btn-small btn-primary">
                                 <i class="fas fa-eye"></i> 查看详情
                             </a>
@@ -756,7 +732,7 @@
 
         // 为所有链接添加转换效果
         document.addEventListener('DOMContentLoaded', function() {
-            const links = document.querySelectorAll('a[href*="request_feedback"]');
+            const links = document.querySelectorAll('a[href*="feedback"]');
             links.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查看反馈 - 员工仪表板</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #F2F2F7;
+            --bg-secondary: rgba(255, 255, 255, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --text-tertiary: #C7C7CC;
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-orange: #FF9500;
+            --accent-red: #FF3B30;
+            --accent-purple: #AF52DE;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius: 16px;
+            --border-radius-large: 24px;
+            --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            --transition-fast: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-secondary: rgba(44, 44, 46, 0.8);
+            --bg-card: rgba(44, 44, 46, 0.9);
+            --text-primary: #FFFFFF;
+            --text-secondary: #EBEBF5;
+            --text-tertiary: #8E8E93;
+            --accent-blue: #0A84FF;
+            --accent-green: #30D158;
+            --accent-orange: #FF9F0A;
+            --accent-red: #FF453A;
+            --accent-purple: #BF5AF2;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, #5856D6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+        }
+
+        .feedback-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sender-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .sender-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sender-details h3 {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+        }
+
+        .sender-details p {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        .feedback-meta {
+            text-align: right;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .priority-high {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 59, 48, 0.3);
+        }
+
+        .priority-medium {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--accent-orange);
+            border: 1px solid rgba(255, 149, 0, 0.3);
+        }
+
+        .priority-low {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(52, 199, 89, 0.3);
+        }
+
+        .feedback-date {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        .feedback-content {
+            margin-bottom: 30px;
+        }
+
+        .feedback-category {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin-bottom: 20px;
+            background: rgba(175, 82, 222, 0.1);
+            color: var(--accent-purple);
+            border: 1px solid rgba(175, 82, 222, 0.3);
+        }
+
+        .feedback-text {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .feedback-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition-fast);
+            border: none;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-purple) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--accent-blue);
+            border: 2px solid var(--accent-blue);
+        }
+
+        .btn-outline:hover {
+            background: var(--accent-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status-sent {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .status-read {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--accent-green);
+        }
+
+        .status-responded {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .status-archived {
+            background: rgba(142, 142, 147, 0.1);
+            color: var(--text-tertiary);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: var(--transition-fast);
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .feedback-card {
+                padding: 25px;
+            }
+            
+            .feedback-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .feedback-meta {
+                text-align: left;
+            }
+            
+            .feedback-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 返回按钮 -->
+        <a href="{{ url_for('talent_management.employee_manager.feedback.feedback_dashboard') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            返回反馈列表
+        </a>
+
+        <!-- 页面标题 -->
+        <div class="header">
+            <h1>查看反馈详情</h1>
+            <p>查看来自管理层的详细反馈信息</p>
+        </div>
+
+        <!-- 反馈详情卡片 -->
+        <div class="feedback-card">
+            <div class="feedback-header">
+                <div class="sender-info">
+                    <div class="sender-avatar">
+                        {{ sender.first_name[0] if sender.first_name else 'U' }}
+                    </div>
+                    <div class="sender-details">
+                        <h3>{{ sender.first_name }} {{ sender.last_name }}</h3>
+                        <p>{{ sender.position or '未知职位' }} • {{ sender.department or '未知部门' }}</p>
+                    </div>
+                </div>
+                <div class="feedback-meta">
+                    <div class="priority-badge priority-{{ feedback.priority }}">
+                        {% if feedback.priority == 'high' %}
+                            高优先级
+                        {% elif feedback.priority == 'medium' %}
+                            中优先级
+                        {% else %}
+                            低优先级
+                        {% endif %}
+                    </div>
+                    <div class="feedback-date">
+                        {{ feedback.created_at.strftime('%Y年%m月%d日 %H:%M') }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="feedback-content">
+                <div class="feedback-category">
+                    {% if feedback.category == 'skill' %}
+                        🚀 技能发展
+                    {% elif feedback.category == 'communication' %}
+                        💬 沟通协作
+                    {% elif feedback.category == 'performance' %}
+                        📈 绩效表现
+                    {% else %}
+                        📝 {{ feedback.category }}
+                    {% endif %}
+                </div>
+                
+                <div class="feedback-text">
+                    {{ feedback.content }}
+                </div>
+            </div>
+
+            <div class="feedback-actions">
+                {% if feedback.status == 'sent' %}
+                    <a href="{{ url_for('talent_management.employee_manager.feedback.respond_feedback', feedback_id=feedback.id) }}" class="btn btn-primary">
+                        <i class="fas fa-reply"></i>
+                        回复反馈
+                    </a>
+                {% endif %}
+                
+                {% if feedback.status != 'archived' %}
+                    <a href="{{ url_for('talent_management.employee_manager.feedback.archive_feedback', feedback_id=feedback.id) }}" class="btn btn-outline" onclick="return confirm('确定要归档此反馈吗？')">
+                        <i class="fas fa-archive"></i>
+                        归档反馈
+                    </a>
+                {% endif %}
+                
+                <a href="{{ url_for('talent_management.employee_manager.feedback.feedback_dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-list"></i>
+                    返回列表
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.feedback-card, .header');
+            elements.forEach((element, index) => {
+                element.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // 确认归档操作
+        function confirmArchive() {
+            return confirm('确定要归档此反馈吗？归档后将无法恢复。');
+        }
+    </script>
+</body>
+</html>
