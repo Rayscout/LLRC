@@ -419,6 +419,16 @@ def extract_user_skills(user):
             # 这里可以添加简历解析逻辑
             pass
         
+        # 优先使用用户资料中已保存的技能（JSON 字符串）
+        try:
+            if getattr(user, 'skills', None):
+                import json
+                parsed = json.loads(user.skills)
+                if isinstance(parsed, list):
+                    skills.extend([str(s).strip() for s in parsed if str(s).strip()])
+        except Exception:
+            pass
+
         # 从职位字段中提取技能
         if hasattr(user, 'position') and user.position:
             skills.append(user.position)

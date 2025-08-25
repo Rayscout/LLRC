@@ -11,6 +11,10 @@ import logging
 import sys
 import os
 from jinja2 import ChoiceLoader, FileSystemLoader
+try:
+    from dotenv import load_dotenv
+except Exception:
+    load_dotenv = None
 
 # 配置日志
 logging.basicConfig(level=logging.DEBUG)
@@ -40,6 +44,12 @@ def create_app():
     templates_dir = os.path.join(base_dir, 'templates')
     static_dir = os.path.join(base_dir, 'static')
     app = Flask(__name__, template_folder=templates_dir, static_folder=static_dir)
+    # 加载 .env 本地环境变量（如果可用）
+    try:
+        if load_dotenv is not None:
+            load_dotenv()
+    except Exception as e:
+        logger.warning(f"Failed to load .env: {e}")
     # 兼容多种工作目录的模板搜索路径
     try:
         search_paths = [

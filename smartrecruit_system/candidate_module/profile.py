@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.utils import secure_filename
 import os
 from app.models import User, db
-from app.utils import allowed_file, get_allowed_cv_extensions, extract_text_from_resume
+from app.utils import allowed_file, get_allowed_cv_extensions, extract_text_from_resume, ai_analyze_resume_text
+from .candidate_ai import update_user_skills_from_resume
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 
@@ -68,6 +69,33 @@ def settings():
                         g.user.cv_file = filename
                         g.user.cv_data = cv_data
                         db.session.commit()
+
+                        # 基于AI自动解析技能并保存
+                        try:
+                            parsed_skills = update_user_skills_from_resume(g.user, cv_data or b'', filename)
+                            if parsed_skills:
+                                flash('已基于简历自动更新技能标签。', 'success')
+                        except Exception as e:
+                            current_app.logger.warning(f'AI skill extraction failed: {e}')
+
+                        # 生成简历分析报告并展示
+                        try:
+                            resume_text = ''
+                            if cv_data:
+                                resume_text = extract_text_from_resume(cv_data, filename) or ''
+                            analysis = ai_analyze_resume_text(resume_text)
+                            analysis_msg = '概述：' + analysis.get('summary','')
+                            if analysis.get('strengths'):
+                                analysis_msg += '\n优势：' + '；'.join(analysis['strengths'])
+                            if analysis.get('weaknesses'):
+                                analysis_msg += '\n可改进：' + '；'.join(analysis['weaknesses'])
+                            if analysis.get('suggestions'):
+                                analysis_msg += '\n建议：' + '；'.join(analysis['suggestions'])
+                            if analysis.get('recommended_roles'):
+                                analysis_msg += '\n推荐岗位：' + '、'.join(analysis['recommended_roles'])
+                            flash(analysis_msg, 'info')
+                        except Exception as e:
+                            current_app.logger.warning(f'AI resume analysis failed: {e}')
 
                         flash('简历上传成功！' if file_ext not in video_exts else '视频简历上传成功！', 'success')
                         return redirect(url_for('smartrecruit.candidate.profile.settings'))

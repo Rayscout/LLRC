@@ -12,9 +12,11 @@ from app.utils import (
     allowed_file,
     get_allowed_cv_extensions,
 )
+from app.utils import _gemini_generate  # 使用 Gemini，避免走 HF 降级
 from app import applications_collection
 from datetime import datetime
 from sqlalchemy import text
+from .candidate_ai import update_user_skills_from_resume
 
 applications_bp = Blueprint('applications', __name__, url_prefix='/applications')
 
@@ -64,6 +66,14 @@ def pre_apply(job_id):
             g.user.cv_data = cv_data
             db.session.commit()
 
+            # 基于AI自动解析技能并保存
+            try:
+                parsed_skills = update_user_skills_from_resume(g.user, cv_data or b'', filename)
+                if parsed_skills:
+                    flash('已基于简历自动更新技能标签。', 'success')
+            except Exception as e:
+                current_app.logger.warning(f'AI skill extraction failed: {e}')
+
             flash('简历上传成功！', 'success')
             return redirect(url_for('smartrecruit.candidate.applications.apply', job_id=job_id))
         except Exception as e:
@@ -98,12 +108,92 @@ def withdraw_application(application_id):
 
 @applications_bp.route('/virtual_interview', methods=['GET'])
 def virtual_interview():
-    """AI 虚拟面试（仅前端界面，不接入API）"""
+    """AI 虚拟面试（前端界面，提供API在同文件中）"""
     if g.user is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
 
     return render_template('smartrecruit/candidate/virtual_interview.html')
+
+@applications_bp.route('/api/virtual_interview/start', methods=['GET'])
+def api_vi_start():
+    """返回基于简历/资料动态生成的问题列表。"""
+    if g.user is None:
+        return jsonify({'success': False, 'message': '请先登录'}), 401
+    try:
+        # 获取简历文本，若没有则根据资料拼接
+        cv_text = ''
+        if getattr(g.user, 'cv_data', None) and getattr(g.user, 'cv_file', None):
+            try:
+                cv_text = extract_text_from_resume(g.user.cv_data, g.user.cv_file) or ''
+            except Exception:
+                cv_text = ''
+        if not cv_text:
+            cv_text = f"姓名:{g.user.first_name} {g.user.last_name}\n公司:{g.user.company_name}\n职位:{g.user.position or ''}\n简介:{g.user.bio or ''}\n经验:{g.user.experience or ''}\n教育:{g.user.education or ''}\n技能:{g.user.skills or ''}"
+        job_desc = request.args.get('job_desc', '')
+
+        # 强制优先使用 Gemini，避免走 HF
+        prompt = (
+            "基于以下候选人简历与职位描述，用中文生成5道不重复的结构化面试问题。\n"
+            "每道题尽量具体，长度不超过40字。只输出JSON数组，数组元素为字符串，不要任何额外文字。\n"
+            f"简历:\n{cv_text}\n职位描述:\n{job_desc}\n输出:"
+        )
+        questions = None
+        gem = _gemini_generate(prompt, max_tokens=600)
+        if gem:
+            import json, re
+            text = gem.strip()
+            # 去掉markdown代码块围栏
+            text = text.replace('```json', '').replace('```', '').strip()
+            # 优先尝试提取方括号JSON
+            m = re.search(r"\[[\s\S]*\]", text)
+            if m:
+                candidate = m.group(0)
+                try:
+                    parsed = json.loads(candidate)
+                    if isinstance(parsed, list):
+                        questions = [str(x).strip().strip('"\'') for x in parsed if str(x).strip()]
+                except Exception:
+                    questions = None
+            # 若仍未解析，按行切分并过滤噪声
+            if not questions:
+                lines = [ln.strip('- ').strip() for ln in text.splitlines() if ln.strip()]
+                filtered = [ln for ln in lines if ln not in ('[',']','```json','```')]
+                if filtered:
+                    questions = filtered
+
+        if not questions:
+            # 退回到旧的通用生成（内部仍可能降级），再取前5
+            questions = generate_interview_questions(cv_text, job_desc)
+            questions = questions[:5] if isinstance(questions, list) else []
+        else:
+            questions = questions[:5]
+        return jsonify({'success': True, 'questions': questions})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@applications_bp.route('/api/virtual_interview/score', methods=['POST'])
+def api_vi_score():
+    """对单题作答给出反馈和（文本中包含）评分。"""
+    if g.user is None:
+        return jsonify({'success': False, 'message': '请先登录'}), 401
+    try:
+        data = request.get_json(silent=True) or {}
+        q = data.get('question', '')
+        a = data.get('answer', '')
+        job_desc = data.get('job_desc', '')
+        if not q or not a:
+            return jsonify({'success': False, 'message': '缺少问题或答案'}), 400
+        # 先用 Gemini 直接打分
+        prompt = (
+            "使用中文，对候选人的回答给出简洁、可执行的反馈，并在最后单独一行输出‘评分：X/10’。\n"
+            f"问题：{q}\n回答：{a}\n职位描述：{job_desc}\n反馈："
+        )
+        fb = _gemini_generate(prompt, max_tokens=400)
+        feedback = (fb.strip() if fb else None) or generate_feedback(q, a, job_desc)
+        return jsonify({'success': True, 'feedback': feedback})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @applications_bp.route('/virtual_feedback', methods=['GET'])
 def virtual_feedback():

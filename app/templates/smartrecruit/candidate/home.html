@@ -42,6 +42,40 @@
                 <i class="fas fa-star" style="color: #ffd700; margin-right: 10px;"></i>
                 为您推荐
             </h2>
+
+            {% if resume_analysis %}
+            <div class="card" style="margin: 0 0 16px; padding:16px; background:#f8fafc; border-left:4px solid #2563eb;">
+              <h3 style="margin:0 0 8px;">基于最新简历的AI分析</h3>
+              <p style="margin:0 0 6px; color:#374151;">{{ resume_analysis.summary }}</p>
+              {% if resume_analysis.strengths %}
+                <div style="margin:6px 0;"><strong>优势：</strong>
+                  <ul style="margin:6px 0 0 18px;">
+                    {% for s in resume_analysis.strengths %}<li>{{ s }}</li>{% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+              {% if resume_analysis.weaknesses %}
+                <div style="margin:6px 0;"><strong>可改进：</strong>
+                  <ul style="margin:6px 0 0 18px;">
+                    {% for s in resume_analysis.weaknesses %}<li>{{ s }}</li>{% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+              {% if resume_analysis.suggestions %}
+                <div style="margin:6px 0;"><strong>建议：</strong>
+                  <ul style="margin:6px 0 0 18px;">
+                    {% for s in resume_analysis.suggestions %}<li>{{ s }}</li>{% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
+              {% if resume_analysis.recommended_roles %}
+                <div style="margin:6px 0;"><strong>推荐岗位：</strong>
+                  <span>{{ ', '.join(resume_analysis.recommended_roles) }}</span>
+                </div>
+              {% endif %}
+              <div style="margin-top:8px; color:#6b7280; font-size:12px;">每次更新简历后，此分析将自动刷新。</div>
+            </div>
+            {% endif %}
             
             <div class="grid grid-2">
                 <div class="job-card animate-slide-in-left">

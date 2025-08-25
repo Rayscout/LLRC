@@ -3,6 +3,7 @@ from .profile import profile_bp
 from .jobs import jobs_bp
 from .applications import applications_bp
 from .interview import interview_bp
+from app.utils import extract_text_from_resume, ai_analyze_resume_text
 
 # 创建求职者主蓝图
 candidate_bp = Blueprint('candidate', __name__, url_prefix='/candidate')
@@ -21,7 +22,18 @@ def home():
     except Exception:
         user_skills = []
 
-    return render_template('smartrecruit/candidate/home.html', user=g.user, user_skills=user_skills)
+    # 生成简历AI分析（轻量运行，失败忽略）
+    resume_analysis = None
+    try:
+        cv_text = ''
+        if getattr(g.user, 'cv_data', None) and getattr(g.user, 'cv_file', None):
+            cv_text = extract_text_from_resume(g.user.cv_data, g.user.cv_file) or ''
+        if cv_text:
+            resume_analysis = ai_analyze_resume_text(cv_text)
+    except Exception:
+        resume_analysis = None
+
+    return render_template('smartrecruit/candidate/home.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
 
 @candidate_bp.route('/dashboard')
 def dashboard():

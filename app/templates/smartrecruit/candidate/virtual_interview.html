@@ -72,13 +72,7 @@
 
 <script>
   (function(){
-    const sampleQuestions = [
-      '请做一个 30 秒的自我介绍。',
-      '谈谈你最近一次解决棘手问题的经历。',
-      '你为什么想加入我们公司？',
-      '描述一个你主导的项目以及你的贡献。',
-      '收到批评时你如何应对？'
-    ];
+    let sampleQuestions = [];
 
     const viVideo = document.getElementById('viVideo');
     const viVideoPh = document.getElementById('viVideoPlaceholder');
@@ -131,14 +125,32 @@
       viStatus.textContent = micEnabled ? '麦克风已开启' : '麦克风已关闭';
     });
 
-    btnStart.addEventListener('click', ()=>{
-      if(started) return; started = true; current = 0; seconds = 0; startTimer(); viStatus.textContent='面试进行中';
-      btnStart.disabled = true; btnEnd.disabled = false; btnNext.disabled = false; renderQuestions(); viAnswer.focus();
+    btnStart.addEventListener('click', async ()=>{
+      if(started) return; started = true; current = 0; seconds = 0; startTimer(); viStatus.textContent='生成题目中...';
+      btnStart.disabled = true; btnEnd.disabled = false; btnNext.disabled = true;
+      try {
+        const resp = await fetch('{{ url_for('smartrecruit.candidate.applications.api_vi_start') }}');
+        const js = await resp.json();
+        if(js && js.success){ sampleQuestions = js.questions || []; viStatus.textContent='面试进行中'; btnNext.disabled = false; renderQuestions(); viAnswer.focus(); }
+        else { sampleQuestions = ['请做一个 30 秒的自我介绍。']; viStatus.textContent = js.message || '生成题目失败，已使用默认题目'; btnNext.disabled = false; renderQuestions(); }
+      } catch(e) {
+        sampleQuestions = ['请做一个 30 秒的自我介绍。']; viStatus.textContent='网络错误，已使用默认题目'; btnNext.disabled = false; renderQuestions();
+      }
     });
 
-    btnNext.addEventListener('click', ()=>{
-      if(!started) return; current++;
+    btnNext.addEventListener('click', async ()=>{
+      if(!started) return;
+      const q = sampleQuestions[current] || '';
+      const a = (viAnswer.value || '').trim();
       viAnswer.value = '';
+      try {
+        if(a){
+          const resp = await fetch('{{ url_for('smartrecruit.candidate.applications.api_vi_score') }}', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ question:q, answer:a }) });
+          const js = await resp.json();
+          if(js && js.success && js.feedback){ alert(js.feedback); }
+        }
+      } catch(e) {}
+      current++;
       if(current >= sampleQuestions.length){ viStatus.textContent='面试已完成，跳转中...'; stopTimer(); setTimeout(()=>{ window.location.href = "{{ url_for('smartrecruit.candidate.applications.virtual_feedback') }}"; }, 700); }
       renderQuestions();
     });
