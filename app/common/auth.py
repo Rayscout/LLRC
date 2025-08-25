@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, g
 from ..models import User, db
 from datetime import datetime
+from werkzeug.security import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -80,7 +81,7 @@ def sign():
                         email=email,
                         phone_number=phone_number,
                         birthday=birthday,
-                        password=password,
+                        password=generate_password_hash(password),
                         user_type='employee',
                         is_hr=False
                     )
@@ -95,7 +96,7 @@ def sign():
                         email=email,
                         phone_number=phone_number,
                         birthday=birthday,
-                        password=password,
+                        password=generate_password_hash(password),
                         user_type='executive',
                         is_hr=False
                     )
@@ -108,7 +109,7 @@ def sign():
                     email=email,
                     phone_number=phone_number,
                     birthday=birthday,
-                    password=password,
+                    password=generate_password_hash(password),
                     is_hr=(role == 'recruiter'),
                     user_type=role
                 )
@@ -128,8 +129,8 @@ def sign():
                 flash('请选择登录身份。', 'danger')
                 return redirect(url_for('common.auth.sign'))
             
-            user = User.query.filter_by(email=email, password=password).first()
-            if user:
+            user = User.query.filter_by(email=email).first()
+            if user and check_password_hash(user.password, password):
                 # 检查用户是否有user_type字段，如果没有则设置默认值
                 if not hasattr(user, 'user_type') or user.user_type is None:
                     # 根据is_hr字段设置默认用户类型

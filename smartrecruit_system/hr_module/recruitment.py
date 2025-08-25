@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import logging
 from app.models import Job, User, Application, db
+from app.sync_service import DataSyncService
 
 recruitment_bp = Blueprint('recruitment', __name__, url_prefix='/recruitment')
 
@@ -66,6 +67,8 @@ def publish_recruitment():
                 job_to_edit.job_type = job_type
                 job_to_edit.department = department
                 db.session.commit()
+                # 同步职位更新到求职者端
+                DataSyncService.sync_job_to_candidates(job_to_edit.id)
                 flash('招聘启事更新成功！', 'success')
             else:
                 new_job = Job(
@@ -89,6 +92,8 @@ def publish_recruitment():
                 )
                 db.session.add(new_job)
                 db.session.commit()
+                # 同步新职位到求职者端
+                DataSyncService.sync_job_to_candidates(new_job.id)
                 flash('招聘启事发布成功！', 'success')
 
             return redirect(url_for('smartrecruit.hr.recruitment.my_jobs'))
@@ -139,6 +144,8 @@ def edit_job(job_id):
         job.department = request.form.get('department')
         
         db.session.commit()
+        # 同步职位更新到求职者端
+        DataSyncService.sync_job_to_candidates(job.id)
         flash('职位更新成功！', 'success')
         return redirect(url_for('smartrecruit.hr.recruitment.my_jobs'))
 
@@ -155,6 +162,8 @@ def delete_job(job_id):
     if job.user_id != g.user.id:
         abort(403)
 
+    # 注意：删除职位时，相关的申请也会被级联删除
+    # 这里可以添加删除前的同步逻辑
     db.session.delete(job)
     db.session.commit()
     flash('职位删除成功！', 'success')

@@ -3,7 +3,7 @@ from app.models import User, db
 from datetime import datetime, timedelta
 import random
 import json
-import pandas as pd
+# import pandas as pd
 import io
 import os
 
