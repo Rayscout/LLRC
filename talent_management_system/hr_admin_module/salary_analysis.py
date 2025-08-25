@@ -3,10 +3,11 @@ from app.models import User, db
 from datetime import datetime, timedelta
 import random
 import json
-try:
-    import pandas as pd
-except ImportError:
-    pd = None
+# try:
+#     import pandas as pd
+# except ImportError:
+#     pd = None
+pd = None
 import io
 import os
 

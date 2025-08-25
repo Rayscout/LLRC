@@ -26,12 +26,17 @@ mongo_client = None
 mongodb = None
 applications_collection = None
 try:
-    mongo_client = MongoClient('mongodb://localhost:27017/')
+    mongo_client = MongoClient('mongodb://localhost:27017/', serverSelectionTimeoutMS=5000)
+    # 测试连接
+    mongo_client.admin.command('ping')
     mongodb = mongo_client['applications']
     applications_collection = mongodb['applications']
     logger.info("MongoDB connected successfully.")
 except Exception as e:
     logger.warning(f"Could not connect to MongoDB: {e}. MongoDB features will be disabled.")
+    mongo_client = None
+    mongodb = None
+    applications_collection = None
 
 def create_app():
     app = Flask(__name__)

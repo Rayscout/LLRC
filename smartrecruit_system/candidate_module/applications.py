@@ -13,6 +13,7 @@ from app.utils import (
     get_allowed_cv_extensions,
 )
 from app import applications_collection
+from app.sync_service import DataSyncService
 from datetime import datetime
 from sqlalchemy import text
 
@@ -63,6 +64,9 @@ def pre_apply(job_id):
             g.user.cv_file = filename
             g.user.cv_data = cv_data
             db.session.commit()
+
+            # 同步简历更新到HR端
+            DataSyncService.sync_cv_update_to_hr(g.user.id)
 
             flash('简历上传成功！', 'success')
             return redirect(url_for('smartrecruit.candidate.applications.apply', job_id=job_id))
@@ -164,6 +168,10 @@ def apply(job_id):
         # 记录到用户资料，作为最新简历
         g.user.cv_file = unique_name
         db.session.commit()
+        
+        # 同步简历更新到HR端
+        DataSyncService.sync_cv_update_to_hr(g.user.id)
+        
         cv_filename_to_use = unique_name
 
     if not cv_filename_to_use:
@@ -182,6 +190,9 @@ def apply(job_id):
         )
         db.session.add(application)
         db.session.commit()
+
+        # 同步申请到HR端
+        DataSyncService.sync_application_to_hr(application.id)
 
         # 可选写入 Mongo
         try:
@@ -451,6 +462,9 @@ def apply_job(job_id):
             
             db.session.add(new_application)
             db.session.commit()
+            
+            # 同步申请到HR端
+            DataSyncService.sync_application_to_hr(new_application.id)
             
             if request.headers.get('Content-Type') == 'application/json':
                 return jsonify({'success': True, 'message': '申请提交成功'})
