@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>登录 & 注册</title>
+    <title>智能招聘与人才发展系统</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='auth_sign.css') }}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,6 +21,14 @@
          .tile-body h3{color:#111827 !important;font-weight:600}
          .tile-body p{color:#374151 !important;line-height:1.5}
          .tile{background:#ffffff !important;border:1px solid #e5e7eb !important}
+         /* Hero image responsive fit */
+         .hero .hero-content{align-items:center}
+         .hero-right{display:flex;justify-content:center}
+         .hero-right .avatar{width:min(48vw,520px);aspect-ratio:1/1;border-radius:999px;overflow:hidden;position:relative;background:transparent;border:6px solid rgba(96,165,250,.35);box-shadow:0 20px 60px rgba(0,0,0,.12), 0 0 0 18px rgba(96,165,250,.18), 0 0 0 36px rgba(96,165,250,.08)}
+         .hero-right .avatar img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;border-radius:999px}
+         @media(max-width:991.98px){
+             .hero-right .avatar{width:min(70vw,380px);box-shadow:0 16px 44px rgba(0,0,0,.1), 0 0 0 14px rgba(96,165,250,.16), 0 0 0 28px rgba(96,165,250,.07)}
+         }
      </style>
 </head>
 <body>
@@ -39,8 +47,8 @@
     <header class="site-header">
         <div class="container header-inner">
                          <a href="#home" class="brand" data-scroll>
-                 <img src="https://mcp-media.8n6n.com/img/2025/08/20/c0ce9b147f51df7246a8d9ffb6a64012" alt="林理人才 Logo" />
-                 <span class="brand-text">智能招聘与人才发展系统</span>
+                 <img src="https://mcp-media.8n6n.com/img/2025/08/20/c0ce9b147f51df7246a8d9ffb6a64012" alt="IRTDS Logo" />
+                 <span class="brand-text">IRTDS</span>
              </a>
             <nav class="nav md-nav" aria-label="Primary">
                 <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" id="navToggle">☰</button>
@@ -58,7 +66,65 @@
     </header>
 
     <main>
-        <!-- Hero -->
+        
+
+        <!-- 其余展示区块可按需保留，保持模板结构 -->
+        <section id="services" class="section">
+            <style>
+            /* 散开图标 + 中央渐显文字区块样式 */
+            .scatter-wrap{position:relative; height:100vh; min-height:560px; overflow:hidden; border-radius:0; background:linear-gradient(180deg, rgba(99,102,241,0.04), rgba(59,130,246,0.04)); box-shadow:0 10px 40px rgba(0,0,0,.06); width:100vw; left:50%; transform:translateX(-50%); opacity:0; transition:opacity .6s ease; margin-top:-1cm;
+            --center-shift-y: 190px;}
+            .scatter-wrap.ready{opacity:1}
+            .scatter-center{position:absolute; left:50%; top:calc(50% - var(--center-shift-y)); transform:translate(-50%,-50%) translateY(3cm) scale(.92); text-align:center; pointer-events:none; opacity:0; transition:opacity .8s cubic-bezier(.25,1,.5,1), transform .8s cubic-bezier(.25,1,.5,1)}
+            .scatter-center h2{margin:0; font-size:44px; line-height:1.12; letter-spacing:.2px}
+            .scatter-center h2 span{font-weight:800}
+            .scatter-center .big-line{display:inline-block; transform-origin:left center; font-size:66px; position:relative; top:2cm}
+            @media(min-width:992px){ .scatter-center .big-line{font-size:72px} }
+            /* 动视效果：微缩放+上浮位移（进入/循环） */
+            .mv{animation:mvPulse 3.2s cubic-bezier(.25,1,.5,1) infinite}
+            .mv.delay{animation-delay:.6s}
+            @keyframes mvPulse{0%{transform:translateY(2px) scale(1)}40%{transform:translateY(-4px) scale(1.05)}60%{transform:translateY(-2px) scale(1.03)}100%{transform:translateY(2px) scale(1)}}
+            .scatter-icons{position:absolute; left:50%; top:calc(50% - var(--center-shift-y)); width:0; height:0}
+            .scatter-icon{position:absolute; left:0; top:0; width:88px; height:88px; border-radius:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.12); transform:translate(-50%,-50%) scale(0.9); transition:box-shadow .3s ease; cursor:pointer}
+            .scatter-icon img{width:100%; height:100%; object-fit:cover; animation:breathe 3.6s ease-in-out infinite}
+            /* 点击波纹 */
+            .click-ripple{position:absolute; left:50%; top:50%; width:10px; height:10px; transform:translate(-50%,-50%) scale(0); border-radius:999px; background:rgba(96,165,250,.35); pointer-events:none; animation:ripple 700ms ease-out forwards}
+            @keyframes ripple{0%{opacity:.55; transform:translate(-50%,-50%) scale(0)}70%{opacity:.18; transform:translate(-50%,-50%) scale(6)}100%{opacity:0; transform:translate(-50%,-50%) scale(8)}}
+            @keyframes breathe{0%,100%{transform:scale(1);opacity:.96}50%{transform:scale(1.04);opacity:1}}
+            @media(min-width:992px){ .scatter-icon{width:104px; height:104px} .scatter-center h2{font-size:56px} .scatter-wrap{ --center-shift-y: 210px; } }
+            </style>
+            <div class="container">
+                <div id="scatterSection" class="scatter-wrap mt-12">
+                    <div class="scatter-icons" aria-hidden="true">
+                        <div class="scatter-icon" data-idx="0"><img src="https://mcp-media.8n6n.com/img/2025/04/17/39f459b938fc69dd692a70065b99dde9" alt="icon1"></div>
+                        <div class="scatter-icon" data-idx="1"><img src="https://mcp-media.8n6n.com/img/2025/04/17/340465a65d6bf4196d5c9fb6292df646" alt="icon2"></div>
+                        <div class="scatter-icon" data-idx="2"><img src="https://mcp-media.8n6n.com/img/2025/04/17/39f459b938fc69dd692a70065b99dde9" alt="icon3"></div>
+                        <div class="scatter-icon" data-idx="3"><img src="https://mcp-media.8n6n.com/img/2025/04/17/b491a9f66ccc9c0874a9595550781560" alt="icon4"></div>
+                        <div class="scatter-icon" data-idx="4"><img src="https://mcp-media.8n6n.com/img/2025/04/17/0fef9599e406e3435d8e7155ec0706da" alt="icon5"></div>
+                        <div class="scatter-icon" data-idx="5"><img src="https://mcp-media.8n6n.com/img/2025/04/17/01b44253c4e46378709e1d20ca2dd303" alt="icon6"></div>
+                        <div class="scatter-icon" data-idx="6"><img src="https://mcp-media.8n6n.com/img/2025/04/17/88c86e4e311ff44450d3fd7382ce56e8" alt="icon7"></div>
+                        <div class="scatter-icon" data-idx="7"><img src="https://mcp-media.8n6n.com/img/2025/04/18/ec4fcbab6c55265d5ebcfdca4632702c" alt="icon8"></div>
+                        <div class="scatter-icon" data-idx="8"><img src="https://mcp-media.8n6n.com/img/2025/04/17/5b82dab72493da6628b56d8f5f823be8" alt="icon9"></div>
+                        <div class="scatter-icon" data-idx="9"><img src="https://mcp-media.8n6n.com/img/2025/04/17/a0943644097d75d3e1763c24a4a9c6e8" alt="icon10"></div>
+                        <div class="scatter-icon" data-idx="10"><img src="https://mcp-media.8n6n.com/img/2025/04/18/0a684cb6d685abeebae8f1ef938ea8e7" alt="icon11"></div>
+                        <div class="scatter-icon" data-idx="11"><img src="https://mcp-media.8n6n.com/img/2025/04/20/02b050475e70e00996b237db752d810d" alt="icon12"></div>
+                        <div class="scatter-icon" data-idx="12"><img src="https://mcp-media.8n6n.com/img/2025/05/02/234129e2329a2504771400ba45eb0617" alt="icon13"></div>
+                        <div class="scatter-icon" data-idx="13"><img src="https://mcp-media.8n6n.com/img/2025/05/02/969af67a70f2aab9602500509ea4e398" alt="icon14"></div>
+                        <div class="scatter-icon" data-idx="14"><img src="https://mcp-media.8n6n.com/img/2025/05/02/9023b4476de07c898e026e9c0756de4a" alt="icon15"></div>
+                        <div class="scatter-icon" data-idx="15"><img src="https://mcp-media.8n6n.com/img/2025/05/03/f90736e24a73ff06b0ec12a306a1911a" alt="icon16"></div>
+                    </div>
+                    <div class="scatter-center" id="scatterCenter">
+                        <h2>
+                            <span>Intelligent</span><br/>
+                            <span class="big-line mv">RECRUITMENT &</span><br/>
+                            <span class="big-line mv delay">Talent Development</span>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero moved below scatter section -->
         <section id="home" class="section hero">
             <div class="hero-bg"></div>
             <div class="container hero-content">
@@ -72,73 +138,8 @@
                 </div>
                 <div class="hero-right">
                     <div class="avatar">
-                                                 <img src="{{ url_for('static', filename='Images/logo.svg') }}" alt="Job Seeker" />
+                                                 <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Logo" />
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 其余展示区块可按需保留，保持模板结构 -->
-        <section id="services" class="section">
-            <div class="container">
-                <div class="section-head">
-                    <span class="pill">解决方案</span>
-                    <h2>我们提供什么</h2>
-                    <p class="muted">围绕“招-育-用-留”的人才全生命周期，提供可落地的 AI 方案与工程化实践。</p>
-                </div>
-                <div class="grid grid-4 mt-12">
-                    <article class="card">
-                        <div class="card-head">
-                            <div class="icon-badge">🤖</div>
-                            <h3>智能招聘引擎</h3>
-                        </div>
-                        <p class="card-desc">多渠道职位发布、简历解析、意向识别与候选人去重，自动化收集与预筛选候选人。</p>
-                        <ul class="list">
-                            <li>多平台一键发布</li>
-                            <li>简历结构化解析</li>
-                            <li>NLP 意向识别</li>
-                            <li>反作弊与去重</li>
-                        </ul>
-                    </article>
-                    <article class="card">
-                        <div class="card-head">
-                            <div class="icon-badge">🧭</div>
-                            <h3>人岗匹配</h3>
-                        </div>
-                        <p class="card-desc">基于职位与人才画像，利用向量检索与知识图谱进行匹配、排序与推荐。</p>
-                        <ul class="list">
-                            <li>职位画像建模</li>
-                            <li>人才画像建模</li>
-                            <li>匹配度评分</li>
-                            <li>相似候选推荐</li>
-                        </ul>
-                    </article>
-                    <article class="card">
-                        <div class="card-head">
-                            <div class="icon-badge">📊</div>
-                            <h3>人才画像与测评</h3>
-                        </div>
-                        <p class="card-desc">整合能力/性格/胜任力量表与面试问答，形成动态人才画像与风险提示。</p>
-                        <ul class="list">
-                            <li>在线测评矩阵</li>
-                            <li>多模态问答评分</li>
-                            <li>标签与维度刻画</li>
-                            <li>风险规则库</li>
-                        </ul>
-                    </article>
-                    <article class="card">
-                        <div class="card-head">
-                            <div class="icon-badge">📈</div>
-                            <h3>发展与数据看板</h3>
-                        </div>
-                        <p class="card-desc">培训路径个性化推荐与用人数据可视化，沉淀组织能力地图与经营洞察。</p>
-                        <ul class="list">
-                            <li>学习路径推荐</li>
-                            <li>留任/流失预警</li>
-                            <li>招聘漏斗分析</li>
-                            <li>经营与人效看板</li>
-                        </ul>
-                    </article>
                 </div>
             </div>
         </section>
@@ -162,62 +163,62 @@
                 </div>
                 <div class="grid grid-3 mt-8" id="portfolioGrid">
                     <article class="tile" data-category="recruit">
-                                                 <div class="media"><img src="{{ url_for('static', filename='Images/tile-1.svg') }}" alt="智能招聘引擎" /></div>
+                                                 <div class="media"><img src="{{ url_for('static', filename='Images/q1.jpg') }}" alt="智能招聘引擎" /></div>
                         <div class="tile-body">
                             <h3>智能招聘引擎</h3>
                             <p>职位多平台一键分发、简历解析与意向识别，自动预筛候选人并聚合人才库。</p>
                             <div class="actions">
-                                                                 <button class="btn btn-outline" data-details data-title="智能招聘引擎" data-img="{{ url_for('static', filename='Images/tile-1.svg') }}" data-desc="支持多平台职位一键发布、简历结构化解析、意向识别与去重。自动化预筛候选，统一沉淀到人才库并可复用。" data-link="#">了解详情</button>
+                                                                 <button class="btn btn-outline" data-details data-title="智能招聘引擎" data-img="{{ url_for('static', filename='Images/q1.jpg') }}" data-desc="支持多平台职位一键发布、简历结构化解析、意向识别与去重。自动化预筛候选，统一沉淀到人才库并可复用。" data-link="#">了解详情</button>
                             </div>
                         </div>
                     </article>
                     <article class="tile" data-category="match">
-                         <div class="media"><img src="{{ url_for('static', filename='Images/tile-2.svg') }}" alt="人岗匹配" /></div>
+                         <div class="media"><img src="{{ url_for('static', filename='Images/q2.jpg') }}" alt="人岗匹配" /></div>
                         <div class="tile-body">
                             <h3>人岗匹配</h3>
                             <p>向量检索 + 知识图谱，给出匹配度评分、解释与相似人选推荐。</p>
                             <div class="actions">
-                                                                 <button class="btn btn-outline" data-details data-title="人岗匹配" data-img="{{ url_for('static', filename='Images/tile-2.svg') }}" data-desc="结合职位画像与人才画像，采用向量检索/重排与知识图谱规则，输出可解释的匹配度、关键命中点与相似候选推荐。" data-link="#">了解详情</button>
+                                                                 <button class="btn btn-outline" data-details data-title="人岗匹配" data-img="{{ url_for('static', filename='Images/q2.jpg') }}" data-desc="结合职位画像与人才画像，采用向量检索/重排与知识图谱规则，输出可解释的匹配度、关键命中点与相似候选推荐。" data-link="#">了解详情</button>
                             </div>
                         </div>
                     </article>
                     <article class="tile" data-category="assess">
-                         <div class="media"><img src="{{ url_for('static', filename='Images/tile-3.svg') }}" alt="人才画像与测评" /></div>
+                         <div class="media"><img src="{{ url_for('static', filename='Images/q3.jpg') }}" alt="人才画像与测评" /></div>
                         <div class="tile-body">
                             <h3>人才画像与测评</h3>
                             <p>整合量表与面试问答，输出可视化画像、胜任力评估与风险提示。</p>
                             <div class="actions">
-                                                                 <button class="btn btn-outline" data-details data-title="人才画像与测评" data-img="{{ url_for('static', filename='Images/tile-3.svg') }}" data-desc="融合在线量表、结构化面试与多模态要素，生成可视化人才画像与胜任力评估，并给出风险与提升建议。" data-link="#">了解详情</button>
+                                                                 <button class="btn btn-outline" data-details data-title="人才画像与测评" data-img="{{ url_for('static', filename='Images/q3.jpg') }}" data-desc="融合在线量表、结构化面试与多模态要素，生成可视化人才画像与胜任力评估，并给出风险与提升建议。" data-link="#">了解详情</button>
                             </div>
                         </div>
                     </article>
                     <article class="tile" data-category="develop">
-                         <div class="media"><img src="{{ url_for('static', filename='Images/tile-4.svg') }}" alt="培训与发展" /></div>
+                         <div class="media"><img src="{{ url_for('static', filename='Images/q4.jpg') }}" alt="培训与发展" /></div>
                         <div class="tile-body">
                             <h3>培训与发展</h3>
                             <p>个性化学习路径与岗位能力地图，支撑人才发展与组织升级。</p>
                             <div class="actions">
-                                                                 <button class="btn btn-outline" data-details data-title="培训与发展" data-img="{{ url_for('static', filename='Images/tile-4.svg') }}" data-desc="依据岗位能力模型与画像差距，自动推荐个性化学习路径；结合能力地图与学习记录，持续跟踪成长。" data-link="#">了解详情</button>
+                                                                 <button class="btn btn-outline" data-details data-title="培训与发展" data-img="{{ url_for('static', filename='Images/q4.jpg') }}" data-desc="依据岗位能力模型与画像差距，自动推荐个性化学习路径；结合能力地图与学习记录，持续跟踪成长。" data-link="#">了解详情</button>
                             </div>
                         </div>
                     </article>
                     <article class="tile" data-category="data">
-                         <div class="media"><img src="{{ url_for('static', filename='Images/tile-5.svg') }}" alt="数据看板" /></div>
+                         <div class="media"><img src="{{ url_for('static', filename='Images/q5.jpg') }}" alt="数据看板" /></div>
                         <div class="tile-body">
                             <h3>数据看板</h3>
                             <p>招聘漏斗、用工效率、留任与流失预警，多维报表助力经营与人效提升。</p>
                             <div class="actions">
-                                                                 <button class="btn btn-outline" data-details data-title="数据看板" data-img="{{ url_for('static', filename='Images/tile-5.svg') }}" data-desc="提供招聘漏斗、入转离、效率与成本等指标看板，支持维度钻取、预警与导出，沉淀组织管理洞察。" data-link="#">了解详情</button>
+                                                                 <button class="btn btn-outline" data-details data-title="数据看板" data-img="{{ url_for('static', filename='Images/q5.jpg') }}" data-desc="提供招聘漏斗、入转离、效率与成本等指标看板，支持维度钻取、预警与导出，沉淀组织管理洞察。" data-link="#">了解详情</button>
                             </div>
                         </div>
                     </article>
                     <article class="tile" data-category="integration">
-                         <div class="media"><img src="{{ url_for('static', filename='Images/tile-6.svg') }}" alt="集成与 API" /></div>
+                         <div class="media"><img src="{{ url_for('static', filename='Images/q6.jpg') }}" alt="集成与 API" /></div>
                         <div class="tile-body">
                             <h3>集成与 API</h3>
                             <p>开放 API 与 Webhook，支持与 HR 系统、企业微信、钉钉与单点登录集成。</p>
                             <div class="actions">
-                                                                 <button class="btn btn-outline" data-details data-title="集成与 API" data-img="{{ url_for('static', filename='Images/tile-6.svg') }}" data-desc="提供标准化 REST API 与 Webhook 事件，覆盖组织、职位、候选、流程与单点登录，轻松打通现有 HR/IM/SSO 系统。" data-link="#">了解详情</button>
+                                                                 <button class="btn btn-outline" data-details data-title="集成与 API" data-img="{{ url_for('static', filename='Images/q6.jpg') }}" data-desc="提供标准化 REST API 与 Webhook 事件，覆盖组织、职位、候选、流程与单点登录，轻松打通现有 HR/IM/SSO 系统。" data-link="#">了解详情</button>
                             </div>
                         </div>
                     </article>
@@ -483,6 +484,226 @@
         // 轻量初始化：显示页面渐入
         document.addEventListener('DOMContentLoaded', () => {
             document.body.style.opacity = '1';
+            // 散开图标滚动动效
+            (function(){
+                const section = document.getElementById('scatterSection');
+                if(!section) return;
+                const icons = Array.from(section.querySelectorAll('.scatter-icon'));
+                const center = document.getElementById('scatterCenter');
+                const rect = () => section.getBoundingClientRect();
+
+                // 区域范围与随机游走
+                const baseRadiusXRatio = 1.10; // 左右范围≈原来2倍
+                const baseRadiusYRatio = 0.68;  // 垂直范围同步放大
+                const radiusRand  = icons.map(()=> 0.75 + Math.random()*0.5);
+                const pos = icons.map(()=> ({x:0, y:0, init:false}));
+                const vel = icons.map(()=> ({x:(Math.random()-0.5)*1.2, y:(Math.random()-0.5)*1.2}));
+                // 点击图标：将速度反向，并给予轻微增益
+                icons.forEach((el, i)=>{
+                    el.addEventListener('click', (e)=>{
+                        // 反向 + 加速-减速动画（easeOutExpo 逐帧衰减）
+                        const minKick = 0.6;
+                        vel[i].x = -(Math.abs(vel[i].x) > 0.2 ? vel[i].x : (vel[i].x >= 0 ? minKick : -minKick));
+                        vel[i].y = -(Math.abs(vel[i].y) > 0.2 ? vel[i].y : (vel[i].y >= 0 ? minKick : -minKick));
+                        let boost = 1.8; // 初速度提升
+                        const decayStart = performance.now();
+                        function decay(now){
+                            const t = Math.min(1, (now - decayStart)/600); // 0.6s 衰减
+                            const ease = 1 - Math.pow(2, -8 * t); // easeOutExpo 近似
+                            const scale = 1 + (boost - 1) * (1 - ease);
+                            vel[i].x *= scale; vel[i].y *= scale;
+                            if(t < 1) requestAnimationFrame(decay);
+                        }
+                        requestAnimationFrame(decay);
+                        // 点击波纹
+                        const ripple = document.createElement('span');
+                        ripple.className = 'click-ripple';
+                        el.appendChild(ripple);
+                        ripple.addEventListener('animationend', ()=> ripple.remove());
+                    });
+                });
+                const MAX_SPEED = 1.2;
+                const MIN_SPEED = 0.25;
+
+                function update(){
+                    const r = rect();
+                    const vh = window.innerHeight || document.documentElement.clientHeight;
+                    // 计算可视比例：区块进入视口中线后开始散开，0->1
+                    // 根据启动动画进度计算 eased（0->1）
+                    const t = Math.max(0, Math.min(1, (typeof openProgress==='number'? openProgress : 0)));
+                    const eased = t*t*(3-2*t); // easeInOut
+                    // 设置中心文案透明度
+                    if(center){
+                        center.style.opacity = String(eased);
+                        center.style.transform = `translate(-50%,-50%) scale(${0.92 + 0.08*eased})`;
+                    }
+                    // 图标从中心向外插值（椭圆 + 缓慢移动）
+                    const minDim = Math.min(r.width, r.height);
+                    const rx = (r.width)  * baseRadiusXRatio * 0.5;  // 半径取容器宽/高比例
+                    const ry = (r.height) * baseRadiusYRatio * 0.5;
+                    // 中心文字留白矩形：避免遮挡文字
+                    const textClearX = Math.max(220, r.width  * 0.18);
+                    const textClearY = Math.max(120, r.height * 0.12);
+                    // 预警区（比留白稍大，提前产生斥力）
+                    const textWarnX = textClearX * 1.25;
+                    const textWarnY = textClearY * 1.25;
+                    const innerExclusionX = Math.max(textClearX, minDim * 0.12);
+                    const innerExclusionY = Math.max(textClearY, minDim * 0.10);
+                    const boundsX = (window.innerWidth || document.documentElement.clientWidth)/2 - 52;  // 左右边界扩展到视口边缘
+                    const boundsY = r.height/2 - 72;
+                    const boundaryPadding = 37.8; // 约 1cm @96dpi
+
+                    const positions = new Array(icons.length);
+                    const sizes = icons.map(el => el.offsetWidth || 96);
+
+                    icons.forEach((el, i)=>{
+                        // 初始化分布（随机方向和半径），随后随机游走
+                        const rxEff = Math.max(innerExclusionX, rx*radiusRand[i]);
+                        const ryEff = Math.max(innerExclusionY, ry*radiusRand[i]);
+                        if(!pos[i].init){
+                            const a = Math.random()*Math.PI*2;
+                            const kx = (Math.cos(a) * rxEff);
+                            const ky = (Math.sin(a) * ryEff);
+                            pos[i].x = kx * (0.6 + Math.random()*0.4);
+                            pos[i].y = ky * (0.6 + Math.random()*0.4);
+                            pos[i].init = true;
+                        }
+                        // 随机扰动速度
+                        vel[i].x += (Math.random()-0.5)*0.08;
+                        vel[i].y += (Math.random()-0.5)*0.08;
+                        // 速度限幅
+                        const sp = Math.hypot(vel[i].x, vel[i].y) || 0.001;
+                        const clamped = Math.max(MIN_SPEED, Math.min(MAX_SPEED, sp));
+                        vel[i].x = vel[i].x / sp * clamped;
+                        vel[i].y = vel[i].y / sp * clamped;
+                        // 位置更新
+                        pos[i].x += vel[i].x;
+                        pos[i].y += vel[i].y;
+                        // 中心文字提前远离：对预警区内/附近的点持续施加斥力
+                        const ax = pos[i].x;
+                        const ay = pos[i].y;
+                        const insideWarn = Math.abs(ax) < textWarnX && Math.abs(ay) < textWarnY;
+                        if(insideWarn){
+                            // 基于距离中心的归一化向量施加力
+                            const nx = (ax === 0 ? (Math.random() - 0.5) : ax) / (Math.abs(ax) + 1e-3);
+                            const ny = (ay === 0 ? (Math.random() - 0.5) : ay) / (Math.abs(ay) + 1e-3);
+                            // 强度：越靠近中心越强
+                            const px = 1 - Math.min(1, Math.abs(ax) / textWarnX);
+                            const py = 1 - Math.min(1, Math.abs(ay) / textWarnY);
+                            const force = 0.8 * Math.max(px, py); // 0~0.8
+                            vel[i].x += nx * force;
+                            vel[i].y += ny * force;
+                        }
+                        // 严格留白区域内，立即弹出
+                        const insideClear = Math.abs(ax) < textClearX && Math.abs(ay) < textClearY;
+                        if(insideClear){
+                            const nx = (ax === 0 ? (Math.random() - 0.5) : ax) / (Math.abs(ax) + 1e-3);
+                            const ny = (ay === 0 ? (Math.random() - 0.5) : ay) / (Math.abs(ay) + 1e-3);
+                            pos[i].x = Math.sign(nx) * textClearX;
+                            pos[i].y = Math.sign(ny) * textClearY;
+                            vel[i].x += nx * 1.2;
+                            vel[i].y += ny * 1.2;
+                        }
+                        // 边界反弹
+                        if(pos[i].x > boundsX || pos[i].x < -boundsX){ vel[i].x *= -1; pos[i].x = Math.max(-boundsX, Math.min(boundsX, pos[i].x)); }
+                        if(pos[i].y > boundsY || pos[i].y < -boundsY){ vel[i].y *= -1; pos[i].y = Math.max(-boundsY, Math.min(boundsY, pos[i].y)); }
+                        // 吸附回许可半径内（防止长时间漂到内圈）
+                        pos[i].x = Math.max(-rxEff, Math.min(rxEff, pos[i].x));
+                        pos[i].y = Math.max(-ryEff, Math.min(ryEff, pos[i].y));
+                        let x = pos[i].x;
+                        let y = pos[i].y;
+                        // 边界限制，留出约1cm安全距离
+                        x = Math.max(-boundsX + boundaryPadding, Math.min(boundsX - boundaryPadding, x));
+                        y = Math.max(-boundsY + boundaryPadding, Math.min(boundsY - boundaryPadding, y));
+                        positions[i] = {x, y};
+                    });
+
+                    // 简单碰撞分离，避免图标互相遮挡（2-3 次迭代即可）
+                    for(let iter=0; iter<3; iter++){
+                        for(let i=0; i<positions.length; i++){
+                            for(let j=i+1; j<positions.length; j++){
+                                const pi = positions[i];
+                                const pj = positions[j];
+                                const rMin = (sizes[i]+sizes[j]) * 0.48 + 37.8; // 再额外加 ~1cm 分隔
+                                const dx = pj.x - pi.x;
+                                const dy = pj.y - pi.y;
+                                const dist = Math.hypot(dx, dy) || 0.001;
+                                if(dist < rMin){
+                                    const overlap = (rMin - dist) * 0.52; // 分离强度
+                                    const nx = dx / dist;
+                                    const ny = dy / dist;
+                                    pi.x -= nx * overlap;
+                                    pi.y -= ny * overlap;
+                                    pj.x += nx * overlap;
+                                    pj.y += ny * overlap;
+                                    // 远离中心文字的轴向推力，强化不遮字
+                                    if(Math.abs(pi.x) < textClearX && Math.abs(pi.y) < textClearY){ pi.x += Math.sign(pi.x||1)*6; pi.y += Math.sign(pi.y||1)*6; }
+                                    if(Math.abs(pj.x) < textClearX && Math.abs(pj.y) < textClearY){ pj.x += Math.sign(pj.x||1)*6; pj.y += Math.sign(pj.y||1)*6; }
+                                    // 再次边界限制
+                                    pi.x = Math.max(-boundsX, Math.min(boundsX, pi.x));
+                                    pi.y = Math.max(-boundsY, Math.min(boundsY, pi.y));
+                                    pj.x = Math.max(-boundsX, Math.min(boundsX, pj.x));
+                                    pj.y = Math.max(-boundsY, Math.min(boundsY, pj.y));
+                                }
+                            }
+                        }
+                    }
+
+                    // 应用位置
+                    icons.forEach((el, i)=>{
+                        const tx = positions[i].x * eased;
+                        const ty = positions[i].y * eased;
+                        el.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${0.9 + 0.1*eased})`;
+                    });
+                }
+
+                // 启动即四散：初始滚动进度设为 1，使进入页面直接展开
+                // 启动控制：500ms 延迟后触发一次 0->1 的展开动画；
+                // 离开视口后重置，再次进入时重新展开
+                let openProgress = 0; // 0 折叠 -> 1 展开
+                const openDurationMs = 800;
+                let opening = false;
+                let openedOnce = false;
+
+                function easeInOut(t){ return t*t*(3-2*t); }
+
+                function startOpen(){
+                    if(opening) return;
+                    opening = true;
+                    const t0 = performance.now();
+                    function tick(now){
+                        const p = Math.min(1, (now - t0) / openDurationMs);
+                        openProgress = p;
+                        if(p < 1){ requestAnimationFrame(tick); }
+                        else { opening = false; openedOnce = true; }
+                    }
+                    requestAnimationFrame(tick);
+                }
+
+                const wrap = document.getElementById('scatterSection');
+                setTimeout(()=>{ if(wrap){ wrap.classList.add('ready'); startOpen(); } }, 500);
+
+                // 视口进入/离开时再次触发展开
+                if('IntersectionObserver' in window && wrap){
+                    const io = new IntersectionObserver(entries =>{
+                        entries.forEach(e=>{
+                            if(e.isIntersecting){
+                                if(!openedOnce){ startOpen(); }
+                            } else {
+                                // 离开后重置为未展开，下次进入再动画
+                                openProgress = 0; opening = false; openedOnce = false;
+                            }
+                        })
+                    }, { threshold: 0.45 });
+                    io.observe(wrap);
+                }
+
+                // RAF 循环
+                function loop(){ update(); requestAnimationFrame(loop); }
+                window.addEventListener('resize', update);
+                window.addEventListener('scroll', update, {passive:true});
+                loop();
+            })();
             
             // 动态显示/隐藏字段
             const roleInputs = document.querySelectorAll('input[name="role"]');
