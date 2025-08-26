@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>发布人才需求</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth_sign.css') }}" />
+</head>
+<body>
+    <div style="max-width: 720px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,.08);">
+        <h1 style="margin: 0 0 12px 0;">发布人才需求</h1>
+        <p style="margin: 0 0 24px 0; color: #666;">仅需填写关键词，例如：需要会 Python 算法</p>
+
+        <form method="post" action="{{ url_for('talent_management.hr_admin.talent_demand.publish') }}" style="display: grid; gap: 16px;">
+            <div>
+                <label for="keyword" style="display:block; margin-bottom:8px; font-weight:600;">关键词</label>
+                <input id="keyword" name="keyword" required placeholder="例如：Python 算法、NLP、数据分析" style="width:100%; padding:12px 14px; border:1px solid #e3e3e3; border-radius:8px;" />
+            </div>
+            <div>
+                <label for="description" style="display:block; margin-bottom:8px; font-weight:600;">补充说明（可选）</label>
+                <textarea id="description" name="description" rows="4" placeholder="可简单说明背景或期望（可留空）" style="width:100%; padding:12px 14px; border:1px solid #e3e3e3; border-radius:8px;"></textarea>
+            </div>
+            <div style="display:flex; gap:12px;">
+                <button type="submit" style="padding:12px 18px; border:none; background:#667eea; color:#fff; border-radius:8px; cursor:pointer;">发布</button>
+                <a href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}" style="padding:12px 18px; border:1px solid #e3e3e3; color:#333; border-radius:8px; text-decoration:none;">返回</a>
+            </div>
+        </form>
+    </div>
+</body>
+ </html>
+
+
+
