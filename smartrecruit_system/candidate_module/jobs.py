@@ -497,3 +497,161 @@ def get_user_saved_jobs_count(user_id):
         return 3  # 模拟数据
     except Exception:
         return 0
+
+def get_new_jobs_count():
+    """获取今日新增职位数量"""
+    try:
+        # 这里可以添加实际的数据库查询逻辑
+        # 目前返回模拟数据
+        return 25  # 模拟数据
+    except Exception:
+        return 0
+
+def get_recommended_jobs(user_id):
+    """获取推荐职位列表"""
+    try:
+        # 这里可以添加实际的推荐算法逻辑
+        # 目前返回模拟数据
+        return [
+            {
+                'id': 1,
+                'title': 'Python开发工程师',
+                'company': 'ABC科技有限公司',
+                'location': '北京',
+                'work_type': '远程',
+                'tags': ['Python', 'Django', 'MySQL'],
+                'match_rate': 95
+            },
+            {
+                'id': 2,
+                'title': '数据分析师',
+                'company': 'XYZ数据公司',
+                'location': '上海',
+                'work_type': '混合办公',
+                'tags': ['Python', 'Pandas', 'SQL'],
+                'match_rate': 88
+            },
+            {
+                'id': 3,
+                'title': '机器学习工程师',
+                'company': 'AI创新科技',
+                'location': '深圳',
+                'work_type': '全职',
+                'tags': ['Python', 'TensorFlow', '深度学习'],
+                'match_rate': 92
+            }
+        ]
+    except Exception:
+        return []
+
+def save_job_for_user(user_id, job_id):
+    """为用户收藏职位"""
+    try:
+        # 这里可以添加实际的数据库保存逻辑
+        # 目前返回成功
+        return True
+    except Exception:
+        return False
+
+def get_job_details(job_id):
+    """获取职位详情"""
+    try:
+        # 这里可以添加实际的数据库查询逻辑
+        # 目前返回模拟数据
+        return {
+            'id': job_id,
+            'title': 'Python开发工程师',
+            'company': 'ABC科技有限公司',
+            'location': '北京',
+            'work_type': '远程',
+            'salary_range': '15k-25k',
+            'experience': '3-5年',
+            'education': '本科及以上',
+            'description': '负责公司核心产品的后端开发，使用Python、Django等技术栈...',
+            'requirements': [
+                '精通Python编程语言',
+                '熟悉Django、Flask等Web框架',
+                '熟练使用MySQL、Redis等数据库',
+                '有良好的代码规范和团队协作能力'
+            ],
+            'benefits': [
+                '五险一金',
+                '年终奖金',
+                '带薪年假',
+                '免费培训'
+            ],
+            'tags': ['Python', 'Django', 'MySQL', 'Redis', 'Git']
+        }
+    except Exception:
+        return None
+
+def search_jobs_by_filters(filters):
+    """根据筛选条件搜索职位"""
+    try:
+        # 这里可以添加实际的搜索逻辑
+        # 目前返回模拟数据
+        return [
+            {
+                'id': 1,
+                'title': 'Python开发工程师',
+                'company': 'ABC科技有限公司',
+                'location': '北京',
+                'work_type': '远程',
+                'salary_range': '15k-25k',
+                'match_rate': 95
+            },
+            {
+                'id': 2,
+                'title': '数据分析师',
+                'company': 'XYZ数据公司',
+                'location': '上海',
+                'work_type': '混合办公',
+                'salary_range': '12k-20k',
+                'match_rate': 88
+            }
+        ]
+    except Exception:
+        return []
+
+def get_popular_jobs():
+    """获取热门职位"""
+    try:
+        # 这里可以添加实际的查询逻辑
+        # 目前返回模拟数据
+        return [
+            {
+                'id': 1,
+                'title': 'Python开发工程师',
+                'company': 'ABC科技有限公司',
+                'location': '北京',
+                'views': 1250
+            },
+            {
+                'id': 2,
+                'title': '数据分析师',
+                'company': 'XYZ数据公司',
+                'location': '上海',
+                'views': 980
+            }
+        ]
+    except Exception:
+        return []
+
+def get_job_statistics():
+    """获取职位统计信息"""
+    try:
+        # 这里可以添加实际的统计逻辑
+        # 目前返回模拟数据
+        return {
+            'total_jobs': 1250,
+            'new_jobs_today': 25,
+            'remote_jobs': 180,
+            'high_salary_jobs': 320
+        }
+    except Exception:
+        return {
+            'total_jobs': 0,
+            'new_jobs_today': 0,
+            'remote_jobs': 0,
+            'high_salary_jobs': 0
+        }

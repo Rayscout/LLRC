@@ -144,43 +144,11 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
             color: white;
         }
-        
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .back-link:hover {
-            transform: translateX(-5px);
-            background: rgba(255, 255, 255, 0.3);
-            color: white;
-        }
-        
-        .back-link i {
-            margin-right: 8px;
-        }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
         <div class="container">
-            <!-- 返回按钮 -->
-            <div class="row mb-3">
-                <div class="col-12">
-                    <a href="{{ url_for('talent_management.employee_auth.employee_dashboard') }}" class="back-link">
-                        <i class="fas fa-arrow-left"></i> 返回仪表盘
-                    </a>
-                </div>
-            </div>
-            
             <!-- 页面标题 -->
             <div class="row mb-4">
                 <div class="col-12">
