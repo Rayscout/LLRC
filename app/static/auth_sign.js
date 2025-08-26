@@ -9,6 +9,16 @@
   const sections = qsa('section[id]');
   const themeToggle = qs('#themeToggle');
 
+  // Auto-dismiss flash alerts after 5s
+  const flashAlerts = qsa('.alert-container .alert');
+  flashAlerts.forEach(el => {
+    setTimeout(() => {
+      el.classList.add('fade-out');
+      // wait for css transition then remove
+      setTimeout(() => { try { el.remove(); } catch(_){} }, 600);
+    }, 5000);
+  });
+
   // Smooth scroll with offset
   function smoothScrollTo(targetId){
     const el = qs(`#${targetId}`);
@@ -133,11 +143,14 @@
       if(!authModal) return;
       // 为了触发CSS过渡：先使容器可见，再在下一帧添加open类
       authModal.classList.remove('open');
+      // show without flash: render hidden for 1 frame, then animate open
       authModal.style.display = 'flex';
+      authModal.style.opacity = '0';
       authModal.setAttribute('aria-hidden','false');
       requestAnimationFrame(()=>{
         authModal.classList.add('open');
-        authModal.style.display = '';
+        // clear inline opacity in the next frame so CSS takes over
+        requestAnimationFrame(()=>{ authModal.style.opacity = ''; authModal.style.display = ''; });
       });
       if(type==='signup'){
         if(authTitle) authTitle.textContent = '注册';
@@ -215,8 +228,12 @@
   }, { threshold: 0.3 })
   bars.forEach(b => io.observe(b))
 
-  // Reveal-on-scroll for cards/sections
-  const animatedBlocks = qsa('.card,.tile,.t-card,.info-card,.product-card,.solution-item,.support-item,.resource-item,.ai-card,.case-card,.contact-item,.section-head');
+  // Reveal-on-scroll: ensure key blocks have reveal class
+  const targetsNeedingReveal = qsa('.hero-left-content,.hero-right-avatar,.card,.tile,.t-card,.info-card,.product-card,.solution-item,.support-item,.resource-item,.ai-card,.case-card,.contact-item,.section-head,.btn,.avatar');
+  targetsNeedingReveal.forEach(el => el.classList.add('reveal-on-scroll'));
+
+  // Observe all reveal-on-scroll elements
+  const animatedBlocks = qsa('.reveal-on-scroll');
   let lastY = window.pageYOffset;
   function updateScrollDir(){
     const y = window.pageYOffset;

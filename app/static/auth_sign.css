@@ -87,15 +87,23 @@ body.dark .site-header{background:rgba(28,28,30,.82)}
 }
 
 .nav-list .theme-toggle-container .theme-toggle {
-  width: 40px;
-  height: 40px;
+  width: auto;
+  height: auto;
+  padding: 8px 16px; /* extra horizontal room for sun/moon icon */
   border-radius: 8px;
   background: var(--card);
   border: 1px solid var(--border);
-  color: var(--muted);
+  color: var(--fg);
   font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
   transition: all .2s cubic-bezier(0.25,1,0.5,1);
 }
+
+/* Hide legacy slider knob for nav theme button so it doesn't cover the icon */
+.nav-list .theme-toggle-container .theme-toggle::after{content:none;display:none}
 
 .nav-list .theme-toggle-container .theme-toggle:hover {
   background: var(--surface);
@@ -125,8 +133,9 @@ body.dark .site-header{background:rgba(28,28,30,.82)}
   }
   
   .nav-list .theme-toggle-container .theme-toggle {
-    width: 36px;
-    height: 36px;
+    width: auto;
+    height: auto;
+    padding: 8px 16px; /* wider on mobile too */
     font-size: 14px;
   }
 }
@@ -147,7 +156,7 @@ body.dark .site-header{background:rgba(28,28,30,.82)}
 /* 左侧内容区域 */
 .hero-left-content{display:flex;flex-direction:column;gap:24px;text-align:left;animation:hero-title-fade-in 1.2s ease-out forwards;opacity:0;transform:translateY(30px)}
 .hero-main-title{font-size:57px;line-height:1.2;margin:0;color:var(--fg);font-weight:800;animation:hero-title-fade-in 1.2s ease-out forwards, hero-title-glow 3s ease-in-out infinite alternate;opacity:0;transform:translateY(30px)}
-.hero-description{font-size:30px;color:var(--muted);margin:0;line-height:1.6;animation:hero-subtitle-fade-in 1.2s ease-out 0.3s forwards, hero-description-pulse 4s ease-in-out infinite;opacity:0;transform:translateY(30px)}
+.hero-description{font-size:19px;color:var(--muted);margin:0;line-height:1.6;animation:hero-subtitle-fade-in 1.2s ease-out 0.3s forwards, hero-description-pulse 4s ease-in-out infinite;opacity:0;transform:translateY(30px)}
 .hero-actions{display:flex;flex-wrap:wrap;gap:15px;animation:hero-actions-fade-in 1.2s ease-out 0.6s forwards;opacity:0;transform:translateY(30px)}
 
 /* 右侧头像区域 */
@@ -160,7 +169,7 @@ body.dark .site-header{background:rgba(28,28,30,.82)}
   .hero-content{grid-template-columns:1fr;gap:32px;text-align:center;margin-top:-75px}
   .hero-left-content{text-align:center}
   .hero-main-title{font-size:45px}
-  .hero-description{font-size:24px}
+  .hero-description{font-size:19px}
   .avatar{width:300px;height:300px}
 }
 /* 呼吸灯与环形波浪 */
@@ -187,7 +196,7 @@ body.dark .site-header{background:rgba(28,28,30,.82)}
 }
 @media(min-width:992px){
   .hero-main-title{font-size:68px}
-  .hero-description{font-size:36px}
+  .hero-description{font-size:19px}
   .avatar{width:500px;height:500px}
 }
 
@@ -253,13 +262,14 @@ body.dark .tile{background:rgba(44,44,46,0.9);border:1px solid rgba(72,72,74,0.3
 .tab.active,.tab:hover{background:linear-gradient(135deg, #60a5fa, #3b82f6);border-color:transparent;color:#fff;box-shadow:0 6px 20px rgba(96,165,250,0.4);transform:translateY(-2px)}
 
 /* Modal */
-.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:10002}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:48px 24px;z-index:10002}
 .modal.open{display:flex}
 .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:10002}
-.modal-dialog{position:relative;background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);border-radius:20px;border:1px solid rgba(255,255,255,0.2);padding:16px;max-width:860px;width:100%;box-shadow:0 14px 56px rgba(0,0,0,.24);transform:translateY(22px) scale(.94);opacity:0;transition:transform .3s var(--ease),opacity .3s var(--ease);z-index:10003}
+.modal-dialog{position:relative;background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);border-radius:28px;border:1px solid rgba(255,255,255,0.2);padding:24px;max-width:1290px;width:100%;box-shadow:0 14px 56px rgba(0,0,0,.24);transform:translateY(22px) scale(.94);opacity:0;transition:transform .3s var(--ease),opacity .3s var(--ease);z-index:10003}
 body.dark .modal-dialog{background:rgba(44,44,46,0.9);border:1px solid rgba(72,72,74,0.3)}
 .modal.open .modal-dialog{transform:none;opacity:1}
-.modal-close{position:absolute;right:10px;top:10px;border:none;background:var(--card);border:1px solid var(--border);width:36px;height:36px;border-radius:8px;cursor:pointer;z-index:10004}
+.modal-close{position:absolute;right:10px;top:10px;border:none;background:var(--card);border:1px solid var(--border);width:36px;height:36px;border-radius:8px;cursor:pointer;z-index:10004;color:var(--fg);display:flex;align-items:center;justify-content:center;font-weight:700}
+.modal-close::before{content:none}
 .modal-media{margin-top:12px}
 .modal-media img{width:100%;border-radius:10px}
 .modal-actions{margin-top:12px;display:flex;justify-content:flex-end}
@@ -314,6 +324,9 @@ body.dark .modal-dialog{background:rgba(44,44,46,0.9);border:1px solid rgba(72,7
 /* Info cards + form */
 .info-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.04)}
 .info-card .link{color:var(--primary);text-decoration:none}
+.terms a.link{color:var(--primary)}
+body.dark .terms a.link{color:#93c5fd}
+body.dark .terms label{color:#e5e7eb}
 .form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 4px 14px rgba(0,0,0,.04)}
 /* iOS-like glass for info/form */
 .form,.info-card{background:rgba(255,255,255,0.9);backdrop-filter:blur(20px)}
@@ -339,7 +352,7 @@ body.dark input,body.dark textarea{background:var(--card);color:var(--fg);border
 #authModal .left-signin .btn:hover{background:linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.15));border-color:rgba(255,255,255,0.5);box-shadow:0 4px 15px rgba(255,255,255,0.2);transform:translateY(-1px)}
 
 /* Auth modal left side background */
-#authModal aside{background:linear-gradient(135deg, var(--primary), var(--primary-600)) !important}
+#authModal aside{background:linear-gradient(135deg, var(--primary), var(--primary-600))}
 
 /* Footer */
 .site-footer{border-top:1px solid var(--border);padding:20px 0}
