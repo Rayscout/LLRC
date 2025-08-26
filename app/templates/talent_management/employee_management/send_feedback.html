@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发送反馈 - 员工仪表板</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #F2F2F7;
+            --bg-secondary: rgba(255, 255, 255, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --text-tertiary: #C7C7CC;
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-orange: #FF9500;
+            --accent-red: #FF3B30;
+            --accent-purple: #AF52DE;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius: 16px;
+            --border-radius-large: 24px;
+            --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            --transition-fast: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-secondary: rgba(44, 44, 46, 0.8);
+            --bg-card: rgba(44, 44, 46, 0.9);
+            --text-primary: #FFFFFF;
+            --text-secondary: #EBEBF5;
+            --text-tertiary: #8E8E93;
+            --accent-blue: #0A84FF;
+            --accent-green: #30D158;
+            --accent-orange: #FF9F0A;
+            --accent-red: #FF453A;
+            --accent-purple: #BF5AF2;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, #5856D6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+        }
+
+        .form-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 40px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 1em;
+            transition: var(--transition-fast);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .form-control option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition-fast);
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        .back-link i {
+            margin-right: 8px;
+        }
+
+        .priority-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .priority-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .priority-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-blue);
+        }
+
+        .priority-option label {
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .priority-high { color: var(--accent-red); }
+        .priority-medium { color: var(--accent-orange); }
+        .priority-low { color: var(--accent-green); }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .form-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('talent_management.employee_manager.feedback.feedback_dashboard') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> 返回反馈管理
+        </a>
+
+        <div class="header">
+            <h1><i class="fas fa-paper-plane"></i> 发送反馈</h1>
+            <p>向高管或主管发送反馈，促进沟通和团队协作</p>
+        </div>
+
+        <div class="form-card">
+            <form method="POST" action="{{ url_for('talent_management.employee_manager.feedback.send_feedback') }}">
+                <div class="form-group">
+                    <label for="recipient_id" class="form-label">
+                        <i class="fas fa-user"></i> 接收者 *
+                    </label>
+                    <select name="recipient_id" id="recipient_id" class="form-control" required>
+                        <option value="">请选择接收者</option>
+                        {% for executive in executives %}
+                            <option value="{{ executive.id }}">
+                                {{ executive.first_name }} {{ executive.last_name }} 
+                                ({{ executive.position or '未知职位' }}) - {{ executive.user_type }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category" class="form-label">
+                            <i class="fas fa-tag"></i> 反馈类别 *
+                        </label>
+                        <select name="category" id="category" class="form-control" required>
+                            <option value="">请选择类别</option>
+                            <option value="skill">🚀 技能发展</option>
+                            <option value="communication">💬 沟通协作</option>
+                            <option value="performance">📈 绩效表现</option>
+                            <option value="general">📝 一般反馈</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="feedback_type" class="form-label">
+                            <i class="fas fa-comment"></i> 反馈类型 *
+                        </label>
+                        <select name="feedback_type" id="feedback_type" class="form-control" required>
+                            <option value="">请选择类型</option>
+                            <option value="request">📋 请求反馈</option>
+                            <option value="suggestion">💡 建议</option>
+                            <option value="question">❓ 问题咨询</option>
+                            <option value="appreciation">🙏 感谢</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority" class="form-label">
+                        <i class="fas fa-exclamation-triangle"></i> 优先级
+                    </label>
+                    <div class="priority-options">
+                        <div class="priority-option">
+                            <input type="radio" name="priority" id="priority-low" value="low" checked>
+                            <label for="priority-low" class="priority-low">低优先级</label>
+                        </div>
+                        <div class="priority-option">
+                            <input type="radio" name="priority" id="priority-medium" value="medium">
+                            <label for="priority-medium" class="priority-medium">中优先级</label>
+                        </div>
+                        <div class="priority-option">
+                            <input type="radio" name="priority" id="priority-high" value="high">
+                            <label for="priority-high" class="priority-high">高优先级</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="content" class="form-label">
+                        <i class="fas fa-edit"></i> 反馈内容 *
+                    </label>
+                    <textarea name="content" id="content" class="form-control" 
+                              placeholder="请详细描述您的反馈内容..." required></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> 发送反馈
+                    </button>
+                    <a href="{{ url_for('talent_management.employee_manager.feedback.feedback_dashboard') }}" 
+                       class="btn btn-secondary">
+                        <i class="fas fa-times"></i> 取消
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后的动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为表单控件添加焦点效果
+            const formControls = document.querySelectorAll('.form-control');
+            formControls.forEach(control => {
+                control.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'scale(1.02)';
+                });
+                
+                control.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'scale(1)';
+                });
+            });
+
+            // 为优先级选项添加点击效果
+            const priorityOptions = document.querySelectorAll('.priority-option');
+            priorityOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    // 添加选中效果
+                    priorityOptions.forEach(opt => opt.style.opacity = '0.7');
+                    this.style.opacity = '1';
+                });
+            });
+        });
+
+        // 表单验证
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const content = document.getElementById('content').value.trim();
+            if (content.length < 10) {
+                e.preventDefault();
+                alert('反馈内容至少需要10个字符');
+                return false;
+            }
+        });
+
+        // 字符计数
+        document.getElementById('content').addEventListener('input', function() {
+            const length = this.value.length;
+            const minLength = 10;
+            
+            if (length < minLength) {
+                this.style.borderColor = 'var(--accent-red)';
+            } else {
+                this.style.borderColor = 'var(--accent-green)';
+            }
+        });
+    </script>
+</body>
+</html>

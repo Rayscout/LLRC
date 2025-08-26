@@ -189,6 +189,8 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            position: relative;
+            z-index: 10;
         }
 
         .info-card {
@@ -196,6 +198,10 @@
             padding: 25px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
+            /* 确保卡片始终可见 */
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
         }
 
         .info-card h3 {
@@ -254,6 +260,30 @@
             font-size: 0.8em;
             font-weight: 500;
             display: inline-block;
+        }
+
+        .feedback-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .feedback-section {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .feedback-section h2 {
+            margin: 0 0 20px 0;
+            color: var(--dark-color);
+            font-size: 1.6em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .recent-feedback {
@@ -398,7 +428,7 @@
         }
 
         .slide-in-right {
-            animation: slideInRight 0.8s ease-out;
+            animation: slideInRight 0.8s ease-out forwards;
         }
 
         @keyframes slideInRight {
@@ -433,6 +463,26 @@
                 <div class="header-stat">
                     <div class="header-stat-number">{{ feedback_categories|length }}</div>
                     <div class="header-stat-label">反馈分类</div>
+                </div>
+            </div>
+            
+            <!-- 详细统计信息 -->
+            <div class="detailed-stats" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                <div class="header-stat" style="background: rgba(255, 255, 255, 0.15);">
+                    <div class="header-stat-number">{{ total_sent }}</div>
+                    <div class="header-stat-label">已发送反馈</div>
+                </div>
+                <div class="header-stat" style="background: rgba(255, 255, 255, 0.15);">
+                    <div class="header-stat-number">{{ total_received }}</div>
+                    <div class="header-stat-label">收到反馈</div>
+                </div>
+                <div class="header-stat" style="background: rgba(255, 255, 255, 0.15);">
+                    <div class="header-stat-number">{{ recent_sent }}</div>
+                    <div class="header-stat-label">本周发送</div>
+                </div>
+                <div class="header-stat" style="background: rgba(255, 255, 255, 0.15);">
+                    <div class="header-stat-number">{{ recent_received }}</div>
+                    <div class="header-stat-label">本周收到</div>
                 </div>
             </div>
         </div>
@@ -533,41 +583,102 @@
             {% endfor %}
         </div>
 
-        <!-- 最近反馈记录 -->
-        {% if recent_records %}
-        <div class="recent-feedback fade-in">
-            <h2>
-                <div class="chart-icon">📝</div>
-                最近反馈记录
-            </h2>
-            {% for record in recent_records %}
-            <div class="feedback-item">
-                <div class="feedback-icon {{ record.category }}">
-                    {% if record.category == 'skill' %}🚀
-                    {% elif record.category == 'communication' %}💬
-                    {% else %}📈{% endif %}
-                </div>
-                <div class="feedback-content">
-                    <div class="feedback-recipient">{{ record.recipient_name }}</div>
-                    <div class="feedback-text">{{ record.content[:100] }}{% if record.content|length > 100 %}...{% endif %}</div>
-                </div>
-                <div class="feedback-meta">
-                    <div>{{ record.created_at.strftime('%m-%d %H:%M') }}</div>
-                    <div style="margin-top: 5px;">
-                        <span style="padding: 2px 8px; border-radius: 12px; font-size: 0.7em; background: 
-                            {% if record.priority == 'high' %}#f8d7da; color: #721c24;
-                            {% elif record.priority == 'medium' %}#fff3cd; color: #856404;
-                            {% else %}#d1ecf1; color: #0c5460;{% endif %}">
-                            {% if record.priority == 'high' %}高优先级
-                            {% elif record.priority == 'medium' %}中优先级
-                            {% else %}低优先级{% endif %}
-                        </span>
+        <!-- 最近反馈记录 - 分为发送和接收两部分 -->
+        <div class="feedback-sections fade-in">
+            <!-- 发送的反馈 -->
+            <div class="feedback-section">
+                <h2>
+                    <div class="chart-icon">📤</div>
+                    最近发送的反馈
+                </h2>
+                {% if recent_sent_records %}
+                    {% for record in recent_sent_records %}
+                    <div class="feedback-item">
+                        <div class="feedback-icon {{ record.category }}">
+                            {% if record.category == 'skill' %}🚀
+                            {% elif record.category == 'communication' %}💬
+                            {% else %}📈{% endif %}
+                        </div>
+                        <div class="feedback-content">
+                            <div class="feedback-recipient">
+                                <span style="color: #28a745;">📤 发送给: {{ record.recipient_name }}</span>
+                            </div>
+                            <div class="feedback-text">{{ record.content[:100] }}{% if record.content|length > 100 %}...{% endif %}</div>
+                        </div>
+                        <div class="feedback-meta">
+                            <div>{{ record.created_at.strftime('%m-%d %H:%M') }}</div>
+                            <div style="margin-top: 5px;">
+                                <span style="padding: 2px 8px; border-radius: 12px; font-size: 0.7em; background: 
+                                    {% if record.priority == 'high' %}#f8d7da; color: #721c24;
+                                    {% elif record.priority == 'medium' %}#fff3cd; color: #856404;
+                                    {% else %}#d1ecf1; color: #0c5460;{% endif %}">
+                                    {% if record.priority == 'high' %}高优先级
+                                    {% elif record.priority == 'medium' %}中优先级
+                                    {% else %}低优先级{% endif %}
+                                </span>
+                                <span style="margin-left: 5px; padding: 2px 8px; border-radius: 12px; font-size: 0.7em; background: #d4edda; color: #155724;">
+                                    发送
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <div style="font-size: 3em; margin-bottom: 20px;">📤</div>
+                        <p>暂无发送的反馈</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">开始向团队成员发送反馈</p>
+                    </div>
+                {% endif %}
             </div>
-            {% endfor %}
+
+            <!-- 接收的反馈 -->
+            <div class="feedback-section">
+                <h2>
+                    <div class="chart-icon">📥</div>
+                    最近接收的反馈
+                </h2>
+                {% if recent_received_records %}
+                    {% for record in recent_received_records %}
+                    <div class="feedback-item">
+                        <div class="feedback-icon {{ record.category }}">
+                            {% if record.category == 'skill' %}🚀
+                            {% elif record.category == 'communication' %}💬
+                            {% else %}📈{% endif %}
+                        </div>
+                        <div class="feedback-content">
+                            <div class="feedback-recipient">
+                                <span style="color: #007bff;">📥 来自: {{ record.sender_name }}</span>
+                            </div>
+                            <div class="feedback-text">{{ record.content[:100] }}{% if record.content|length > 100 %}...{% endif %}</div>
+                        </div>
+                        <div class="feedback-meta">
+                            <div>{{ record.created_at.strftime('%m-%d %H:%M') }}</div>
+                            <div style="margin-top: 5px;">
+                                <span style="padding: 2px 8px; border-radius: 12px; font-size: 0.7em; background: 
+                                    {% if record.priority == 'high' %}#f8d7da; color: #721c24;
+                                    {% elif record.priority == 'medium' %}#fff3cd; color: #856404;
+                                    {% else %}#d1ecf1; color: #0c5460;{% endif %}">
+                                    {% if record.priority == 'high' %}高优先级
+                                    {% elif record.priority == 'medium' %}中优先级
+                                    {% else %}低优先级{% endif %}
+                                </span>
+                                <span style="margin-left: 5px; padding: 2px 8px; border-radius: 12px; font-size: 0.7em; background: #cce5ff; color: #004085;">
+                                    接收
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; padding: 40px; color: #666;">
+                        <div style="font-size: 3em; margin-bottom: 20px;">📥</div>
+                        <p>暂无接收的反馈</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">等待员工发送反馈</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
     </div>
     
     <script>
@@ -616,9 +727,30 @@
             const elements = document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right');
             elements.forEach((el, index) => {
                 el.style.animationDelay = `${index * 0.1}s`;
+                // 确保元素在动画完成后保持可见
+                el.addEventListener('animationend', function() {
+                    this.style.opacity = '1';
+                    this.style.transform = 'translateX(0)';
+                });
             });
 
             console.log('反馈系统仪表板已加载');
+            
+            // 调试：检查快速操作和反馈分类元素
+            const sidebarCards = document.querySelectorAll('.sidebar .info-card');
+            console.log('侧边栏卡片数量:', sidebarCards.length);
+            
+            sidebarCards.forEach((card, index) => {
+                const title = card.querySelector('h3');
+                if (title) {
+                    console.log(`卡片 ${index + 1} 标题:`, title.textContent.trim());
+                }
+                
+                // 确保侧边栏元素始终可见
+                card.style.visibility = 'visible';
+                card.style.display = 'block';
+                card.style.opacity = '1';
+            });
         });
 
         // 刷新统计功能
@@ -626,6 +758,46 @@
             alert('正在刷新统计数据...');
             location.reload();
         }
+        
+        // HR管理员仪表板修复脚本
+        function fixSidebarElements() {
+            const sidebarCards = document.querySelectorAll('.sidebar .info-card');
+            console.log(`找到 ${sidebarCards.length} 个侧边栏卡片`);
+            
+            sidebarCards.forEach((card, index) => {
+                // 强制设置可见性
+                card.style.opacity = '1';
+                card.style.visibility = 'visible';
+                card.style.display = 'block';
+                card.style.transform = 'translateX(0)';
+                
+                const title = card.querySelector('h3');
+                if (title) {
+                    console.log(`修复卡片 ${index + 1}: ${title.textContent.trim()}`);
+                }
+            });
+        }
+        
+        // 立即修复
+        fixSidebarElements();
+        
+        // 延迟修复（防止动画干扰）
+        setTimeout(fixSidebarElements, 100);
+        setTimeout(fixSidebarElements, 500);
+        setTimeout(fixSidebarElements, 1000);
+        
+        // 定期检查元素可见性
+        setInterval(() => {
+            const sidebarCards = document.querySelectorAll('.sidebar .info-card');
+            sidebarCards.forEach(card => {
+                if (card.style.opacity === '0' || card.style.visibility === 'hidden') {
+                    console.log('检测到隐藏的侧边栏卡片，正在修复...');
+                    card.style.opacity = '1';
+                    card.style.visibility = 'visible';
+                    card.style.display = 'block';
+                }
+            });
+        }, 2000);
     </script>
 </body>
 </html>

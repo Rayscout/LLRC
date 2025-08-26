@@ -76,14 +76,16 @@ class Feedback(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    category = db.Column(db.String(50), nullable=False)  # skill, communication, performance
-    feedback_type = db.Column(db.String(50), nullable=False)  # positive, constructive, improvement
+    category = db.Column(db.String(50), nullable=False)  # skill, communication, performance, general
+    feedback_type = db.Column(db.String(50), nullable=False)  # positive, constructive, improvement, request
     content = db.Column(db.Text, nullable=False)
     priority = db.Column(db.String(20), default='medium')  # high, medium, low
     status = db.Column(db.String(20), default='sent')  # sent, read, responded, archived
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     read_at = db.Column(db.DateTime)
     responded_at = db.Column(db.DateTime)
+    response_content = db.Column(db.Text)  # 回复内容
+    response_rating = db.Column(db.Integer)  # 回复评分 1-5
     
     # 关系
     sender = db.relationship('User', foreign_keys=[sender_id], backref=db.backref('sent_feedback', lazy=True))

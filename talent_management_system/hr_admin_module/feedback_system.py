@@ -128,24 +128,50 @@ def feedback_dashboard():
     team_members = get_team_members(user.id)
     feedback_categories = get_feedback_categories()
     
-    # 统计反馈数据
+    # 统计反馈数据 - 包括发送和接收的反馈
     sent_feedback = Feedback.query.filter_by(sender_id=user.id).all()
-    total_feedback = len(sent_feedback)
-    recent_feedback = len([f for f in sent_feedback 
-                          if (datetime.now() - f.created_at).days <= 7])
+    received_feedback = Feedback.query.filter_by(recipient_id=user.id).all()
     
-    # 获取最近的反馈记录
-    recent_records = Feedback.query.filter_by(sender_id=user.id)\
+    total_sent = len(sent_feedback)
+    total_received = len(received_feedback)
+    total_feedback = total_sent + total_received
+    
+    recent_sent = len([f for f in sent_feedback 
+                      if (datetime.now() - f.created_at).days <= 7])
+    recent_received = len([f for f in received_feedback 
+                          if (datetime.now() - f.created_at).days <= 7])
+    recent_feedback = recent_sent + recent_received
+    
+    # 获取最近的发送反馈记录
+    recent_sent_records = Feedback.query.filter_by(sender_id=user.id)\
         .order_by(Feedback.created_at.desc()).limit(5).all()
     
-    # 转换为字典格式用于模板渲染
-    recent_records_dict = []
-    for record in recent_records:
+    # 获取最近的接收反馈记录
+    recent_received_records = Feedback.query.filter_by(recipient_id=user.id)\
+        .order_by(Feedback.created_at.desc()).limit(5).all()
+    
+    # 转换为字典格式用于模板渲染 - 发送的反馈
+    recent_sent_records_dict = []
+    for record in recent_sent_records:
         recipient = User.query.get(record.recipient_id)
-        recent_records_dict.append({
+        recent_sent_records_dict.append({
             'id': record.id,
-            'sender_name': f"{user.first_name} {user.last_name}",
             'recipient_name': f"{recipient.first_name} {recipient.last_name}" if recipient else '未知用户',
+            'category': record.category,
+            'feedback_type': record.feedback_type,
+            'content': record.content,
+            'priority': record.priority,
+            'status': record.status,
+            'created_at': record.created_at
+        })
+    
+    # 转换为字典格式用于模板渲染 - 接收的反馈
+    recent_received_records_dict = []
+    for record in recent_received_records:
+        sender = User.query.get(record.sender_id)
+        recent_received_records_dict.append({
+            'id': record.id,
+            'sender_name': f"{sender.first_name} {sender.last_name}" if sender else '未知用户',
             'category': record.category,
             'feedback_type': record.feedback_type,
             'content': record.content,
@@ -161,7 +187,12 @@ def feedback_dashboard():
         feedback_categories=feedback_categories,
         total_feedback=total_feedback,
         recent_feedback=recent_feedback,
-        recent_records=recent_records_dict
+        total_sent=total_sent,
+        total_received=total_received,
+        recent_sent=recent_sent,
+        recent_received=recent_received,
+        recent_sent_records=recent_sent_records_dict,
+        recent_received_records=recent_received_records_dict
     )
 
 @feedback_system_bp.route('/send_feedback', methods=['GET', 'POST'])

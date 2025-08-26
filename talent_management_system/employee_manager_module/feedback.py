@@ -23,6 +23,10 @@ def feedback_dashboard():
         received_feedback = Feedback.query.filter_by(recipient_id=user.id)\
             .order_by(Feedback.created_at.desc()).all()
         
+        # 获取发送的反馈（员工发送给高管）
+        sent_feedback = Feedback.query.filter_by(sender_id=user.id)\
+            .order_by(Feedback.created_at.desc()).all()
+        
         # 获取未读反馈
         unread_feedback = [f for f in received_feedback if f.status == 'sent']
         
@@ -37,6 +41,7 @@ def feedback_dashboard():
         return render_template('talent_management/employee_management/feedback_dashboard.html',
                              user=user,
                              received_feedback=received_feedback,
+                             sent_feedback=sent_feedback,
                              unread_feedback=unread_feedback,
                              feedback_stats=feedback_stats,
                              recent_notifications=recent_notifications)
@@ -44,6 +49,91 @@ def feedback_dashboard():
     except Exception as e:
         flash(f'加载反馈页面时发生错误: {str(e)}', 'danger')
         return redirect(url_for('talent_management.employee_auth.employee_dashboard'))
+
+@feedback_bp.route('/send', methods=['GET', 'POST'])
+def send_feedback():
+    """发送反馈给高管"""
+    try:
+        if 'user_id' not in session:
+            flash('请先登录', 'warning')
+            return redirect(url_for('common.auth.sign'))
+        
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'employee':
+            flash('用户信息获取失败', 'warning')
+            return redirect(url_for('common.auth.sign'))
+        
+        if request.method == 'POST':
+            # 处理反馈发送
+            recipient_id = request.form.get('recipient_id')
+            category = request.form.get('category')
+            feedback_type = request.form.get('feedback_type')
+            content = request.form.get('content')
+            priority = request.form.get('priority', 'medium')
+            
+            if not all([recipient_id, category, feedback_type, content]):
+                flash('请填写所有必填字段', 'warning')
+                return redirect(url_for('talent_management.employee_manager.feedback.send_feedback'))
+            
+            # 验证接收者是否存在且是高管
+            recipient = User.query.get(recipient_id)
+            if not recipient or recipient.user_type not in ['supervisor', 'executive']:
+                flash('接收者不存在或无权限接收反馈', 'warning')
+                return redirect(url_for('talent_management.employee_manager.feedback.send_feedback'))
+            
+            # 创建新反馈
+            new_feedback = Feedback(
+                sender_id=user.id,
+                recipient_id=recipient_id,
+                category=category,
+                feedback_type=feedback_type,
+                content=content,
+                priority=priority,
+                status='sent'
+            )
+            
+            db.session.add(new_feedback)
+            db.session.commit()
+            
+            # 创建通知给接收者
+            create_feedback_notification(new_feedback.id, recipient_id, user.id)
+            
+            flash('反馈已成功发送', 'success')
+            return redirect(url_for('talent_management.employee_manager.feedback.feedback_dashboard'))
+        
+        # 获取可接收反馈的高管和主管
+        executives = User.query.filter(User.user_type.in_(['supervisor', 'executive'])).all()
+        
+        return render_template('talent_management/employee_management/send_feedback.html',
+                             user=user, executives=executives)
+                             
+    except Exception as e:
+        flash(f'发送反馈时发生错误: {str(e)}', 'danger')
+        return redirect(url_for('talent_management.employee_manager.feedback.feedback_dashboard'))
+
+@feedback_bp.route('/sent')
+def sent_feedback():
+    """查看已发送的反馈"""
+    try:
+        if 'user_id' not in session:
+            flash('请先登录', 'warning')
+            return redirect(url_for('common.auth.sign'))
+        
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'employee':
+            flash('用户信息获取失败', 'warning')
+            return redirect(url_for('common.auth.sign'))
+        
+        # 获取发送的反馈
+        sent_feedback = Feedback.query.filter_by(sender_id=user.id)\
+            .order_by(Feedback.created_at.desc()).all()
+        
+        return render_template('talent_management/employee_management/sent_feedback.html',
+                             user=user, sent_feedback=sent_feedback)
+                             
+    except Exception as e:
+        flash(f'查看已发送反馈时发生错误: {str(e)}', 'danger')
+        return redirect(url_for('talent_management.employee_manager.feedback.feedback_dashboard'))
 
 @feedback_bp.route('/view/<feedback_id>')
 def view_feedback(feedback_id):
@@ -233,7 +323,7 @@ def api_mark_read(notification_id):
     except Exception as e:
         return jsonify({'success': False, 'message': f'标记失败: {str(e)}'})
 
-@feedback_bp.route('/api/mark_all_read')
+@feedback_bp.route('/api/mark_all_read', methods=['GET', 'POST'])
 def api_mark_all_read():
     """标记所有通知为已读API"""
     try:
@@ -244,14 +334,22 @@ def api_mark_all_read():
         if not user:
             return jsonify({'success': False, 'message': '用户信息获取失败'})
         
+        # 标记所有未读的通知为已读
         FeedbackNotification.query.filter_by(
             user_id=user.id, is_read=False
         ).update({'is_read': True})
+        
+        # 同时标记所有未读的反馈为已读
+        Feedback.query.filter_by(
+            recipient_id=user.id, status='sent'
+        ).update({'status': 'read'})
+        
         db.session.commit()
         
-        return jsonify({'success': True, 'message': '所有通知已标记为已读'})
+        return jsonify({'success': True, 'message': '所有反馈已标记为已读'})
         
     except Exception as e:
+        db.session.rollback()
         return jsonify({'success': False, 'message': f'标记失败: {str(e)}'})
 
 # 辅助函数
@@ -261,12 +359,18 @@ def get_feedback_statistics(user_id):
         # 获取用户收到的所有反馈
         received_feedback = Feedback.query.filter_by(recipient_id=user_id).all()
         
+        # 获取用户发送的所有反馈
+        sent_feedback = Feedback.query.filter_by(sender_id=user_id).all()
+        
         stats = {
             'total_received': len(received_feedback),
+            'total_sent': len(sent_feedback),
             'unread': len([f for f in received_feedback if f.status == 'sent']),
             'read': len([f for f in received_feedback if f.status == 'read']),
             'responded': len([f for f in received_feedback if f.status == 'responded']),
             'archived': len([f for f in received_feedback if f.status == 'archived']),
+            'pending_responses': len([f for f in sent_feedback if f.status == 'sent']),
+            'completed': len([f for f in sent_feedback if f.status == 'responded']),
             'high_priority': len([f for f in received_feedback if f.priority == 'high']),
             'medium_priority': len([f for f in received_feedback if f.priority == 'medium']),
             'low_priority': len([f for f in received_feedback if f.priority == 'low'])
@@ -276,6 +380,28 @@ def get_feedback_statistics(user_id):
     except Exception as e:
         print(f"获取反馈统计失败: {e}")
         return {}
+
+def create_feedback_notification(feedback_id, recipient_id, sender_id):
+    """创建反馈通知"""
+    try:
+        recipient = User.query.get(recipient_id)
+        recipient_name = f"{recipient.first_name} {recipient.last_name}"
+        
+        notification = FeedbackNotification(
+            user_id=recipient_id,
+            feedback_id=feedback_id,
+            notification_type='new_feedback',
+            title=f'新反馈',
+            message=f'{recipient_name}已发送新反馈给您',
+            is_read=False
+        )
+        db.session.add(notification)
+        db.session.commit()
+        return True
+    except Exception as e:
+        print(f"创建反馈通知失败: {e}")
+        db.session.rollback()
+        return False
 
 def create_response_notification(feedback_id, sender_id, responder_id):
     """创建回复通知"""
