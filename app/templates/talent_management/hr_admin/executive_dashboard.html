@@ -50,6 +50,12 @@
                         <span>团队管理</span>
                     </a>
                 </li>
+                <li class="executive-nav-item">
+                    <a href="{{ url_for('talent_management.hr_admin.employee_management.employee_list') }}" class="executive-nav-link">
+                        <i class="uil uil-users executive-nav-icon"></i>
+                        <span>员工管理</span>
+                    </a>
+                </li>
                 
             </ul>
             
@@ -102,24 +108,24 @@
                     </div>
                     
                     <div class="executive-card executive-metric">
-                        <div class="executive-metric-value">85%</div>
+                        <div class="executive-metric-value">{{ (subordinates|selectattr('is_active', 'equalto', true)|list|length / subordinates|length * 100)|round(1) if subordinates else 0 }}%</div>
                         <div class="executive-metric-label">人才保留率</div>
                     </div>
                     
                     <div class="executive-card executive-metric">
-                        <div class="executive-metric-value">92%</div>
-                        <div class="executive-metric-label">满意度指数</div>
+                        <div class="executive-metric-value">{{ subordinates|selectattr('is_active', 'equalto', true)|list|length if subordinates else 0 }}</div>
+                        <div class="executive-metric-label">活跃员工</div>
                     </div>
                     
                     <div class="executive-card executive-metric">
-                        <div class="executive-metric-value">78%</div>
-                        <div class="executive-metric-label">技能匹配度</div>
+                        <div class="executive-metric-value">{{ subordinates|selectattr('is_active', 'equalto', false)|list|length if subordinates else 0 }}</div>
+                        <div class="executive-metric-label">已注销员工</div>
                     </div>
         </div>
         
                 <!-- 快速操作 -->
                 <div class="executive-fade-in-up" style="text-align: center; margin-top: var(--ios-spacing-xxl);">
-                    <div class="executive-grid executive-grid-3" style="max-width: 800px; margin: 0 auto;">
+                    <div class="executive-grid executive-grid-4" style="max-width: 1000px; margin: 0 auto;">
                         <a href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}" class="executive-button large">
                             <i class="uil uil-exclamation-triangle"></i>
                             人才流失预警
@@ -131,6 +137,10 @@
                         <a href="{{ url_for('talent_management.hr_admin.org_health.org_health_dashboard') }}" class="executive-button large secondary">
                             <i class="uil uil-heart"></i>
                             组织健康度
+                        </a>
+                        <a href="{{ url_for('talent_management.hr_admin.employee_management.employee_list') }}" class="executive-button large secondary">
+                            <i class="uil uil-users"></i>
+                            员工管理
                         </a>
             </div>
             </div>

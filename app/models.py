@@ -26,6 +26,11 @@ class User(db.Model):
     skills = db.Column(db.Text)  # 技能标签（JSON格式存储）
     education = db.Column(db.Text)  # 教育经历
     experience = db.Column(db.Text)  # 工作经历
+    
+    # 账号状态管理字段
+    is_active = db.Column(db.Boolean, default=True)  # 账号是否活跃
+    deactivated_at = db.Column(db.DateTime)  # 注销时间
+    deactivated_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # 注销操作人ID
 
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)

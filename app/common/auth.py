@@ -1,13 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, g
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, g, jsonify
 from ..models import User, db
 from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
-
-@auth_bp.route('/')
-def root():
-    """根路径 - 重定向到登录页面"""
-    return redirect(url_for('common.auth.sign'))
 
 @auth_bp.route('/sign', methods=['GET', 'POST'])
 def sign():
@@ -130,6 +125,11 @@ def sign():
             
             user = User.query.filter_by(email=email, password=password).first()
             if user:
+                # 检查账号是否被注销
+                if hasattr(user, 'is_active') and user.is_active is False:
+                    flash('您的账号已被注销，请联系管理员。', 'danger')
+                    return redirect(url_for('common.auth.sign'))
+                
                 # 检查用户是否有user_type字段，如果没有则设置默认值
                 if not hasattr(user, 'user_type') or user.user_type is None:
                     # 根据is_hr字段设置默认用户类型
@@ -170,6 +170,33 @@ def logout():
     session.clear()
     flash('你已退出登录。', 'success')
     return redirect(url_for('common.auth.sign'))
+
+@auth_bp.route('/api/check-account-status')
+def check_account_status():
+    """检查当前登录用户的账号状态"""
+    if 'user_id' not in session:
+        return jsonify({'status': 'not_logged_in', 'message': '用户未登录'}), 401
+    
+    try:
+        from ..models import User
+        user = User.query.get(session['user_id'])
+        
+        if not user:
+            return jsonify({'status': 'user_not_found', 'message': '用户不存在'}), 404
+        
+        if hasattr(user, 'is_active'):
+            if user.is_active:
+                return jsonify({'status': 'active', 'message': '账号正常'})
+            else:
+                return jsonify({
+                    'status': 'deactivated', 
+                    'message': '您的账号已被注销，请联系管理员。'
+                })
+        else:
+            return jsonify({'status': 'unknown', 'message': '无法确定账号状态'})
+            
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'检查失败：{str(e)}'}), 500
 
 @auth_bp.route('/home')
 def home():

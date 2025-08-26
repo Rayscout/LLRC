@@ -207,6 +207,35 @@
             color: #999;
             font-size: 0.8em;
         }
+
+        /* 账号状态样式 */
+        .account-status {
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            padding: 10px 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .account-status.active {
+            background-color: #e8f5e9; /* Light green background */
+            color: #2e7d32; /* Dark green text */
+        }
+
+        .account-status.deactivated {
+            background-color: #ffebee; /* Light red background */
+            color: #c62828; /* Dark red text */
+        }
+
+        .status-message {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -215,8 +244,23 @@
             <a href="{{ url_for('common.auth.logout') }}" class="btn logout-btn">
                 <i class="fas fa-sign-out-alt"></i> 退出登录
             </a>
+            
+            <!-- 账号状态通知 -->
+            {% if user and user.is_active is defined %}
+                {% if user.is_active %}
+                    <div class="account-status active">
+                        <i class="fas fa-check-circle"></i> 账号状态：活跃
+                    </div>
+                {% else %}
+                    <div class="account-status deactivated">
+                        <i class="fas fa-exclamation-triangle"></i> 账号状态：已注销
+                        <p class="status-message">您的账号已被注销，请联系管理员。</p>
+                    </div>
+                {% endif %}
+            {% endif %}
+            
             <h1><i class="fas fa-user-tie"></i> 员工仪表板</h1>
-            <p>欢迎回来，{{ user.username }}！今天是 {{ current_date }}</p>
+            <p>欢迎回来，{{ user.first_name }} {{ user.last_name }}！今天是 {{ current_date }}</p>
         </div>
         
         <div class="content">
@@ -348,5 +392,8 @@
             </div>
         </div>
     </div>
+    
+    <!-- 引入账号状态检查器 -->
+    <script src="{{ url_for('static', filename='js/account_status_checker.js') }}"></script>
 </body>
 </html>

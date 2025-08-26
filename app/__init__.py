@@ -147,9 +147,9 @@ def create_app():
         # 添加根路径路由
         @app.route('/')
         def root():
-            """根路径 - 重定向到登录页面"""
-            from flask import redirect, url_for
-            return redirect(url_for('common.auth.sign'))
+            """根路径 - 直接渲染登录页面"""
+            from flask import render_template
+            return render_template('common/sign.html')
         
         # 避免浏览器请求 /favicon.ico 导致 404 噪音
         @app.route('/favicon.ico')
@@ -187,6 +187,26 @@ def create_app():
                 logger.error(f"Error in before_request hook: {e}")
                 g.user = None
         
+        # 暂时注释掉全局账号状态检查，避免重定向循环
+        # 改用页面级别的状态显示和操作时检查
+        # @app.before_request
+        # def check_user_status():
+        #     """检查已登录用户的账号状态"""
+        #     from flask import session, redirect, url_for, flash
+        #     try:
+        #         # 只检查已登录用户
+        #         if 'user_id' in session and g.user:
+        #             if hasattr(g.user, 'is_active') and g.user.is_active is False:
+        #                 # 账号已被注销，强制退出
+        #                 session.clear()
+        #                 flash('您的账号已被注销，已自动退出登录。请联系管理员。', 'warning')
+        #                 return redirect(url_for('common.auth.sign'))
+        #     except Exception as e:
+        #         # 如果查询失败，记录错误但不重定向，避免循环
+        #         logger.error(f"Error in check_user_status: {e}")
+        #         # 不重定向，让请求继续处理
+        #         pass
+
         # 添加错误处理器
         @app.errorhandler(500)
         def internal_error(error):
