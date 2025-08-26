@@ -73,41 +73,6 @@ def employee_dashboard():
         'learning_progress': 78,
         'skills_count': 12
     }
-
-def calculate_profile_completion(user):
-    """计算用户资料完整度"""
-    fields = [
-        user.first_name, user.last_name, user.email, user.phone_number,
-        user.birthday, user.company_name, user.position, user.cv_file
-    ]
     
-    filled_fields = sum(1 for field in fields if field)
-    total_fields = len(fields)
-    
-    return int((filled_fields / total_fields) * 100) if total_fields > 0 else 0
-
-    # 获取统计数据
-    try:
-        from smartrecruit_system.candidate_module.jobs import extract_user_skills
-        user_skills = extract_user_skills(user)
-    except Exception:
-        user_skills = []
-
-    # 计算资料完整度
-    profile_completion = calculate_profile_completion(user)
-    
-    # 模拟申请数量和收藏职位数量
-    applications_count = 4
-    saved_jobs_count = 3
-    
-    # 修改模板中的链接，让它们指向员工相关的功能
-    template_data = {
-        'user': user,
-        'user_skills': user_skills,
-        'applications_count': applications_count,
-        'saved_jobs_count': saved_jobs_count,
-        'profile_completion': profile_completion,
-        'is_employee': True  # 标记这是员工页面
-    }
-    
-    return render_template('talent_management/employee_management/employee_dashboard_new.html', **template_data)
+    return render_template('talent_management/employee_management/employee_dashboard.html', 
+                         user=user, supervisor=supervisor, **dashboard_data)

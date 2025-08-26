@@ -1,178 +1,186 @@
-{% extends 'smartrecruit/candidate/base_ios_new.html' %}
+{% extends 'base.html' %}
 
-{% block title %}职业路径与技能差距{% endblock %}
-{% block navbar_title %}职业发展{% endblock %}
+{% block title %}职业发展与技能差距{% endblock %}
 
 {% block content %}
-<section class="section" id="career-path">
-  <div class="section-content">
-    <h1 class="section-title">我的职业发展路径</h1>
-    <p class="section-subtitle">基于你的资料与技能，为你规划清晰的成长路线并给出可执行建议</p>
+<style>
+  .cp-wrap{max-width:1100px;margin:20px auto;display:grid;gap:16px}
+  .cp-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+  .cp-card{background:#fff;border-radius:12px;box-shadow:0 6px 16px rgba(0,0,0,.08);padding:16px}
+  .cp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px}
+  .cp-title{font-size:22px;font-weight:700;color:#111827}
+  .cp-sub{color:#6b7280;font-size:13px}
+  .cp-legend{display:flex;gap:8px;align-items:center;color:#374151;font-size:12px}
+  .cp-pill{padding:4px 10px;border-radius:999px;background:#f3f4f6}
+  .cp-steps{display:grid;gap:12px}
+  .cp-step{display:flex;gap:12px;align-items:flex-start;background:#f9fafb;border-radius:10px;padding:12px}
+  .cp-step .num{width:28px;height:28px;border-radius:50%;background:#2563eb;color:#fff;display:grid;place-items:center;font-weight:700}
+  .cp-step .body{flex:1}
+  .cp-step .body h4{margin:0 0 6px}
+  .cp-badges{display:flex;flex-wrap:wrap;gap:6px}
+  .cp-badge{font-size:12px;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:4px 8px}
+  .cp-meter{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+  .cp-meter>div{height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);width:0%}
+  .cp-gaps{display:grid;gap:10px}
+  .cp-gap{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px;border-radius:10px}
+  .cp-gap strong{margin-right:6px}
+  .cp-actions{display:flex;gap:10px;justify-content:flex-end}
+  .cp-btn{padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+  .cp-btn.primary{background:#2563eb;color:#fff}
+  .cp-btn.neutral{background:#f3f4f6;color:#111}
+  .cp-select{min-width:180px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff}
+  body.dark .cp-card{background:#1f2937;color:#e5e7eb}
+  body.dark .cp-step{background:#111827}
+  body.dark .cp-gap{background:#2b190b;border-color:#b45309;color:#fde68a}
+</style>
 
-    <div class="grid grid-3" style="margin-top: 20px;">
-      <div class="card">
-        <div style="font-weight:700; margin-bottom:10px;">当前职位</div>
-        <div style="font-size:1.1rem;">{{ user.position or '未填写' }}</div>
-        <div style="color:var(--text-secondary); margin-top:6px;">公司：{{ user.company_name or '未填写' }}</div>
+<div class="cp-wrap">
+  <div class="cp-grid">
+    <div class="cp-card">
+      <div class="cp-header">
+        <div>
+          <div class="cp-title">职业雷达与成长进度</div>
+          <div class="cp-sub">基于当前简历信息的模拟评估（仅前端展示）</div>
+        </div>
+        <div class="cp-legend">
+          <span class="cp-pill">当前水平</span>
+          <span class="cp-pill">目标岗位要求</span>
+        </div>
       </div>
-      <div class="card">
-        <div style="font-weight:700; margin-bottom:10px;">目标职位</div>
-        <div style="font-size:1.1rem;">高级/资深工程师</div>
-        <div style="color:var(--text-secondary); margin-top:6px;">示例：高级前端工程师 / 全栈工程师</div>
-      </div>
-      <div class="card">
-        <div style="font-weight:700; margin-bottom:10px;">预计达成时间</div>
-        <div style="font-size:1.1rem;">6-12 个月</div>
-        <div style="color:var(--text-secondary); margin-top:6px;">结合你的技能与经验估算</div>
+      <canvas id="cpRadar" height="260"></canvas>
+      <div style="margin-top:12px">
+        <div class="cp-meter"><div id="cpProgress"></div></div>
+        <div class="cp-sub" style="margin-top:6px">总体达成度：<span id="cpProgressText">0%</span></div>
       </div>
     </div>
 
-    <div class="card" style="margin-top: 24px;">
-      <div style="display:flex;justify-content:space-between;align-items:center; margin-bottom:10px;">
-        <div style="font-weight:700;">技能差距分析</div>
-        <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="btn btn-outline">更新技能</a>
-      </div>
-      <div style="display:grid; gap:14px;">
-        <div style="display:grid; gap:8px;">
-          <div style="font-weight:600;">目标核心技能</div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;">
-            <span class="skill-tag">TypeScript</span>
-            <span class="skill-tag">React</span>
-            <span class="skill-tag">Node.js</span>
-            <span class="skill-tag">系统设计</span>
-            <span class="skill-tag">自动化测试</span>
-          </div>
-        </div>
-        <div style="display:grid; gap:8px;">
-          <div style="font-weight:600;">我的已具备</div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;">
-            {% if user_skills %}
-              {% for s in user_skills %}<span class="skill-tag" style="background:rgba(52,199,89,.9)">{{ s }}</span>{% endfor %}
-            {% else %}
-              <span class="skill-tag" style="background:rgba(52,199,89,.9)">JavaScript</span>
-              <span class="skill-tag" style="background:rgba(52,199,89,.9)">HTML/CSS</span>
-            {% endif %}
-          </div>
-        </div>
-        <div style="display:grid; gap:8px;">
-          <div style="font-weight:600;">差距（优先补齐）</div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;">
-            <span class="skill-tag" style="background:rgba(255,149,0,.95)">TypeScript</span>
-            <span class="skill-tag" style="background:rgba(255,149,0,.95)">自动化测试</span>
-            <span class="skill-tag" style="background:rgba(255,149,0,.95)">系统设计</span>
-          </div>
+    <div class="cp-card">
+      <div class="cp-header">
+        <div class="cp-title">目标岗位</div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span class="cp-sub">选择目标：</span>
+          <select id="cpRoleSelect" class="cp-select"></select>
         </div>
       </div>
-    </div>
-
-    <div class="grid grid-2" style="margin-top:24px;">
-      <div class="card">
-        <div style="font-weight:700; margin-bottom:10px;">提升计划（里程碑）</div>
-        <ul style="margin:0; padding-left:18px; color:var(--text-secondary);">
-          <li>第 1-2 个月：完成 TypeScript 系统学习，重构 1 个中等复杂度模块</li>
-          <li>第 3-4 个月：学习自动化测试（Jest/Playwright），为核心流程补齐测试</li>
-          <li>第 5-6 个月：系统设计与性能优化，完成 1 个拆分与重构项目</li>
-        </ul>
-      </div>
-      <div class="card">
-        <div style="font-weight:700; margin-bottom:10px;">课程与资源推荐</div>
-        <div style="display:grid; gap:10px;">
-          <a class="feature-link" href="#">TypeScript 实战课程</a>
-          <a class="feature-link" href="#">React 高级模式与性能优化</a>
-          <a class="feature-link" href="#">系统设计入门（含案例）</a>
-          <a class="feature-link" href="#">自动化测试从 0 到 1</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:24px;">
-      <div style="font-weight:700; margin-bottom:10px;">下一步建议</div>
-      <ol style="margin:0; padding-left:18px; color:var(--text-secondary);">
-        <li>在“我的申请”中优先投递与目标岗位匹配度高的职位</li>
-        <li>完善个人资料与技能标签，提高推荐与搜索命中率</li>
-        <li>使用“AI 面试训练”针对目标岗位题库进行专项练习</li>
-      </ol>
-      <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
-        <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="btn btn-primary">去搜索目标职位</a>
-        <a href="{{ url_for('smartrecruit.candidate.applications.virtual_interview') }}" class="btn btn-outline">开始面试训练</a>
-      </div>
+      <div class="cp-steps" id="cpTargets"></div>
     </div>
   </div>
-</section>
-{% endblock %}
 
-{% block extra_js %}
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <div class="cp-card">
+    <div class="cp-header">
+      <div>
+        <div class="cp-title">技能差距与学习建议</div>
+        <div class="cp-sub">以下建议为示例数据，帮助你快速制定学习路线</div>
+      </div>
+    </div>
+    <div class="cp-gaps" id="cpGaps"></div>
+    <div class="cp-actions" style="margin-top:12px">
+      <a class="cp-btn neutral" href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}">查看相关职位</a>
+      <button class="cp-btn primary" id="cpPlan">生成学习计划</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // 在页面末尾追加一个雷达图卡片
   (function(){
-    const container = document.querySelector('#career-path .section-content');
-    if(!container) return;
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.style.marginTop = '24px';
-    card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-weight:700;">职业发挥雷达图（示例）</div>
-        <small style="color:var(--text-secondary)">用于自我评估与目标对齐</small>
-      </div>
-      <div style="max-width:800px;margin:0 auto;">
-        <canvas id="careerRadar" height="260"></canvas>
-      </div>
-    `;
-    container.appendChild(card);
+    const USER_ID = {{ (user.id if user else 'null') | tojson }};
+    const STORAGE_KEY = `careerTargetRole_${USER_ID ?? 'guest'}`;
 
-    const ctx = document.getElementById('careerRadar');
-    if(!ctx) return;
-    const dataNow = [70, 55, 68, 62, 78]; // 当前发挥（可后端提供）
-    const dataTarget = [90, 80, 85, 80, 88]; // 目标发挥
-    const radar = new Chart(ctx, {
+    // 维度与当前评估（示例）
+    const dimensions = ['编程基础','后端框架','前端技能','云与DevOps','数据库','沟通与协作'];
+    const current = [68, 55, 60, 40, 62, 70];
+
+    // 目标岗位库（示例）
+    const rolesCatalog = {
+      backend:  { label:'后端工程师', level:'中级', target:[85,80,60,65,78,70], skills:['Python','Flask/Django','SQL','微服务','容器化'] },
+      fullstack: { label:'全栈工程师', level:'中级', target:[80,70,75,60,72,72], skills:['React','Node.js','API 设计','数据库','CI/CD'] },
+      cloud:    { label:'云平台工程师', level:'初级', target:[70,55,55,75,65,70], skills:['Linux','Docker','云基础','监控','自动化脚本'] },
+      data:     { label:'数据工程师', level:'初级', target:[75,65,50,55,80,68], skills:['Python','ETL','SQL/NoSQL','数据建模','批流一体'] }
+    };
+
+    // 初始化选择框
+    const roleSelect = document.getElementById('cpRoleSelect');
+    roleSelect.innerHTML = Object.entries(rolesCatalog).map(([key,meta])=>`<option value="${key}">${meta.label} · ${meta.level}</option>`).join('');
+    const saved = localStorage.getItem(STORAGE_KEY) || 'backend';
+    roleSelect.value = rolesCatalog[saved] ? saved : 'backend';
+
+    // 图表
+    const ctx = document.getElementById('cpRadar').getContext('2d');
+    const radarChart = new Chart(ctx, {
       type: 'radar',
-      data: {
-        labels: ['技术深度','系统设计','沟通影响','项目推进','学习力'],
-        datasets: [
-          {
-            label: '当前',
-            data: dataNow,
-            fill: true,
-            backgroundColor: 'rgba(0,122,255,0.15)',
-            borderColor: 'rgba(0,122,255,0.8)',
-            pointBackgroundColor: 'rgba(0,122,255,1)'
-          },
-          {
-            label: '目标',
-            data: dataTarget,
-            fill: true,
-            backgroundColor: 'rgba(52,199,89,0.15)',
-            borderColor: 'rgba(52,199,89,0.9)',
-            pointBackgroundColor: 'rgba(52,199,89,1)'
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#111' } }
-        },
-        scales: {
-          r: {
-            angleLines: { color: 'rgba(128,128,128,0.2)' },
-            grid: { color: 'rgba(128,128,128,0.2)' },
-            suggestedMin: 0,
-            suggestedMax: 100,
-            pointLabels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') || '#555' },
-            ticks: { display: false }
-          }
-        }
-      }
+      data: { labels: dimensions, datasets: [
+        { label:'当前', data: current, backgroundColor:'rgba(37,99,235,0.2)', borderColor:'#2563eb', pointBackgroundColor:'#2563eb' },
+        { label:'目标', data: rolesCatalog[roleSelect.value].target, backgroundColor:'rgba(34,197,94,0.15)', borderColor:'#22c55e', pointBackgroundColor:'#22c55e' }
+      ]},
+      options: { responsive: true, scales: { r: { suggestedMin: 0, suggestedMax: 100, angleLines:{ color:'#e5e7eb' }, grid:{ color:'#e5e7eb' } } }, plugins: { legend: { labels: { color: getComputedStyle(document.body).getPropertyValue('--text-color') || '#111827' } } } }
     });
 
-    // 跟随主题变化刷新颜色
-    document.addEventListener('themeChanged', () => {
-      radar.options.plugins.legend.labels.color = getComputedStyle(document.documentElement).getPropertyValue('--text-primary') || '#fff';
-      radar.options.scales.r.pointLabels.color = getComputedStyle(document.documentElement).getPropertyValue('--text-secondary') || '#bbb';
-      radar.update();
+    const cpProgress = document.getElementById('cpProgress');
+    const cpProgressText = document.getElementById('cpProgressText');
+    function updateProgress(target){
+      const p = Math.round(current.reduce((a,b)=>a+b,0)/target.reduce((a,b)=>a+b,0)*100);
+      cpProgress.style.width = p + '%';
+      cpProgressText.textContent = p + '%';
+    }
+
+    // 目标岗位卡片与差距
+    const cpTargets = document.getElementById('cpTargets');
+    const cpGaps = document.getElementById('cpGaps');
+    function renderTargetsPanel(roleKey){
+      const meta = rolesCatalog[roleKey];
+      cpTargets.innerHTML = `
+        <div class="cp-step">
+          <div class="num">1</div>
+          <div class="body">
+            <h4>${meta.label} · ${meta.level}</h4>
+            <div class="cp-badges">${meta.skills.map(s=>`<span class=\"cp-badge\">${s}</span>`).join('')}</div>
+          </div>
+        </div>`;
+    }
+    function renderGaps(roleKey){
+      const meta = rolesCatalog[roleKey];
+      const target = meta.target;
+      const gaps = [
+        { name:'后端框架', idx:1, tips:['系统学习 Flask/Django','构建含认证/ORM/测试的服务','阅读优秀项目结构'] },
+        { name:'云与DevOps', idx:3, tips:['掌握 Docker 与镜像优化','熟悉 CI/CD 并实操','入门云服务部署与监控'] },
+        { name:'前端技能', idx:2, tips:['组件化与状态管理','响应式与可访问性','打包优化与构建工具'] },
+        { name:'数据库', idx:4, tips:['深化 SQL 与索引优化','理解事务与锁','了解 NoSQL 与场景'] }
+      ].map(g=>({ ...g, gap: Math.max(0, target[g.idx] - current[g.idx]) })).filter(g=>g.gap>0).sort((a,b)=>b.gap-a.gap);
+
+      if(gaps.length===0){
+        cpGaps.innerHTML = '<div class="cp-sub">已达到当前目标要求，继续保持并拓展深度。</div>';
+      } else {
+        cpGaps.innerHTML = gaps.map(g=>`
+          <div class="cp-gap">
+            <div><strong>${g.name}</strong>差距约 <strong>${g.gap}</strong> 分</div>
+            <div class="cp-sub" style="margin-top:6px">建议：${g.tips.join('；')}</div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 初始化渲染与动画
+    requestAnimationFrame(()=>{ cpProgress.style.width = '0%'; });
+    setTimeout(()=>{ updateProgress(rolesCatalog[roleSelect.value].target); }, 300);
+    renderTargetsPanel(roleSelect.value);
+    renderGaps(roleSelect.value);
+
+    // 监听选择改变
+    roleSelect.addEventListener('change', ()=>{
+      const key = roleSelect.value;
+      localStorage.setItem(STORAGE_KEY, key);
+      radarChart.data.datasets[1].data = rolesCatalog[key].target;
+      radarChart.update();
+      updateProgress(rolesCatalog[key].target);
+      renderTargetsPanel(key);
+      renderGaps(key);
+    });
+
+    // 学习计划（基于选择角色）
+    document.getElementById('cpPlan').addEventListener('click',()=>{
+      const meta = rolesCatalog[roleSelect.value];
+      alert(`已为你生成 4 周 ${meta.label} 学习计划（示例）：\n\n第1周：核心基础与项目骨架\n第2周：数据库/接口或前端模块实践\n第3周：容器化与CI/CD落地\n第4周：监控与性能优化，撰写文档`);
     });
   })();
 </script>

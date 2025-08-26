@@ -98,8 +98,6 @@ def withdraw_application(application_id):
     try:
         app_rec.status = 'Withdrawn'
         app_rec.message = '用户已撤销申请'
-        # 关键：软撤销，允许后续重新申请
-        app_rec.is_active = False
         db.session.commit()
         flash('已撤销该申请。', 'success')
     except Exception as e:
@@ -215,14 +213,14 @@ def apply(job_id):
 
     job = Job.query.get_or_404(job_id)
 
-    # 检查是否已有申请记录
-    existing_any_application = Application.query.filter_by(
-        user_id=g.user.id,
-        job_id=job_id
+    # 检查是否有活跃的申请（未撤销的申请）
+    existing_active_application = Application.query.filter_by(
+        user_id=g.user.id, 
+        job_id=job_id, 
+        is_active=True
     ).first()
-
-    # 有活跃申请则阻止重复
-    if existing_any_application and existing_any_application.is_active:
+    
+    if existing_active_application:
         flash('你已申请过该职位，请等待处理结果。', 'info')
         return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
 
@@ -262,26 +260,17 @@ def apply(job_id):
         flash('请勾选使用已保存的简历或上传新简历。', 'warning')
         return redirect(request.url)
 
-    # 创建或复活申请记录
+    # 创建申请记录
     try:
         message = note or f'已提交简历: {cv_filename_to_use}'
-
-        if existing_any_application and not existing_any_application.is_active:
-            # 复活撤销的申请，避免触发唯一约束
-            existing_any_application.is_active = True
-            existing_any_application.status = 'Pending'
-            existing_any_application.timestamp = datetime.utcnow()
-            existing_any_application.message = '重新申请: ' + message
-            application = existing_any_application
-        else:
-            application = Application(
-                user_id=g.user.id,
-                job_id=job_id,
-                status='Pending',
-                message=message,
-                is_active=True
-            )
-            db.session.add(application)
+        application = Application(
+            user_id=g.user.id,
+            job_id=job_id,
+            status='submitted',
+            message=message,
+            is_active=True
+        )
+        db.session.add(application)
         db.session.commit()
 
         # 可选写入 Mongo
@@ -502,7 +491,7 @@ def view_applications():
 def apply_job(job_id):
     """申请职位"""
     if g.user is None:
-        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        if request.headers.get('Content-Type') == 'application/json':
             return jsonify({'success': False, 'message': '请先登录'}), 401
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -510,7 +499,7 @@ def apply_job(job_id):
     # 检查职位是否存在
     job = Job.query.get(job_id)
     if not job:
-        if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        if request.headers.get('Content-Type') == 'application/json':
             return jsonify({'success': False, 'message': '职位不存在'}), 404
         flash('职位不存在。', 'danger')
         return redirect(url_for('smartrecruit.candidate.jobs.search'))
@@ -525,7 +514,7 @@ def apply_job(job_id):
             
             if existing_application:
                 if existing_application.is_active:
-                    if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    if request.headers.get('Content-Type') == 'application/json':
                         return jsonify({'success': False, 'message': '您已经申请过这个职位'}), 400
                     flash('您已经申请过这个职位。', 'warning')
                     return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
@@ -537,7 +526,7 @@ def apply_job(job_id):
                     existing_application.message = '重新申请'
                     db.session.commit()
                     
-                    if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    if request.headers.get('Content-Type') == 'application/json':
                         return jsonify({'success': True, 'message': '申请已重新提交'})
                     flash('申请已重新提交！', 'success')
                     return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
@@ -553,7 +542,7 @@ def apply_job(job_id):
             db.session.add(new_application)
             db.session.commit()
             
-            if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            if request.headers.get('Content-Type') == 'application/json':
                 return jsonify({'success': True, 'message': '申请提交成功'})
             flash('职位申请已提交！', 'success')
             return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
@@ -561,7 +550,7 @@ def apply_job(job_id):
         except Exception as e:
             db.session.rollback()
             logging.error(f'申请职位失败: {e}')
-            if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            if request.headers.get('Content-Type') == 'application/json':
                 return jsonify({'success': False, 'message': '申请失败，请稍后重试'}), 500
             flash('申请失败，请稍后重试。', 'danger')
             return redirect(url_for('smartrecruit.candidate.jobs.search'))
@@ -577,148 +566,3 @@ def get_user_applications_count(user_id):
         return count
     except Exception:
         return 0
-
-def get_pending_applications_count(user_id):
-    """获取待处理申请数量"""
-    try:
-        # 获取状态为Pending的申请数量
-        count = Application.query.filter_by(
-            user_id=user_id, 
-            status='Pending', 
-            is_active=True
-        ).count()
-        return count
-    except Exception:
-        return 0
-
-def get_success_rate(user_id):
-    """获取申请成功率"""
-    try:
-        # 获取用户所有申请
-        total_applications = Application.query.filter_by(
-            user_id=user_id, 
-            is_active=True
-        ).count()
-        
-        if total_applications == 0:
-            return 0
-        
-        # 获取成功的申请（状态为Accepted或Interview）
-        successful_applications = Application.query.filter(
-            Application.user_id == user_id,
-            Application.is_active == True,
-            Application.status.in_(['Accepted', 'Interview'])
-        ).count()
-        
-        # 计算成功率
-        success_rate = (successful_applications / total_applications) * 100
-        return round(success_rate, 1)
-    except Exception:
-        return 0
-
-def get_user_applications(user_id, limit=None):
-    """获取用户申请列表"""
-    try:
-        query = Application.query.filter_by(user_id=user_id, is_active=True)
-        if limit:
-            query = query.limit(limit)
-        
-        applications = query.order_by(Application.timestamp.desc()).all()
-        
-        result = []
-        for app in applications:
-            job = Job.query.get(app.job_id)
-            if job:
-                result.append({
-                    'id': app.id,
-                    'job_title': job.title,
-                    'company': job.company,
-                    'status': app.status,
-                    'timestamp': app.timestamp.strftime('%Y-%m-%d %H:%M'),
-                    'message': app.message
-                })
-        
-        return result
-    except Exception:
-        return []
-
-def get_application_statistics(user_id):
-    """获取申请统计信息"""
-    try:
-        # 获取各种状态的申请数量
-        total = Application.query.filter_by(user_id=user_id, is_active=True).count()
-        pending = Application.query.filter_by(user_id=user_id, status='Pending', is_active=True).count()
-        accepted = Application.query.filter_by(user_id=user_id, status='Accepted', is_active=True).count()
-        rejected = Application.query.filter_by(user_id=user_id, status='Rejected', is_active=True).count()
-        interview = Application.query.filter_by(user_id=user_id, status='Interview', is_active=True).count()
-        
-        return {
-            'total': total,
-            'pending': pending,
-            'accepted': accepted,
-            'rejected': rejected,
-            'interview': interview,
-            'success_rate': get_success_rate(user_id)
-        }
-    except Exception:
-        return {
-            'total': 0,
-            'pending': 0,
-            'accepted': 0,
-            'rejected': 0,
-            'interview': 0,
-            'success_rate': 0
-        }
-
-def get_recent_applications(user_id, limit=5):
-    """获取最近的申请"""
-    try:
-        applications = Application.query.filter_by(
-            user_id=user_id, 
-            is_active=True
-        ).order_by(Application.timestamp.desc()).limit(limit).all()
-        
-        result = []
-        for app in applications:
-            job = Job.query.get(app.job_id)
-            if job:
-                result.append({
-                    'id': app.id,
-                    'job_title': job.title,
-                    'company': job.company,
-                    'status': app.status,
-                    'timestamp': app.timestamp.strftime('%Y-%m-%d %H:%M'),
-                    'days_ago': (datetime.utcnow() - app.timestamp).days
-                })
-        
-        return result
-    except Exception:
-        return []
-
-def get_application_trends(user_id, days=30):
-    """获取申请趋势"""
-    try:
-        from datetime import timedelta
-        
-        end_date = datetime.utcnow()
-        start_date = end_date - timedelta(days=days)
-        
-        # 获取指定时间范围内的申请
-        applications = Application.query.filter(
-            Application.user_id == user_id,
-            Application.is_active == True,
-            Application.timestamp >= start_date,
-            Application.timestamp <= end_date
-        ).all()
-        
-        # 按日期分组统计
-        trends = {}
-        for app in applications:
-            date_str = app.timestamp.strftime('%Y-%m-%d')
-            if date_str not in trends:
-                trends[date_str] = 0
-            trends[date_str] += 1
-        
-        return trends
-    except Exception:
-        return {}

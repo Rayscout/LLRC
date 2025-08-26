@@ -48,7 +48,7 @@ def interview_dashboard():
                     })(),
                     'application': type('Application', (), {
                         'status': 'Pending',
-                        'timestamp': datetime.now()
+                        'created_at': datetime.now()
                     })()
                 },
                 {
@@ -62,7 +62,7 @@ def interview_dashboard():
                     })(),
                     'application': type('Application', (), {
                         'status': 'Reviewing',
-                        'timestamp': datetime.now()
+                        'created_at': datetime.now()
                     })()
                 }
             ]
@@ -82,7 +82,7 @@ def interview_dashboard():
                 })(),
                 'application': type('Application', (), {
                     'status': 'Pending',
-                    'timestamp': datetime.now()
+                    'created_at': datetime.now()
                 })()
             },
             {
@@ -96,7 +96,7 @@ def interview_dashboard():
                 })(),
                 'application': type('Application', (), {
                     'status': 'Reviewing',
-                    'timestamp': datetime.now()
+                    'created_at': datetime.now()
                 })()
             }
         ]
@@ -316,187 +316,3 @@ def calculate_interview_score(answers):
             total_score += 5  # 默认分数
     
     return round(total_score / len(answers), 1)
-
-def get_interview_count(user_id):
-    """获取用户面试练习次数"""
-    try:
-        # 统计用户完成的面试会话数量
-        count = 0
-        for session_data in INTERVIEW_SESSIONS.values():
-            if session_data['user_id'] == user_id and session_data['status'] == 'completed':
-                count += 1
-        return count
-    except Exception:
-        return 0
-
-def get_interview_statistics(user_id):
-    """获取面试统计信息"""
-    try:
-        total_sessions = 0
-        completed_sessions = 0
-        total_score = 0
-        average_score = 0
-        
-        for session_data in INTERVIEW_SESSIONS.values():
-            if session_data['user_id'] == user_id:
-                total_sessions += 1
-                if session_data['status'] == 'completed':
-                    completed_sessions += 1
-                    if 'total_score' in session_data:
-                        total_score += session_data['total_score']
-        
-        if completed_sessions > 0:
-            average_score = round(total_score / completed_sessions, 1)
-        
-        return {
-            'total_sessions': total_sessions,
-            'completed_sessions': completed_sessions,
-            'completion_rate': round((completed_sessions / total_sessions * 100) if total_sessions > 0 else 0, 1),
-            'average_score': average_score,
-            'total_score': total_score
-        }
-    except Exception:
-        return {
-            'total_sessions': 0,
-            'completed_sessions': 0,
-            'completion_rate': 0,
-            'average_score': 0,
-            'total_score': 0
-        }
-
-def get_recent_interviews(user_id, limit=5):
-    """获取最近的面试记录"""
-    try:
-        user_sessions = []
-        for session_data in INTERVIEW_SESSIONS.values():
-            if session_data['user_id'] == user_id and session_data['status'] == 'completed':
-                # 添加职位信息
-                job = Job.query.get(session_data['job_id'])
-                if job:
-                    session_data['job_title'] = job.title
-                    session_data['company_name'] = job.company
-                else:
-                    session_data['job_title'] = '未知职位'
-                    session_data['company_name'] = '未知公司'
-                user_sessions.append(session_data)
-        
-        # 按时间排序并限制数量
-        user_sessions.sort(key=lambda x: x['end_time'], reverse=True)
-        return user_sessions[:limit]
-    except Exception:
-        return []
-
-def get_interview_performance_trends(user_id, days=30):
-    """获取面试表现趋势"""
-    try:
-        from datetime import timedelta
-        
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=days)
-        
-        trends = {}
-        for session_data in INTERVIEW_SESSIONS.values():
-            if (session_data['user_id'] == user_id and 
-                session_data['status'] == 'completed' and
-                'end_time' in session_data and
-                session_data['end_time'] >= start_date):
-                
-                date_str = session_data['end_time'].strftime('%Y-%m-%d')
-                if date_str not in trends:
-                    trends[date_str] = {
-                        'count': 0,
-                        'total_score': 0,
-                        'average_score': 0
-                    }
-                
-                trends[date_str]['count'] += 1
-                if 'total_score' in session_data:
-                    trends[date_str]['total_score'] += session_data['total_score']
-        
-        # 计算每日平均分
-        for date_str in trends:
-            if trends[date_str]['count'] > 0:
-                trends[date_str]['average_score'] = round(
-                    trends[date_str]['total_score'] / trends[date_str]['count'], 1
-                )
-        
-        return trends
-    except Exception:
-        return {}
-
-def get_interview_skill_analysis(user_id):
-    """获取面试技能分析"""
-    try:
-        skill_scores = {}
-        total_sessions = 0
-        
-        for session_data in INTERVIEW_SESSIONS.values():
-            if session_data['user_id'] == user_id and session_data['status'] == 'completed':
-                total_sessions += 1
-                
-                # 分析每个问题的技能类别
-                for answer_data in session_data.get('answers', []):
-                    question = answer_data.get('question', '')
-                    feedback = answer_data.get('feedback', '')
-                    
-                    # 根据问题内容判断技能类别
-                    skill_category = categorize_question_skill(question)
-                    if skill_category:
-                        if skill_category not in skill_scores:
-                            skill_scores[skill_category] = {
-                                'total_score': 0,
-                                'count': 0,
-                                'average_score': 0
-                            }
-                        
-                        # 从反馈中提取分数
-                        score = extract_score_from_feedback(feedback)
-                        skill_scores[skill_category]['total_score'] += score
-                        skill_scores[skill_category]['count'] += 1
-        
-        # 计算每个技能类别的平均分
-        for skill_category in skill_scores:
-            if skill_scores[skill_category]['count'] > 0:
-                skill_scores[skill_category]['average_score'] = round(
-                    skill_scores[skill_category]['total_score'] / skill_scores[skill_category]['count'], 1
-                )
-        
-        return {
-            'total_sessions': total_sessions,
-            'skill_scores': skill_scores
-        }
-    except Exception:
-        return {
-            'total_sessions': 0,
-            'skill_scores': {}
-        }
-
-def categorize_question_skill(question):
-    """根据问题内容分类技能"""
-    question_lower = question.lower()
-    
-    if any(keyword in question_lower for keyword in ['python', 'java', 'javascript', 'c++', '编程', '代码']):
-        return '编程技能'
-    elif any(keyword in question_lower for keyword in ['算法', '数据结构', '复杂度', '排序', '查找']):
-        return '算法与数据结构'
-    elif any(keyword in question_lower for keyword in ['数据库', 'sql', 'mysql', 'redis', 'mongodb']):
-        return '数据库技能'
-    elif any(keyword in question_lower for keyword in ['系统设计', '架构', '微服务', '分布式']):
-        return '系统设计'
-    elif any(keyword in question_lower for keyword in ['团队', '沟通', '领导', '管理']):
-        return '软技能'
-    elif any(keyword in question_lower for keyword in ['项目', '经验', '工作']):
-        return '项目经验'
-    else:
-        return '其他技能'
-
-def extract_score_from_feedback(feedback):
-    """从反馈中提取分数"""
-    try:
-        if '评分：' in feedback:
-            score_text = feedback.split('评分：')[-1].split('/')[0]
-            return int(score_text)
-        else:
-            return 5  # 默认分数
-    except:
-        return 5  # 默认分数
