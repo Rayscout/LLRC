@@ -60,6 +60,11 @@
                     <li><a href="#testimonials" data-scroll data-section="testimonials">合作</a></li>
                     <li><a href="#contact" data-scroll data-section="contact">联系</a></li>
                     <li class="hire"><a href="#" class="auth-trigger" data-auth="signin">登录</a></li>
+                    <li class="theme-toggle-container">
+                        <button id="themeToggle" class="theme-toggle" aria-label="切换深色模式" title="切换深色模式">
+                            🌙
+                        </button>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -128,17 +133,20 @@
         <section id="home" class="section hero">
             <div class="hero-bg"></div>
             <div class="container hero-content">
-                <div class="hero-left">
-                    <h1>基于 AI 的智能招聘与人才发展系统</h1>
-                    <p>面向企业与高校提供智能招聘、人岗匹配、人才画像与测评、培训发展与数据看板的一体化解决方案。</p>
+                <!-- 左侧内容区域 -->
+                <div class="hero-left-content">
+                    <h1 class="hero-main-title">基于 AI 的智能招聘与人才发展系统</h1>
+                    <p class="hero-description">面向企业与高校提供智能招聘、人岗匹配、人才画像与测评、培训发展与数据看板的一体化解决方案。</p>
                     <div class="hero-actions">
                         <a class="btn btn-primary auth-trigger" href="#" data-auth="signin">登录 <span class="icon">→</span></a>
                         <a class="btn btn-ghost auth-trigger" href="#" data-auth="signup">注册</a>
                     </div>
                 </div>
-                <div class="hero-right">
+                
+                <!-- 右侧头像区域 -->
+                <div class="hero-right-avatar">
                     <div class="avatar">
-                                                 <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Logo" />
+                        <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Logo" />
                     </div>
                 </div>
             </div>

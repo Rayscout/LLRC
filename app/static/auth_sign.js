@@ -7,6 +7,7 @@
   const navList = qs('#navList');
   const links = qsa('[data-scroll]');
   const sections = qsa('section[id]');
+  const themeToggle = qs('#themeToggle');
 
   // Smooth scroll with offset
   function smoothScrollTo(targetId){
@@ -32,7 +33,7 @@
     })
   })
 
-  // Active section highlight
+  // Active section highlight and header scroll effect
   function onScrollActive(){
     const scrollY = window.scrollY + (header.offsetHeight || 64) + 100;
     let current = 'home';
@@ -44,6 +45,15 @@
       const sec = a.getAttribute('data-section');
       if(sec){ a.classList.toggle('active', sec === current); }
     })
+    
+    // Header scroll effect
+    if(header){
+      if(window.scrollY > 100){
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    }
   }
   window.addEventListener('scroll', onScrollActive);
   onScrollActive();
@@ -312,16 +322,29 @@
   // iOS-style Dark Mode: system + manual toggle with persistence
   const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
   const savedTheme = localStorage.getItem('theme');
+  
   function applyTheme(theme){
     document.body.classList.toggle('dark', theme === 'dark');
-    const toggle = qs('.theme-toggle');
-    if(toggle){ toggle.classList.toggle('active', theme === 'dark'); }
+    const toggle = qs('#themeToggle');
+    if(toggle){ 
+      toggle.classList.toggle('active', theme === 'dark');
+      toggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+    
+    // Update meta theme-color for mobile browsers
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if(metaThemeColor){
+      metaThemeColor.setAttribute('content', theme === 'dark' ? '#000000' : '#F2F2F7');
+    }
   }
+  
   function currentTheme(){
     if(savedTheme === 'dark' || savedTheme === 'light') return savedTheme;
     return prefersDark && prefersDark.matches ? 'dark' : 'light';
   }
+  
   applyTheme(currentTheme());
+  
   if(prefersDark){
     prefersDark.addEventListener('change', e =>{
       if(!localStorage.getItem('theme')){
@@ -329,7 +352,7 @@
       }
     });
   }
-  const themeToggle = qs('.theme-toggle');
+  
   if(themeToggle){
     themeToggle.addEventListener('click', ()=>{
       const next = document.body.classList.contains('dark') ? 'light' : 'dark';
@@ -381,6 +404,29 @@
     scrollProgress.style.width = scrollPercent + '%';
   }
 
+  // Section reveal animations
+  function initSectionAnimations() {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+    
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+        }
+      });
+    }, observerOptions);
+    
+    sections.forEach(section => {
+      sectionObserver.observe(section);
+    });
+  }
+  
+  // Initialize section animations
+  initSectionAnimations();
+  
   // 初始化背景动效
   createFloatingShapes();
   createParticles();
@@ -388,6 +434,18 @@
   // 监听滚动更新进度条
   window.addEventListener('scroll', updateScrollProgress);
   updateScrollProgress();
+  
+  // Page load animation
+  window.addEventListener('load', () => {
+    document.body.classList.add('loaded');
+    
+    // Animate sections in sequence
+    sections.forEach((section, index) => {
+      setTimeout(() => {
+        section.classList.add('loaded');
+      }, index * 200);
+    });
+  });
 })();
 
 
