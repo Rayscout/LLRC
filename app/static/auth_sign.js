@@ -7,6 +7,10 @@
   const navList = qs('#navList');
   const links = qsa('[data-scroll]');
   const sections = qsa('section[id]');
+<<<<<<< HEAD
+=======
+  const themeToggle = qs('#themeToggle');
+>>>>>>> parent of e696d58 (UI最后一版-苏杰)
 
   // Smooth scroll with offset
   function smoothScrollTo(targetId){
