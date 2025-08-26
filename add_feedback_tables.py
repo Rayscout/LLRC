@@ -51,3 +51,4 @@ if __name__ == '__main__':
     else:
         print("\n💥 反馈系统数据表迁移失败！")
         sys.exit(1)
+

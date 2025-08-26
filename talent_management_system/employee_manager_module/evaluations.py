@@ -54,3 +54,4 @@ def view(eval_id):
 	except Exception as e:
 		flash(f'查看绩效评价时发生错误: {str(e)}', 'danger')
 		return redirect(url_for('talent_management.employee_management.evaluations.list'))
+
