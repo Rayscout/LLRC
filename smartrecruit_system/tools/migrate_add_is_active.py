@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-数据库迁移脚本：为Application表添加is_active字段
+数据库迁移脚本：
+1) 为 user 表添加账号状态字段：is_active, deactivated_at, deactivated_by
+2) 为 application 表添加 is_active 字段（若缺失）
 """
 
 import os
@@ -10,7 +12,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 def migrate_add_is_active():
-    """为Application表添加is_active字段"""
+    """为 user 与 application 表添加缺失字段"""
     print("=== 数据库迁移：添加is_active字段 ===\n")
     
     try:
@@ -30,44 +32,57 @@ def migrate_add_is_active():
                 print(f"❌ 数据库连接失败: {e}")
                 return
             
-            # 检查is_active字段是否已存在
+            # 1) user 表新增账号状态字段
             try:
-                # 尝试查询is_active字段
-                result = db.session.execute(db.text("PRAGMA table_info(application)"))
-                columns = [row[1] for row in result.fetchall()]
-                
-                if 'is_active' in columns:
-                    print("✅ is_active字段已存在，跳过迁移")
-                    return
+                user_cols = [row[1] for row in db.session.execute(db.text("PRAGMA table_info(user)")).fetchall()]
+                print(f"当前 user 表字段: {user_cols}")
+
+                # 依次补齐
+                if 'is_active' not in user_cols:
+                    db.session.execute(db.text("ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 1"))
+                    print("✅ user.is_active 添加完成")
                 else:
-                    print("📝 需要添加is_active字段")
+                    print("ℹ️ user.is_active 已存在")
+
+                if 'deactivated_at' not in user_cols:
+                    db.session.execute(db.text("ALTER TABLE user ADD COLUMN deactivated_at DATETIME"))
+                    print("✅ user.deactivated_at 添加完成")
+                else:
+                    print("ℹ️ user.deactivated_at 已存在")
+
+                if 'deactivated_by' not in user_cols:
+                    db.session.execute(db.text("ALTER TABLE user ADD COLUMN deactivated_by INTEGER REFERENCES user(id)"))
+                    print("✅ user.deactivated_by 添加完成")
+                else:
+                    print("ℹ️ user.deactivated_by 已存在")
+
+                db.session.commit()
             except Exception as e:
-                print(f"⚠️ 检查字段时出错: {e}")
-            
-            # 添加is_active字段
+                print(f"❌ 更新 user 表失败: {e}")
+                db.session.rollback()
+
+            # 2) application 表新增 is_active 字段
             try:
-                # 添加is_active字段，默认值为True
-                db.session.execute(db.text("ALTER TABLE application ADD COLUMN is_active BOOLEAN DEFAULT 1"))
-                db.session.commit()
-                print("✅ 成功添加is_active字段")
-                
-                # 更新现有记录，将所有现有申请标记为活跃
-                db.session.execute(db.text("UPDATE application SET is_active = 1 WHERE is_active IS NULL"))
-                db.session.commit()
-                print("✅ 成功更新现有申请记录")
-                
+                app_cols = [row[1] for row in db.session.execute(db.text("PRAGMA table_info(application)")).fetchall()]
+                if 'is_active' not in app_cols:
+                    db.session.execute(db.text("ALTER TABLE application ADD COLUMN is_active BOOLEAN DEFAULT 1"))
+                    db.session.commit()
+                    print("✅ application.is_active 添加完成")
+                    db.session.execute(db.text("UPDATE application SET is_active = 1 WHERE is_active IS NULL"))
+                    db.session.commit()
+                    print("✅ application 现有记录初始化完成")
+                else:
+                    print("ℹ️ application.is_active 已存在")
+
                 # 验证迁移结果
                 total_applications = db.session.execute(db.text("SELECT COUNT(*) FROM application")).scalar()
                 active_applications = db.session.execute(db.text("SELECT COUNT(*) FROM application WHERE is_active = 1")).scalar()
-                
-                print(f"📊 迁移结果:")
+                print("📊 迁移结果:")
                 print(f"   总申请数: {total_applications}")
                 print(f"   活跃申请数: {active_applications}")
-                
                 print("✅ 数据库迁移完成")
-                
             except Exception as e:
-                print(f"❌ 迁移失败: {e}")
+                print(f"❌ 更新 application 表失败: {e}")
                 db.session.rollback()
                 
     except Exception as e:
