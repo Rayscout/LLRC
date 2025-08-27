@@ -33,12 +33,12 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ url_for('smartrecruit.candidate.interview.interview_dashboard') }}" class="nav-link {% if 'interview' in request.endpoint %}active{% endif %}">
+                <a href="{{ url_for('smartrecruit.candidate.applications.virtual_interview') }}" class="nav-link {% if 'virtual_interview' in request.endpoint or 'interview' in request.endpoint %}active{% endif %}">
                     <i class="fas fa-microphone"></i> AI面试训练
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ url_for('smartrecruit.candidate.dashboard') }}" class="nav-link {% if request.endpoint == 'smartrecruit.candidate.dashboard' %}active{% endif %}">
+                <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="nav-link {% if 'profile.settings' in request.endpoint %}active{% endif %}">
                     <i class="fas fa-user"></i> 个人资料
                 </a>
             </li>
@@ -53,7 +53,7 @@
                     {{ user.first_name[0] if user and user.first_name else 'U' }}
                 </div>
                 <div class="user-dropdown-menu" id="userDropdownMenu">
-                    <a href="{{ url_for('smartrecruit.candidate.dashboard') }}" class="dropdown-item">
+                    <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="dropdown-item">
                         <i class="fas fa-user"></i> 个人资料
                     </a>
                     <a href="{{ url_for('smartrecruit.candidate.settings') }}" class="dropdown-item">
