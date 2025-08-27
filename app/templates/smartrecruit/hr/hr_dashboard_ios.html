@@ -7,26 +7,39 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
+        /* 主题调优：仅改变风格，不增加结构 */
+        :root{
+            --ios-surface:#ffffff;
+            --ios-border:rgba(15, 23, 42, 0.06);
+            --ios-shadow:0 6px 22px rgba(30,41,59,.06);
+            --ios-shadow-strong:0 12px 32px rgba(30,41,59,.12);
+            --ios-chip:#3b82f6;
+            --fx-glow:#8b5cf6;
+            --fx-pink:#ec4899;
+            --fx-blue:#0ea5e9;
+            --fx-bg-1:#eef2ff;
+            --fx-bg-2:#f5f3ff;
+            --fx-bg-3:#f0f9ff;
+        }
         /* 页面特定样式 */
-        .ios-hero-section {
-            background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%);
-        }
+        .ios-hero-section { background: radial-gradient(1200px 420px at 20% -10%, #f0f6ff 0%, #f7f9ff 40%, #ffffff 100%); position:relative; overflow:hidden }
+        .ios-hero-section:before{content:""; position:absolute; inset:-20% -10% auto -10%; height:320px; background:conic-gradient(from 180deg, rgba(14,165,233,.18), rgba(139,92,246,.14), rgba(236,72,153,.12), rgba(14,165,233,.18)); filter:blur(40px); animation:spinSlow 22s linear infinite; pointer-events:none}
+        .ios-hero-section:after{content:""; position:absolute; right:-160px; top:-120px; width:520px; height:520px; background:radial-gradient(closest-side, rgba(99,102,241,.25), rgba(99,102,241,0)); filter:blur(10px); transform:rotate(15deg); animation:floatY 12s ease-in-out infinite; pointer-events:none}
         
-        .ios-stats-section {
-            background: var(--ios-bg-secondary);
-        }
+        .ios-stats-section { background: var(--ios-bg-secondary); position:relative; overflow:hidden }
+        .ios-stats-section:before{content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(99,102,241,.06), rgba(14,165,233,.06)); opacity:.6; mix-blend:multiply; pointer-events:none}
         
-        .ios-actions-section {
-            background: var(--ios-bg-tertiary);
-        }
+        .ios-actions-section { background: var(--ios-bg-tertiary); position:relative }
+        .ios-actions-section:before{content:""; position:absolute; inset:0; background:radial-gradient(1000px 380px at 85% -20%, rgba(14,165,233,.10), transparent 60%), radial-gradient(800px 320px at 10% 120%, rgba(236,72,153,.10), transparent 55%)}
         
-        .ios-recent-section {
-            background: var(--ios-bg-secondary);
-        }
+        .ios-recent-section { background: var(--ios-bg-secondary); }
+
+        /* 连续滚动：关闭任何滚动分页/吸附 */
+        .ios-scroll-container{ overflow-y:auto; scroll-snap-type: none !important; }
+        .ios-section{ scroll-snap-align: none !important; }
         
-        .ios-insights-section {
-            background: var(--ios-bg-primary);
-        }
+        .ios-insights-section { background: var(--ios-bg-primary); position:relative }
+        .ios-insights-section:before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(236,72,153,.04), rgba(14,165,233,.05)); pointer-events:none}
         
         .ios-footer-section {
             background: var(--ios-bg-secondary);
@@ -85,6 +98,12 @@
             margin-bottom: var(--ios-spacing-xl);
             text-align: center;
         }
+        /* 关怀式欢迎标题与信息胶囊 */
+        .ios-title.hello{font-size: 2.2rem; letter-spacing:.3px; font-weight:800; background:linear-gradient(90deg,#0A84FF,#6C5CE7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-align:center; margin-bottom:12px; background-size:200% 100%; animation:gradientBreath 6s ease-in-out infinite; position:relative}
+        .ios-title.hello:after{content:""; position:absolute; inset:0; background:linear-gradient(115deg, transparent 0%, rgba(255,255,255,.8) 8%, transparent 16%) no-repeat; background-size:18% 100%; background-position:-25% 0; mix-blend-mode:screen; pointer-events:none; animation:sweepX 3.4s ease-in-out infinite}
+        .ios-hero-pills{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom: var(--ios-spacing-lg)}
+        .ios-hero-pills .pill{display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#ffffff; border:1px solid var(--ios-border); box-shadow: var(--ios-shadow); color:var(--ios-text-secondary); font-size:.95rem}
+        .ios-hero-pills .pill .v{font-weight:700; color:#0A84FF}
         
         .ios-hero-actions {
             display: flex;
@@ -93,24 +112,22 @@
             flex-wrap: wrap;
         }
         
-        .ios-quick-action {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: var(--ios-radius-large);
-            padding: var(--ios-spacing-lg);
-            text-align: center;
-            text-decoration: none;
+        .ios-quick-action{
+            background: var(--ios-surface);
+            border:1px solid var(--ios-border);
+            border-radius: 16px;
+            padding: calc(var(--ios-spacing-lg) - 4px);
+            text-align:center;
+            text-decoration:none;
             color: var(--ios-text-primary);
-            transition: all var(--ios-transition-medium);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: var(--ios-shadow-light);
+            transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease, filter .25s ease;
+            box-shadow: var(--ios-shadow);
+            position:relative; overflow:hidden
         }
         
-        .ios-quick-action:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--ios-shadow-heavy);
-            color: var(--ios-blue);
-        }
+        .ios-quick-action:hover{ transform: translateY(-8px) scale(1.02); box-shadow: var(--ios-shadow-strong); color: var(--ios-blue); filter:saturate(1.1) }
+        .ios-quick-action:after{content:""; position:absolute; inset:auto -30% -60% -30%; height:120%; background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.35), rgba(255,255,255,0)); transform:translateY(80%) rotate(8deg); transition:transform .8s ease; pointer-events:none}
+        .ios-quick-action:hover:after{ transform:translateY(-30%) rotate(8deg) }
         
         .ios-quick-action i {
             font-size: 2rem;
@@ -129,20 +146,19 @@
             color: var(--ios-text-secondary);
         }
         
-        .ios-recent-item {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            border-radius: var(--ios-radius-medium);
+        .ios-recent-item{
+            background: var(--ios-surface);
+            border:1px solid var(--ios-border);
+            border-radius: 14px;
             padding: var(--ios-spacing-lg);
             margin-bottom: var(--ios-spacing-md);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all var(--ios-transition-fast);
+            box-shadow: var(--ios-shadow);
+            transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s ease;
+            position:relative; overflow:hidden
         }
         
-        .ios-recent-item:hover {
-            transform: translateX(8px);
-            box-shadow: var(--ios-shadow-medium);
-        }
+        .ios-recent-item:hover { transform: translateX(8px) translateY(-2px); box-shadow: var(--ios-shadow-medium); }
+        .ios-recent-item:before{content:""; position:absolute; right:-60px; top:-60px; width:160px; height:160px; background:radial-gradient(circle at center, rgba(99,102,241,.12), rgba(99,102,241,0) 60%); transform:rotate(12deg)}
         
         .ios-recent-header {
             display: flex;
@@ -166,25 +182,94 @@
             gap: var(--ios-spacing-sm);
         }
         
-        .ios-chart-container {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-radius: var(--ios-radius-large);
+        .ios-chart-container{
+            background: var(--ios-surface);
+            border:1px solid var(--ios-border);
+            border-radius: 18px;
             padding: var(--ios-spacing-xl);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: var(--ios-shadow-medium);
+            box-shadow: var(--ios-shadow);
+            transform-style:preserve-3d; transition:transform .35s ease, box-shadow .35s ease
         }
+        .ios-chart-container:hover{ transform: translateY(-6px) rotateX(2deg); box-shadow: var(--ios-shadow-strong) }
         
-        .ios-chart-placeholder {
-            height: 200px;
-            background: linear-gradient(135deg, var(--ios-bg-tertiary), var(--ios-bg-secondary));
-            border-radius: var(--ios-radius-medium);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--ios-text-tertiary);
-            font-size: 1.125rem;
+        .ios-chart-placeholder{ height:200px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--ios-text-tertiary); font-size:1.125rem; background: linear-gradient(180deg,#eef4ff,#f8fbff); border:1px dashed rgba(99,102,241,.25); position:relative; overflow:hidden }
+        .ios-chart-placeholder:after{content:""; position:absolute; inset:auto -30% -70% -30%; height:140%; background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.3), rgba(255,255,255,0)); transform:translateY(90%) rotate(8deg); animation:shine 4.6s ease-in-out infinite}
+
+        /* 指标卡片风格与浮起徽标（右上角） */
+        .ios-metric-card{ background:var(--ios-surface); border:1px solid var(--ios-border); border-radius:16px; box-shadow: var(--ios-shadow); padding: var(--ios-spacing-lg); position:relative; overflow:hidden; isolation:isolate }
+        .ios-metric-card:after{content:""; position:absolute; right:-30px; top:-30px; width:120px; height:120px; background:radial-gradient(circle at center, rgba(14,165,233,.18), rgba(14,165,233,0) 60%); z-index:-1; filter:blur(1px)}
+        .ios-metric-card:hover{ transform:translateY(-6px); box-shadow: var(--ios-shadow-strong) }
+        .ios-metric-icon i{ color:#2563eb; }
+        .ios-metric-value{ font-weight:800; font-size:28px; color:#0A84FF; }
+
+        /* 头部 tabs 的视觉（明细/分析）可通过链接样式体现）*/
+        .ios-title{ display:flex; align-items:center; gap:10px; }
+
+        /* 滑动时卡片渐显（不改结构，仅加类名控制） */
+        .fade-card{ opacity:0; transform: translateY(12px); transition: opacity .5s ease, transform .6s cubic-bezier(.22,1,.36,1); will-change: transform, opacity; }
+        .fade-card.visible{ opacity:1; transform: none; }
+
+        /* 背景粒子画布 */
+        #bgParticles{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.7}
+        .ios-parallax-bg{z-index:0}
+        .ios-scroll-container{ position:relative; z-index:1 }
+
+        /* 涟漪与磁性按钮基础 */
+        .ripple{ position:absolute; border-radius:50%; transform:scale(0); animation:ripple .6s linear; background:rgba(255,255,255,.55) }
+        .magnet{ will-change:transform }
+
+        /* 关键动画 */
+        @keyframes spinSlow{to{transform:rotate(360deg)}}
+        @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(16px)}}
+        @keyframes shine{0%{transform:translateY(120%) rotate(8deg)}45%{transform:translateY(-20%) rotate(8deg)}100%{transform:translateY(-20%) rotate(8deg)}}
+        @keyframes ripple{to{transform:scale(8); opacity:0}}
+        @keyframes gradientBreath{0%,100%{filter:drop-shadow(0 6px 14px rgba(99,102,241,.12)); background-position:0% 50%}50%{filter:drop-shadow(0 10px 22px rgba(99,102,241,.22)); background-position:100% 50%}}
+        @keyframes sweepX{0%{background-position:-25% 0; opacity:.65}60%{background-position:120% 0; opacity:.9}100%{background-position:120% 0; opacity:.0}}
+
+        /* 导航按钮动效：弹簧与铃铛抖动、未读红点 */
+        .ios-nav-button{transition:transform .18s ease}
+        .ios-nav-button:hover{transform:translateY(-2px)}
+        .ios-nav-button.spring{animation:springPop .6s cubic-bezier(.22,1,.36,1)}
+        .ios-nav-button[data-action="notify"].has-unread{animation:bellJiggle 2.8s ease-in-out infinite}
+        .ios-nav-button[data-action="notify"].has-unread:after{content:""; position:absolute; width:8px; height:8px; right:6px; top:6px; background:#ef4444; border-radius:999px; box-shadow:0 0 0 6px rgba(239,68,68,.15)}
+        @keyframes springPop{0%{transform:scale(.9)}40%{transform:scale(1.12)}70%{transform:scale(.98)}100%{transform:scale(1)}}
+        @keyframes bellJiggle{0%,80%,100%{transform:none}85%{transform:rotate(-12deg)}90%{transform:rotate(10deg)}95%{transform:rotate(-6deg)}}
+
+        /* 紧凑模式：缩小一切卡片尺寸、间距、字体 */
+        .compact .ios-container{ --ios-spacing-xl:24px; --ios-spacing-lg:16px; --ios-spacing-md:10px; --ios-spacing-sm:6px }
+        .compact .ios-title.hello{ font-size:1.8rem }
+        .compact .ios-title{ font-size:1rem }
+        .compact .ios-subtitle{ font-size:.85rem }
+        .compact .ios-metric-card{ padding: var(--ios-spacing-md); border-radius:12px }
+        .compact .ios-metric-value{ font-size:22px }
+        .compact .ios-quick-action{ padding: var(--ios-spacing-md); border-radius:12px }
+        .compact .ios-recent-item{ padding: var(--ios-spacing-md); border-radius:12px }
+        .compact .ios-chart-container{ padding: var(--ios-spacing-lg); border-radius:14px }
+        .compact .ios-grid.ios-grid-4{ grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px }
+        .compact .ios-grid.ios-grid-3{ grid-template-columns: repeat(3, minmax(0,1fr)); gap:12px }
+        .compact .ios-grid.ios-grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); gap:14px }
+        @media (max-width: 900px){
+          .compact .ios-grid.ios-grid-4{ grid-template-columns: repeat(2, minmax(0,1fr)) }
+          .compact .ios-grid.ios-grid-3{ grid-template-columns: repeat(2, minmax(0,1fr)) }
         }
+
+        /* 迷你统计卡（顶部条状卡片） */
+        .mini-stats{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; margin-top:12px }
+        .mini-card{ background:var(--ios-surface); border:1px solid var(--ios-border); border-radius:12px; padding:12px 14px; box-shadow:var(--ios-shadow); display:flex; align-items:center; justify-content:space-between }
+        .mini-card .label{ color:var(--ios-text-secondary); font-size:.85rem }
+        .mini-card .value{ font-weight:800; color:#0A84FF }
+        .mini-card .delta{ font-size:.75rem; color:#10b981 }
+        .mini-card .delta.neg{ color:#ef4444 }
+
+        /* 悬浮蓝色分布卡 */
+        .overlay-card{ position:absolute; right:4%; top:-28px; background:#3b82f6; color:#fff; border-radius:16px; box-shadow:0 18px 40px rgba(59,130,246,.35); padding:14px 18px; width:280px; transform:translateZ(0) }
+        .overlay-card h4{ margin:0 0 8px 0; font-size:1rem }
+        .overlay-chart{ height:56px; display:flex; align-items:flex-end; gap:8px }
+        .overlay-bar{ flex:1; height:40%; background:rgba(255,255,255,.9); border-radius:6px 6px 0 0; opacity:.85; animation:barUp .9s cubic-bezier(.22,1,.36,1) both }
+        .overlay-bar:nth-child(2){ height:60%; animation-delay:.05s }
+        .overlay-bar:nth-child(3){ height:35%; animation-delay:.1s }
+        .overlay-bar:nth-child(4){ height:70%; animation-delay:.15s }
+        @keyframes barUp{from{transform:translateY(12px); opacity:0}to{transform:none; opacity:1}}
     </style>
 </head>
 <body>
@@ -251,11 +336,15 @@
                 
                 <div class="ios-nav-divider"></div>
                 
+                <button class="ios-nav-button" data-action="notify" title="通知">
+                    <i class="uil uil-bell"></i>
+                </button>
+                
                 <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
                 
                 
                 
-                <button class="ios-nav-button" data-action="profile">
+                <button class="ios-nav-button" data-action="profile" title="个人中心">
                     <i class="uil uil-user"></i>
                     <span>HR</span>
                 </button>
@@ -272,15 +361,22 @@
 
     <!-- 视差背景 -->
     <div class="ios-parallax-bg"></div>
+    <!-- 粒子背景画布 -->
+    <canvas id="bgParticles"></canvas>
     
     <!-- 滚动容器 -->
     <div class="ios-scroll-container">
         <!-- 欢迎Section -->
         <section class="ios-section ios-hero-section">
             <div class="ios-container">
-                <h1 class="ios-title ios-fade-in">智能招聘系统-HR</h1>
-                <p class="ios-subtitle ios-fade-in">数据驱动的人才获取与招聘管理平台</p>
-                <p class="ios-welcome-text ios-fade-in">欢迎回来，{{ user.name if user else 'HR管理员' }}！</p>
+                <h1 class="ios-title hello ios-fade-in">欢迎回来，{{ user.name if user else 'HR 管理员' }}！</h1>
+                <div class="ios-hero-pills ios-fade-in">
+                    <div class="pill"><i class="uil uil-schedule"></i> 今天 <span class="v">{{ current_date if current_date else '周五 01/16' }}</span></div>
+                    <div class="pill"><i class="uil uil-cloud-sun"></i> 天气 <span class="v">{{ weather|default('晴 18°C') }}</span></div>
+                    <div class="pill"><i class="uil uil-user-plus"></i> 待筛简历 <span class="v">{{ pending_resumes|default(6) }}</span></div>
+                    <div class="pill"><i class="uil uil-calendar-alt"></i> 今日面试 <span class="v">{{ interviews_today|default(2) }}</span></div>
+                </div>
+                <p class="ios-welcome-text ios-fade-in">数据驱动的人才获取与招聘管理平台</p>
                 
                 <!-- 功能引导卡片 -->
                 <div class="ios-feature-guide ios-fade-in-up">
@@ -314,7 +410,7 @@
 
         <!-- 关键指标Section -->
         <section class="ios-section ios-stats-section">
-            <div class="ios-container">
+            <div class="ios-container compact">
                 <h2 class="ios-title ios-fade-in">关键指标</h2>
                 <p class="ios-subtitle ios-fade-in">实时监控招聘流程的核心数据</p>
                 
@@ -335,49 +431,83 @@
                     </div>
                 </div>
                 
-                <div class="ios-grid ios-grid-4">
-                    <div class="ios-metric-card ios-fade-in-up">
+                <!-- 迷你统计条组 -->
+                <div class="mini-stats">
+                    <div class="mini-card fade-card visible">
+                        <div class="label">人员状态</div>
+                        <div class="value">23</div>
+                        <div class="delta">未提交</div>
+                    </div>
+                    <div class="mini-card fade-card visible">
+                        <div class="label">对齐率</div>
+                        <div class="value">80%</div>
+                        <div class="delta">较上周 +20%</div>
+                    </div>
+                    <div class="mini-card fade-card visible">
+                        <div class="label">更新率</div>
+                        <div class="value">20%</div>
+                        <div class="delta">较上周 +20%</div>
+                    </div>
+                    <div class="mini-card fade-card visible">
+                        <div class="label">总进度</div>
+                        <div class="value">60%</div>
+                        <div class="delta">提升中</div>
+                    </div>
+                </div>
+
+                <div class="ios-grid ios-grid-4" style="position:relative; margin-top:12px;">
+                    <!-- 悬浮分布卡 -->
+                    <div class="overlay-card fade-card visible">
+                        <h4>目标进度分布</h4>
+                        <div class="overlay-chart">
+                            <div class="overlay-bar"></div>
+                            <div class="overlay-bar"></div>
+                            <div class="overlay-bar"></div>
+                            <div class="overlay-bar"></div>
+                        </div>
+                    </div>
+                    <div class="ios-metric-card ios-fade-in-up" data-counter="{{ total_jobs|default(0) }}">
                         <div class="ios-metric-icon">
                             <i class="uil uil-briefcase-alt"></i>
                         </div>
                         <div class="ios-metric-label">活跃职位</div>
-                        <div class="ios-metric-value">{{ total_jobs|default(0) }}</div>
+                        <div class="ios-metric-value js-count">0</div>
                         <div class="ios-metric-change">
                             <i class="uil uil-arrow-up"></i>
                             +12% 本月
                         </div>
                     </div>
                     
-                    <div class="ios-metric-card ios-fade-in-up">
+                    <div class="ios-metric-card ios-fade-in-up" data-counter="{{ total_applications|default(0) }}">
                         <div class="ios-metric-icon">
                             <i class="uil uil-file-alt"></i>
                         </div>
                         <div class="ios-metric-label">总申请数</div>
-                        <div class="ios-metric-value">{{ total_applications|default(0) }}</div>
+                        <div class="ios-metric-value js-count">0</div>
                         <div class="ios-metric-change">
                             <i class="uil uil-arrow-up"></i>
                             +8% 本周
                         </div>
                     </div>
                     
-                    <div class="ios-metric-card ios-fade-in-up">
+                    <div class="ios-metric-card ios-fade-in-up" data-counter="0">
                         <div class="ios-metric-icon">
                             <i class="uil uil-calendar-alt"></i>
                         </div>
                         <div class="ios-metric-label">面试安排</div>
-                        <div class="ios-metric-value">0</div>
+                        <div class="ios-metric-value js-count">0</div>
                         <div class="ios-metric-change">
                             <i class="uil uil-minus"></i>
                             0% 变化
                         </div>
                     </div>
                     
-                    <div class="ios-metric-card ios-fade-in-up">
+                    <div class="ios-metric-card ios-fade-in-up" data-counter="0">
                         <div class="ios-metric-icon">
                             <i class="uil uil-users-alt"></i>
                         </div>
                         <div class="ios-metric-label">候选人库</div>
-                        <div class="ios-metric-value">0</div>
+                        <div class="ios-metric-value js-count">0</div>
                         <div class="ios-metric-change">
                             <i class="uil uil-arrow-up"></i>
                             +15% 本月
@@ -716,6 +846,175 @@
           localStorage.setItem('theme', next);
           apply(next);
         });
+      })();
+
+      // 连续滚动 + 渐显：观察进入视窗的卡片
+      (function(){
+        var observer;
+        if('IntersectionObserver' in window){
+          observer = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
+          }, { threshold: 0.12 });
+        }
+        function mountFade(selector){
+          var list = document.querySelectorAll(selector);
+          for(var i=0;i<list.length;i++){
+            list[i].classList.add('fade-card');
+            if(observer) observer.observe(list[i]); else list[i].classList.add('visible');
+          }
+        }
+        // 应用于页面现有卡片：指标卡、快速操作、最近项、图表容器
+        document.addEventListener('DOMContentLoaded', function(){
+          mountFade('.ios-metric-card');
+          mountFade('.ios-quick-action');
+          mountFade('.ios-recent-item');
+          mountFade('.ios-chart-container');
+        });
+      })();
+
+      // 视差背景与磁性按钮、点击涟漪、粒子动画
+      (function(){
+        var root = document.documentElement;
+        // 视差：根据鼠标移动调整背景偏移
+        var parallax = document.querySelector('.ios-parallax-bg');
+        if(parallax){
+          window.addEventListener('mousemove', function(e){
+            var x = (e.clientX / window.innerWidth - .5) * 10;
+            var y = (e.clientY / window.innerHeight - .5) * 10;
+            parallax.style.transform = 'translate3d(' + (-x) + 'px,' + (-y) + 'px,0)';
+          });
+        }
+
+        // 磁性按钮：靠近鼠标微吸附
+        function mountMagnet(selector){
+          var items = document.querySelectorAll(selector);
+          for(var i=0;i<items.length;i++){
+            (function(el){
+              el.classList.add('magnet');
+              var r=0, active=false;
+              el.addEventListener('mousemove', function(ev){
+                var rect = el.getBoundingClientRect();
+                var cx = rect.left + rect.width/2;
+                var cy = rect.top + rect.height/2;
+                var dx = (ev.clientX - cx) * .18;
+                var dy = (ev.clientY - cy) * .18;
+                el.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+                active = true; r = 0;
+              });
+              el.addEventListener('mouseleave', function(){ el.style.transform = ''; active=false; });
+            })(items[i]);
+          }
+        }
+        mountMagnet('.ios-button, .ios-quick-action');
+
+        // 点击涟漪效果（按钮与卡片）
+        function enableRipple(selector){
+          document.addEventListener('click', function(e){
+            var t = e.target.closest(selector);
+            if(!t) return;
+            var rect = t.getBoundingClientRect();
+            var ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            var size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+            ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+            t.appendChild(ripple);
+            setTimeout(function(){ ripple.remove(); }, 600);
+          });
+        }
+        enableRipple('.ios-button, .ios-quick-action, .ios-recent-item');
+
+        // 背景粒子动画（轻量，无依赖）
+        var canvas = document.getElementById('bgParticles');
+        if(canvas){
+          var ctx = canvas.getContext('2d');
+          var w, h, pr = window.devicePixelRatio || 1;
+          var particles = [], num = 70; // 数量适中
+          function resize(){
+            w = canvas.width = Math.floor(window.innerWidth * pr);
+            h = canvas.height = Math.floor(window.innerHeight * pr);
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+          }
+          function rand(a,b){ return Math.random()*(b-a)+a }
+          function init(){
+            particles.length = 0;
+            for(var i=0;i<num;i++){
+              particles.push({
+                x: rand(0,w), y: rand(0,h),
+                vx: rand(-.15,.15)*pr, vy: rand(-.15,.15)*pr,
+                r: rand(1.2,2.6)*pr, o: rand(.25,.65),
+                c: Math.random()<.5? 'rgba(99,102,241,':'rgba(14,165,233,'
+              });
+            }
+          }
+          function step(){
+            ctx.clearRect(0,0,w,h);
+            for(var i=0;i<particles.length;i++){
+              var p = particles[i];
+              p.x += p.vx; p.y += p.vy;
+              if(p.x<0||p.x>w) p.vx*=-1;
+              if(p.y<0||p.y>h) p.vy*=-1;
+              ctx.beginPath();
+              ctx.fillStyle = p.c + p.o + ')';
+              ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+              ctx.fill();
+            }
+            // 连接近邻
+            for(var a=0;a<particles.length;a++){
+              for(var b=a+1;b<particles.length;b++){
+                var pa=particles[a], pb=particles[b];
+                var dx=pa.x-pb.x, dy=pa.y-pb.y; var d=dx*dx+dy*dy;
+                if(d< (120*pr)*(120*pr)){
+                  ctx.strokeStyle = 'rgba(99,102,241,.08)';
+                  ctx.lineWidth = pr;
+                  ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke();
+                }
+              }
+            }
+            requestAnimationFrame(step);
+          }
+          window.addEventListener('resize', function(){ resize(); init(); });
+          resize(); init(); step();
+        }
+
+        // 导航铃铛：模拟未读 + 弹簧效果
+        var bell = document.querySelector('.ios-nav-button[data-action="notify"]');
+        if(bell){
+          bell.classList.add('spring');
+          setTimeout(function(){ bell.classList.remove('spring'); bell.classList.add('has-unread'); }, 800);
+          bell.addEventListener('click', function(){ bell.classList.remove('has-unread'); bell.classList.add('spring'); setTimeout(function(){ bell.classList.remove('spring'); }, 600); });
+        }
+
+        // 指标卡数字滚动计数器（进入视口时启动）
+        function animateCounter(el, to){
+          var start = 0; var dur = 1200; var t0 = performance.now();
+          function tick(now){
+            var p = Math.min(1, (now - t0)/dur);
+            var ease = 1 - Math.pow(1-p, 3);
+            el.textContent = Math.floor(start + (to - start) * ease).toLocaleString();
+            if(p<1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+        }
+        var counterCards = document.querySelectorAll('.ios-metric-card[data-counter]');
+        if('IntersectionObserver' in window){
+          var ob = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){
+              if(e.isIntersecting){
+                var target = e.target;
+                var val = parseInt(target.getAttribute('data-counter')||'0',10);
+                var num = target.querySelector('.js-count');
+                if(num && !target.__counted){ animateCounter(num, val); target.__counted=true; }
+                ob.unobserve(target);
+              }
+            });
+          }, { threshold:.35 });
+          counterCards.forEach(function(c){ ob.observe(c); });
+        }else{
+          counterCards.forEach(function(c){ var val = parseInt(c.getAttribute('data-counter')||'0',10); var num=c.querySelector('.js-count'); if(num) num.textContent = val; });
+        }
       })();
     </script>
 </body>
