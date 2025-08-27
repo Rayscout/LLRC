@@ -146,3 +146,56 @@ sqlalchemy.exc.ArgumentError: Textual SQL expression 'SELECT 1' should be explic
  * Running on http://172.26.58.204:5000
 2025-08-23 14:35:04,022 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
 2025-08-23 14:40:00,457 - __main__ - INFO - ”¶”√“—Õ£÷π
+<<<<<<< Updated upstream
+=======
+2025-08-26 13:44:08,293 - __main__ - INFO - Python¬∑æ∂“—…Ë÷√: D:\vs code\Summer Intership\À… ÛÃÿπ§∂”\Code\System\LLRC
+2025-08-26 13:44:08,293 - __main__ - INFO - ’˝‘⁄µº»Î”¶”√...
+2025-08-26 13:44:08,304 - __main__ - ERROR - Traceback (most recent call last):
+  File "D:\vs code\Summer Intership\À… ÛÃÿπ§∂”\Code\System\LLRC\run_app.py", line 35, in main
+    from app import create_app
+  File "D:\vs code\Summer Intership\À… ÛÃÿπ§∂”\Code\System\LLRC\app\__init__.py", line 1, in <module>
+    from flask import Flask
+ModuleNotFoundError: No module named 'flask'
+
+2025-08-26 13:44:08,305 - __main__ - INFO - ”¶”√“—Õ£÷π
+2025-08-27 11:56:57,426 - __main__ - INFO - Python¬∑æ∂“—…Ë÷√: F:\Summer-Intership\LLRC\app
+2025-08-27 11:56:57,426 - __main__ - INFO - ’˝‘⁄µº»Î”¶”√...
+2025-08-27 11:56:57,432 - __main__ - ERROR - Traceback (most recent call last):
+  File "F:\Summer-Intership\LLRC\app\run.py", line 35, in main
+    from app import create_app
+ModuleNotFoundError: No module named 'app'
+
+2025-08-27 11:56:57,432 - __main__ - INFO - ”¶”√“—Õ£÷π
+2025-08-27 11:58:53,052 - __main__ - INFO - Python¬∑æ∂“—…Ë÷√: F:\Summer-Intership\LLRC\app
+2025-08-27 11:58:53,052 - __main__ - INFO - ’˝‘⁄µº»Î”¶”√...
+2025-08-27 11:58:53,056 - __main__ - ERROR - Traceback (most recent call last):
+  File "F:\Summer-Intership\LLRC\app\run.py", line 35, in main
+    from app import create_app
+ModuleNotFoundError: No module named 'app'
+
+2025-08-27 11:58:53,056 - __main__ - INFO - ”¶”√“—Õ£÷π
+2025-08-27 12:01:29,971 - __main__ - INFO - Python¬∑æ∂“—…Ë÷√: F:\Summer-Intership\LLRC\app
+2025-08-27 12:01:29,971 - __main__ - INFO - ’˝‘⁄µº»Î”¶”√...
+2025-08-27 12:01:29,979 - __main__ - ERROR - Traceback (most recent call last):
+  File "F:\Summer-Intership\LLRC\app\run.py", line 35, in main
+    from app import create_app
+ModuleNotFoundError: No module named 'app'
+
+2025-08-27 12:01:29,979 - __main__ - INFO - ”¶”√“—Õ£÷π
+2025-08-27 13:58:26,569 - __main__ - INFO - Python¬∑æ∂“—…Ë÷√: F:\Summer-Intership\LLRC\app
+2025-08-27 13:58:26,569 - __main__ - INFO - ’˝‘⁄µº»Î”¶”√...
+2025-08-27 13:58:26,573 - __main__ - ERROR - Traceback (most recent call last):
+  File "F:\Summer-Intership\LLRC\app\run.py", line 35, in main
+    from app import create_app
+ModuleNotFoundError: No module named 'app'
+
+2025-08-27 13:58:26,574 - __main__ - INFO - ”¶”√“—Õ£÷π
+2025-08-27 14:02:47,415 - __main__ - INFO - Python¬∑æ∂“—…Ë÷√: F:\Summer-Intership\LLRC\app
+2025-08-27 14:02:47,415 - __main__ - INFO - ’˝‘⁄µº»Î”¶”√...
+2025-08-27 14:02:47,420 - __main__ - ERROR - Traceback (most recent call last):
+  File "F:\Summer-Intership\LLRC\app\run.py", line 35, in main
+    from app import create_app
+ModuleNotFoundError: No module named 'app'
+
+2025-08-27 14:02:47,420 - __main__ - INFO - ”¶”√“—Õ£÷π
+>>>>>>> Stashed changes

@@ -15,7 +15,12 @@
          .alert.alert-danger{background:#dc3545}
          .alert.alert-success{background:#1a9d1a}
          .alert.alert-info{background:#2563eb}
+<<<<<<< Updated upstream
          .hero-bg{background-image:url("{{ url_for('static', filename='Images/background.jpg') }}");}
+=======
+         .alert.fade-out{opacity:0;transform:translateY(-6px)}
+
+>>>>>>> Stashed changes
          .site-header .brand{display:flex;align-items:center;gap:10px}
          .site-header .brand .brand-text{color:#5fa9a6;font-weight:800;font-style:italic;font-size:22px;font-family:'Ma Shan Zheng','KaiTi','STKaiti','Microsoft YaHei',sans-serif}
          .tile-body h3{color:#111827 !important;font-weight:600}
@@ -85,17 +90,19 @@
             .mv.delay{animation-delay:.6s}
             @keyframes mvPulse{0%{transform:translateY(2px) scale(1)}40%{transform:translateY(-4px) scale(1.05)}60%{transform:translateY(-2px) scale(1.03)}100%{transform:translateY(2px) scale(1)}}
             .scatter-icons{position:absolute; left:50%; top:calc(50% - var(--center-shift-y)); width:0; height:0}
-            .scatter-icon{position:absolute; left:0; top:0; width:88px; height:88px; border-radius:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.12); transform:translate(-50%,-50%) scale(0.9); transition:box-shadow .3s ease; cursor:pointer}
-            .scatter-icon img{width:100%; height:100%; object-fit:cover; animation:breathe 3.6s ease-in-out infinite}
+            .scatter-icon{position:absolute; left:0; top:0; width:88px; height:88px; border-radius:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.12); transform:translate(-50%,-50%) scale(0.9); transition:all .3s ease; cursor:pointer}
+            .scatter-icon:hover{transform:translate(-50%,-50%) scale(1.15) rotate(5deg); box-shadow:0 15px 40px rgba(96,165,250,.3); z-index:10}
+            .scatter-icon img{width:100%; height:100%; object-fit:cover; animation:randomPulse 4s ease-in-out infinite}
             /* 点击波纹 */
             .click-ripple{position:absolute; left:50%; top:50%; width:10px; height:10px; transform:translate(-50%,-50%) scale(0); border-radius:999px; background:rgba(96,165,250,.35); pointer-events:none; animation:ripple 700ms ease-out forwards}
             @keyframes ripple{0%{opacity:.55; transform:translate(-50%,-50%) scale(0)}70%{opacity:.18; transform:translate(-50%,-50%) scale(6)}100%{opacity:0; transform:translate(-50%,-50%) scale(8)}}
-            @keyframes breathe{0%,100%{transform:scale(1);opacity:.96}50%{transform:scale(1.04);opacity:1}}
+            @keyframes randomPulse{0%,100%{transform:scale(1) rotate(0deg);opacity:.96}25%{transform:scale(1.08) rotate(2deg);opacity:1}50%{transform:scale(0.95) rotate(-1deg);opacity:.9}75%{transform:scale(1.12) rotate(1deg);opacity:1}}
             @media(min-width:992px){ .scatter-icon{width:104px; height:104px} .scatter-center h2{font-size:56px} .scatter-wrap{ --center-shift-y: 210px; } }
             </style>
             <div class="container">
                 <div id="scatterSection" class="scatter-wrap mt-12">
                     <div class="scatter-icons" aria-hidden="true">
+<<<<<<< Updated upstream
                         <div class="scatter-icon" data-idx="0"><img src="https://mcp-media.8n6n.com/img/2025/04/17/39f459b938fc69dd692a70065b99dde9" alt="icon1"></div>
                         <div class="scatter-icon" data-idx="1"><img src="https://mcp-media.8n6n.com/img/2025/04/17/340465a65d6bf4196d5c9fb6292df646" alt="icon2"></div>
                         <div class="scatter-icon" data-idx="2"><img src="https://mcp-media.8n6n.com/img/2025/04/17/39f459b938fc69dd692a70065b99dde9" alt="icon3"></div>
@@ -112,6 +119,34 @@
                         <div class="scatter-icon" data-idx="13"><img src="https://mcp-media.8n6n.com/img/2025/05/02/969af67a70f2aab9602500509ea4e398" alt="icon14"></div>
                         <div class="scatter-icon" data-idx="14"><img src="https://mcp-media.8n6n.com/img/2025/05/02/9023b4476de07c898e026e9c0756de4a" alt="icon15"></div>
                         <div class="scatter-icon" data-idx="15"><img src="https://mcp-media.8n6n.com/img/2025/05/03/f90736e24a73ff06b0ec12a306a1911a" alt="icon16"></div>
+=======
+                        <div class="scatter-icon" data-idx="0" style="animation-delay: 0s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-亚马逊网络服务-100.png') }}" alt="aws"></div>
+                        <div class="scatter-icon" data-idx="1" style="animation-delay: 0.3s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-铬-100.png') }}" alt="chrome"></div>
+                        <div class="scatter-icon" data-idx="2" style="animation-delay: 0.6s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-facebook-logo-100.png') }}" alt="facebook"></div>
+                        <div class="scatter-icon" data-idx="3" style="animation-delay: 0.9s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-instagram-logo-100.png') }}" alt="instagram"></div>
+                        <div class="scatter-icon" data-idx="4" style="animation-delay: 1.2s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-推特-100.png') }}" alt="twitter"></div>
+                        <div class="scatter-icon" data-idx="5" style="animation-delay: 1.5s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-whatsapp-100.png') }}" alt="whatsapp"></div>
+                        <div class="scatter-icon" data-idx="6" style="animation-delay: 1.8s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-youtube上播放-100.png') }}" alt="youtube"></div>
+                        <div class="scatter-icon" data-idx="7" style="animation-delay: 2.1s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-gmail-100.png') }}" alt="gmail"></div>
+                        <div class="scatter-icon" data-idx="8" style="animation-delay: 2.4s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-gmail-新-100.png') }}" alt="gmail-new"></div>
+                        <div class="scatter-icon" data-idx="9" style="animation-delay: 2.7s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-谷歌播放商店新-100.png') }}" alt="playstore"></div>
+                        <div class="scatter-icon" data-idx="10" style="animation-delay: 3.0s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-菲格玛-100.png') }}" alt="figma"></div>
+                        <div class="scatter-icon" data-idx="11" style="animation-delay: 3.3s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-node-js-100.png') }}" alt="nodejs"></div>
+                        <div class="scatter-icon" data-idx="12" style="animation-delay: 3.6s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-nodejs-100.png') }}" alt="nodejs-alt"></div>
+                        <div class="scatter-icon" data-idx="13" style="animation-delay: 3.9s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-microsoft-365-100.png') }}" alt="m365"></div>
+                        <div class="scatter-icon" data-idx="14" style="animation-delay: 4.2s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-microsoft-powerpoint-2019-100.png') }}" alt="ppt"></div>
+                        <div class="scatter-icon" data-idx="15" style="animation-delay: 4.5s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-meta-100.png') }}" alt="meta"></div>
+                        <div class="scatter-icon" data-idx="16" style="animation-delay: 4.8s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-微软-100.png') }}" alt="microsoft"></div>
+                        <div class="scatter-icon" data-idx="17" style="animation-delay: 5.1s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-java咖啡杯徽标-100.png') }}" alt="java"></div>
+                        <div class="scatter-icon" data-idx="18" style="animation-delay: 5.4s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-微信-100.png') }}" alt="wechat"></div>
+                        <div class="scatter-icon" data-idx="19" style="animation-delay: 5.7s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-adobe-illustrator-100.png') }}" alt="ai"></div>
+                        <div class="scatter-icon" data-idx="20" style="animation-delay: 6.0s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-ibis-paint-x-100.png') }}" alt="ibis"></div>
+                        <div class="scatter-icon" data-idx="21" style="animation-delay: 6.3s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-bmo-100.png') }}" alt="bmo"></div>
+                        <div class="scatter-icon" data-idx="22" style="animation-delay: 6.6s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-bluesky-100.png') }}" alt="bluesky"></div>
+                        <div class="scatter-icon" data-idx="23" style="animation-delay: 6.9s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-anaconda-100.png') }}" alt="anaconda"></div>
+                        <div class="scatter-icon" data-idx="24" style="animation-delay: 7.2s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-deepseek-100.png') }}" alt="deepseek"></div>
+                        <div class="scatter-icon" data-idx="25" style="animation-delay: 7.5s"><img src="{{ url_for('static', filename='Images/Icons8/icons8-xbox-控制器-100.png') }}" alt="xbox"></div>
+>>>>>>> Stashed changes
                     </div>
                     <div class="scatter-center" id="scatterCenter">
                         <h2>
@@ -126,7 +161,6 @@
 
         <!-- Hero moved below scatter section -->
         <section id="home" class="section hero">
-            <div class="hero-bg"></div>
             <div class="container hero-content">
                 <div class="hero-left">
                     <h1>基于 AI 的智能招聘与人才发展系统</h1>
@@ -378,10 +412,18 @@
                                 <input type="text" name="last_name" placeholder="姓" required />
                             </label>
                         </div>
+<<<<<<< Updated upstream
                         <label class="field">
                             <span class="label">公司名称</span>
                             <input type="text" name="company_name" placeholder="公司名称" required />
                         </label>
+=======
+                        <!-- 公司名称字段（求职者不显示） -->
+                        <div id="company-name-field" class="field input-icon" style="display: none;">
+                            <span class="icon">🏢</span>
+                            <input type="text" name="company_name" placeholder="公司名称" />
+                        </div>
+>>>>>>> Stashed changes
                         <!-- 主管和员工专用字段 -->
                         <div id="supervisor-employee-fields" style="display: none;">
                             <label class="field">
@@ -434,11 +476,39 @@
                         </div>
                         <div class="field" style="margin-top:8px">
                             <span class="label">身份选择 <span style="color: red;">*</span></span>
+<<<<<<< Updated upstream
                             <div class="role-row">
                                 <label><input type="radio" name="role" value="candidate" required /> 求职者</label>
                                 <label><input type="radio" name="role" value="recruiter" required /> 招聘者（HR）</label>
                                 <label><input type="radio" name="role" value="executive" required /> 高管</label>
                                 <label><input type="radio" name="role" value="employee" required /> 员工</label>
+=======
+                            <div class="role-cards">
+                                <label class="role-card">
+                                    <input type="radio" name="role" value="candidate" required />
+                                    <div class="card-content">
+                                        <span class="card-title">求职者</span>
+                                    </div>
+                                </label>
+                                <label class="role-card">
+                                    <input type="radio" name="role" value="recruiter" required />
+                                    <div class="card-content">
+                                        <span class="card-title">HR</span>
+                                    </div>
+                                </label>
+                                <label class="role-card">
+                                    <input type="radio" name="role" value="executive" required />
+                                    <div class="card-content">
+                                        <span class="card-title">高管</span>
+                                    </div>
+                                </label>
+                                <label class="role-card">
+                                    <input type="radio" name="role" value="employee" required />
+                                    <div class="card-content">
+                                        <span class="card-title">员工</span>
+                                    </div>
+                                </label>
+>>>>>>> Stashed changes
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width:100%">注册</button>
@@ -456,11 +526,39 @@
                         </label>
                         <div class="field" style="margin-top:8px">
                             <span class="label">以身份登录 <span style="color: red;">*</span></span>
+<<<<<<< Updated upstream
                             <div class="role-row">
                                 <label><input type="radio" name="role" value="candidate" required /> 求职者</label>
                                 <label><input type="radio" name="role" value="recruiter" required /> 招聘者（HR）</label>
                                 <label><input type="radio" name="role" value="executive" required /> 高管</label>
                                 <label><input type="radio" name="role" value="employee" required /> 员工</label>
+=======
+                            <div class="role-cards">
+                                <label class="role-card">
+                                    <input type="radio" name="role" value="candidate" required />
+                                    <div class="card-content">
+                                        <span class="card-title">求职者</span>
+                                    </div>
+                                </label>
+                                <label class="role-card">
+                                    <input type="radio" name="role" value="recruiter" required />
+                                    <div class="card-content">
+                                        <span class="card-title">HR</span>
+                                    </div>
+                                </label>
+                                <label class="role-card">
+                                    <input type="radio" name="role" value="executive" required />
+                                    <div class="card-content">
+                                        <span class="card-title">高管</span>
+                                    </div>
+                                </label>
+                                <label class="role-card">
+                                    <input type="radio" name="role" value="employee" required />
+                                    <div class="card-content">
+                                        <span class="card-title">员工</span>
+                                    </div>
+                                </label>
+>>>>>>> Stashed changes
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px; color: black;">登录</button>
@@ -497,7 +595,7 @@
                 const baseRadiusYRatio = 0.68;  // 垂直范围同步放大
                 const radiusRand  = icons.map(()=> 0.75 + Math.random()*0.5);
                 const pos = icons.map(()=> ({x:0, y:0, init:false}));
-                const vel = icons.map(()=> ({x:(Math.random()-0.5)*1.2, y:(Math.random()-0.5)*1.2}));
+                const vel = icons.map(()=> ({x:(Math.random()-0.5)*0.6, y:(Math.random()-0.5)*0.6}));
                 // 点击图标：将速度反向，并给予轻微增益
                 icons.forEach((el, i)=>{
                     el.addEventListener('click', (e)=>{
@@ -522,8 +620,8 @@
                         ripple.addEventListener('animationend', ()=> ripple.remove());
                     });
                 });
-                const MAX_SPEED = 1.2;
-                const MIN_SPEED = 0.25;
+                const MAX_SPEED = 0.8;
+                const MIN_SPEED = 0.15;
 
                 function update(){
                     const r = rect();
@@ -569,8 +667,8 @@
                             pos[i].init = true;
                         }
                         // 随机扰动速度
-                        vel[i].x += (Math.random()-0.5)*0.08;
-                        vel[i].y += (Math.random()-0.5)*0.08;
+                        vel[i].x += (Math.random()-0.5)*0.04;
+                        vel[i].y += (Math.random()-0.5)*0.04;
                         // 速度限幅
                         const sp = Math.hypot(vel[i].x, vel[i].y) || 0.001;
                         const clamped = Math.max(MIN_SPEED, Math.min(MAX_SPEED, sp));
@@ -629,7 +727,7 @@
                                 const dy = pj.y - pi.y;
                                 const dist = Math.hypot(dx, dy) || 0.001;
                                 if(dist < rMin){
-                                    const overlap = (rMin - dist) * 0.52; // 分离强度
+                                    const overlap = (rMin - dist) * 0.35; // 分离强度（降低）
                                     const nx = dx / dist;
                                     const ny = dy / dist;
                                     pi.x -= nx * overlap;
@@ -637,8 +735,8 @@
                                     pj.x += nx * overlap;
                                     pj.y += ny * overlap;
                                     // 远离中心文字的轴向推力，强化不遮字
-                                    if(Math.abs(pi.x) < textClearX && Math.abs(pi.y) < textClearY){ pi.x += Math.sign(pi.x||1)*6; pi.y += Math.sign(pi.y||1)*6; }
-                                    if(Math.abs(pj.x) < textClearX && Math.abs(pj.y) < textClearY){ pj.x += Math.sign(pj.x||1)*6; pj.y += Math.sign(pj.y||1)*6; }
+                                    if(Math.abs(pi.x) < textClearX && Math.abs(pi.y) < textClearY){ pi.x += Math.sign(pi.x||1)*4; pi.y += Math.sign(pi.y||1)*4; }
+                                    if(Math.abs(pj.x) < textClearX && Math.abs(pj.y) < textClearY){ pj.x += Math.sign(pj.x||1)*4; pj.y += Math.sign(pj.y||1)*4; }
                                     // 再次边界限制
                                     pi.x = Math.max(-boundsX, Math.min(boundsX, pi.x));
                                     pi.y = Math.max(-boundsY, Math.min(boundsY, pi.y));
@@ -661,7 +759,7 @@
                 // 启动控制：500ms 延迟后触发一次 0->1 的展开动画；
                 // 离开视口后重置，再次进入时重新展开
                 let openProgress = 0; // 0 折叠 -> 1 展开
-                const openDurationMs = 800;
+                const openDurationMs = 1200;
                 let opening = false;
                 let openedOnce = false;
 
@@ -707,16 +805,46 @@
             
             // 动态显示/隐藏字段
             const roleInputs = document.querySelectorAll('input[name="role"]');
+            const companyNameField = document.getElementById('company-name-field');
             const supervisorEmployeeFields = document.getElementById('supervisor-employee-fields');
             const employeeFields = document.getElementById('employee-fields');
             
             function toggleFields() {
                 const selectedRole = document.querySelector('input[name="role"]:checked').value;
                 
-                if (selectedRole === 'executive') {
+                if (selectedRole === 'candidate') {
+                    // 求职者：隐藏公司名称、部门、职位、员工相关字段
+                    companyNameField.style.display = 'none';
+                    supervisorEmployeeFields.style.display = 'none';
+                    employeeFields.style.display = 'none';
+                    // 设置字段为非必填
+                    companyNameField.querySelector('input').required = false;
+                    supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = false;
+                    });
+                    employeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = false;
+                    });
+                } else if (selectedRole === 'recruiter') {
+                    // HR：显示公司名称，隐藏其他字段
+                    companyNameField.style.display = 'block';
+                    supervisorEmployeeFields.style.display = 'none';
+                    employeeFields.style.display = 'none';
+                    // 设置公司名称为必填
+                    companyNameField.querySelector('input').required = true;
+                    supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = false;
+                    });
+                    employeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = false;
+                    });
+                } else if (selectedRole === 'executive') {
+                    // 高管：显示公司名称、部门、职位，隐藏员工字段
+                    companyNameField.style.display = 'block';
                     supervisorEmployeeFields.style.display = 'block';
                     employeeFields.style.display = 'none';
                     // 设置高管字段为必填
+                    companyNameField.querySelector('input').required = true;
                     supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
                         input.required = true;
                     });
@@ -724,24 +852,17 @@
                         input.required = false;
                     });
                 } else if (selectedRole === 'employee') {
+                    // 员工：显示所有字段
+                    companyNameField.style.display = 'block';
                     supervisorEmployeeFields.style.display = 'block';
                     employeeFields.style.display = 'block';
                     // 设置所有字段为必填
+                    companyNameField.querySelector('input').required = true;
                     supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
                         input.required = true;
                     });
                     employeeFields.querySelectorAll('input').forEach(input => {
                         input.required = true;
-                    });
-                } else {
-                    supervisorEmployeeFields.style.display = 'none';
-                    employeeFields.style.display = 'none';
-                    // 设置字段为非必填
-                    supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
-                        input.required = false;
-                    });
-                    employeeFields.querySelectorAll('input').forEach(input => {
-                        input.required = false;
                     });
                 }
             }
