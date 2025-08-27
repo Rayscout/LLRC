@@ -10,3 +10,6 @@ Markdown==3.6
 docx2txt==0.8
 pytesseract==0.3.13
 Pillow==11.0.0
+reportlab==4.1.0
+matplotlib==3.8.3
+numpy==1.26.4

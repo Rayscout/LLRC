@@ -201,6 +201,14 @@
         .ios-tab-content.active {
             display: block;
         }
+        /* 强制禁用进入动画，避免页面频闪，直接显示内容 */
+        .ios-fade-in,
+        .ios-fade-in-up {
+            opacity: 1 !important;
+            transform: none !important;
+            animation: none !important;
+            transition: none !important;
+        }
     </style>
 </head>
 <body>
