@@ -498,33 +498,127 @@ body.scroll-up .out-view.card,body.scroll-up .out-view.tile,body.scroll-up .out-
 body.dark .theme-toggle{background:var(--primary);color:#fff}
 body.dark .theme-toggle::after{background:#fff}
 
-/* 角色选择样式 */
-.role-row {
-    display: flex;
-    gap: 16px;
-    align-items: center;
+/* 角色选择卡片样式 */
+.role-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
     margin-top: 8px;
+    padding: 0 2px;
 }
 
-.role-row label {
+.role-card {
+    position: relative;
+    cursor: pointer;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.role-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary);
+}
+
+.role-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.card-content {
+    padding: 10px 6px;
+    text-align: center;
     display: flex;
     align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    font-weight: 500;
+    justify-content: center;
+    min-height: 44px;
+}
+
+.card-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--fg);
+    transition: color 0.3s ease;
+    line-height: 1.2;
+}
+
+.role-card input[type="radio"]:checked + .card-content {
+    background: linear-gradient(135deg, var(--primary), var(--primary-600));
+}
+
+.role-card input[type="radio"]:checked + .card-content .card-title {
+    color: #fff;
+    font-weight: 700;
+}
+
+.role-card input[type="radio"]:checked {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.25);
+}
+
+/* 深色模式适配 */
+body.dark .role-card {
+    background: var(--card);
+    border-color: var(--border);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+body.dark .role-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    border-color: var(--primary);
+}
+
+body.dark .card-title {
     color: var(--fg);
 }
 
-.role-row input[type="radio"] {
-    accent-color: #60a5fa;
-    width: 16px;
-    height: 16px;
-    margin: 0;
+body.dark .role-card input[type="radio"]:checked + .card-content {
+    background: linear-gradient(135deg, var(--primary), var(--primary-600));
 }
 
-.role-row input[type="radio"]:checked + span {
-    color: #60a5fa;
-    font-weight: 600;
+body.dark .role-card input[type="radio"]:checked + .card-content .card-title {
+    color: #fff;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .role-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 0 3px;
+    }
+    
+    .card-content {
+        padding: 10px 6px;
+        min-height: 44px;
+    }
+    
+    .card-title {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .role-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 0 2px;
+    }
+    
+    .card-content {
+        padding: 10px 6px;
+        min-height: 44px;
+    }
+    
+    .card-title {
+        font-size: 13px;
+    }
 }
 
 /* Hero section animations */
