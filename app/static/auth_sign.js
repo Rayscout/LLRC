@@ -9,6 +9,16 @@
   const sections = qsa('section[id]');
   const themeToggle = qs('#themeToggle');
 
+  // Auto-dismiss flash alerts after 5s
+  const flashAlerts = qsa('.alert-container .alert');
+  flashAlerts.forEach(el => {
+    setTimeout(() => {
+      el.classList.add('fade-out');
+      // wait for css transition then remove
+      setTimeout(() => { try { el.remove(); } catch(_){} }, 600);
+    }, 5000);
+  });
+
   // Smooth scroll with offset
   function smoothScrollTo(targetId){
     const el = qs(`#${targetId}`);
@@ -59,7 +69,7 @@
   onScrollActive();
 
   // Mobile menu
-  navToggle.addEventListener('click', ()=>{
+  navToggle && navToggle.addEventListener('click', ()=>{
     const open = !navList.classList.contains('open');
     navList.classList.toggle('open', open);
     navToggle.setAttribute('aria-expanded', String(open));
@@ -111,7 +121,7 @@
   })
   // close button only for details modal
   qsa('#detailsModal [data-modal-close]').forEach(el => el.addEventListener('click', closeModal))
-  modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); })
+  modal && modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); })
   document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); })
 
   // Auth modal
@@ -133,11 +143,15 @@
       if(!authModal) return;
       // 为了触发CSS过渡：先使容器可见，再在下一帧添加open类
       authModal.classList.remove('open');
+      // show without flash: render hidden for 1 frame, then animate open
       authModal.style.display = 'flex';
+      authModal.style.opacity = '0';
       authModal.setAttribute('aria-hidden','false');
       requestAnimationFrame(()=>{
         authModal.classList.add('open');
         authModal.style.display = '';
+        // clear inline opacity in the next frame so CSS takes over
+        requestAnimationFrame(()=>{ authModal.style.opacity = ''; authModal.style.display = ''; });
       });
       if(type==='signup'){
         if(authTitle) authTitle.textContent = '注册';
@@ -216,7 +230,12 @@
   bars.forEach(b => io.observe(b))
 
   // Reveal-on-scroll for cards/sections
-  const animatedBlocks = qsa('.card,.tile,.t-card,.info-card,.product-card,.solution-item,.support-item,.resource-item,.ai-card,.case-card,.contact-item,.section-head');
+  // Reveal-on-scroll: ensure key blocks have reveal class
+  const targetsNeedingReveal = qsa('.hero-left-content,.hero-right-avatar,.card,.tile,.t-card,.info-card,.product-card,.solution-item,.support-item,.resource-item,.ai-card,.case-card,.contact-item,.section-head,.btn,.avatar');
+  targetsNeedingReveal.forEach(el => el.classList.add('reveal-on-scroll'));
+
+  // Observe all reveal-on-scroll elements
+  const animatedBlocks = qsa('.reveal-on-scroll');
   let lastY = window.pageYOffset;
   function updateScrollDir(){
     const y = window.pageYOffset;
@@ -264,11 +283,11 @@
       const end = start + ip;
       card.style.display = (idx >= start && idx < end) ? '' : 'none';
     })
-    prevBtn.disabled = (page <= 0);
-    nextBtn.disabled = (page >= total - 1);
+    prevBtn && (prevBtn.disabled = (page <= 0));
+    nextBtn && (nextBtn.disabled = (page >= total - 1));
   }
-  prevBtn.addEventListener('click', ()=>{ page = Math.max(0, page - 1); renderSlider(); })
-  nextBtn.addEventListener('click', ()=>{ page = Math.min(totalPages()-1, page + 1); renderSlider(); })
+  prevBtn && prevBtn.addEventListener('click', ()=>{ page = Math.max(0, page - 1); renderSlider(); })
+  nextBtn && nextBtn.addEventListener('click', ()=>{ page = Math.min(totalPages()-1, page + 1); renderSlider(); })
   window.addEventListener('resize', renderSlider);
   renderSlider();
 
@@ -446,6 +465,28 @@
       }, index * 200);
     });
   });
+
+  // “登录遇到问题” -> 关闭弹窗并跳转到联系区块（更稳健）
+  const helpLink = document.getElementById('signinHelp');
+  function closeModalAndGoContact(ev){
+    if(ev){ ev.preventDefault(); }
+    const modalEl = document.getElementById('authModal');
+    if(modalEl){
+      modalEl.classList.remove('open');
+      modalEl.style.opacity = '0';
+      modalEl.setAttribute('aria-hidden','true');
+      setTimeout(()=>{ modalEl.style.display = 'none'; modalEl.style.opacity = ''; }, 120);
+    }
+    setTimeout(()=>{
+      const contact = document.getElementById('contact');
+      if(contact){
+        contact.scrollIntoView({behavior:'smooth', block:'start'});
+      } else {
+        window.location.hash = 'contact';
+      }
+    }, 30);
+  }
+  if(helpLink){ helpLink.addEventListener('click', closeModalAndGoContact); }
 })();
 
 

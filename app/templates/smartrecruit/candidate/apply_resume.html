@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'smartrecruit/candidate/base_ios_new.html' %}
 
 {% block title %}提交申请 - {{ job.title }}{% endblock %}
 
@@ -17,13 +17,13 @@
     {% endif %}
 
     <div class="field">
-      <label>上传新简历（PDF/DOC/DOCX/PNG/JPG）</label>
+      <label>上传新简历（PDF / DOC / DOCX / PPT / PPTX / 图片 / 视频）</label>
       <div class="dropzone" id="dropzone">
-        <input id="cvInput" type="file" name="cv_file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" />
+        <input id="cvInput" type="file" name="cv_file" accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.webp,.bmp,.gif,.mp4,.webm,.ogg,.mov,.avi,.mkv" />
         <div class="dz-content">
           <i class="uil uil-cloud-upload"></i>
           <div class="dz-title">拖拽文件到此处，或点击选择文件</div>
-          <div class="dz-hint">支持最大 20MB | 建议命名：姓名_岗位_日期</div>
+          <div class="dz-hint">支持最大 20MB；可直接使用已上传简历或提交新简历（含视频/PPT）；建议命名：姓名_岗位_日期</div>
           <div class="dz-file" id="fileName" style="display:none"></div>
         </div>
       </div>

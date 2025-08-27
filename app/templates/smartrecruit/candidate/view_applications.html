@@ -1,4 +1,4 @@
-{% extends "smartrecruit/candidate/base_ios.html" %}
+{% extends "smartrecruit/candidate/base_ios_new.html" %}
 
 {% block title %}我的申请{% endblock %}
 
@@ -106,6 +106,7 @@
         <i class="uil uil-list icon"></i>
         <h1 class="page-title">我的申请</h1>
     </div>
+    {% if applications and applications|length > 0 %}
     <table class="applications-table">
         <thead>
             <tr>
@@ -137,6 +138,14 @@
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <div style="padding: 40px 0;">
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">目前还没有申请记录。</p>
+        <a class="view-details-button" href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}">
+            去搜索职位
+        </a>
+    </div>
+    {% endif %}
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

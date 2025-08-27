@@ -106,6 +106,43 @@ class FeedbackNotification(db.Model):
     user = db.relationship('User', backref=db.backref('feedback_notifications', lazy=True))
     feedback = db.relationship('Feedback', backref=db.backref('notifications', lazy=True))
 
+class TalentDemand(db.Model):
+    """高管发布的人才需求（仅关键词/描述）"""
+    id = db.Column(db.Integer, primary_key=True)
+    executive_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    keyword = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # 关系
+    executive = db.relationship('User', backref=db.backref('talent_demands', lazy=True))
+
+class TalentDemandNotification(db.Model):
+    """HR 消息通知：来自某高管的人才需求"""
+    id = db.Column(db.Integer, primary_key=True)
+    hr_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    demand_id = db.Column(db.Integer, db.ForeignKey('talent_demand.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # 关系
+    hr_user = db.relationship('User', backref=db.backref('talent_demand_notifications', lazy=True))
+    demand = db.relationship('TalentDemand', backref=db.backref('notifications', lazy=True))
+
+class TalentDemandDraft(db.Model):
+    """HR 需求暂存箱（从高管通知保存，便于发布职位时参考）"""
+    id = db.Column(db.Integer, primary_key=True)
+    hr_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    notification_id = db.Column(db.Integer, db.ForeignKey('talent_demand_notification.id'))
+    executive_name = db.Column(db.String(200))
+    executive_email = db.Column(db.String(200))
+    keyword = db.Column(db.String(255))
+    description = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # 关系
+    hr_user = db.relationship('User', backref=db.backref('talent_demand_drafts', lazy=True))
+    notification = db.relationship('TalentDemandNotification', backref=db.backref('drafts', lazy=True))
+
 class TaskEvaluation(db.Model):
     """任务绩效评价数据模型"""
     id = db.Column(db.Integer, primary_key=True)

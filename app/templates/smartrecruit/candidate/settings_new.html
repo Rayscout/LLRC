@@ -1,0 +1,863 @@
+{% extends 'smartrecruit/candidate/base_ios_new.html' %}
+
+{% block title %}个人设置 - 智能招聘系统{% endblock %}
+
+{% block navbar_title %}个人设置{% endblock %}
+
+{% block content %}
+<!-- 个人资料概览 Section -->
+<section class="section profile-overview" id="overview">
+    <div class="section-content">
+        <h1 class="section-title">个人资料设置</h1>
+        <p class="section-subtitle">完善您的个人信息，提升求职成功率</p>
+        
+        <div class="profile-summary">
+            <div class="profile-avatar">
+                {% if user and user.profile_photo %}
+                    <img src="{{ url_for('static', filename='uploads/photos/' ~ user.profile_photo) }}" alt="头像">
+                {% else %}
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                {% endif %}
+                <button class="avatar-upload-btn" onclick="document.getElementById('avatarInput').click()">
+                    <i class="fas fa-camera"></i>
+                </button>
+                <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+            </div>
+            
+            <div class="profile-info">
+                <h2>{{ user.first_name }} {{ user.last_name if user.last_name else '' }}</h2>
+                <p class="profile-email">{{ user.email }}</p>
+                <div class="profile-completion">
+                    <span class="completion-label">资料完整度</span>
+                    <div class="completion-bar">
+                        <div class="completion-fill" style="width: {{ profile_completion or 87 }}%"></div>
+                    </div>
+                    <span class="completion-percentage">{{ profile_completion or 87 }}%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 基本信息设置 Section -->
+<section class="section basic-info" id="basic">
+    <div class="section-content">
+        <h2 class="section-title">基本信息</h2>
+        <p class="section-subtitle">完善您的个人基本信息</p>
+        
+        <div class="settings-form">
+            <div class="form-group">
+                <label for="firstName">姓名</label>
+                <input type="text" id="firstName" name="firstName" value="{{ user.first_name or '' }}" placeholder="请输入您的姓名">
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">姓氏</label>
+                <input type="text" id="lastName" name="lastName" value="{{ user.last_name or '' }}" placeholder="请输入您的姓氏">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" id="email" name="email" value="{{ user.email or '' }}" placeholder="请输入您的邮箱">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">电话</label>
+                <input type="tel" id="phone" name="phone" value="{{ user.phone_number or '' }}" placeholder="请输入您的电话号码">
+            </div>
+            
+            <div class="form-group">
+                <label for="birthday">生日</label>
+                <input type="date" id="birthday" name="birthday" value="{{ user.birthday or '' }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="location">所在地</label>
+                <input type="text" id="location" name="location" value="{{ user.location or '' }}" placeholder="请输入您的所在地">
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="saveBasicInfo()">
+                    <i class="fas fa-save"></i>
+                    保存基本信息
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 职业信息设置 Section -->
+<section class="section career-info" id="career">
+    <div class="section-content">
+        <h2 class="section-title">职业信息</h2>
+        <p class="section-subtitle">设置您的职业相关信息和偏好</p>
+        
+        <div class="settings-form">
+            <div class="form-group">
+                <label for="currentCompany">当前公司</label>
+                <input type="text" id="currentCompany" name="currentCompany" value="{{ user.company_name or '' }}" placeholder="请输入您当前的公司名称">
+            </div>
+            
+            <div class="form-group">
+                <label for="currentPosition">当前职位</label>
+                <input type="text" id="currentPosition" name="currentPosition" value="{{ user.position or '' }}" placeholder="请输入您当前的职位">
+            </div>
+            
+            <div class="form-group">
+                <label for="experience">工作经验</label>
+                <select id="experience" name="experience">
+                    <option value="">请选择工作经验</option>
+                    <option value="0-1" {% if user.experience == '0-1' %}selected{% endif %}>0-1年</option>
+                    <option value="1-3" {% if user.experience == '1-3' %}selected{% endif %}>1-3年</option>
+                    <option value="3-5" {% if user.experience == '3-5' %}selected{% endif %}>3-5年</option>
+                    <option value="5-10" {% if user.experience == '5-10' %}selected{% endif %}>5-10年</option>
+                    <option value="10+" {% if user.experience == '10+' %}selected{% endif %}>10年以上</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="education">最高学历</label>
+                <select id="education" name="education">
+                    <option value="">请选择最高学历</option>
+                    <option value="高中" {% if user.education == '高中' %}selected{% endif %}>高中</option>
+                    <option value="大专" {% if user.education == '大专' %}selected{% endif %}>大专</option>
+                    <option value="本科" {% if user.education == '本科' %}selected{% endif %}>本科</option>
+                    <option value="硕士" {% if user.education == '硕士' %}selected{% endif %}>硕士</option>
+                    <option value="博士" {% if user.education == '博士' %}selected{% endif %}>博士</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="expectedSalary">期望薪资</label>
+                <select id="expectedSalary" name="expectedSalary">
+                    <option value="">请选择期望薪资</option>
+                    <option value="5-10k" {% if user.expected_salary == '5-10k' %}selected{% endif %}>5-10K</option>
+                    <option value="10-15k" {% if user.expected_salary == '10-15k' %}selected{% endif %}>10-15K</option>
+                    <option value="15-25k" {% if user.expected_salary == '15-25k' %}selected{% endif %}>15-25K</option>
+                    <option value="25-35k" {% if user.expected_salary == '25-35k' %}selected{% endif %}>25-35K</option>
+                    <option value="35k+" {% if user.expected_salary == '35k+' %}selected{% endif %}>35K+</option>
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="saveCareerInfo()">
+                    <i class="fas fa-save"></i>
+                    保存职业信息
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 简历管理 Section -->
+<section class="section resume-management" id="resume">
+    <div class="section-content">
+        <h2 class="section-title">简历管理</h2>
+        <p class="section-subtitle">上传和管理您的简历文件</p>
+        
+        <div class="resume-upload-area">
+            {% if user.cv_file %}
+            <div class="current-resume">
+                <div class="resume-info">
+                    <i class="fas fa-file-pdf"></i>
+                    <div class="resume-details">
+                        <h4>当前简历</h4>
+                        <p>{{ user.cv_file }}</p>
+                        <span class="upload-time">上传时间：{{ user.cv_upload_time or '未知' }}</span>
+                    </div>
+                </div>
+                <div class="resume-actions">
+                    <button class="btn btn-outline" onclick="downloadResume()">
+                        <i class="fas fa-download"></i>
+                        下载
+                    </button>
+                    <button class="btn btn-outline" onclick="deleteResume()">
+                        <i class="fas fa-trash"></i>
+                        删除
+                    </button>
+                </div>
+            </div>
+            {% else %}
+            <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>上传简历</h3>
+                <p>支持 PDF、Word、TXT 格式，最大 10MB</p>
+                <button class="btn btn-primary" onclick="document.getElementById('resumeInput').click()">
+                    <i class="fas fa-upload"></i>
+                    选择文件
+                </button>
+                <input type="file" id="resumeInput" accept=".pdf,.doc,.docx,.txt" style="display: none;">
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="resume-tips">
+            <h4>简历优化建议</h4>
+            <ul>
+                <li>确保简历内容真实准确，避免夸大或虚假信息</li>
+                <li>突出与目标职位相关的技能和经验</li>
+                <li>使用简洁明了的语言，避免过于复杂的表述</li>
+                <li>定期更新简历，保持信息的时效性</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- 隐私设置 Section -->
+<section class="section privacy-settings" id="privacy">
+    <div class="section-content">
+        <h2 class="section-title">隐私设置</h2>
+        <p class="section-subtitle">控制您的个人信息可见性</p>
+        
+        <div class="privacy-options">
+            <div class="privacy-option">
+                <div class="option-info">
+                    <h4>简历可见性</h4>
+                    <p>控制其他用户是否可以查看您的简历</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="resumeVisibility" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="privacy-option">
+                <div class="option-info">
+                    <h4>联系方式可见性</h4>
+                    <p>控制其他用户是否可以查看您的联系方式</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="contactVisibility">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="privacy-option">
+                <div class="option-info">
+                    <h4>求职状态可见性</h4>
+                    <p>控制其他用户是否可以查看您的求职状态</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="statusVisibility" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="privacy-option">
+                <div class="option-info">
+                    <h4>接收职位推荐</h4>
+                    <p>是否接收系统推送的职位推荐</p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="jobRecommendations" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="button" class="btn btn-primary" onclick="savePrivacySettings()">
+                <i class="fas fa-save"></i>
+                保存隐私设置
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- 返回顶部按钮 -->
+<button class="scroll-to-top" onclick="scrollToTop()" title="返回顶部">
+    <i class="fas fa-chevron-up"></i>
+</button>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 个人设置页面特定样式 */
+.profile-overview {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.profile-overview .section-title,
+.profile-overview .section-subtitle {
+    color: white;
+}
+
+.profile-summary {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-top: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-large);
+    padding: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-avatar {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.profile-avatar img,
+.avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.avatar-placeholder {
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.avatar-upload-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background: var(--accent-primary);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all var(--transition-fast);
+}
+
+.avatar-upload-btn:hover {
+    background: var(--accent-secondary);
+    transform: scale(1.1);
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-info h2 {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: white;
+}
+
+.profile-email {
+    font-size: var(--font-size-lg);
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 24px;
+}
+
+.profile-completion {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.completion-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: var(--font-size-sm);
+}
+
+.completion-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.completion-fill {
+    height: 100%;
+    background: var(--accent-success);
+    border-radius: 4px;
+    transition: width var(--transition-medium);
+}
+
+.completion-percentage {
+    color: var(--accent-success);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.settings-form {
+    max-width: 600px;
+    margin: 40px auto 0;
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-card);
+    border-radius: var(--radius-large);
+    padding: 32px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-size: var(--font-size-base);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-medium);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    transition: all var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.form-group input::placeholder {
+    color: var(--text-tertiary);
+}
+
+.form-actions {
+    margin-top: 32px;
+    text-align: center;
+}
+
+.resume-upload-area {
+    max-width: 800px;
+    margin: 40px auto 0;
+}
+
+.current-resume {
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-card);
+    border-radius: var(--radius-large);
+    padding: 32px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.resume-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+}
+
+.resume-info i {
+    font-size: 48px;
+    color: var(--accent-danger);
+}
+
+.resume-details h4 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.resume-details p {
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.upload-time {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+}
+
+.resume-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.upload-placeholder {
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-card);
+    border-radius: var(--radius-large);
+    padding: 64px 32px;
+    box-shadow: var(--shadow-card);
+    border: 2px dashed var(--border-color);
+    text-align: center;
+    transition: all var(--transition-medium);
+}
+
+.upload-placeholder:hover {
+    border-color: var(--accent-primary);
+    background: rgba(0, 122, 255, 0.05);
+}
+
+.upload-placeholder i {
+    font-size: 64px;
+    color: var(--text-tertiary);
+    margin-bottom: 24px;
+}
+
+.upload-placeholder h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.upload-placeholder p {
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+}
+
+.resume-tips {
+    max-width: 800px;
+    margin: 40px auto 0;
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-card);
+    border-radius: var(--radius-large);
+    padding: 32px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+}
+
+.resume-tips h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.resume-tips ul {
+    list-style: none;
+    padding: 0;
+}
+
+.resume-tips li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.resume-tips li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--accent-success);
+    font-weight: 600;
+}
+
+.privacy-options {
+    max-width: 800px;
+    margin: 40px auto 0;
+}
+
+.privacy-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px;
+    background: var(--bg-card);
+    backdrop-filter: var(--blur-card);
+    border-radius: var(--radius-medium);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+    transition: all var(--transition-medium);
+}
+
+.privacy-option:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.option-info h4 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.option-info p {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+/* 开关样式 */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--border-color);
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--accent-primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.scroll-to-top {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 56px;
+    height: 56px;
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all var(--transition-medium);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    z-index: 1000;
+}
+
+.scroll-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.scroll-to-top:hover {
+    background: var(--accent-secondary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .profile-summary {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+    }
+    
+    .profile-avatar img,
+    .avatar-placeholder {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .settings-form {
+        margin: 24px 16px 0;
+        padding: 24px;
+    }
+    
+    .current-resume {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .resume-actions {
+        justify-content: center;
+    }
+    
+    .privacy-option {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    
+    .scroll-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// 个人设置页面特定JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // 滚动到顶部按钮显示/隐藏
+    const scrollToTopBtn = document.querySelector('.scroll-to-top');
+    
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            scrollToTopBtn.classList.add('show');
+        } else {
+            scrollToTopBtn.classList.remove('show');
+        }
+    });
+    
+    // 头像上传处理
+    const avatarInput = document.getElementById('avatarInput');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadAvatar(file);
+            }
+        });
+    }
+    
+    // 简历上传处理
+    const resumeInput = document.getElementById('resumeInput');
+    if (resumeInput) {
+        resumeInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadResume(file);
+            }
+        });
+    }
+});
+
+// 保存基本信息
+function saveBasicInfo() {
+    const formData = {
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        birthday: document.getElementById('birthday').value,
+        location: document.getElementById('location').value
+    };
+    
+    // 这里应该发送到后端API
+    console.log('保存基本信息:', formData);
+    showNotification('基本信息保存成功', 'success');
+}
+
+// 保存职业信息
+function saveCareerInfo() {
+    const formData = {
+        currentCompany: document.getElementById('currentCompany').value,
+        currentPosition: document.getElementById('currentPosition').value,
+        experience: document.getElementById('experience').value,
+        education: document.getElementById('education').value,
+        expectedSalary: document.getElementById('expectedSalary').value
+    };
+    
+    // 这里应该发送到后端API
+    console.log('保存职业信息:', formData);
+    showNotification('职业信息保存成功', 'success');
+}
+
+// 保存隐私设置
+function savePrivacySettings() {
+    const formData = {
+        resumeVisibility: document.getElementById('resumeVisibility').checked,
+        contactVisibility: document.getElementById('contactVisibility').checked,
+        statusVisibility: document.getElementById('statusVisibility').checked,
+        jobRecommendations: document.getElementById('jobRecommendations').checked
+    };
+    
+    // 这里应该发送到后端API
+    console.log('保存隐私设置:', formData);
+    showNotification('隐私设置保存成功', 'success');
+}
+
+// 上传头像
+function uploadAvatar(file) {
+    // 这里应该发送到后端API
+    console.log('上传头像:', file);
+    showNotification('头像上传成功', 'success');
+    
+    // 模拟上传成功后的预览
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = document.querySelector('.profile-avatar img') || document.querySelector('.avatar-placeholder');
+        if (img) {
+            img.src = e.target.result;
+            img.style.display = 'block';
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+// 上传简历
+function uploadResume(file) {
+    // 这里应该发送到后端API
+    console.log('上传简历:', file);
+    showNotification('简历上传成功', 'success');
+    
+    // 模拟上传成功后的页面刷新
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+// 下载简历
+function downloadResume() {
+    // 这里应该触发简历下载
+    showNotification('开始下载简历', 'info');
+}
+
+// 删除简历
+function deleteResume() {
+    if (confirm('确定要删除当前简历吗？')) {
+        // 这里应该发送删除请求到后端API
+        showNotification('简历删除成功', 'success');
+        
+        // 模拟删除成功后的页面刷新
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    }
+}
+</script>
+{% endblock %}
