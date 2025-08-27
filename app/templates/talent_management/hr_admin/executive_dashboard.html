@@ -142,6 +142,16 @@
                             <i class="uil uil-megaphone"></i>
                             发布人才需求
                         </a>
+                        <!-- 新增：AI 人才大盘入口（接入 Gemini） -->
+                        <a href="/talent-dashboard" class="executive-button large" title="AI 驱动的人才大盘（Gemini 1.5 Flash）">
+                            <i class="uil uil-robot"></i>
+                            AI 人才大盘
+                        </a>
+                        <!-- 新增：生成 AI 公司报告（PDF） -->
+                        <button class="executive-button large secondary" onclick="generateAICompanyReport()" title="调用 Gemini 1.5 Flash 生成综合PDF">
+                            <i class="uil uil-file-graph"></i>
+                            生成AI公司报告
+                        </button>
                     </div>
                 </div>
             </div>
@@ -601,6 +611,29 @@
             document.body.appendChild(form);
             form.submit();
             document.body.removeChild(form);
+        }
+
+        // 新增：调用后端 /api/talent/generate-report，使用 Gemini 生成公司级AI报告
+        async function generateAICompanyReport() {
+            try {
+                const resp = await fetch('/api/talent/generate-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ report_type: 'company', target_id: 0 })
+                });
+                const data = await resp.json();
+                if (!resp.ok || !data.success) {
+                    alert('生成失败：' + (data.error || '未知错误'));
+                    return;
+                }
+                alert('AI 公司报告已生成！即将下载PDF。');
+                if (data.report_id) {
+                    window.open(`/api/talent/download-report/${data.report_id}`, '_blank');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('生成失败，请稍后再试');
+            }
         }
 
         // 刷新数据功能

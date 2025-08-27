@@ -122,6 +122,13 @@ def create_app():
             logger.error(f"Failed to import talent management blueprint: {e}")
             raise
         
+        try:
+            from .talent_dashboard import talent_dashboard
+            logger.info("Talent dashboard blueprint imported successfully")
+        except Exception as e:
+            logger.warning(f"Failed to import talent dashboard blueprint: {e}")
+            talent_dashboard = None
+        
         # 注册蓝图
         try:
             app.register_blueprint(common_bp)
@@ -143,6 +150,15 @@ def create_app():
         except Exception as e:
             logger.error(f"Failed to register talent management blueprint: {e}")
             raise
+        
+        if talent_dashboard:
+            try:
+                app.register_blueprint(talent_dashboard)
+                logger.info("Talent dashboard blueprint registered successfully")
+            except Exception as e:
+                logger.error(f"Failed to register talent dashboard blueprint: {e}")
+        else:
+            logger.warning("Talent dashboard blueprint not available")
         
         # 添加根路径路由
         @app.route('/')

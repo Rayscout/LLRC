@@ -642,12 +642,13 @@ html { overflow: hidden; }
 
 /* 滚动捕捉 */
 .ios-scroll-container {
-    scroll-snap-type: y mandatory;
-    overflow-y: auto;
-    height: 100vh;
+    /* 关闭分屏吸附，允许多个卡片持续停留在页面可视区域 */
+    scroll-snap-type: none;
+    overflow-y: visible;
+    height: auto;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    scroll-behavior: smooth;
+    overscroll-behavior: auto;
+    scroll-behavior: auto;
 }
 
 /* iOS theme toggle (shared with iOS pages) */
