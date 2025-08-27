@@ -134,6 +134,10 @@
             position: absolute;
             left: 0;
         }
+        /* cards for drafts highlight */
+        .draft-card { position: relative; }
+        .border-highlight { border: 2px solid #007aff !important; }
+        .border-normal { border: 2px solid rgba(255,255,255,0.2) !important; }
         
         .ios-form-actions {
             display: flex;
@@ -397,6 +401,49 @@
                     </div>
                 </form>
             </div>
+            <div class="ios-container" style="margin-top: var(--ios-spacing-xl);">
+                <h2 class="ios-title ios-fade-in">需求暂存箱</h2>
+                <p class="ios-subtitle ios-fade-in">可编辑的暂存文本，支持一键复制与手动补充，为后续AI分析做准备</p>
+                <div class="ios-grid ios-grid-2">
+                    <div class="ios-preview-card ios-fade-in-up" style="position:relative;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px;">
+                            <div style="font-weight:600;">暂存内容</div>
+                            <div style="display:flex; gap:8px;">
+                                <button type="button" id="copyDraftBtn" class="ios-button" style="padding:6px 10px;">复制</button>
+                                <button type="button" id="aiPrintBtn" class="ios-button" style="padding:6px 14px; background:#5856d6; color:#fff; border-radius:10px; display:flex; align-items:center; gap:6px;">
+                                    <i class="uil uil-terminal"></i>
+                                    发送到AI并打印
+                                </button>
+                                <button type="button" id="uploadToFormBtn" class="ios-button" style="padding:6px 12px; background:#34c759; color:#fff; border-radius:10px; display:flex; align-items:center; gap:6px;">
+                                    <i class="uil uil-arrow-to-right"></i>
+                                    一键上传到职位信息
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="draftText" class="ios-textarea" rows="8" placeholder="这里会自动带入来自高管的关键词/描述，你也可以继续补充...">{{ draft_text }}</textarea>
+                    </div>
+                    {% if drafts %}
+                    <div>
+                        <div style="font-weight:600; margin-bottom:8px;">最近来自高管的需求</div>
+                        <div id="executiveDraftList" style="display:flex; flex-direction:column; gap:12px;">
+                            {% for d in drafts %}
+                            <div class="ios-preview-card draft-card {% if highlight_id and d.id|string == highlight_id %}border-highlight{% else %}border-normal{% endif %}">
+                                <div style="font-weight:600; margin-bottom:4px;">{{ d.executive_name }}（{{ d.executive_email }}）</div>
+                                <div style="color:#666; font-size:14px;">关键词：{{ d.keyword }}</div>
+                                {% if d.description %}
+                                <div style="margin-top:6px; white-space:pre-wrap;">{{ d.description }}</div>
+                                {% endif %}
+                                <div style="position:absolute; right:12px; top:12px; font-size:12px; color:#999;">{{ d.created_at.strftime('%Y-%m-%d %H:%M') }}</div>
+                                <div style="margin-top:8px; display:flex; gap:8px;">
+                                    <button type="button" class="ios-button secondary fill-btn" data-content="关键词：{{ d.keyword }}{% if d.description %}&#10;描述：{{ d.description }}{% endif %}">填充到文本框</button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </section>
 
         <!-- 预览Section -->
@@ -506,6 +553,187 @@
             document.querySelector('.ios-save-draft').addEventListener('click', function() {
                 alert('草稿已保存');
             });
+
+            // 暂存箱交互
+            var copyBtn = document.getElementById('copyDraftBtn');
+            var draftText = document.getElementById('draftText');
+            if (copyBtn && draftText) {
+                copyBtn.addEventListener('click', function() {
+                    draftText.select();
+                    try {
+                        document.execCommand('copy');
+                        copyBtn.textContent = '已复制';
+                        setTimeout(function(){ copyBtn.textContent = '复制'; }, 1200);
+                    } catch (e) {}
+                });
+            }
+            document.querySelectorAll('.fill-btn').forEach(function(btn){
+                btn.addEventListener('click', function(){
+                    var content = this.getAttribute('data-content') || '';
+                    if (draftText) {
+                        draftText.value = content;
+                        draftText.dispatchEvent(new Event('input'));
+                    }
+                });
+            });
+
+            // 限制“最近来自高管的需求”列表的最大显示数量，超出自动删除
+            (function limitExecutiveDrafts(){
+                var list = document.getElementById('executiveDraftList');
+                if (!list) return;
+                var MAX_ITEMS = 3; // 最大容纳数量
+                while (list.children.length > MAX_ITEMS) {
+                    list.removeChild(list.lastElementChild);
+                }
+            })();
+
+            // AI 一键填入（调用后端 Gemini 接口，根据暂存文本自动填充表单）
+            var aiBtn = document.getElementById('aiFillBtn');
+            if (aiBtn && draftText) {
+                aiBtn.addEventListener('click', async function(){
+                    aiBtn.disabled = true; aiBtn.innerHTML = '<i class="uil uil-spinner-alt" style="animation:spin 1s linear infinite"></i> 生成中...';
+                    try {
+                        // 计算接口地址（模板生成优先，失败则使用固定路径）
+                        let apiUrl = "{{ url_for('smartrecruit.hr.recruitment.generate_from_draft') }}";
+                        if (!apiUrl || apiUrl === '' || apiUrl === 'None') {
+                            apiUrl = '/smartrecruit/hr/recruitment/generate_from_draft';
+                        }
+                        console.log('调用AI接口:', apiUrl);
+
+                        // 添加请求开始日志
+                        console.log('POST body draft length:', (draftText.value||'').length);
+                        const resp = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ draft: draftText.value })
+                        });
+                        console.log('AI接口响应状态:', resp.status);
+                        const raw = await resp.text().catch(()=> '');
+                        console.log('AI接口状态:', resp.status, 'RAW响应:', raw);
+                        if (!resp.ok) {
+                            throw new Error('生成失败');
+                        }
+                        let data = {};
+                        try { data = raw ? JSON.parse(raw) : {}; } catch(_) { data = {}; }
+                        console.log('AI 解析后的JSON:', data);
+                        // 将AI结果回填到暂存箱（而非直接填表单）
+                        // 结构：关键词：...\n描述：...
+                        const existedKw = (draftText.value.match(/关键词：([^\n]+)/) || [,''])[1].trim();
+                        const kwFromAI = (data.skills || '').toString();
+                        const keywords = existedKw || kwFromAI;
+                        const description = (data.description || '').toString();
+                        const stamp = new Date().toLocaleString();
+                        let composed = '';
+                        if (keywords) composed += '关键词：' + keywords + '\n';
+                        if (description) composed += '描述：' + description;
+                        if (!composed.trim()) {
+                            // 兜底：即使后端无返回，也生成基础模板，确保用户能看到变化
+                            const rawTxt = draftText.value || '';
+                            const roughKw = (rawTxt.match(/关键词：([^\n]+)/) || [,''])[1].trim();
+                            const roughDesc = (rawTxt.match(/描述：([\s\S]+)/) || [,''])[1].trim();
+                            composed = '关键词：' + (roughKw || '待补充') + '\n' + '描述：' + (roughDesc || '（AI占位：请在此完善岗位描述）');
+                        }
+                        draftText.value = composed + "\n\n（已生成于：" + stamp + "）";
+                        draftText.dispatchEvent(new Event('input'));
+                        alert('已写入暂存箱');
+                        aiBtn.innerHTML = '<i class="uil uil-check"></i> 填入完成';
+                        setTimeout(function(){ aiBtn.innerHTML = '<i class="uil uil-magic"></i> AI一键填入'; aiBtn.disabled = false; }, 1200);
+                    } catch(e){
+                        aiBtn.innerHTML = '<i class="uil uil-exclamation-circle"></i> 生成失败';
+                        setTimeout(function(){ aiBtn.innerHTML = '<i class="uil uil-magic"></i> AI一键填入'; aiBtn.disabled = false; }, 1500);
+                    }
+                });
+            }
+
+            // 一键上传到职位信息：从暂存文本解析并填充对应表单
+            var uploadBtn = document.getElementById('uploadToFormBtn');
+            if (uploadBtn && draftText) {
+                uploadBtn.addEventListener('click', function(){
+                    var text = draftText.value || '';
+                    // 提取函数：匹配“字段：值”或“字段: 值”，忽略前后空格
+                    function pick(regex){
+                        var m = regex.exec(text);
+                        return m && m[1] ? m[1].trim() : '';
+                    }
+                    // 兼容中英文字段名
+                    var title = pick(/(?:标题|title)[:：]\s*([^\n]+)/i);
+                    var location = pick(/(?:工作地点|地点|城市|location)[:：]\s*([^\n]+)/i);
+                    var salary = pick(/(?:薪资|薪酬|salary)[:：]\s*([^\n]+)/i);
+                    var jobType = pick(/(?:类型|工作类型|job[_\s-]?type)[:：]\s*([^\n]+)/i);
+                    var description = (function(){
+                        var m = /(描述|description)[:：]([\s\S]+)/i.exec(text);
+                        return m && m[2] ? m[2].trim() : '';
+                    })();
+                    var skillsLine = pick(/(?:技能|skills)[:：]\s*([^\n]+)/i);
+
+                    // 写入表单（缺失就留空，不改动已填的）
+                    var titleInput = document.querySelector('input[name="title"]');
+                    var locationInput = document.querySelector('input[name="location"]');
+                    var salaryInput = document.querySelector('input[name="salary"]');
+                    var jobTypeSelect = document.querySelector('select[name="job_type"]');
+                    var descTextarea = document.querySelector('textarea[name="description"]');
+                    var skillsTextarea = document.querySelector('textarea[name="skills"]');
+
+                    if (titleInput) titleInput.value = title || titleInput.value || '';
+                    if (locationInput) locationInput.value = location || locationInput.value || '';
+                    if (salaryInput) salaryInput.value = salary || salaryInput.value || '';
+                    if (descTextarea) descTextarea.value = description || descTextarea.value || '';
+                    if (skillsTextarea) {
+                        // 规范化技能分隔符为逗号
+                        var normalized = skillsLine.replace(/[，\s]+/g, ', ').replace(/,+/g, ',').replace(/,\s*,/g, ',').replace(/^,|,$/g, '').trim();
+                        skillsTextarea.value = (normalized || skillsTextarea.value || '');
+                    }
+                    if (jobTypeSelect && jobType) {
+                        var map = { '全职':'fulltime', '兼职':'parttime', '实习':'internship', '合同工':'contract', 'fulltime':'fulltime', 'parttime':'parttime', 'internship':'internship', 'contract':'contract' };
+                        var v = map[(jobType||'').toLowerCase()] || map[jobType] || '';
+                        if (v) jobTypeSelect.value = v;
+                    }
+
+                    // 触发预览更新
+                    ['input','change'].forEach(function(evt){
+                        if (titleInput) titleInput.dispatchEvent(new Event(evt));
+                        if (locationInput) locationInput.dispatchEvent(new Event(evt));
+                        if (salaryInput) salaryInput.dispatchEvent(new Event(evt));
+                        if (jobTypeSelect) jobTypeSelect.dispatchEvent(new Event(evt));
+                        if (descTextarea) descTextarea.dispatchEvent(new Event(evt));
+                        if (skillsTextarea) skillsTextarea.dispatchEvent(new Event(evt));
+                    });
+
+                    // 反馈
+                    uploadBtn.textContent = '已上传到职位信息';
+                    setTimeout(function(){ uploadBtn.textContent = '一键上传到职位信息'; }, 1200);
+                });
+            }
+
+            // 发送到后端AI，并将返回的新文本覆盖到暂存框
+            var aiPrintBtn = document.getElementById('aiPrintBtn');
+            if (aiPrintBtn && draftText) {
+                aiPrintBtn.addEventListener('click', async function(){
+                    aiPrintBtn.disabled = true; aiPrintBtn.innerHTML = '<i class="uil uil-spinner-alt" style="animation:spin 1s linear infinite"></i> 处理中...';
+                    try {
+                        let apiUrl = "{{ url_for('smartrecruit.hr.recruitment.materialize_draft') }}";
+                        if (!apiUrl || apiUrl === '' || apiUrl === 'None') { apiUrl = '/smartrecruit/hr/recruitment/materialize_draft'; }
+                        console.log('调用终端打印AI接口:', apiUrl);
+                        const resp = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ draft: draftText.value })
+                        });
+                        console.log('materialize_draft 状态:', resp.status);
+                        let data = {};
+                        try { data = await resp.json(); } catch(e) { data = {}; }
+                        if (data && typeof data.content === 'string' && data.content.trim()) {
+                            draftText.value = data.content;
+                            draftText.dispatchEvent(new Event('input'));
+                        }
+                        aiPrintBtn.innerHTML = '<i class="uil uil-check"></i> 已写入暂存框';
+                        setTimeout(function(){ aiPrintBtn.innerHTML = '<i class="uil uil-terminal"></i> 发送到AI并打印'; aiPrintBtn.disabled = false; }, 1500);
+                    } catch(e) {
+                        aiPrintBtn.innerHTML = '<i class="uil uil-exclamation-circle"></i> 失败';
+                        setTimeout(function(){ aiPrintBtn.innerHTML = '<i class="uil uil-terminal"></i> 发送到AI并打印'; aiPrintBtn.disabled = false; }, 1500);
+                    }
+                });
+            }
         });
     </script>
 </body>

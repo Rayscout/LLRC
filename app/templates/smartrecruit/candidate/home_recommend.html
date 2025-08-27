@@ -1,0 +1,93 @@
+{% extends 'smartrecruit/candidate/base_ios_new.html' %}
+
+{% block title %}智能推荐 - 求职者首页{% endblock %}
+{% block navbar_title %}为你推荐{% endblock %}
+
+{% block content %}
+<section class="section" id="hero">
+  <div class="section-content">
+    <h1 class="section-title">智能职位推荐</h1>
+    <p class="section-subtitle">基于你的技能与偏好，为你优先推荐最匹配的岗位</p>
+
+    {% if user_skills %}
+    <div class="card" style="margin-bottom:28px">
+      <div style="font-weight:600; margin-bottom:12px; text-align:left">你的技能</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center">
+        {% for sk in user_skills %}
+        <span class="skill-tag">{{ sk }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if recommended_jobs and recommended_jobs|length %}
+    <div class="grid grid-2">
+      {% for rec in recommended_jobs %}
+      <div class="card" style="text-align:left">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:1.2rem;font-weight:700">{{ rec.job.title }}</div>
+          <span class="tag" style="background:rgba(0,122,255,.12);color:var(--accent-primary);padding:6px 10px;border-radius:12px;">匹配 {{ rec.match_score }}%</span>
+        </div>
+        <div style="color:var(--text-secondary);margin-bottom:6px">{{ rec.job.company_name }}</div>
+        <div style="color:var(--text-secondary);margin-bottom:18px">{{ rec.job.location }} · {{ rec.job.salary }}</div>
+        <div style="display:flex;gap:12px">
+          <a href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=rec.job.id) }}" class="btn btn-outline">查看</a>
+          <a href="{{ url_for('smartrecruit.candidate.applications.pre_apply', job_id=rec.job.id) }}" class="btn btn-primary">申请</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+      <div class="card">
+        <div style="margin-bottom:8px;font-weight:600">暂无推荐</div>
+        <div style="color:var(--text-secondary);margin-bottom:14px">完善个人资料或上传简历，获取更精准的推荐。</div>
+        <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="btn btn-primary">完善资料</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- 求职进度追踪 Section（从仪表盘移至首页） -->
+<section class="section" id="progress-tracking">
+  <div class="section-content">
+    <h2 class="section-title">求职进度追踪</h2>
+    <p class="section-subtitle">实时了解您的申请状态和面试安排</p>
+
+    <div class="progress-timeline" style="max-width:800px;margin:40px auto 0;">
+      <div class="timeline-item completed" style="display:flex;gap:24px;margin-bottom:24px;align-items:flex-start;">
+        <div class="timeline-icon" style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent-success);color:#fff;flex-shrink:0;">
+          <i class="fas fa-check"></i>
+        </div>
+        <div class="timeline-content">
+          <h4 style="margin:0 0 6px;color:var(--text-primary);">简历投递完成</h4>
+          <p style="margin:0 0 6px;color:var(--text-secondary);">已成功投递最近的目标职位</p>
+          <span class="timeline-time" style="font-size:.9rem;color:var(--text-tertiary);">近期</span>
+        </div>
+      </div>
+
+      <div class="timeline-item active" style="display:flex;gap:24px;margin-bottom:24px;align-items:flex-start;">
+        <div class="timeline-icon" style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent-primary);color:#fff;flex-shrink:0;">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="timeline-content">
+          <h4 style="margin:0 0 6px;color:var(--text-primary);">等待HR回复</h4>
+          <p style="margin:0 0 6px;color:var(--text-secondary);">简历已被查看，等待进一步通知</p>
+          <span class="timeline-time" style="font-size:.9rem;color:var(--text-tertiary);">进行中</span>
+        </div>
+      </div>
+
+      <div class="timeline-item pending" style="display:flex;gap:24px;margin-bottom:24px;align-items:flex-start;">
+        <div class="timeline-icon" style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--text-tertiary);color:#fff;flex-shrink:0;">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="timeline-content">
+          <h4 style="margin:0 0 6px;color:var(--text-primary);">面试安排</h4>
+          <p style="margin:0 0 6px;color:var(--text-secondary);">通过筛选后将安排技术/HR面试</p>
+          <span class="timeline-time" style="font-size:.9rem;color:var(--text-tertiary);">待定</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</section>
+{% endblock %}
