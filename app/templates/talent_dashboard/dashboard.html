@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人才发展大盘 - LLRC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        .risk-low { color: #28a745; }
+        .risk-medium { color: #ffc107; }
+        .risk-high { color: #dc3545; }
+        .nav-tabs .nav-link.active {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .btn-primary {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        .btn-primary:hover {
+            background-color: #5a6fd8;
+            border-color: #5a6fd8;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- 页面标题 -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <h1 class="text-center mb-4">
+                    <i class="bi bi-graph-up"></i> 人才发展大盘
+                </h1>
+            </div>
+        </div>
+
+        <!-- 概览卡片 -->
+        <div class="row" id="overview-section">
+            <div class="col-md-3">
+                <div class="dashboard-card text-center">
+                    <h3 id="total-employees">-</h3>
+                    <p>总员工数</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card text-center">
+                    <h3 id="avg-salary">-</h3>
+                    <p>平均薪资</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card text-center">
+                    <h3 id="avg-performance">-</h3>
+                    <p>平均绩效</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card text-center">
+                    <h3 id="high-risk-count">-</h3>
+                    <p>高风险员工</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导航标签 -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                            <i class="bi bi-pie-chart"></i> 概览分析
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="employees-tab" data-bs-toggle="tab" data-bs-target="#employees" type="button" role="tab">
+                            <i class="bi bi-people"></i> 员工管理
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="departments-tab" data-bs-toggle="tab" data-bs-target="#departments" type="button" role="tab">
+                            <i class="bi bi-building"></i> 部门分析
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="positions-tab" data-bs-toggle="tab" data-bs-target="#positions" type="button" role="tab">
+                            <i class="bi bi-briefcase"></i> 职位分析
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab">
+                            <i class="bi bi-file-earmark-text"></i> 报告管理
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 标签内容 -->
+        <div class="tab-content mt-3" id="dashboardTabContent">
+            <!-- 概览分析 -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <h5>风险分布</h5>
+                            <div class="chart-container">
+                                <canvas id="riskChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="metric-card">
+                            <h5>部门分布</h5>
+                            <div class="chart-container">
+                                <canvas id="departmentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="metric-card">
+                            <h5>快速操作</h5>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <button class="btn btn-primary w-100 mb-2" onclick="generateCompanyReport()">
+                                        <i class="bi bi-file-earmark-pdf"></i> 生成公司报告
+                                    </button>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-outline-primary w-100 mb-2" onclick="showHighRiskEmployees()">
+                                        <i class="bi bi-exclamation-triangle"></i> 查看高风险员工
+                                    </button>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-outline-primary w-100 mb-2" onclick="showSalaryAnalysis()">
+                                        <i class="bi bi-currency-dollar"></i> 薪资分析
+                                    </button>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-outline-primary w-100 mb-2" onclick="refreshData()">
+                                        <i class="bi bi-arrow-clockwise"></i> 刷新数据
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 员工管理 -->
+            <div class="tab-pane fade" id="employees" role="tabpanel">
+                <div class="metric-card">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>员工列表</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filterEmployees('')">全部</button>
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="filterEmployees('high')">高风险</button>
+                                <button type="button" class="btn btn-outline-warning btn-sm" onclick="filterEmployees('medium')">中风险</button>
+                                <button type="button" class="btn btn-outline-success btn-sm" onclick="filterEmployees('low')">低风险</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="employeesTable">
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>职位</th>
+                                    <th>部门</th>
+                                    <th>薪资</th>
+                                    <th>绩效评分</th>
+                                    <th>离职风险</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeesTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <nav>
+                        <ul class="pagination justify-content-center" id="employeesPagination">
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- 部门分析 -->
+            <div class="tab-pane fade" id="departments" role="tabpanel">
+                <div class="metric-card">
+                    <h5>部门分析</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>部门</th>
+                                    <th>员工数</th>
+                                    <th>平均薪资</th>
+                                    <th>平均绩效</th>
+                                    <th>平均风险</th>
+                                    <th>高风险员工</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="departmentsTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 职位分析 -->
+            <div class="tab-pane fade" id="positions" role="tabpanel">
+                <div class="metric-card">
+                    <h5>职位分析</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>职位</th>
+                                    <th>员工数</th>
+                                    <th>平均薪资</th>
+                                    <th>市场平均薪资</th>
+                                    <th>薪资竞争力</th>
+                                    <th>平均绩效</th>
+                                    <th>平均风险</th>
+                                </tr>
+                            </thead>
+                            <tbody id="positionsTableBody">
+                                <tr>
+                                    <td colspan="7" class="text-center">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 报告管理 -->
+            <div class="tab-pane fade" id="reports" role="tabpanel">
+                <div class="metric-card">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>报告列表</h5>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-primary" onclick="generateCompanyReport()">
+                                <i class="bi bi-plus"></i> 生成新报告
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>报告类型</th>
+                                    <th>目标</th>
+                                    <th>生成时间</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportsTableBody">
+                                <tr>
+                                    <td colspan="5" class="text-center">加载中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 员工详情模态框 -->
+    <div class="modal fade" id="employeeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">员工详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="employeeModalBody">
+                    <!-- 内容将通过JavaScript填充 -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" onclick="generateEmployeeReport()">生成报告</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 全局变量
+        let currentEmployeeId = null;
+        let currentPage = 1;
+        let currentFilter = '';
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOverviewData();
+            loadEmployeesList();
+            loadDepartmentsData();
+            loadPositionsData();
+            loadReportsList();
+        });
+
+        // 加载概览数据
+        async function loadOverviewData() {
+            try {
+                const response = await fetch('/api/talent/overview');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateOverviewCards(data);
+                    createRiskChart(data.risk_distribution);
+                    createDepartmentChart(data.department_distribution);
+                } else {
+                    console.error('加载概览数据失败:', data.error);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+            }
+        }
+
+        // 更新概览卡片
+        function updateOverviewCards(data) {
+            document.getElementById('total-employees').textContent = data.total_employees;
+            document.getElementById('avg-salary').textContent = `¥${data.average_salary.toLocaleString()}`;
+            document.getElementById('avg-performance').textContent = data.average_performance.toFixed(1);
+            document.getElementById('high-risk-count').textContent = data.risk_distribution.high_risk;
+        }
+
+        // 创建风险分布图表
+        function createRiskChart(riskData) {
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['低风险', '中风险', '高风险'],
+                    datasets: [{
+                        data: [riskData.low_risk, riskData.medium_risk, riskData.high_risk],
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // 创建部门分布图表
+        function createDepartmentChart(deptData) {
+            const ctx = document.getElementById('departmentChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(deptData),
+                    datasets: [{
+                        label: '员工数量',
+                        data: Object.values(deptData),
+                        backgroundColor: '#667eea'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // 加载员工列表
+        async function loadEmployeesList(page = 1, filter = '') {
+            try {
+                const params = new URLSearchParams({
+                    page: page,
+                    per_page: 20
+                });
+                
+                if (filter) {
+                    params.append('risk_level', filter);
+                }
+                
+                const response = await fetch(`/api/talent/employees?${params}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateEmployeesTable(data.employees);
+                    updateEmployeesPagination(data);
+                } else {
+                    console.error('加载员工列表失败:', data.error);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+            }
+        }
+
+        // 更新员工表格
+        function updateEmployeesTable(employees) {
+            const tbody = document.getElementById('employeesTableBody');
+            tbody.innerHTML = '';
+            
+            if (employees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">暂无数据</td></tr>';
+                return;
+            }
+            
+            employees.forEach(employee => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${employee.name}</td>
+                    <td>${employee.position}</td>
+                    <td>${employee.department}</td>
+                    <td>¥${employee.salary.toLocaleString()}</td>
+                    <td>${employee.performance_score.toFixed(1)}</td>
+                    <td><span class="risk-${getRiskClass(employee.turnover_risk)}">${(employee.turnover_risk * 100).toFixed(1)}%</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="showEmployeeDetail(${employee.id})">
+                            <i class="bi bi-eye"></i> 详情
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 更新员工分页
+        function updateEmployeesPagination(data) {
+            const pagination = document.getElementById('employeesPagination');
+            pagination.innerHTML = '';
+            
+            if (data.pages <= 1) return;
+            
+            // 上一页
+            if (data.current_page > 1) {
+                const prevLi = document.createElement('li');
+                prevLi.className = 'page-item';
+                prevLi.innerHTML = `<a class="page-link" href="#" onclick="loadEmployeesList(${data.current_page - 1}, '${currentFilter}')">上一页</a>`;
+                pagination.appendChild(prevLi);
+            }
+            
+            // 页码
+            for (let i = 1; i <= data.pages; i++) {
+                const li = document.createElement('li');
+                li.className = `page-item ${i === data.current_page ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#" onclick="loadEmployeesList(${i}, '${currentFilter}')">${i}</a>`;
+                pagination.appendChild(li);
+            }
+            
+            // 下一页
+            if (data.current_page < data.pages) {
+                const nextLi = document.createElement('li');
+                nextLi.className = 'page-item';
+                nextLi.innerHTML = `<a class="page-link" href="#" onclick="loadEmployeesList(${data.current_page + 1}, '${currentFilter}')">下一页</a>`;
+                pagination.appendChild(nextLi);
+            }
+        }
+
+        // 过滤员工
+        function filterEmployees(riskLevel) {
+            currentFilter = riskLevel;
+            currentPage = 1;
+            loadEmployeesList(currentPage, riskLevel);
+        }
+
+        // 显示员工详情
+        async function showEmployeeDetail(employeeId) {
+            try {
+                const response = await fetch(`/api/talent/employee/${employeeId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentEmployeeId = employeeId;
+                    displayEmployeeDetail(data);
+                    new bootstrap.Modal(document.getElementById('employeeModal')).show();
+                } else {
+                    alert('获取员工详情失败: ' + data.error);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+                alert('获取员工详情失败');
+            }
+        }
+
+        // 显示员工详情内容
+        function displayEmployeeDetail(data) {
+            const modalBody = document.getElementById('employeeModalBody');
+            
+            modalBody.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>基本信息</h6>
+                        <table class="table table-sm">
+                            <tr><td>姓名:</td><td>${data.basic_info.name}</td></tr>
+                            <tr><td>职位:</td><td>${data.basic_info.position}</td></tr>
+                            <tr><td>部门:</td><td>${data.basic_info.department}</td></tr>
+                            <tr><td>薪资:</td><td>¥${data.basic_info.salary.toLocaleString()}</td></tr>
+                            <tr><td>入职日期:</td><td>${data.basic_info.hire_date || '未知'}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>绩效数据</h6>
+                        <table class="table table-sm">
+                            <tr><td>绩效评分:</td><td>${data.performance_data.performance_score.toFixed(1)}/5.0</td></tr>
+                            <tr><td>技能水平:</td><td>${data.performance_data.skills_level.toFixed(1)}/5.0</td></tr>
+                            <tr><td>工作满意度:</td><td>${data.performance_data.satisfaction_score.toFixed(1)}/5.0</td></tr>
+                            <tr><td>团队协作:</td><td>${data.performance_data.teamwork_score.toFixed(1)}/5.0</td></tr>
+                            <tr><td>领导力潜力:</td><td>${data.performance_data.leadership_potential.toFixed(1)}/5.0</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>离职风险分析</h6>
+                        <div class="alert alert-${getRiskAlertClass(data.turnover_analysis.turnover_risk)}">
+                            <strong>风险概率: ${(data.turnover_analysis.turnover_risk * 100).toFixed(1)}% (${data.turnover_analysis.risk_level})</strong>
+                        </div>
+                        ${data.turnover_analysis.risk_factors.length > 0 ? 
+                            `<p><strong>风险因素:</strong></p><ul>${data.turnover_analysis.risk_factors.map(factor => `<li>${factor}</li>`).join('')}</ul>` : 
+                            '<p>暂无风险因素</p>'
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        // 加载部门数据
+        async function loadDepartmentsData() {
+            try {
+                const response = await fetch('/api/talent/departments');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateDepartmentsTable(data.departments);
+                } else {
+                    console.error('加载部门数据失败:', data.error);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+            }
+        }
+
+        // 更新部门表格
+        function updateDepartmentsTable(departments) {
+            const tbody = document.getElementById('departmentsTableBody');
+            tbody.innerHTML = '';
+            
+            departments.forEach(dept => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${dept.department}</td>
+                    <td>${dept.employee_count}</td>
+                    <td>¥${dept.average_salary.toLocaleString()}</td>
+                    <td>${dept.average_performance.toFixed(1)}</td>
+                    <td><span class="risk-${getRiskClass(dept.average_risk)}">${(dept.average_risk * 100).toFixed(1)}%</span></td>
+                    <td>${dept.high_risk_count} (${dept.high_risk_percentage}%)</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="generateDepartmentReport('${dept.department}')">
+                            <i class="bi bi-file-earmark-pdf"></i> 报告
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 加载职位数据
+        async function loadPositionsData() {
+            try {
+                const response = await fetch('/api/talent/positions');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updatePositionsTable(data.positions);
+                } else {
+                    console.error('加载职位数据失败:', data.error);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+            }
+        }
+
+        // 更新职位表格
+        function updatePositionsTable(positions) {
+            const tbody = document.getElementById('positionsTableBody');
+            tbody.innerHTML = '';
+            
+            positions.forEach(pos => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${pos.position}</td>
+                    <td>${pos.employee_count}</td>
+                    <td>¥${pos.average_salary.toLocaleString()}</td>
+                    <td>¥${pos.market_avg_salary.toLocaleString()}</td>
+                    <td>${pos.salary_competitiveness.toFixed(2)}</td>
+                    <td>${pos.average_performance.toFixed(1)}</td>
+                    <td><span class="risk-${getRiskClass(pos.average_risk)}">${(pos.average_risk * 100).toFixed(1)}%</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 加载报告列表
+        async function loadReportsList() {
+            try {
+                const response = await fetch('/api/talent/reports');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    updateReportsTable(data.reports);
+                } else {
+                    console.error('加载报告列表失败:', data.error);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+            }
+        }
+
+        // 更新报告表格
+        function updateReportsTable(reports) {
+            const tbody = document.getElementById('reportsTableBody');
+            tbody.innerHTML = '';
+            
+            if (reports.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">暂无报告</td></tr>';
+                return;
+            }
+            
+            reports.forEach(report => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${getReportTypeName(report.report_type)}</td>
+                    <td>${report.target_id || '公司整体'}</td>
+                    <td>${report.generated_at}</td>
+                    <td>${report.has_pdf ? '<span class="badge bg-success">已生成</span>' : '<span class="badge bg-warning">生成中</span>'}</td>
+                    <td class="d-flex gap-2">
+                        ${report.has_pdf ? 
+                            `<button class=\"btn btn-sm btn-outline-primary\" onclick=\"downloadReport(${report.id})\">\n                                <i class=\"bi bi-download\"></i> 下载\n                            </button>` : 
+                            '<span class="text-muted">等待生成</span>'
+                        }
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteReport(${report.id})">
+                            <i class="bi bi-trash"></i> 删除
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // 生成公司报告
+        async function generateCompanyReport() {
+            try {
+                const response = await fetch('/api/talent/generate-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        report_type: 'company',
+                        target_id: 0
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('报告生成成功！');
+                    loadReportsList();
+                } else {
+                    alert('报告生成失败: ' + data.error);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+                alert('报告生成失败');
+            }
+        }
+
+        // 生成员工报告
+        async function generateEmployeeReport() {
+            if (!currentEmployeeId) return;
+            
+            try {
+                const response = await fetch('/api/talent/generate-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        report_type: 'individual',
+                        target_id: currentEmployeeId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('员工报告生成成功！');
+                    loadReportsList();
+                    bootstrap.Modal.getInstance(document.getElementById('employeeModal')).hide();
+                } else {
+                    alert('报告生成失败: ' + data.error);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+                alert('报告生成失败');
+            }
+        }
+
+        // 生成部门报告
+        async function generateDepartmentReport(departmentName) {
+            try {
+                const response = await fetch('/api/talent/generate-report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        report_type: 'department',
+                        target_id: 1  // 这里需要根据实际情况调整
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('部门报告生成成功！');
+                    loadReportsList();
+                } else {
+                    alert('报告生成失败: ' + data.error);
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+                alert('报告生成失败');
+            }
+        }
+
+        // 下载报告
+        async function downloadReport(reportId) {
+            try {
+                window.open(`/api/talent/download-report/${reportId}`, '_blank');
+            } catch (error) {
+                console.error('下载失败:', error);
+                alert('下载失败');
+            }
+        }
+
+        // 删除报告
+        async function deleteReport(reportId) {
+            if (!confirm('确认删除该报告吗？此操作不可撤销。')) return;
+            try {
+                const resp = await fetch(`/api/talent/delete-report/${reportId}`, { method: 'DELETE' });
+                const data = await resp.json().catch(() => ({}));
+                if (!resp.ok || data.error) {
+                    alert('删除失败' + (data.error ? `: ${data.error}` : ''));
+                    return;
+                }
+                loadReportsList();
+            } catch (e) {
+                console.error('删除失败:', e);
+                alert('删除失败');
+            }
+        }
+
+        // 工具函数
+        function getRiskClass(risk) {
+            if (risk < 0.3) return 'low';
+            if (risk < 0.6) return 'medium';
+            return 'high';
+        }
+
+        function getRiskAlertClass(risk) {
+            if (risk < 0.3) return 'success';
+            if (risk < 0.6) return 'warning';
+            return 'danger';
+        }
+
+        function getReportTypeName(type) {
+            const types = {
+                'individual': '个人报告',
+                'department': '部门报告',
+                'company': '公司报告'
+            };
+            return types[type] || type;
+        }
+
+        function showHighRiskEmployees() {
+            document.getElementById('employees-tab').click();
+            filterEmployees('high');
+        }
+
+        function showSalaryAnalysis() {
+            document.getElementById('positions-tab').click();
+        }
+
+        function refreshData() {
+            loadOverviewData();
+            loadEmployeesList();
+            loadDepartmentsData();
+            loadPositionsData();
+            loadReportsList();
+        }
+    </script>
+</body>
+</html>

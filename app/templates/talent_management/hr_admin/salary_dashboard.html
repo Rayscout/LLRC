@@ -444,7 +444,7 @@
         <!-- 主要内容区域 -->
         <div class="main-grid">
             <!-- 左侧图表区域 -->
-            <div class="chart-section slide-in-left">
+            <div class="chart-section slide-in-left" id="chartSection">
                 <h2>
                     <div class="chart-icon">📈</div>
                     12个月薪酬趋势分析
@@ -521,8 +521,8 @@
                     <div class="position-item">
                         <div class="position-name">{{ position.position }}</div>
                         <div class="salary-info">
-                            <div class="company-salary">¥{{ "{:,}".format(position.company_salary) }}</div>
-                            <div class="industry-salary">行业: ¥{{ "{:,}".format(position.industry_salary) }}</div>
+                            <div class="company-salary">¥{{ ":,".format(position.company_salary) }}</div>
+                            <div class="industry-salary">行业: ¥{{ ":,".format(position.industry_salary) }}</div>
                             <div class="gap-badge {% if position.gap_percentage > 0 %}positive{% elif position.gap_percentage < 0 %}negative{% else %}neutral{% endif %}">
                                 {{ position.gap_percentage }}% {{ position.gap_status }}
                             </div>
