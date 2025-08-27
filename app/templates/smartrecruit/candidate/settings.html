@@ -1,76 +1,102 @@
-{% extends 'smartrecruit/candidate/base_ios.html' %}
+{% extends 'smartrecruit/candidate/base_ios_new.html' %}
 
 {% block title %}设置{% endblock %}
 
 {% block content %}
-<div class="page-header" style="background: linear-gradient(135deg,#667eea 0%, #764ba2 100%); color:#fff;">
-    <i class="uil uil-setting icon" style="color:#fff;"></i>
-    <h1 class="page-title" style="color:#fff;">账户设置</h1>
-            <div style="margin-left:auto; display:flex; gap:8px;">
-            <a href="{{ url_for('smartrecruit.candidate.dashboard') }}" class="btn" style="background:#ffffff22; color:#fff; border:1px solid #ffffff44;">仪表盘</a>
-            <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="btn" style="background:#ffffff22; color:#fff; border:1px solid #ffffff44;">去找职位</a>
-            <a href="{{ url_for('smartrecruit.candidate.profile.career_path') }}" class="btn" style="background:#ffffff22; color:#fff; border:1px solid #ffffff44;">职业与技能</a>
+<div class="no-sidebar-layout">
+<div class="hr-profile-page ios-container">
+<div class="profile-content">
+
+<div class="page-header">
+    <h1><i class="uil uil-user"></i> 个人资料设置</h1>
+    <p>完善您的基本信息与简历，获得更精准的职位与面试体验</p>
+</div>
+<div class="settings-hero">
+    <div class="settings-hero-inner">
+        <div class="hero-text">
+            <h1><i class="uil uil-setting"></i> 账户设置</h1>
+            <p>更新你的基本信息、上传头像与简历</p>
         </div>
-    
+        <div class="hero-actions">
+            <a href="{{ url_for('smartrecruit.candidate.profile.career_path') }}" class="btn btn-outline">职业与技能</a>
+            <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="btn btn-outline">去找职位</a>
+            <a href="{{ url_for('smartrecruit.candidate.applications.virtual_interview') }}" class="btn btn-outline">AI面试训练</a>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
 </div>
 
-<div class="settings-container">
-    <!-- General Settings Section -->
-    <div class="settings-section general-info-bar">
-        <h2>基本信息</h2>
-        
-        <!-- Profile Photo Section -->
-        <div class="profile-photo-container">
-            {% if user.profile_photo %}
-            <img src="{{ url_for('static', filename='uploads/photos/' ~ user.profile_photo) }}" alt="头像" class="profile-photo">
-            {% else %}
-            <p>暂无头像</p>
-            {% endif %}
+<div class="settings-layout">
+    <div class="card settings-card">
+        <h2 class="section-title">基本信息</h2>
+        <div class="profile-grid">
+            <div class="avatar-block">
+                <div class="profile-photo-container">
+                    {% if user.profile_photo %}
+                    <img src="{{ url_for('static', filename='uploads/photos/' ~ user.profile_photo) }}" alt="头像" class="profile-photo">
+                    {% else %}
+                    <div class="avatar-placeholder">暂无头像</div>
+                    {% endif %}
+                </div>
+                <form action="{{ url_for('smartrecruit.candidate.profile.settings') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="profile_photo">上传头像</label>
+                        <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                        <small class="muted">支持格式：PNG, JPG, JPEG, GIF</small>
+                    </div>
+                    <button type="submit" name="save_changes" class="btn btn-primary">保存头像</button>
+                </form>
+            </div>
+            <div class="form-block">
+                <form action="{{ url_for('smartrecruit.candidate.profile.settings') }}" method="post" enctype="multipart/form-data" class="form-grid-2">
+                    <div class="form-group">
+                        <label for="first_name">名字</label>
+                        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">姓氏</label>
+                        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company_name">公司名称</label>
+                        <input type="text" id="company_name" name="company_name" value="{{ user.company_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="position">职位</label>
+                        <input type="text" id="position" name="position" value="{{ user.position }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">邮箱</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone_number">电话号码</label>
+                        <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="birthday">生日</label>
+                        <input type="date" id="birthday" name="birthday" value="{{ user.birthday }}" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" name="save_changes" class="btn btn-primary">保存更改</button>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <form action="{{ url_for('smartrecruit.candidate.profile.settings') }}" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="first_name">名字</label>
-                <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
-            </div>
-            <div class="form-group">
-                <label for="last_name">姓氏</label>
-                <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
-            </div>
-            <div class="form-group">
-                <label for="company_name">公司名称</label>
-                <input type="text" id="company_name" name="company_name" value="{{ user.company_name }}" required>
-            </div>
-            <div class="form-group">
-                <label for="email">邮箱</label>
-                <input type="email" id="email" name="email" value="{{ user.email }}" required>
-            </div>
-            <div class="form-group">
-                <label for="phone_number">电话号码</label>
-                <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number }}" required>
-            </div>
-            <div class="form-group">
-                <label for="birthday">生日</label>
-                <input type="date" id="birthday" name="birthday" value="{{ user.birthday }}" required>
-            </div>
-            <div class="form-group">
-                <label for="profile_photo">上传头像</label>
-                <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
-                <small style="color: #666; font-size: 12px;">支持格式：PNG, JPG, JPEG, GIF</small>
-            </div>
-            <button type="submit" name="save_changes">保存更改</button>
-        </form>
     </div>
 
     <!-- CV Section -->
-    <div class="settings-section cv-bar">
-        <h2>简历</h2>
+    <div class="card settings-card">
+        <h2 class="section-title">简历</h2>
         <form action="{{ url_for('smartrecruit.candidate.profile.settings') }}" method="post" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="cv_file">上传简历 (PDF/DOCX/PNG/JPG/视频)</label>
-                <input type="file" id="cv_file" name="cv_file" accept=".pdf,.docx,.png,.jpg,.jpeg,.mp4,.webm,.ogg,.mov,.avi,.mkv">
+                <label for="cv_file">上传简历 (PDF/DOCX/PPT/PPTX/PNG/JPG/视频)</label>
+                <input type="file" id="cv_file" name="cv_file" accept=".pdf,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.mp4,.webm,.ogg,.mov,.avi,.mkv">
             </div>
-            <button type="submit" name="upload_cv">上传简历</button>
+            <button type="submit" name="upload_cv" class="btn btn-primary">上传简历</button>
         </form>
         {% if user.cv_file %}
         <div class="cv-display">
@@ -248,52 +274,43 @@
 </div>
 
 <style>
-    /* Page Header Styling */
-.page-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+/* HR风格容器与标题（参考HR个人资料页） */
+.hr-profile-page { padding:32px 24px; max-width: 1100px; margin: 16px auto; }
+.profile-content { background:#ffffff; border-radius:20px; padding:20px; border:1px solid #e6f0ff; box-shadow:0 10px 24px rgba(16,77,165,.08) }
+.page-header { text-align:center; margin-bottom:18px }
+.page-header h1 { color:#0b1e3a; margin-bottom:6px; font-weight:900; letter-spacing:.2px }
+.page-header p { color:#49618a; font-size:14px }
+/* Hero banner (HR风格) */
+.settings-hero{background:linear-gradient(135deg,#eef5ff,#e8ecff);border:1px solid #e6f0ff;border-radius:24px;box-shadow:0 14px 34px rgba(16,77,165,.12);padding:20px;margin-bottom:20px}
+.settings-hero-inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.settings-hero h1{color:#0b1e3a;margin:0;font-weight:900}
+.settings-hero p{color:#49618a;margin:4px 0 0 0}
+.hero-actions{display:flex;gap:8px}
 
-.page-header .icon {
-    font-size: 24px;
-    margin-right: 10px;
-    color: #007bff;
-}
+/* Layout */
+.settings-layout{display:grid;gap:16px}
+.settings-card{padding:20px;border:1px solid #e6f0ff;border-radius:18px;box-shadow:0 16px 40px rgba(16,77,165,.08);background:#fff}
+.section-title{display:flex;align-items:center;gap:8px;color:#0b1e3a;border-bottom:2px solid #60A5FA;padding-bottom:10px;margin-bottom:14px;font-weight:900}
 
-.page-header .page-title {
-    margin: 0;
-    color: #333;
-    font-size: 1.8em;
-}
+/* Grid cards */
+.profile-grid{display:grid;grid-template-columns:260px 1fr;gap:14px}
+.form-block{background:linear-gradient(180deg,#f9fbff,#f4f8ff);border:1px solid #e7f0ff;border-radius:12px;padding:12px}
+.form-grid-2{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px}
+.form-group{background:#fff;border:1px solid #e6eefc;border-radius:12px;padding:10px 12px;box-shadow:0 6px 14px rgba(16,77,165,.06)}
+.form-group label{display:block;font-weight:700;color:#6b7280;font-size:12px;margin-bottom:6px}
+.form-group input,.form-group textarea{width:100%;padding:10px 12px;border:1px solid #d8e2f0;border-radius:10px;font-size:14px;background:#f9fbff}
 
-/* Settings Container */
-.settings-container {
-    display: block;
-    width: 100%;
-}
+/* Avatar card */
+.avatar-block{background:#fff;border:1px solid #e6eefc;border-radius:12px;padding:16px;box-shadow:0 8px 18px rgba(16,77,165,.06)}
+.avatar-placeholder{height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#64748b;background:linear-gradient(180deg,#eef2ff,#eaf0ff);border:1px dashed #c7d2fe}
 
-.settings-section {
-    width: 100%;
-    padding: 20px;
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
+/* Button styles */
+.btn{padding:12px 20px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,#4f8bff,#007AFF);color:#fff;border:none;box-shadow:0 10px 22px rgba(0,122,255,.28)}
+.btn-outline{background:#fff;border:1px solid #bfd4ff;color:#0b1e3a}
 
-.general-info-bar {
-    width: 100%;
-}
-
-.cv-bar {
-    width: 100%;
-}
+/* Center primary action */
+.form-actions{grid-column:1/-1;display:flex;justify-content:center}
 
 /* Profile Photo Styling */
 .profile-photo-container {
@@ -311,25 +328,23 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Form Styling */
-.settings-section form {
-    display: flex;
-    flex-direction: column;
-}
+/* 修正表单布局冲突：仅非网格表单使用纵向排布 */
+.settings-card form:not(.form-grid-2) { display: flex; flex-direction: column; }
 
-.settings-section .form-group {
+/* Form Styling */
+.settings-card .form-group {
     margin-bottom: 15px;
 }
 
-.settings-section .form-group label {
+.settings-card .form-group label {
     display: block;
     font-weight: 500;
     margin-bottom: 5px;
     color: #555;
 }
 
-.settings-section .form-group input,
-.settings-section .form-group textarea {
+.settings-card .form-group input,
+.settings-card .form-group textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -339,42 +354,18 @@
     transition: border-color 0.3s ease;
 }
 
-.settings-section .form-group input:focus,
-.settings-section .form-group textarea:focus {
+.settings-card .form-group input:focus,
+.settings-card .form-group textarea:focus {
     outline: none;
     border-color: #007bff;
     box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
 }
 
-.settings-section .form-group textarea {
+.settings-card .form-group textarea {
     resize: vertical;
     min-height: 100px;
 }
 
-.settings-section button {
-<<<<<<< HEAD
-    background: rgba(255,255,255,.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: #000;
-=======
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #fff;
->>>>>>> 0c1a8164980c3c64a222c904ce2402def3fc7a6f
-    border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: transform .2s ease, box-shadow .2s ease;
-    margin-top: 10px;
-    box-shadow: 0 6px 16px rgba(102,126,234,.25);
-}
-
-.settings-section button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 22px rgba(118,75,162,.25);
-}
 
 /* CV Display Styling */
 .cv-display {
