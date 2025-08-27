@@ -33,7 +33,8 @@ def home():
     except Exception:
         resume_analysis = None
 
-    return render_template('smartrecruit/candidate/home.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
+    # 使用新版首页（与全站新基座一致的风格）
+    return render_template('smartrecruit/candidate/home_recommend.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
 
 @candidate_bp.route('/dashboard')
 def dashboard():
