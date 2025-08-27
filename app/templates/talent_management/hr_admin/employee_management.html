@@ -7,6 +7,20 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='executive_ios_style.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
+        /* 应用壳：侧边栏 + 顶栏，与仪表板一致 */
+        .app { display:grid; grid-template-columns:240px 1fr; grid-template-rows:64px 1fr; grid-template-areas:"sidebar topbar" "sidebar main"; min-height:100vh; }
+        .sidebar { grid-area:sidebar; background:#fff; border-right:1px solid rgba(0,0,0,.06); padding:16px 12px; }
+        .brand { display:flex; align-items:center; gap:10px; padding:8px 10px; font-weight:700; color:#007AFF; text-decoration:none; }
+        .nav-item { display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; color:#1D1D1F; text-decoration:none; transition:all .25s ease; }
+        .nav-item:hover{ background:#F2F2F7; }
+        .nav-item.active{ background:#E8F0FF; color:#0A84FF; }
+        .topbar { grid-area:topbar; display:flex; align-items:center; justify-content:space-between; padding:12px 20px; background:#ffffffaa; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid rgba(0,0,0,.06); }
+        .search { display:flex; align-items:center; gap:10px; background:#F2F2F7; border-radius:10px; padding:8px 12px; min-width:360px; }
+        .search input{ border:0; outline:none; background:transparent; width:100%; font-size:14px; }
+        .actions{ display:flex; align-items:center; gap:12px; }
+        .icon-btn{ width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; border-radius:10px; background:#F2F2F7; text-decoration:none; color:#1D1D1F; }
+        .main{ grid-area:main; padding:20px; }
+        html { scroll-behavior:smooth; }
         .employee-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -239,25 +253,29 @@
             flex: 1;
         }
     </style>
-</head>
+    </head>
 <body>
-    <!-- 顶部导航栏 -->
-    <nav class="executive-nav" id="executiveNav">
-        <div class="executive-nav-container">
-            <a href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}" class="executive-nav-brand">
-                <div class="executive-nav-brand-icon">
-                    <i class="uil uil-arrow-left"></i>
-                </div>
-                <span>返回高管首页</span>
-            </a>
-            
-            <div class="executive-nav-actions">
-                <h2 style="margin: 0; color: var(--ios-text-primary);">员工管理</h2>
+    <div class="app">
+        <aside class="sidebar">
+            <a class="brand" href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}"><i class="uil uil-apps"></i><span>TalentSuite</span></a>
+            <div class="nav-group">
+                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.dashboard.dashboard') }}"><i class="uil uil-chart"></i><span>仪表板</span></a>
+                <a class="nav-item active" href="{{ url_for('talent_management.hr_admin.employees.employees_dashboard') }}"><i class="uil uil-users-alt"></i><span>员工管理</span></a>
+                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.departments.departments_dashboard') }}"><i class="uil uil-sitemap"></i><span>组织架构</span></a>
+                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}"><i class="uil uil-user-exclamation"></i><span>流失预警</span></a>
             </div>
-        </div>
-    </nav>
+        </aside>
+        <header class="topbar">
+            <div class="search">
+                <i class="uil uil-search"></i>
+                <input type="search" placeholder="搜索员工、部门或邮箱..." />
+            </div>
+            <div class="actions">
+                <a class="icon-btn" href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" title="返回"><i class="uil uil-arrow-left"></i></a>
+            </div>
+        </header>
 
-    <!-- 主要内容 -->
+        <main class="main">
     <div class="executive-scroll-container">
         <section class="executive-section">
             <div class="executive-container">
@@ -325,11 +343,11 @@
                             </a>
                             
                             {% if employee.is_active %}
-                            <button class="btn-deactivate" onclick="confirmDeactivate({{ employee.id }}, '{{ employee.first_name }} {{ employee.last_name }}')">
+                            <button class="btn-deactivate" data-id="{{ employee.id }}" data-name="{{ employee.first_name }} {{ employee.last_name }}" onclick="confirmDeactivate(this.dataset.id, this.dataset.name)">
                                 <i class="uil uil-user-times"></i> 注销账号
                             </button>
                             {% else %}
-                            <button class="btn-reactivate" onclick="reactivateEmployee({{ employee.id }})">
+                            <button class="btn-reactivate" data-id="{{ employee.id }}" onclick="reactivateEmployee(this.dataset.id)">
                                 <i class="uil uil-user-check"></i> 重新激活
                             </button>
                             {% endif %}
@@ -346,6 +364,9 @@
                 {% endif %}
             </div>
         </section>
+    </div>
+
+        </main>
     </div>
 
     <!-- 确认注销模态框 -->
