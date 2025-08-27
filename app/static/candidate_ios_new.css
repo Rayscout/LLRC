@@ -418,6 +418,74 @@ body {
     box-shadow: var(--shadow-heavy);
 }
 
+/* 统一的卡片排版元素 */
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.card-title {
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+}
+
+.card-subtitle {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.text-secondary { color: var(--text-secondary); }
+
+.card-body-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.card-block { display: grid; gap: 8px; text-align: left; }
+
+.skills-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.skill-tag {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(0,0,0,.08);
+    border: 1px solid var(--border-color);
+    font-size: var(--font-size-sm);
+}
+
+.skill-tag-success { background: rgba(52,199,89,.9); color: #fff; border-color: transparent; }
+.skill-tag-warning { background: rgba(255,149,0,.95); color: #fff; border-color: transparent; }
+
+.list-plain { margin: 0; padding-left: 18px; color: var(--text-secondary); text-align: left; }
+
+.link-list { display: grid; gap: 10px; text-align: left; }
+
+.feature-link { color: var(--accent-primary); text-decoration: none; }
+.feature-link:hover { text-decoration: underline; }
+
+/* 雷达图左右排版与缩放 */
+.radar-wrap {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.radar-canvas { flex: 0 0 280px; display:flex; align-items:center; justify-content:center; }
+.radar-canvas canvas { max-width: 260px; max-height: 220px; }
+.radar-desc { flex: 1; max-width: 520px; text-align: left; }
+
+@media (max-width: 768px) {
+    .radar-wrap { flex-direction: column; align-items: center; }
+    .radar-canvas { flex: none; }
+    .radar-canvas canvas { max-width: 220px; max-height: 200px; }
+    .radar-desc { max-width: 100%; }
+}
+
 /* 按钮样式 */
 .btn {
     display: inline-flex;

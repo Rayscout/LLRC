@@ -49,6 +49,13 @@
             box-sizing: border-box;
         }
 
+        /* 更流畅的滚动与动画开销优化 */
+        html { scroll-behavior: smooth; }
+        .stat-card, .action-card { will-change: transform, box-shadow; }
+        @media (prefers-reduced-motion: reduce) {
+            * { animation: none !important; transition: none !important; }
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
             background: var(--bg-primary);
@@ -67,6 +74,89 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* 应用壳：侧边栏 + 顶栏 */
+        .app {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            grid-template-rows: 64px 1fr;
+            grid-template-areas:
+                "sidebar topbar"
+                "sidebar main";
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            grid-area: sidebar;
+            background: #ffffff;
+            border-right: 1px solid rgba(0,0,0,0.06);
+            padding: 16px 12px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            font-weight: 700;
+            color: #007AFF;
+        }
+
+        .nav-group { margin-top: 16px; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            color: #1D1D1F;
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+        .nav-item:hover { background: #F2F2F7; }
+        .nav-item.active { background: #E8F0FF; color: #0A84FF; }
+
+        .topbar {
+            grid-area: topbar;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: #ffffffaa;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #F2F2F7;
+            border-radius: 10px;
+            padding: 8px 12px;
+            min-width: 380px;
+        }
+        .search input {
+            border: 0;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .actions { display: flex; align-items: center; gap: 12px; }
+        .icon-btn {
+            width: 36px; height: 36px; display: inline-flex; align-items:center; justify-content:center;
+            border-radius: 10px; background: #F2F2F7; color: #1D1D1F; text-decoration: none;
+            transition: var(--transition-fast);
+        }
+        .icon-btn:hover { transform: translateY(-1px); }
+
+        .main {
+            grid-area: main;
+            padding: 20px;
         }
 
         .container {
@@ -113,21 +203,29 @@
             color: var(--text-secondary);
         }
 
+        /* 统一小卡片样式 */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 16px;
+            box-shadow: var(--shadow-light);
+        }
+
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
 
         .stat-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 18px 20px;
+            border-radius: 14px;
+        }
+
+        .stat-card.card {
             transition: var(--transition-fast);
             text-align: center;
             animation: slideInUp 0.6s ease-out;
@@ -188,13 +286,7 @@
         }
 
         .action-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--border-radius-large);
-            padding: 30px;
-            box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
             transition: var(--transition-fast);
             text-decoration: none;
             color: inherit;
@@ -217,6 +309,28 @@
                 transform: translateX(0);
             }
         }
+
+        /* 面试日程 / 待办 模块 */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 20px;
+            margin-bottom: 26px;
+        }
+        .section-head {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px; color: var(--text-secondary);
+        }
+        .list { display: grid; gap: 10px; }
+        .list-item {
+            display: grid; grid-template-columns: 80px 1fr auto; gap: 12px; align-items: center;
+            padding: 12px; border-radius: 12px;
+        }
+        .badge { padding: 4px 10px; border-radius: 999px; font-size: 12px; }
+        .badge.blue { background: rgba(10,132,255,.12); color:#0A84FF; }
+        .badge.green{ background: rgba(52,199,89,.12); color:#34C759; }
+        .time { font-weight: 600; color: var(--text-primary); }
+        .muted { color: var(--text-secondary); font-size: 13px; }
 
         .action-card:hover {
             transform: translateY(-5px);
@@ -303,8 +417,42 @@
             }
         }
     </style>
+        @media (max-width: 1200px) {
+            .app { grid-template-columns: 80px 1fr; }
+            .brand span { display: none; }
+            .nav-item span { display: none; }
+            .search { min-width: 220px; }
+        }
+    </style>
 </head>
 <body>
+    <div class="app">
+        <aside class="sidebar">
+            <a class="brand" href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}">
+                <i class="fas fa-people-carry"></i><span>TalentSuite</span>
+            </a>
+            <div class="nav-group">
+                <a class="nav-item active" href="{{ url_for('talent_management.hr_admin.dashboard.dashboard') }}"><i class="fas fa-grid-2"></i><span>仪表板</span></a>
+                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.employees.employees_dashboard') }}"><i class="fas fa-users"></i><span>员工管理</span></a>
+                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.departments.departments_dashboard') }}"><i class="fas fa-sitemap"></i><span>组织架构</span></a>
+                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}"><i class="fas fa-user-minus"></i><span>流失预警</span></a>
+                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.dashboard.dashboard') }}"><i class="fas fa-chart-bar"></i><span>数据分析</span></a>
+            </div>
+        </aside>
+
+        <header class="topbar">
+            <div class="search">
+                <i class="fas fa-search"></i>
+                <input type="search" placeholder="搜索职位、候选人、部门或员工..." />
+            </div>
+            <div class="actions">
+                <a class="icon-btn" href="#" title="通知"><i class="fas fa-bell"></i></a>
+                <a class="icon-btn" href="#" title="帮助"><i class="fas fa-question"></i></a>
+                <a class="icon-btn" href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" title="返回"><i class="fas fa-arrow-left"></i></a>
+            </div>
+        </header>
+
+        <main class="main">
     <div class="container">
         <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="back-link">
             <i class="fas fa-arrow-left"></i> 返回高管首页
@@ -317,7 +465,7 @@
 
         <!-- 统计卡片 -->
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card card">
                 <div class="stat-icon" style="background: var(--accent-blue);">
                     <i class="fas fa-users"></i>
                 </div>
@@ -325,7 +473,7 @@
                 <div class="stat-label">总员工数</div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card card">
                 <div class="stat-icon" style="background: var(--accent-green);">
                     <i class="fas fa-user-plus"></i>
                 </div>
@@ -333,7 +481,7 @@
                 <div class="stat-label">本月入职</div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card card">
                 <div class="stat-icon" style="background: var(--accent-orange);">
                     <i class="fas fa-user-minus"></i>
                 </div>
@@ -341,7 +489,7 @@
                 <div class="stat-label">本月离职</div>
             </div>
 
-            <div class="stat-card">
+            <div class="stat-card card">
                 <div class="stat-icon" style="background: var(--accent-purple);">
                     <i class="fas fa-chart-line"></i>
                 </div>
@@ -352,7 +500,7 @@
 
         <!-- 快速操作 -->
         <div class="quick-actions">
-            <a href="{{ url_for('talent_management.hr_admin.employees.employees_dashboard') }}" class="action-card">
+            <a href="{{ url_for('talent_management.hr_admin.employees.employees_dashboard') }}" class="action-card card">
                 <div class="action-icon">
                     <i class="fas fa-users"></i>
                 </div>
@@ -360,7 +508,7 @@
                 <p class="action-description">管理员工信息、绩效评估、培训记录等，全面掌握员工发展状况</p>
             </a>
 
-            <a href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}" class="action-card">
+            <a href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}" class="action-card card">
                 <div class="action-icon">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
@@ -368,7 +516,7 @@
                 <p class="action-description">实时监控离职趋势，识别高风险岗位，生成预警报告，预防人才流失</p>
             </a>
 
-            <a href="{{ url_for('talent_management.hr_admin.departments.departments_dashboard') }}" class="action-card">
+            <a href="{{ url_for('talent_management.hr_admin.departments.departments_dashboard') }}" class="action-card card">
                 <div class="action-icon">
                     <i class="fas fa-building"></i>
                 </div>
@@ -376,7 +524,7 @@
                 <p class="action-description">管理组织架构、部门设置、岗位配置，优化人力资源结构</p>
             </a>
 
-            <a href="{{ url_for('talent_management.hr_admin.dashboard.dashboard') }}" class="action-card">
+            <a href="{{ url_for('talent_management.hr_admin.dashboard.dashboard') }}" class="action-card card">
                 <div class="action-icon">
                     <i class="fas fa-chart-bar"></i>
                 </div>
@@ -384,6 +532,55 @@
                 <p class="action-description">人力资源数据统计、趋势分析、报表生成，支持决策制定</p>
             </a>
         </div>
+
+        <!-- 面试日程 / 待办 -->
+        <div class="two-col">
+            <section class="card" style="padding:20px;">
+                <div class="section-head">
+                    <h3 style="margin:0;font-size:16px;">面试日程</h3>
+                    <a href="#" style="color:var(--accent-blue);text-decoration:none;">查看全部</a>
+                </div>
+                <div class="list">
+                    <div class="list-item card">
+                        <div class="time">09:00 - 10:00</div>
+                        <div>
+                            <div>高级产品经理候选 - 王杰</div>
+                            <div class="muted">一面 · 线上 · 张敏</div>
+                        </div>
+                        <span class="badge blue">即将开始</span>
+                    </div>
+                    <div class="list-item card">
+                        <div class="time">14:00 - 15:00</div>
+                        <div>
+                            <div>数据分析师 - 吴博</div>
+                            <div class="muted">二面 · 线下 · 李强</div>
+                        </div>
+                        <span class="badge green">已确认</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card" style="padding:20px;">
+                <div class="section-head">
+                    <h3 style="margin:0;font-size:16px;">待办事项</h3>
+                    <a href="#" style="color:var(--accent-blue);text-decoration:none;">新建</a>
+                </div>
+                <div class="list">
+                    <div class="list-item card">
+                        <div class="time">今天</div>
+                        <div class="muted">审核3份新简历并标注标签</div>
+                        <a class="badge blue" href="#">去处理</a>
+                    </div>
+                    <div class="list-item card">
+                        <div class="time">明天</div>
+                        <div class="muted">同步Offer进展到业务经理</div>
+                        <a class="badge blue" href="#">去处理</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+        </main>
     </div>
 </body>
 </html>

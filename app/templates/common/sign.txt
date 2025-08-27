@@ -1,0 +1,705 @@
+@ -11,142 +11,165 @@
+     <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet" />
+         <style>
+         .alert-container{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:90%;max-width:500px;z-index:1000}
+         .alert{padding:12px 14px;margin:8px 0;border-radius:10px;color:#fff;display:flex;align-items:center;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+         .alert{padding:12px 14px;margin:8px 0;border-radius:10px;color:#fff;display:flex;align-items:center;box-shadow:0 4px 12px rgba(0,0,0,.12);transition:opacity .6s ease, transform .6s ease}
+         .alert.alert-danger{background:#dc3545}
+         .alert.alert-success{background:#1a9d1a}
+         .alert.alert-info{background:#2563eb}
+         .alert.fade-out{opacity:0;transform:translateY(-6px)}
+         .hero-bg{background-image:url("{{ url_for('static', filename='Images/background.jpg') }}");}
+         .site-header .brand{display:flex;align-items:center;gap:10px}
+         .site-header .brand .brand-text{color:#5fa9a6;font-weight:800;font-style:italic;font-size:22px;font-family:'Ma Shan Zheng','KaiTi','STKaiti','Microsoft YaHei',sans-serif}
+         .tile-body h3{color:#111827 !important;font-weight:600}
+         .tile-body p{color:#374151 !important;line-height:1.5}
+         .tile{background:#ffffff !important;border:1px solid #e5e7eb !important}
+         /* Hero image responsive fit */
+         .hero .hero-content{align-items:center}
+         .hero-right{display:flex;justify-content:center}
+         .hero-right .avatar{width:min(48vw,520px);aspect-ratio:1/1;border-radius:999px;overflow:hidden;position:relative;background:transparent;border:6px solid rgba(96,165,250,.35);box-shadow:0 20px 60px rgba(0,0,0,.12), 0 0 0 18px rgba(96,165,250,.18), 0 0 0 36px rgba(96,165,250,.08)}
+         .hero-right .avatar img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;border-radius:999px}
+         @media(max-width:991.98px){
+             .hero-right .avatar{width:min(70vw,380px);box-shadow:0 16px 44px rgba(0,0,0,.1), 0 0 0 14px rgba(96,165,250,.16), 0 0 0 28px rgba(96,165,250,.07)}
+         }
+     </style>
+    <style>
+    /* 身份选择卡片样式（仅本页） */
+    .role-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .role-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 12px;border:1.5px solid rgba(148,163,184,.35);border-radius:12px;background:var(--card, rgba(255,255,255,.06));cursor:pointer;transition:transform .15s ease, box-shadow .15s ease,border-color .15s ease;min-height:96px}
+    .role-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+    .role-card .icon{font-size:28px;line-height:1}
+    .role-card .title{margin-top:6px;font-weight:600;font-size:16px}
+    .role-card input{position:absolute;inset:0;opacity:0}
+    .role-card:has(input:checked){border-color:#4f8df5;box-shadow:0 0 0 3px rgba(79,141,245,.2)}
+    @media(max-width:575.98px){.role-cards{grid-template-columns:repeat(2,1fr)}}
+    </style>
+</head>
+<body>
+    <!-- Flash Messages -->
+    <div class="alert-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <!-- Header (from 模板.html) -->
+    <header class="site-header">
+        <div class="container header-inner">
+                         <a href="#home" class="brand" data-scroll>
+                 <img src="https://mcp-media.8n6n.com/img/2025/08/20/c0ce9b147f51df7246a8d9ffb6a64012" alt="IRTDS Logo" />
+                 <img src="{{ url_for('static', filename='Images/logo3.png') }}" alt="IRTDS Logo" />
+                 <span class="brand-text">IRTDS</span>
+             </a>
+            <nav class="nav md-nav" aria-label="Primary">
+                <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false" id="navToggle">☰</button>
+                <ul class="nav-list" id="navList">
+                    <li><a href="#home" data-scroll data-section="home">主页</a></li>
+                    <li><a href="#services" data-scroll data-section="services">方案</a></li>
+                    <li><a href="#portfolio" data-scroll data-section="portfolio">产品</a></li>
+                    <li><a href="#skills" data-scroll data-section="skills">能力</a></li>
+                    <li><a href="#testimonials" data-scroll data-section="testimonials">合作</a></li>
+                    <li><a href="#contact" data-scroll data-section="contact">联系</a></li>
+                    <li class="hire"><a href="#" class="auth-trigger" data-auth="signin">登录</a></li>
+                    <li class="theme-toggle-container">
+                        <button id="themeToggle" class="theme-toggle" aria-label="切换深色模式" title="切换深色模式">
+                            🌙
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        
+
+        <!-- 其余展示区块可按需保留，保持模板结构 -->
+        <section id="services" class="section">
+            <style>
+            /* 散开图标 + 中央渐显文字区块样式 */
+            .scatter-wrap{position:relative; height:100vh; min-height:560px; overflow:hidden; border-radius:0; background:linear-gradient(180deg, rgba(99,102,241,0.04), rgba(59,130,246,0.04)); box-shadow:0 10px 40px rgba(0,0,0,.06); width:100vw; left:50%; transform:translateX(-50%); opacity:0; transition:opacity .6s ease; margin-top:-1cm;
+            --center-shift-y: 190px;}
+            .scatter-wrap.ready{opacity:1}
+            .scatter-center{position:absolute; left:50%; top:calc(50% - var(--center-shift-y)); transform:translate(-50%,-50%) translateY(3cm) scale(.92); text-align:center; pointer-events:none; opacity:0; transition:opacity .8s cubic-bezier(.25,1,.5,1), transform .8s cubic-bezier(.25,1,.5,1)}
+            .scatter-center h2{margin:0; font-size:44px; line-height:1.12; letter-spacing:.2px}
+            .scatter-center h2 span{font-weight:800}
+            .scatter-center .big-line{display:inline-block; transform-origin:left center; font-size:66px; position:relative; top:2cm}
+            @media(min-width:992px){ .scatter-center .big-line{font-size:72px} }
+            /* 动视效果：微缩放+上浮位移（进入/循环） */
+            .mv{animation:mvPulse 3.2s cubic-bezier(.25,1,.5,1) infinite}
+            .mv.delay{animation-delay:.6s}
+            @keyframes mvPulse{0%{transform:translateY(2px) scale(1)}40%{transform:translateY(-4px) scale(1.05)}60%{transform:translateY(-2px) scale(1.03)}100%{transform:translateY(2px) scale(1)}}
+            .scatter-icons{position:absolute; left:50%; top:calc(50% - var(--center-shift-y)); width:0; height:0}
+            .scatter-icon{position:absolute; left:0; top:0; width:88px; height:88px; border-radius:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.12); transform:translate(-50%,-50%) scale(0.9); transition:box-shadow .3s ease; cursor:pointer}
+            .scatter-icon img{width:100%; height:100%; object-fit:cover; animation:breathe 3.6s ease-in-out infinite}
+            /* 点击波纹 */
+            .click-ripple{position:absolute; left:50%; top:50%; width:10px; height:10px; transform:translate(-50%,-50%) scale(0); border-radius:999px; background:rgba(96,165,250,.35); pointer-events:none; animation:ripple 700ms ease-out forwards}
+            @keyframes ripple{0%{opacity:.55; transform:translate(-50%,-50%) scale(0)}70%{opacity:.18; transform:translate(-50%,-50%) scale(6)}100%{opacity:0; transform:translate(-50%,-50%) scale(8)}}
+            @keyframes breathe{0%,100%{transform:scale(1);opacity:.96}50%{transform:scale(1.04);opacity:1}}
+            @media(min-width:992px){ .scatter-icon{width:104px; height:104px} .scatter-center h2{font-size:56px} .scatter-wrap{ --center-shift-y: 210px; } }
+            </style>
+            <div class="container">
+                <div id="scatterSection" class="scatter-wrap mt-12">
+                    <div class="scatter-icons" aria-hidden="true">
+                        <div class="scatter-icon" data-idx="0"><img src="https://mcp-media.8n6n.com/img/2025/04/17/39f459b938fc69dd692a70065b99dde9" alt="icon1"></div>
+                        <div class="scatter-icon" data-idx="1"><img src="https://mcp-media.8n6n.com/img/2025/04/17/340465a65d6bf4196d5c9fb6292df646" alt="icon2"></div>
+                        <div class="scatter-icon" data-idx="2"><img src="https://mcp-media.8n6n.com/img/2025/04/17/39f459b938fc69dd692a70065b99dde9" alt="icon3"></div>
+                        <div class="scatter-icon" data-idx="3"><img src="https://mcp-media.8n6n.com/img/2025/04/17/b491a9f66ccc9c0874a9595550781560" alt="icon4"></div>
+                        <div class="scatter-icon" data-idx="4"><img src="https://mcp-media.8n6n.com/img/2025/04/17/0fef9599e406e3435d8e7155ec0706da" alt="icon5"></div>
+                        <div class="scatter-icon" data-idx="5"><img src="https://mcp-media.8n6n.com/img/2025/04/17/01b44253c4e46378709e1d20ca2dd303" alt="icon6"></div>
+                        <div class="scatter-icon" data-idx="6"><img src="https://mcp-media.8n6n.com/img/2025/04/17/88c86e4e311ff44450d3fd7382ce56e8" alt="icon7"></div>
+                        <div class="scatter-icon" data-idx="7"><img src="https://mcp-media.8n6n.com/img/2025/04/18/ec4fcbab6c55265d5ebcfdca4632702c" alt="icon8"></div>
+                        <div class="scatter-icon" data-idx="8"><img src="https://mcp-media.8n6n.com/img/2025/04/17/5b82dab72493da6628b56d8f5f823be8" alt="icon9"></div>
+                        <div class="scatter-icon" data-idx="9"><img src="https://mcp-media.8n6n.com/img/2025/04/17/a0943644097d75d3e1763c24a4a9c6e8" alt="icon10"></div>
+                        <div class="scatter-icon" data-idx="10"><img src="https://mcp-media.8n6n.com/img/2025/04/18/0a684cb6d685abeebae8f1ef938ea8e7" alt="icon11"></div>
+                        <div class="scatter-icon" data-idx="11"><img src="https://mcp-media.8n6n.com/img/2025/04/20/02b050475e70e00996b237db752d810d" alt="icon12"></div>
+                        <div class="scatter-icon" data-idx="12"><img src="https://mcp-media.8n6n.com/img/2025/05/02/234129e2329a2504771400ba45eb0617" alt="icon13"></div>
+                        <div class="scatter-icon" data-idx="13"><img src="https://mcp-media.8n6n.com/img/2025/05/02/969af67a70f2aab9602500509ea4e398" alt="icon14"></div>
+                        <div class="scatter-icon" data-idx="14"><img src="https://mcp-media.8n6n.com/img/2025/05/02/9023b4476de07c898e026e9c0756de4a" alt="icon15"></div>
+                        <div class="scatter-icon" data-idx="15"><img src="https://mcp-media.8n6n.com/img/2025/05/03/f90736e24a73ff06b0ec12a306a1911a" alt="icon16"></div>
+                        <div class="scatter-icon" data-idx="0"><img src="{{ url_for('static', filename='Images/Icons8/icons8-亚马逊网络服务-100.png') }}" alt="aws"></div>
+                        <div class="scatter-icon" data-idx="1"><img src="{{ url_for('static', filename='Images/Icons8/icons8-铬-100.png') }}" alt="chrome"></div>
+                        <div class="scatter-icon" data-idx="2"><img src="{{ url_for('static', filename='Images/Icons8/icons8-facebook-logo-100.png') }}" alt="facebook"></div>
+                        <div class="scatter-icon" data-idx="3"><img src="{{ url_for('static', filename='Images/Icons8/icons8-instagram-logo-100.png') }}" alt="instagram"></div>
+                        <div class="scatter-icon" data-idx="4"><img src="{{ url_for('static', filename='Images/Icons8/icons8-推特-100.png') }}" alt="twitter"></div>
+                        <div class="scatter-icon" data-idx="5"><img src="{{ url_for('static', filename='Images/Icons8/icons8-whatsapp-100.png') }}" alt="whatsapp"></div>
+                        <div class="scatter-icon" data-idx="6"><img src="{{ url_for('static', filename='Images/Icons8/icons8-youtube上播放-100.png') }}" alt="youtube"></div>
+                        <div class="scatter-icon" data-idx="7"><img src="{{ url_for('static', filename='Images/Icons8/icons8-gmail-100.png') }}" alt="gmail"></div>
+                        <div class="scatter-icon" data-idx="8"><img src="{{ url_for('static', filename='Images/Icons8/icons8-gmail-新-100.png') }}" alt="gmail-new"></div>
+                        <div class="scatter-icon" data-idx="9"><img src="{{ url_for('static', filename='Images/Icons8/icons8-谷歌播放商店新-100.png') }}" alt="playstore"></div>
+                        <div class="scatter-icon" data-idx="10"><img src="{{ url_for('static', filename='Images/Icons8/icons8-菲格玛-100.png') }}" alt="figma"></div>
+                        <div class="scatter-icon" data-idx="11"><img src="{{ url_for('static', filename='Images/Icons8/icons8-node-js-100.png') }}" alt="nodejs"></div>
+                        <div class="scatter-icon" data-idx="12"><img src="{{ url_for('static', filename='Images/Icons8/icons8-nodejs-100.png') }}" alt="nodejs-alt"></div>
+                        <div class="scatter-icon" data-idx="13"><img src="{{ url_for('static', filename='Images/Icons8/icons8-microsoft-365-100.png') }}" alt="m365"></div>
+                        <div class="scatter-icon" data-idx="14"><img src="{{ url_for('static', filename='Images/Icons8/icons8-microsoft-powerpoint-2019-100.png') }}" alt="ppt"></div>
+                        <div class="scatter-icon" data-idx="15"><img src="{{ url_for('static', filename='Images/Icons8/icons8-meta-100.png') }}" alt="meta"></div>
+                        <div class="scatter-icon" data-idx="16"><img src="{{ url_for('static', filename='Images/Icons8/icons8-微软-100.png') }}" alt="microsoft"></div>
+                        <div class="scatter-icon" data-idx="17"><img src="{{ url_for('static', filename='Images/Icons8/icons8-java咖啡杯徽标-100.png') }}" alt="java"></div>
+                        <div class="scatter-icon" data-idx="18"><img src="{{ url_for('static', filename='Images/Icons8/icons8-微信-100.png') }}" alt="wechat"></div>
+                        <div class="scatter-icon" data-idx="19"><img src="{{ url_for('static', filename='Images/Icons8/icons8-adobe-illustrator-100.png') }}" alt="ai"></div>
+                        <div class="scatter-icon" data-idx="20"><img src="{{ url_for('static', filename='Images/Icons8/icons8-ibis-paint-x-100.png') }}" alt="ibis"></div>
+                        <div class="scatter-icon" data-idx="21"><img src="{{ url_for('static', filename='Images/Icons8/icons8-bmo-100.png') }}" alt="bmo"></div>
+                        <div class="scatter-icon" data-idx="22"><img src="{{ url_for('static', filename='Images/Icons8/icons8-bluesky-100.png') }}" alt="bluesky"></div>
+                        <div class="scatter-icon" data-idx="23"><img src="{{ url_for('static', filename='Images/Icons8/icons8-anaconda-100.png') }}" alt="anaconda"></div>
+                        <div class="scatter-icon" data-idx="24"><img src="{{ url_for('static', filename='Images/Icons8/icons8-亚马逊网络服务-100.png') }}" alt="aws-2"></div>
+                        <div class="scatter-icon" data-idx="25"><img src="{{ url_for('static', filename='Images/Icons8/icons8-deepseek-100.png') }}" alt="deepseek"></div>
+                        <div class="scatter-icon" data-idx="26"><img src="{{ url_for('static', filename='Images/Icons8/icons8-xbox-控制器-100.png') }}" alt="xbox"></div>
+                    </div>
+                    <div class="scatter-center" id="scatterCenter">
+                        <h2>
+                            <span>Intelligent</span><br/>
+                            <span class="big-line mv">RECRUITMENT &</span><br/>
+                            <span class="big-line mv delay">Talent Development</span>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero moved below scatter section -->
+        <section id="home" class="section hero">
+            <div class="hero-bg"></div>
+            <div class="container hero-content">
+                <!-- 左侧内容区域 -->
+                <div class="hero-left-content">
+                    <h1 class="hero-main-title">基于 AI 的智能招聘与人才发展系统</h1>
+                    <p class="hero-description">面向企业与高校提供智能招聘、人岗匹配、人才画像与测评、培训发展与数据看板的一体化解决方案。</p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary auth-trigger" href="#" data-auth="signin">登录 <span class="icon">→</span></a>
+                        <a class="btn btn-ghost auth-trigger" href="#" data-auth="signup">注册</a>
+                    </div>
+                </div>
+                
+                <!-- 右侧头像区域 -->
+                <div class="hero-right-avatar">
+                    <div class="avatar">
+                        <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Logo" />
+                                                 <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="Logo" />
+                    </div>
+                </div>
+            </div>
+@ -354,9 +377,9 @@
+        <div class="modal-backdrop" data-modal-close></div>
+        <div class="modal-dialog" role="document" style="padding:0;overflow:hidden">
+            <button class="modal-close" aria-label="Close" data-modal-close>✕</button>
+            <div style="display:flex;height:560px">
+            <div style="display:flex;height:840px">
+                <!-- 左侧介绍 -->
+                <aside style="flex:1;height:100%;padding:40px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
+                <aside style="flex:1;height:100%;padding:40px;background:linear-gradient(135deg, rgba(0,0,0,.55), rgba(0,0,0,.25)), url('{{ url_for('static', filename='Images/reg_bg_min.jpg') }}') center/cover no-repeat;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
+                    <div class="left-signup" style="text-align:center">
+                        <h2 style="font-size:32px;margin:0 0 16px">加入我们！</h2>
+                        <p style="opacity:.95;max-width:280px">成为林理人才招聘系统的一员，开启智能招聘新时代</p>
+@ -369,109 +392,122 @@
+                    </div>
+                </aside>
+                <!-- 右侧表单容器 -->
+                <section style="flex:1;height:100%;padding:32px 24px;overflow:auto;display:flex;flex-direction:column;gap:16px">
+                    <div class="section-head" style="margin-bottom:12px">
+                <section style="flex:1;height:100%;padding:32px 24px;overflow:auto;display:flex;flex-direction:column;gap:16px;justify-content:center;align-items:center">
+                    <style>
+                    .input-icon{position:relative;margin-bottom:12px}
+                    .input-icon .icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.55;font-size:18px}
+                    .input-icon input{padding-left:40px}
+                    </style>
+                    <div class="section-head" style="margin-bottom:12px;width:100%;max-width:600px;text-align:center">
+                        <h2 id="authTitle">注册</h2>
+                    </div>
+                    <!-- 注册表单（默认显示） -->
+                    <form id="signupForm" class="form" method="post" action="{{ url_for('common.auth.sign') }}" style="padding-top:8px">
+                    <form id="signupForm" class="form" method="post" action="{{ url_for('common.auth.sign') }}" style="padding-top:8px;width:100%;max-width:600px">
+                        <input type="hidden" name="action" value="signup" />
+                        <div class="grid grid-2 gap-6">
+                            <label class="field">
+                                <span class="label">名</span>
+                        <div class="grid grid-2 gap-6" style="gap:12px">
+                            <div class="field input-icon">
+                                <span class="icon">👤</span>
+                                <input type="text" name="first_name" placeholder="名" required />
+                            </label>
+                            <label class="field">
+                                <span class="label">姓</span>
+                            </div>
+                            <div class="field input-icon">
+                                <span class="icon">👤</span>
+                                <input type="text" name="last_name" placeholder="姓" required />
+                            </label>
+                            </div>
+                        </div>
+                        <label class="field">
+                            <span class="label">公司名称</span>
+                        <div class="field input-icon">
+                            <span class="icon">🏢</span>
+                            <input type="text" name="company_name" placeholder="公司名称" required />
+                        </label>
+                        </div>
+                        <!-- 主管和员工专用字段 -->
+                        <div id="supervisor-employee-fields" style="display: none;">
+                            <label class="field">
+                                <span class="label">部门</span>
+                            <div class="field input-icon">
+                                <span class="icon">🏬</span>
+                                <input type="text" name="department" placeholder="部门名称" />
+                            </label>
+                            <label class="field">
+                                <span class="label">职位</span>
+                            </div>
+                            <div class="field input-icon">
+                                <span class="icon">💼</span>
+                                <input type="text" name="position" placeholder="职位" />
+                            </label>
+                            </div>
+                        </div>
+                        <!-- 员工专用字段 -->
+                        <div id="employee-fields" style="display: none;">
+                            <label class="field">
+                                <span class="label">员工编号</span>
+                            <div class="field input-icon">
+                                <span class="icon">🆔</span>
+                                <input type="text" name="employee_id" placeholder="员工编号" />
+                            </label>
+                            <label class="field">
+                                                        <span class="label">高管邮箱</span>
+                        <input type="email" name="supervisor_email" placeholder="高管邮箱" />
+                            </label>
+                            <label class="field">
+                                <span class="label">入职日期</span>
+                                <input type="date" name="hire_date" />
+                            </label>
+                            </div>
+                            <div class="field input-icon">
+                                <span class="icon">✉️</span>
+                                <input type="email" name="supervisor_email" placeholder="高管邮箱" />
+                            </div>
+                            <div class="field input-icon">
+                                <span class="icon">📅</span>
+                                <input type="date" name="hire_date" placeholder="入职日期" />
+                            </div>
+                        </div>
+                        <label class="field">
+                            <span class="label">邮箱</span>
+                        <div class="field input-icon">
+                            <span class="icon">✉️</span>
+                            <input type="email" name="email" placeholder="邮箱" required />
+                        </label>
+                        <div class="grid grid-2 gap-6">
+                            <label class="field">
+                                <span class="label">手机号</span>
+                        </div>
+                        <div class="grid grid-2 gap-6" style="gap:12px">
+                            <div class="field input-icon">
+                                <span class="icon">📱</span>
+                                <input type="tel" name="phone_number" placeholder="手机号" required />
+                            </label>
+                            <label class="field">
+                                <span class="label">生日</span>
+                                <input type="date" name="birthday" required />
+                            </label>
+                            </div>
+                            <div class="field input-icon">
+                                <span class="icon">📅</span>
+                                <input type="date" name="birthday" placeholder="生日" required />
+                            </div>
+                        </div>
+                        <div class="grid grid-2 gap-6">
+                            <label class="field">
+                                <span class="label">密码</span>
+                        <div class="grid grid-2 gap-6" style="gap:12px">
+                            <div class="field input-icon">
+                                <span class="icon">🔒</span>
+                                <input type="password" name="password" placeholder="密码" required />
+                            </label>
+                            <label class="field">
+                                <span class="label">确认密码</span>
+                            </div>
+                            <div class="field input-icon">
+                                <span class="icon">🔒</span>
+                                <input type="password" name="confirm_password" placeholder="确认密码" required />
+                            </label>
+                            </div>
+                        </div>
+                        <div class="field" style="margin-top:8px">
+                            <span class="label">身份选择 <span style="color: red;">*</span></span>
+                            <div class="role-row">
+                                <label><input type="radio" name="role" value="candidate" required /> 求职者</label>
+                                <label><input type="radio" name="role" value="recruiter" required /> 招聘者（HR）</label>
+                                <label><input type="radio" name="role" value="executive" required /> 高管</label>
+                                <label><input type="radio" name="role" value="employee" required /> 员工</label>
+                            <div class="role-cards">
+                                <label class="role-card"><span class="title">求职者</span><input type="radio" name="role" value="candidate" required /></label>
+                                <label class="role-card"><span class="title">HR</span><input type="radio" name="role" value="recruiter" required /></label>
+                                <label class="role-card"><span class="title">高管</span><input type="radio" name="role" value="executive" required /></label>
+                                <label class="role-card"><span class="title">员工</span><input type="radio" name="role" value="employee" required /></label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%">注册</button>
+                        <label class="field terms" for="agreeTerms" style="display:flex;flex-direction:row;align-items:center;gap:10px;margin:8px 0 6px 0;flex-wrap:nowrap;cursor:pointer">
+                            <input type="checkbox" id="agreeTerms" required style="width:16px;height:16px;accent-color:#4f8df5;vertical-align:middle" />
+                            <span style="margin:0;color:var(--fg,#e5e7eb)">同意 <a href="#" class="link">《服务条款》</a>、<a href="#" class="link">《隐私政策》</a> 和 <a href="#" class="link">《儿童隐私政策》</a></span>
+                        </label>
+                        <button type="submit" class="btn btn-primary" style="width:100%;position:sticky;bottom:8px;z-index:5">注册</button>
+                    </form>
+                    <!-- 登录表单 -->
+                    <form id="signinForm" class="form" method="post" action="{{ url_for('common.auth.sign') }}" style="display:none;padding-top:8px">
+                    <form id="signinForm" class="form" method="post" action="{{ url_for('common.auth.sign') }}" style="display:none;padding-top:8px;width:100%;max-width:600px">
+                        <input type="hidden" name="action" value="signin" />
+                        <label class="field">
+                            <span class="label">邮箱</span>
+                        <div class="field input-icon">
+                            <span class="icon">✉️</span>
+                            <input type="email" name="email" placeholder="邮箱" required />
+                        </label>
+                        <label class="field">
+                            <span class="label">密码</span>
+                        </div>
+                        <div class="field input-icon">
+                            <span class="icon">🔒</span>
+                            <input type="password" name="password" placeholder="密码" required />
+                        </label>
+                        </div>
+                        <div class="field" style="margin-top:8px">
+                            <span class="label">以身份登录 <span style="color: red;">*</span></span>
+                            <div class="role-row">
+                                <label><input type="radio" name="role" value="candidate" required /> 求职者</label>
+                                <label><input type="radio" name="role" value="recruiter" required /> 招聘者（HR）</label>
+                                <label><input type="radio" name="role" value="executive" required /> 高管</label>
+                                <label><input type="radio" name="role" value="employee" required /> 员工</label>
+                            <div class="role-cards">
+                                <label class="role-card"><span class="title">求职者</span><input type="radio" name="role" value="candidate" required /></label>
+                                <label class="role-card"><span class="title">HR</span><input type="radio" name="role" value="recruiter" required /></label>
+                                <label class="role-card"><span class="title">高管</span><input type="radio" name="role" value="executive" required /></label>
+                                <label class="role-card"><span class="title">员工</span><input type="radio" name="role" value="employee" required /></label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%; margin-top:16px; color: black;">登录</button>
+                        <div class="form-row" style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:12px">
+                            <label style="display:flex;align-items:center;gap:8px;white-space:nowrap"><input type="checkbox" name="remember_me" id="rememberMe" checked style="width:18px;height:18px;accent-color:#4f8df5;background:#fff;border:2px solid rgba(255,255,255,.7);border-radius:4px" /> 下次自动登录</label>
+                            <a href="#contact" data-scroll class="link" id="signinHelp" style="color:var(--muted, #64748b);text-decoration:none;white-space:nowrap">登录遇到问题</a>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:16px;background:#4f8df5;color:#fff;border:none;border-radius:12px;padding:14px 0;box-shadow:0 2px 6px rgba(0,0,0,.08);">登录</button>
+                    </form>
+                </section>
+            </div>
+@ -504,289 +540,316 @@
+                const baseRadiusXRatio = 1.10; // 左右范围≈原来2倍
+                const baseRadiusYRatio = 0.68;  // 垂直范围同步放大
+                const radiusRand  = icons.map(()=> 0.75 + Math.random()*0.5);
+                // 随机缩放基准（每个图标 0.8~1.3 倍）
+                const baseScale   = icons.map(()=> 0.8 + Math.random()*0.5);
+                const pos = icons.map(()=> ({x:0, y:0, init:false}));
+                const vel = icons.map(()=> ({x:(Math.random()-0.5)*1.2, y:(Math.random()-0.5)*1.2}));
+                // 点击图标：将速度反向，并给予轻微增益
+                icons.forEach((el, i)=>{
+                    el.addEventListener('click', (e)=>{
+                        // 反向 + 加速-减速动画（easeOutExpo 逐帧衰减）
+                        const minKick = 0.6;
+                        vel[i].x = -(Math.abs(vel[i].x) > 0.2 ? vel[i].x : (vel[i].x >= 0 ? minKick : -minKick));
+                        vel[i].y = -(Math.abs(vel[i].y) > 0.2 ? vel[i].y : (vel[i].y >= 0 ? minKick : -minKick));
+                        let boost = 1.8; // 初速度提升
+                        const decayStart = performance.now();
+                        function decay(now){
+                            const t = Math.min(1, (now - decayStart)/600); // 0.6s 衰减
+                            const ease = 1 - Math.pow(2, -8 * t); // easeOutExpo 近似
+                            const scale = 1 + (boost - 1) * (1 - ease);
+                            vel[i].x *= scale; vel[i].y *= scale;
+                            if(t < 1) requestAnimationFrame(decay);
+                        }
+                        requestAnimationFrame(decay);
+                        // 点击波纹
+                        const ripple = document.createElement('span');
+                        ripple.className = 'click-ripple';
+                        el.appendChild(ripple);
+                        ripple.addEventListener('animationend', ()=> ripple.remove());
+                    });
+                });
+                const MAX_SPEED = 1.2;
+                const MIN_SPEED = 0.25;
+
+                function update(){
+                    const r = rect();
+                    const vh = window.innerHeight || document.documentElement.clientHeight;
+                    // 计算可视比例：区块进入视口中线后开始散开，0->1
+                    // 根据启动动画进度计算 eased（0->1）
+                    const t = Math.max(0, Math.min(1, (typeof openProgress==='number'? openProgress : 0)));
+                    const eased = t*t*(3-2*t); // easeInOut
+                    // 设置中心文案透明度
+                    if(center){
+                        center.style.opacity = String(eased);
+                        center.style.transform = `translate(-50%,-50%) scale(${0.92 + 0.08*eased})`;
+                    }
+                    // 图标从中心向外插值（椭圆 + 缓慢移动）
+                    const minDim = Math.min(r.width, r.height);
+                    const rx = (r.width)  * baseRadiusXRatio * 0.5;  // 半径取容器宽/高比例
+                    const ry = (r.height) * baseRadiusYRatio * 0.5;
+                    // 中心文字留白矩形：避免遮挡文字
+                    const textClearX = Math.max(220, r.width  * 0.18);
+                    const textClearY = Math.max(120, r.height * 0.12);
+                    // 预警区（比留白稍大，提前产生斥力）
+                    const textWarnX = textClearX * 1.25;
+                    const textWarnY = textClearY * 1.25;
+                    const innerExclusionX = Math.max(textClearX, minDim * 0.12);
+                    const innerExclusionY = Math.max(textClearY, minDim * 0.10);
+                    const boundsX = (window.innerWidth || document.documentElement.clientWidth)/2 - 52;  // 左右边界扩展到视口边缘
+                    const boundsY = r.height/2 - 72;
+                    const boundaryPadding = 37.8; // 约 1cm @96dpi
+
+                    const positions = new Array(icons.length);
+                    const sizes = icons.map(el => el.offsetWidth || 96);
+                    const sizes = icons.map((el, idx) => (el.offsetWidth || 96) * (baseScale[idx] || 1));
+
+                    icons.forEach((el, i)=>{
+                        // 初始化分布（随机方向和半径），随后随机游走
+                        const rxEff = Math.max(innerExclusionX, rx*radiusRand[i]);
+                        const ryEff = Math.max(innerExclusionY, ry*radiusRand[i]);
+                        if(!pos[i].init){
+                            const a = Math.random()*Math.PI*2;
+                            const kx = (Math.cos(a) * rxEff);
+                            const ky = (Math.sin(a) * ryEff);
+                            pos[i].x = kx * (0.6 + Math.random()*0.4);
+                            pos[i].y = ky * (0.6 + Math.random()*0.4);
+                            pos[i].init = true;
+                        }
+                        // 随机扰动速度
+                        vel[i].x += (Math.random()-0.5)*0.08;
+                        vel[i].y += (Math.random()-0.5)*0.08;
+                        // 速度限幅
+                        const sp = Math.hypot(vel[i].x, vel[i].y) || 0.001;
+                        const clamped = Math.max(MIN_SPEED, Math.min(MAX_SPEED, sp));
+                        vel[i].x = vel[i].x / sp * clamped;
+                        vel[i].y = vel[i].y / sp * clamped;
+                        // 位置更新
+                        pos[i].x += vel[i].x;
+                        pos[i].y += vel[i].y;
+                        // 中心文字提前远离：对预警区内/附近的点持续施加斥力
+                        const ax = pos[i].x;
+                        const ay = pos[i].y;
+                        const insideWarn = Math.abs(ax) < textWarnX && Math.abs(ay) < textWarnY;
+                        if(insideWarn){
+                            // 基于距离中心的归一化向量施加力
+                            const nx = (ax === 0 ? (Math.random() - 0.5) : ax) / (Math.abs(ax) + 1e-3);
+                            const ny = (ay === 0 ? (Math.random() - 0.5) : ay) / (Math.abs(ay) + 1e-3);
+                            // 强度：越靠近中心越强
+                            const px = 1 - Math.min(1, Math.abs(ax) / textWarnX);
+                            const py = 1 - Math.min(1, Math.abs(ay) / textWarnY);
+                            const force = 0.8 * Math.max(px, py); // 0~0.8
+                            vel[i].x += nx * force;
+                            vel[i].y += ny * force;
+                        }
+                        // 严格留白区域内，立即弹出
+                        const insideClear = Math.abs(ax) < textClearX && Math.abs(ay) < textClearY;
+                        if(insideClear){
+                            const nx = (ax === 0 ? (Math.random() - 0.5) : ax) / (Math.abs(ax) + 1e-3);
+                            const ny = (ay === 0 ? (Math.random() - 0.5) : ay) / (Math.abs(ay) + 1e-3);
+                            pos[i].x = Math.sign(nx) * textClearX;
+                            pos[i].y = Math.sign(ny) * textClearY;
+                            vel[i].x += nx * 1.2;
+                            vel[i].y += ny * 1.2;
+                        }
+                        // 边界反弹
+                        if(pos[i].x > boundsX || pos[i].x < -boundsX){ vel[i].x *= -1; pos[i].x = Math.max(-boundsX, Math.min(boundsX, pos[i].x)); }
+                        if(pos[i].y > boundsY || pos[i].y < -boundsY){ vel[i].y *= -1; pos[i].y = Math.max(-boundsY, Math.min(boundsY, pos[i].y)); }
+                        // 吸附回许可半径内（防止长时间漂到内圈）
+                        pos[i].x = Math.max(-rxEff, Math.min(rxEff, pos[i].x));
+                        pos[i].y = Math.max(-ryEff, Math.min(ryEff, pos[i].y));
+                        let x = pos[i].x;
+                        let y = pos[i].y;
+                        // 边界限制，留出约1cm安全距离
+                        x = Math.max(-boundsX + boundaryPadding, Math.min(boundsX - boundaryPadding, x));
+                        y = Math.max(-boundsY + boundaryPadding, Math.min(boundsY - boundaryPadding, y));
+                        positions[i] = {x, y};
+                    });
+
+                    // 简单碰撞分离，避免图标互相遮挡（2-3 次迭代即可）
+                    for(let iter=0; iter<3; iter++){
+                        for(let i=0; i<positions.length; i++){
+                            for(let j=i+1; j<positions.length; j++){
+                                const pi = positions[i];
+                                const pj = positions[j];
+                                const rMin = (sizes[i]+sizes[j]) * 0.48 + 37.8; // 再额外加 ~1cm 分隔
+                                const dx = pj.x - pi.x;
+                                const dy = pj.y - pi.y;
+                                const dist = Math.hypot(dx, dy) || 0.001;
+                                if(dist < rMin){
+                                    const overlap = (rMin - dist) * 0.52; // 分离强度
+                                    const nx = dx / dist;
+                                    const ny = dy / dist;
+                                    pi.x -= nx * overlap;
+                                    pi.y -= ny * overlap;
+                                    pj.x += nx * overlap;
+                                    pj.y += ny * overlap;
+                                    // 远离中心文字的轴向推力，强化不遮字
+                                    if(Math.abs(pi.x) < textClearX && Math.abs(pi.y) < textClearY){ pi.x += Math.sign(pi.x||1)*6; pi.y += Math.sign(pi.y||1)*6; }
+                                    if(Math.abs(pj.x) < textClearX && Math.abs(pj.y) < textClearY){ pj.x += Math.sign(pj.x||1)*6; pj.y += Math.sign(pj.y||1)*6; }
+                                    // 再次边界限制
+                                    pi.x = Math.max(-boundsX, Math.min(boundsX, pi.x));
+                                    pi.y = Math.max(-boundsY, Math.min(boundsY, pi.y));
+                                    pj.x = Math.max(-boundsX, Math.min(boundsX, pj.x));
+                                    pj.y = Math.max(-boundsY, Math.min(boundsY, pj.y));
+                                }
+                            }
+                        }
+                    }
+
+                    // 应用位置
+                    icons.forEach((el, i)=>{
+                        const tx = positions[i].x * eased;
+                        const ty = positions[i].y * eased;
+                        el.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${0.9 + 0.1*eased})`;
+                        const s = (0.9 + 0.1*eased) * (baseScale[i] || 1);
+                        el.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${s})`;
+                    });
+                }
+
+                // 启动即四散：初始滚动进度设为 1，使进入页面直接展开
+                // 启动控制：500ms 延迟后触发一次 0->1 的展开动画；
+                // 离开视口后重置，再次进入时重新展开
+                let openProgress = 0; // 0 折叠 -> 1 展开
+                const openDurationMs = 800;
+                let opening = false;
+                let openedOnce = false;
+
+                function easeInOut(t){ return t*t*(3-2*t); }
+
+                function startOpen(){
+                    if(opening) return;
+                    opening = true;
+                    const t0 = performance.now();
+                    function tick(now){
+                        const p = Math.min(1, (now - t0) / openDurationMs);
+                        openProgress = p;
+                        if(p < 1){ requestAnimationFrame(tick); }
+                        else { opening = false; openedOnce = true; }
+                    }
+                    requestAnimationFrame(tick);
+                }
+
+                const wrap = document.getElementById('scatterSection');
+                setTimeout(()=>{ if(wrap){ wrap.classList.add('ready'); startOpen(); } }, 500);
+
+                // 视口进入/离开时再次触发展开
+                if('IntersectionObserver' in window && wrap){
+                    const io = new IntersectionObserver(entries =>{
+                        entries.forEach(e=>{
+                            if(e.isIntersecting){
+                                if(!openedOnce){ startOpen(); }
+                            } else {
+                                // 离开后重置为未展开，下次进入再动画
+                                openProgress = 0; opening = false; openedOnce = false;
+                            }
+                        })
+                    }, { threshold: 0.45 });
+                    io.observe(wrap);
+                }
+
+                // RAF 循环
+                function loop(){ update(); requestAnimationFrame(loop); }
+                window.addEventListener('resize', update);
+                window.addEventListener('scroll', update, {passive:true});
+                loop();
+            })();
+            
+            // 动态显示/隐藏字段
+            const roleInputs = document.querySelectorAll('input[name="role"]');
+            const supervisorEmployeeFields = document.getElementById('supervisor-employee-fields');
+            const employeeFields = document.getElementById('employee-fields');
+            
+            function toggleFields() {
+                const selectedRole = document.querySelector('input[name="role"]:checked').value;
+                
+                if (selectedRole === 'executive') {
+                    supervisorEmployeeFields.style.display = 'block';
+                    employeeFields.style.display = 'none';
+                    // 设置高管字段为必填
+                    supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = true;
+                    });
+                    employeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = false;
+                    });
+                } else if (selectedRole === 'employee') {
+                    supervisorEmployeeFields.style.display = 'block';
+                    employeeFields.style.display = 'block';
+                    // 设置所有字段为必填
+                    supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = true;
+                    });
+                    employeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = true;
+                    });
+                } else {
+                    supervisorEmployeeFields.style.display = 'none';
+                    employeeFields.style.display = 'none';
+                    // 设置字段为非必填
+                    supervisorEmployeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = false;
+                    });
+                    employeeFields.querySelectorAll('input').forEach(input => {
+                        input.required = false;
+                    });
+                }
+            }
+            
+            // 监听角色选择变化
+            roleInputs.forEach(input => {
+                input.addEventListener('change', toggleFields);
+            });
+            
+            // 初始化字段状态
+            toggleFields();
+            
+            // 表单验证
+            const signupForm = document.getElementById('signupForm');
+            const signinForm = document.getElementById('signinForm');
+            
+            // 注册表单验证
+            signupForm.addEventListener('submit', function(e) {
+                const selectedRole = document.querySelector('input[name="role"]:checked');
+                if (!selectedRole) {
+                    e.preventDefault();
+                    alert('请选择注册身份！');
+                    return false;
+                }
+            });
+            
+            // 登录表单验证
+            signinForm.addEventListener('submit', function(e) {
+                const selectedRole = document.querySelector('input[name="role"]:checked');
+                if (!selectedRole) {
+                    e.preventDefault();
+                    alert('请选择登录身份！');
+                    return false;
+                }
+            });
+
+            // “登录遇到问题” -> 关闭弹窗并跳转到联系区块（更稳健）
+            const helpLink = document.getElementById('signinHelp');
+            function closeModalAndGoContact(ev){
+                if(ev){ ev.preventDefault(); }
+                const modal = document.getElementById('authModal');
+                if(modal){
+                    // 双保险：先移除 open，再做淡出并隐藏
+                    modal.classList.remove('open');
+                    modal.style.opacity = '0';
+                    modal.setAttribute('aria-hidden','true');
+                    setTimeout(()=>{ modal.style.display = 'none'; modal.style.opacity = ''; }, 120);
+                }
+                // 等待布局更新后再滚动
+                setTimeout(()=>{
+                    const contact = document.getElementById('contact');
+                    if(contact){
+                        contact.scrollIntoView({behavior:'smooth', block:'start'});
+                    } else {
+                        window.location.hash = 'contact';
+                    }
+                }, 30);
+            }
+            if(helpLink){ helpLink.addEventListener('click', closeModalAndGoContact); }
+        });
+    </script>
+</body>
+</html>

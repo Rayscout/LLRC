@@ -28,14 +28,14 @@
     </div>
 
     <div class="card" style="margin-top: 24px;">
-      <div style="display:flex;justify-content:space-between;align-items:center; margin-bottom:10px;">
-        <div style="font-weight:700;">技能差距分析</div>
+      <div class="card-header">
+        <div class="card-title">技能差距分析</div>
         <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="btn btn-outline">更新技能</a>
       </div>
-      <div style="display:grid; gap:14px;">
-        <div style="display:grid; gap:8px;">
-          <div style="font-weight:600;">目标核心技能</div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;">
+      <div class="card-body-grid">
+        <div class="card-block">
+          <div class="card-subtitle">目标核心技能</div>
+          <div class="skills-wrap">
             <span class="skill-tag">TypeScript</span>
             <span class="skill-tag">React</span>
             <span class="skill-tag">Node.js</span>
@@ -43,23 +43,23 @@
             <span class="skill-tag">自动化测试</span>
           </div>
         </div>
-        <div style="display:grid; gap:8px;">
-          <div style="font-weight:600;">我的已具备</div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <div class="card-block">
+          <div class="card-subtitle">我的已具备</div>
+          <div class="skills-wrap">
             {% if user_skills %}
-              {% for s in user_skills %}<span class="skill-tag" style="background:rgba(52,199,89,.9)">{{ s }}</span>{% endfor %}
+              {% for s in user_skills %}<span class="skill-tag skill-tag-success">{{ s }}</span>{% endfor %}
             {% else %}
-              <span class="skill-tag" style="background:rgba(52,199,89,.9)">JavaScript</span>
-              <span class="skill-tag" style="background:rgba(52,199,89,.9)">HTML/CSS</span>
+              <span class="skill-tag skill-tag-success">JavaScript</span>
+              <span class="skill-tag skill-tag-success">HTML/CSS</span>
             {% endif %}
           </div>
         </div>
-        <div style="display:grid; gap:8px;">
-          <div style="font-weight:600;">差距（优先补齐）</div>
-          <div style="display:flex;flex-wrap:wrap;gap:10px;">
-            <span class="skill-tag" style="background:rgba(255,149,0,.95)">TypeScript</span>
-            <span class="skill-tag" style="background:rgba(255,149,0,.95)">自动化测试</span>
-            <span class="skill-tag" style="background:rgba(255,149,0,.95)">系统设计</span>
+        <div class="card-block">
+          <div class="card-subtitle">差距（优先补齐）</div>
+          <div class="skills-wrap">
+            <span class="skill-tag skill-tag-warning">TypeScript</span>
+            <span class="skill-tag skill-tag-warning">自动化测试</span>
+            <span class="skill-tag skill-tag-warning">系统设计</span>
           </div>
         </div>
       </div>
@@ -67,16 +67,16 @@
 
     <div class="grid grid-2" style="margin-top:24px;">
       <div class="card">
-        <div style="font-weight:700; margin-bottom:10px;">提升计划（里程碑）</div>
-        <ul style="margin:0; padding-left:18px; color:var(--text-secondary);">
+        <div class="card-header"><div class="card-title">提升计划（里程碑）</div></div>
+        <ul class="list-plain">
           <li>第 1-2 个月：完成 TypeScript 系统学习，重构 1 个中等复杂度模块</li>
           <li>第 3-4 个月：学习自动化测试（Jest/Playwright），为核心流程补齐测试</li>
           <li>第 5-6 个月：系统设计与性能优化，完成 1 个拆分与重构项目</li>
         </ul>
       </div>
       <div class="card">
-        <div style="font-weight:700; margin-bottom:10px;">课程与资源推荐</div>
-        <div style="display:grid; gap:10px;">
+        <div class="card-header"><div class="card-title">课程与资源推荐</div></div>
+        <div class="link-list">
           <a class="feature-link" href="#">TypeScript 实战课程</a>
           <a class="feature-link" href="#">React 高级模式与性能优化</a>
           <a class="feature-link" href="#">系统设计入门（含案例）</a>
@@ -105,7 +105,7 @@
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-  // 在页面末尾追加一个雷达图卡片
+  // 在页面末尾追加一个雷达图卡片（左右排版且缩小）
   (function(){
     const container = document.querySelector('#career-path .section-content');
     if(!container) return;
@@ -113,12 +113,13 @@
     card.className = 'card';
     card.style.marginTop = '24px';
     card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <div style="font-weight:700;">职业发挥雷达图（示例）</div>
-        <small style="color:var(--text-secondary)">用于自我评估与目标对齐</small>
-      </div>
-      <div style="max-width:800px;margin:0 auto;">
-        <canvas id="careerRadar" height="260"></canvas>
+      <div class="card-header"><div class="card-title">职业发挥雷达图（示例）</div><small style="color:var(--text-secondary)">用于自我评估与目标对齐</small></div>
+      <div class="radar-wrap">
+        <div class="radar-canvas"><canvas id="careerRadar" width="240" height="200"></canvas></div>
+        <div class="radar-desc">
+          <div class="card-subtitle">说明</div>
+          <p class="text-secondary">蓝色代表当前，绿色为目标范围。建议优先提升系统设计与沟通影响。</p>
+        </div>
       </div>
     `;
     container.appendChild(card);
