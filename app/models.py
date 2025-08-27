@@ -161,3 +161,109 @@ class TaskEvaluation(db.Model):
     evaluator = db.relationship('User', foreign_keys=[evaluator_id], backref=db.backref('given_evaluations', lazy=True))
     employee = db.relationship('User', foreign_keys=[employee_id], backref=db.backref('task_evaluations', lazy=True))
 
+class TalentDevelopmentData(db.Model):
+    """人才发展数据表 - 存储员工详细信息用于AI分析"""
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # 基本信息
+    position = db.Column(db.String(100), nullable=False)  # 职位
+    department = db.Column(db.String(100), nullable=False)  # 部门
+    salary = db.Column(db.Float, nullable=False)  # 薪资
+    hire_date = db.Column(db.Date, nullable=False)  # 入职日期
+    
+    # 绩效相关
+    performance_score = db.Column(db.Float, default=0.0)  # 绩效评分
+    promotion_count = db.Column(db.Integer, default=0)  # 晋升次数
+    last_promotion_date = db.Column(db.Date)  # 最近晋升日期
+    
+    # 技能发展
+    skills_level = db.Column(db.Float, default=0.0)  # 技能水平评分
+    training_hours = db.Column(db.Float, default=0.0)  # 培训时长
+    certification_count = db.Column(db.Integer, default=0)  # 证书数量
+    
+    # 工作满意度
+    satisfaction_score = db.Column(db.Float, default=0.0)  # 满意度评分
+    work_life_balance = db.Column(db.Float, default=0.0)  # 工作生活平衡评分
+    
+    # 团队协作
+    teamwork_score = db.Column(db.Float, default=0.0)  # 团队协作评分
+    leadership_potential = db.Column(db.Float, default=0.0)  # 领导力潜力
+    
+    # 市场竞争力
+    market_salary = db.Column(db.Float)  # 市场薪资
+    market_demand = db.Column(db.Float, default=0.0)  # 市场需求度
+    
+    # 风险指标
+    turnover_risk = db.Column(db.Float, default=0.0)  # 离职风险概率
+    risk_factors = db.Column(db.Text)  # 风险因素（JSON格式）
+    
+    # 时间戳
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 关系
+    employee = db.relationship('User', backref=db.backref('talent_data', lazy=True))
+
+class MarketSalaryData(db.Model):
+    """市场薪资数据表"""
+    id = db.Column(db.Integer, primary_key=True)
+    position = db.Column(db.String(100), nullable=False)  # 职位
+    industry = db.Column(db.String(100), nullable=False)  # 行业
+    location = db.Column(db.String(100), nullable=False)  # 地区
+    experience_level = db.Column(db.String(50), nullable=False)  # 经验级别
+    
+    # 薪资数据
+    min_salary = db.Column(db.Float, nullable=False)  # 最低薪资
+    max_salary = db.Column(db.Float, nullable=False)  # 最高薪资
+    avg_salary = db.Column(db.Float, nullable=False)  # 平均薪资
+    median_salary = db.Column(db.Float, nullable=False)  # 中位数薪资
+    
+    # 市场趋势
+    demand_trend = db.Column(db.Float, default=0.0)  # 需求趋势 (-1到1)
+    supply_trend = db.Column(db.Float, default=0.0)  # 供应趋势 (-1到1)
+    
+    # 时间戳
+    data_date = db.Column(db.Date, nullable=False)  # 数据日期
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class TalentAnalysisReport(db.Model):
+    """人才分析报告表"""
+    id = db.Column(db.Integer, primary_key=True)
+    report_type = db.Column(db.String(50), nullable=False)  # 报告类型：individual, department, company
+    target_id = db.Column(db.Integer)  # 目标ID（员工ID、部门ID等）
+    
+    # 报告内容
+    analysis_data = db.Column(db.Text, nullable=False)  # 分析数据（JSON格式）
+    risk_assessment = db.Column(db.Text)  # 风险评估
+    market_comparison = db.Column(db.Text)  # 市场对比
+    trend_forecast = db.Column(db.Text)  # 趋势预测
+    recommendations = db.Column(db.Text)  # 建议
+    
+    # 文件路径
+    pdf_path = db.Column(db.String(255))  # PDF文件路径
+    
+    # 时间戳
+    generated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # 关系
+    creator = db.relationship('User', backref=db.backref('generated_reports', lazy=True))
+
+class AIAnalysisLog(db.Model):
+    """AI分析日志表"""
+    id = db.Column(db.Integer, primary_key=True)
+    analysis_type = db.Column(db.String(50), nullable=False)  # 分析类型
+    input_data = db.Column(db.Text)  # 输入数据
+    output_data = db.Column(db.Text)  # 输出数据
+    processing_time = db.Column(db.Float)  # 处理时间（秒）
+    status = db.Column(db.String(20), default='success')  # 状态：success, error
+    error_message = db.Column(db.Text)  # 错误信息
+    
+    # 时间戳
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    
+    # 关系
+    user = db.relationship('User', backref=db.backref('ai_analysis_logs', lazy=True))
+

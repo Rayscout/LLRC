@@ -27,32 +27,13 @@ class IOSHRInterface {
         if (!container) return;
 
         this.sections = Array.from(document.querySelectorAll('.ios-section'));
-        
-        // 启用滚动捕捉
-        container.style.scrollSnapType = 'y mandatory';
-        
-        // 监听滚动事件
+
+        // 禁用分屏吸附和强制滚动逻辑，允许内容连续自然滚动
+        container.style.scrollSnapType = 'none';
+
+        // 仍保留轻量的滚动监听以支持视差等，但不再自动对齐或跳转
         container.addEventListener('scroll', (e) => {
             this.handleScroll(e);
-        });
-
-        // 触摸设备支持
-        let startY = 0;
-        let startScrollTop = 0;
-
-        container.addEventListener('touchstart', (e) => {
-            startY = e.touches[0].clientY;
-            startScrollTop = container.scrollTop;
-        });
-
-        container.addEventListener('touchmove', (e) => {
-            if (this.isScrolling) return;
-            
-            const deltaY = startY - e.touches[0].clientY;
-            const newScrollTop = startScrollTop + deltaY;
-            
-            // 平滑滚动到最近的section
-            this.scrollToNearestSection(newScrollTop);
         });
     }
 
@@ -82,38 +63,14 @@ class IOSHRInterface {
 
     // 滚动到最近的section
     scrollToNearestSection(scrollTop) {
-        const windowHeight = window.innerHeight;
-        const targetSection = Math.round(scrollTop / windowHeight);
-        
-        this.smoothScrollTo(targetSection * windowHeight);
+        // 不再自动吸附，直接返回
+        return;
     }
 
     // 平滑滚动
     smoothScrollTo(targetY) {
-        this.isScrolling = true;
-        
-        const container = document.querySelector('.ios-scroll-container');
-        const startY = container.scrollTop;
-        const distance = targetY - startY;
-        const duration = 800;
-        const startTime = performance.now();
-
-        const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-
-        const animate = (currentTime) => {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            
-            container.scrollTop = startY + distance * easeOutCubic(progress);
-            
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                this.isScrolling = false;
-            }
-        };
-
-        requestAnimationFrame(animate);
+        // 取消平滑强制滚动，避免把元素带离视口
+        return;
     }
 
     // 设置视差背景
@@ -498,17 +455,20 @@ class IOSHRInterface {
 
     // 设置平滑过渡
     setupSmoothTransitions() {
-        // 页面切换动画
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.style.opacity = '0';
-            document.body.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                document.body.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
-                document.body.style.opacity = '1';
-                document.body.style.transform = 'translateY(0)';
-            }, 100);
-        });
+        // 出于稳定性考虑，默认不再做“进入时先隐藏再显示”的过渡，避免首屏闪烁
+        // 若确需启用，可在特定页面将 allowPageEnterTransition 设为 true
+        const allowPageEnterTransition = false;
+        if (allowPageEnterTransition) {
+            document.addEventListener('DOMContentLoaded', () => {
+                document.body.style.opacity = '0';
+                document.body.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    document.body.style.transition = 'all 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
+                    document.body.style.opacity = '1';
+                    document.body.style.transform = 'translateY(0)';
+                }, 100);
+            });
+        }
 
         // 链接点击过渡
         const links = document.querySelectorAll('a[href^="#"], a[href^="/"]');
