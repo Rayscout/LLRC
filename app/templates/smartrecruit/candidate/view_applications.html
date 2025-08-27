@@ -7,7 +7,7 @@
     <div style="width: 100%; max-width: 1200px;">
         <div class="card animate-fade-in-up">
             <div style="text-align: center; margin-bottom: 30px;">
-                <h1 style="font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(135deg, var(--accent-color), var(--accent-hover)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 15px; color: var(--text-primary);">
                     📄 我的申请
                 </h1>
                 <p style="font-size: 1.1rem; color: var(--text-secondary);">查看和管理您的职位申请状态</p>
@@ -128,10 +128,12 @@
                 <td>{{ item.application.status }}</td>
                 <td>
                     <a class="view-details-button" href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=item.job.id) }}">查看职位</a>
-                    {% if item.application.status not in ['Withdrawn'] %}
-                        <form method="post" action="{{ url_for('smartrecruit.candidate.applications.withdraw_application', application_id=item.application.id) }}" style="display:inline; margin-left:10px;">
-                            <button type="submit" class="view-details-button btn-danger">撤销申请</button>
+                    {% if item.application.is_active %}
+                        <form method="post" action="{{ url_for('smartrecruit.candidate.applications.withdraw', application_id=item.application.id) }}" style="display:inline; margin-left:10px;">
+                            <button type="submit" class="view-details-button btn-danger withdraw-btn" data-app-id="{{ item.application.id }}">撤销申请</button>
                         </form>
+                    {% else %}
+                        <span style="color:var(--text-secondary);">已撤销</span>
                     {% endif %}
                 </td>
             </tr>
@@ -152,25 +154,30 @@ document.addEventListener('DOMContentLoaded', function() {
   const buttons = document.querySelectorAll('.withdraw-btn');
   buttons.forEach(btn => {
     btn.addEventListener('click', async (e) => {
+      // 优先走AJAX；若失败则回退为原始表单提交
+      e.preventDefault();
       const appId = btn.getAttribute('data-app-id');
       if (!appId) return;
-      // 双重确认以符合两次确认的交互
       if (!confirm('确定撤销申请吗？')) return;
-      if (!confirm('你真的确定吗？')) return;
       try {
         const url = `{{ url_for('smartrecruit.candidate.applications.withdraw', application_id=0) }}`.replace('0', appId) + '?ajax=1';
-        const resp = await fetch(url, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-        const data = await resp.json();
+        const resp = await fetch(url, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' });
+        if (!resp.ok) {
+          // 例如被重定向到登录页/CSRF等异常，直接回退提交表单
+          btn.closest('form')?.submit();
+          return;
+        }
+        const data = await resp.json().catch(() => null);
         if (data && data.success) {
-          // 直接从DOM移除该行，无需整页刷新
           const row = btn.closest('tr');
           if (row) row.remove();
         } else {
-          // 失败则回退为整页刷新
-          window.location.reload();
+          // 服务端未返回成功，提交表单走非AJAX流程
+          btn.closest('form')?.submit();
         }
       } catch (e) {
-        window.location.reload();
+        // 网络级错误：提交表单兜底
+        btn.closest('form')?.submit();
       }
     });
   });

@@ -502,7 +502,8 @@ def get_allowed_cv_extensions():
     Returns:
         set: A set of allowed file extensions for CV uploads.
     """
-    return {'pdf', 'docx', 'png', 'jpg', 'jpeg', 'mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'}
+    # 增加演示所需的PPT格式（ppt, pptx）
+    return {'pdf', 'docx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'}
 
 def extract_text_from_file(file_path):
     """

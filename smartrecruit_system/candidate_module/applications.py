@@ -85,23 +85,32 @@ def pre_apply(job_id):
 
 @applications_bp.route('/withdraw/<int:application_id>', methods=['POST'])
 def withdraw_application(application_id):
-    """撤销申请：仅允许撤销本人申请，状态改为 Withdrawn"""
+    """撤销申请（软撤销）：确保设置 is_active=False 并返回 JSON 以便前端即时更新。"""
     if g.user is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
 
     app_rec = Application.query.filter_by(id=application_id, user_id=g.user.id).first()
     if not app_rec:
+        # AJAX 请求直接返回 JSON
+        if request.args.get('ajax') == '1' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': '未找到该申请或无权限'}), 404
         flash('未找到该申请或无权限。', 'danger')
         return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
 
     try:
         app_rec.status = 'Withdrawn'
-        app_rec.message = '用户已撤销申请'
+        app_rec.is_active = False
+        app_rec.message = (app_rec.message or '') + ' (用户已撤销申请)'
         db.session.commit()
+        # AJAX：直接给前端成功
+        if request.args.get('ajax') == '1' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True})
         flash('已撤销该申请。', 'success')
     except Exception as e:
         logging.error(f"撤销申请失败: {e}")
+        if request.args.get('ajax') == '1' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': '撤销失败，请稍后重试。'}), 500
         flash('撤销失败，请稍后重试。', 'danger')
 
     return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
