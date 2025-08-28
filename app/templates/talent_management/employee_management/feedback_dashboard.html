@@ -321,7 +321,6 @@
             background: linear-gradient(135deg, transparent, rgba(0, 122, 255, 0.05), transparent);
             opacity: 0;
             transition: opacity 0.3s ease;
-            pointer-events: none;
         }
 
         .feedback-item:hover::before {
@@ -768,89 +767,6 @@
             </div>
         </div>
         {% endif %}
-
-        <!-- 反馈总结 -->
-        <div class="content-card">
-            <h2 class="section-title">
-                <i class="fas fa-chart-pie"></i> 反馈总结
-            </h2>
-            {% if ai_summary and (ai_summary.strengths or ai_summary.weaknesses) %}
-            <div class="content-grid" style="grid-template-columns: 1fr 1fr;">
-                <div>
-                    <h3 class="section-title"><i class="fas fa-thumbs-up"></i> 优点</h3>
-                    {% if ai_summary.strengths %}
-                    <ul>
-                        {% for s in ai_summary.strengths %}
-                        <li>{{ s }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <div class="empty-state">
-                        <p>暂无数据</p>
-                    </div>
-                    {% endif %}
-                </div>
-                <div>
-                    <h3 class="section-title"><i class="fas fa-triangle-exclamation"></i> 缺点</h3>
-                    {% if ai_summary.weaknesses %}
-                    <ul>
-                        {% for w in ai_summary.weaknesses %}
-                        <li>{{ w }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <div class="empty-state">
-                        <p>暂无数据</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-layer-group"></i>
-                <p>暂无可用的AI总结</p>
-                <p class="text-muted">请确认已收到反馈，且已配置 GEMINI_API_KEY 或 GOOGLE_API_KEY</p>
-            </div>
-            {% endif %}
-        </div>
-
-        <!-- 学习建议 -->
-        <div class="content-card">
-            <h2 class="section-title">
-                <i class="fas fa-book-open"></i> 学习建议
-            </h2>
-            {% if ai_recommendations %}
-            <div class="feedback-list">
-                {% for rec in ai_recommendations %}
-                <div class="feedback-item">
-                    <div class="feedback-header">
-                        <div class="feedback-info">
-                            <h4>🎯 {{ rec.topic }}</h4>
-                            {% if rec.reason %}
-                            <div class="feedback-meta">{{ rec.reason }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% if rec.links %}
-                    <div class="feedback-actions">
-                        {% for link in rec.links %}
-                        <a href="{{ link.url }}" target="_blank" rel="noopener" class="btn-small btn-secondary">{{ link.title or '查看课程' }}</a>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="empty-state"><p>未找到相关课程链接</p></div>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-lightbulb"></i>
-                <p>暂无可用的学习建议</p>
-                <p class="text-muted">请确认已生成总结并开启外网搜索（DDG）</p>
-            </div>
-            {% endif %}
-        </div>
     </div>
 
     <script>
