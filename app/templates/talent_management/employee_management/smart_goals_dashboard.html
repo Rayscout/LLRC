@@ -203,20 +203,83 @@
             margin-bottom: 15px;
         }
 
+        .progress-container {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
         .progress-bar {
             width: 100%;
-            height: 8px;
+            height: 12px;
             background: rgba(0, 122, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 8px;
+            border-radius: 6px;
+            overflow: visible;
+            position: relative;
+            cursor: pointer;
         }
 
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--accent-blue) 0%, #5856D6 100%);
-            border-radius: 4px;
+            border-radius: 6px;
             transition: width 0.3s ease;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .progress-handle {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 2px solid var(--accent-blue);
+            border-radius: 50%;
+            cursor: grab;
+            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+
+        .progress-handle:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+        }
+
+        .progress-handle:active {
+            cursor: grabbing;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .progress-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .hours-input {
+            width: 80px;
+            padding: 6px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .hours-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+        }
+
+        .hours-label {
+            font-size: 0.85em;
+            color: var(--text-secondary);
         }
 
         .progress-text {
@@ -402,7 +465,7 @@
 </head>
 <body>
     <div class="container">
-        <a href="{{ url_for('talent_management.employee_auth.employee_dashboard') }}" class="back-link">
+        <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="back-link">
             <i class="fas fa-arrow-left"></i> 返回仪表板
         </a>
 
@@ -449,12 +512,24 @@
                             </div>
 
                             <div class="goal-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: {{ goal.progress }}%"></div>
+                                <div class="progress-container">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="progress-fill-{{ goal.id }}" style="width: {{ goal.progress }}%"></div>
+                                        <div class="progress-handle" id="progress-handle-{{ goal.id }}"
+                                             style="left: {{ goal.progress }}%"
+                                             data-goal-id="{{ goal.id }}"
+                                             data-max-hours="{{ goal.estimated_hours }}"></div>
+                                    </div>
+                                    <div class="progress-input-group">
+                                        <input type="number" class="hours-input" id="hours-input-{{ goal.id }}"
+                                               value="{{ goal.completed_hours }}" min="0" max="{{ goal.estimated_hours }}"
+                                               data-goal-id="{{ goal.id }}">
+                                        <span class="hours-label">/{{ goal.estimated_hours }} 小时</span>
+                                    </div>
                                 </div>
                                 <div class="progress-text">
-                                    <span>进度: {{ goal.progress }}%</span>
-                                    <span>{{ goal.completed_hours }}/{{ goal.estimated_hours }} 小时</span>
+                                    <span>进度: <span id="progress-text-{{ goal.id }}">{{ "%.1f"|format(goal.progress) }}%</span></span>
+                                    <span>剩余: <span id="remaining-hours-{{ goal.id }}">{{ goal.remaining_hours }}</span> 小时</span>
                                 </div>
                             </div>
 
@@ -485,8 +560,8 @@
                             {% endif %}
 
                             <div class="goal-actions">
-                                <button class="btn btn-primary" onclick="updateProgress({{ goal.id }})">
-                                    <i class="fas fa-edit"></i> 更新进度
+                                <button class="btn save-progress-btn" onclick="saveProgress({{ goal.id }})" data-goal-id="{{ goal.id }}">
+                                    <i class="fas fa-save"></i> 保存
                                 </button>
                                 <button class="btn btn-secondary" onclick="viewDetails({{ goal.id }})">
                                     <i class="fas fa-eye"></i> 查看详情
@@ -564,7 +639,7 @@
                     <p style="color: var(--text-secondary); margin-bottom: 20px;">
                         基于您的技能差距和职业发展需求，创建个性化的SMART目标
                     </p>
-                    <a href="{{ url_for('talent_management.employee_manager.smart_goals.create_goal') }}" class="create-goal-btn">
+                    <a href="{{ url_for('talent_management.employee_management.smart_goals.create_goal') }}" class="create-goal-btn">
                         <i class="fas fa-plus"></i> 创建SMART目标
                     </a>
                 </div>
@@ -573,48 +648,326 @@
     </div>
 
     <script>
-        function updateProgress(goalId) {
-            const progress = prompt('请输入新的进度百分比 (0-100):');
-            if (progress !== null && !isNaN(progress) && progress >= 0 && progress <= 100) {
-                const notes = prompt('请输入进度备注 (可选):');
-                
-                fetch(`/talent/employee_manager/smart_goals/${goalId}/update_progress`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        goal_id: goalId,
-                        progress: parseInt(progress),
-                        notes: notes || ''
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('进度更新成功！');
-                        location.reload();
-                    } else {
-                        alert('更新失败: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('更新失败，请稍后重试');
+        // 进度条拖拽功能
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeProgressBars();
+            updateSaveButtonState(); // 初始化保存按钮状态
+        });
+
+        function initializeProgressBars() {
+            // 为每个进度条添加事件监听器
+            document.querySelectorAll('.progress-handle').forEach(handle => {
+                const goalId = handle.dataset.goalId;
+                const maxHours = parseInt(handle.dataset.maxHours);
+
+                // 鼠标按下事件
+                handle.addEventListener('mousedown', function(e) {
+                    e.preventDefault();
+                    startDragging(handle, goalId, maxHours);
                 });
-            }
+            });
+
+            // 为进度条背景添加点击事件
+            document.querySelectorAll('.progress-bar').forEach(bar => {
+                bar.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('progress-handle')) return;
+
+                    const rect = this.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const percentage = (clickX / rect.width) * 100;
+
+                    const handle = this.querySelector('.progress-handle');
+                    const goalId = handle.dataset.goalId;
+                    const maxHours = parseInt(handle.dataset.maxHours);
+
+                    updateProgressByPercentage(goalId, maxHours, percentage);
+                    // 点击进度条时也要标记为待保存
+                    const numericGoalId = parseInt(goalId);
+                    pendingChanges.add(numericGoalId);
+
+                    // 强制更新特定按钮状态
+                    const saveButton = document.querySelector(`[data-goal-id="${goalId}"].save-progress-btn`);
+                    if (saveButton) {
+                        saveButton.style.background = 'linear-gradient(135deg, #FF9500 0%, #FF6B35 100%)';
+                        saveButton.innerHTML = '<i class="fas fa-save"></i> 保存更改';
+                        saveButton.disabled = false;
+                    }
+
+                    updateSaveButtonState();
+                });
+            });
+
+            // 为小时数输入框添加事件监听器
+            document.querySelectorAll('.hours-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    const goalId = this.dataset.goalId;
+                    const maxHours = parseInt(this.max);
+                    const completedHours = parseInt(this.value) || 0;
+
+                    updateProgressByHours(goalId, maxHours, completedHours);
+                    // 标记该目标有待保存的更改
+                    const numericGoalId = parseInt(goalId);
+                    pendingChanges.add(numericGoalId);
+
+                    // 强制更新特定按钮状态
+                    const saveButton = document.querySelector(`[data-goal-id="${goalId}"].save-progress-btn`);
+                    if (saveButton) {
+                        saveButton.style.background = 'linear-gradient(135deg, #FF9500 0%, #FF6B35 100%)';
+                        saveButton.innerHTML = '<i class="fas fa-save"></i> 保存更改';
+                        saveButton.disabled = false;
+                    }
+
+                    updateSaveButtonState();
+                });
+
+                input.addEventListener('blur', function() {
+                    // 不再立即保存，等待用户点击保存按钮
+                    // const goalId = this.dataset.goalId;
+                    // const completedHours = parseInt(this.value) || 0;
+                    // updateGoalHours(goalId, completedHours);
+                });
+            });
         }
 
-        function completeGoal(goalId) {
-            const notes = prompt('请输入完成备注 (可选):');
-            
-            fetch(`/talent/employee_manager/smart_goals/${goalId}/complete`, {
+        // 存储待保存的更改
+        let pendingChanges = new Set();
+
+        function startDragging(handle, goalId, maxHours) {
+            let isDragging = true;
+
+            function handleMouseMove(e) {
+                if (!isDragging) return;
+
+                const bar = handle.parentElement;
+                const rect = bar.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const percentage = Math.max(0, Math.min(100, (mouseX / rect.width) * 100));
+
+                updateProgressByPercentage(goalId, maxHours, percentage);
+                // 标记该目标有待保存的更改 - 确保使用数字类型
+                const numericGoalId = parseInt(goalId);
+                pendingChanges.add(numericGoalId);
+
+                // 强制更新特定按钮状态
+                const saveButton = document.querySelector(`[data-goal-id="${goalId}"].save-progress-btn`);
+                if (saveButton) {
+                    saveButton.style.background = 'linear-gradient(135deg, #FF9500 0%, #FF6B35 100%)';
+                    saveButton.innerHTML = '<i class="fas fa-save"></i> 保存更改';
+                    saveButton.disabled = false;
+                }
+
+                updateSaveButtonState();
+            }
+
+            function handleMouseUp() {
+                isDragging = false;
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+                // 不再立即保存，等待用户点击保存按钮
+            }
+
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        }
+
+        function updateProgressByPercentage(goalId, maxHours, percentage) {
+            const completedHours = Math.round((percentage / 100) * maxHours);
+            updateProgressByHours(goalId, maxHours, completedHours);
+        }
+
+        function updateSaveButtonState() {
+            const saveButtons = document.querySelectorAll('.save-progress-btn');
+
+            saveButtons.forEach(button => {
+                const goalId = button.dataset.goalId;
+                const numericGoalId = parseInt(goalId);
+                const hasChanges = pendingChanges.has(numericGoalId);
+
+                if (hasChanges) {
+                    // 有待保存更改时的状态
+                    button.style.background = 'linear-gradient(135deg, #FF9500 0%, #FF6B35 100%)';
+                    button.innerHTML = '<i class="fas fa-save"></i> 保存更改';
+                    button.disabled = false;
+                } else {
+                    // 无待保存更改时的状态 - 可点击但样式不同
+                    button.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 100%)';
+                    button.innerHTML = '<i class="fas fa-save"></i> 保存';
+                    button.disabled = false;
+                }
+            });
+        }
+
+        function updateProgressByHours(goalId, maxHours, completedHours) {
+            // 限制在有效范围内
+            completedHours = Math.max(0, Math.min(maxHours, completedHours));
+            const percentage = (completedHours / maxHours) * 100;
+
+            // 更新UI
+            const progressFill = document.getElementById(`progress-fill-${goalId}`);
+            const progressHandle = document.getElementById(`progress-handle-${goalId}`);
+            const progressText = document.getElementById(`progress-text-${goalId}`);
+            const hoursInput = document.getElementById(`hours-input-${goalId}`);
+            const remainingHours = document.getElementById(`remaining-hours-${goalId}`);
+
+            if (progressFill) progressFill.style.width = percentage + '%';
+            if (progressHandle) progressHandle.style.left = percentage + '%';
+            if (progressText) progressText.textContent = percentage.toFixed(1) + '%';
+            if (hoursInput) hoursInput.value = completedHours;
+            if (remainingHours) remainingHours.textContent = maxHours - completedHours;
+        }
+
+        function updateGoalHours(goalId, completedHours) {
+            fetch(`/talent/employee_management/smart_goals/${goalId}/update_hours`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    goal_id: goalId,
+                    completed_hours: completedHours
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新UI
+                    const progressText = document.getElementById(`progress-text-${goalId}`);
+                    const remainingHours = document.getElementById(`remaining-hours-${goalId}`);
+                    const progressFill = document.getElementById(`progress-fill-${goalId}`);
+                    const progressHandle = document.getElementById(`progress-handle-${goalId}`);
+                    const hoursInput = document.getElementById(`hours-input-${goalId}`);
+
+                    if (progressText) progressText.textContent = data.progress + '%';
+                    if (remainingHours) remainingHours.textContent = data.remaining_hours;
+                    if (progressFill) progressFill.style.width = data.progress + '%';
+                    if (progressHandle) progressHandle.style.left = data.progress + '%';
+                    if (hoursInput) hoursInput.value = data.completed_hours;
+
+                    // 如果目标完成，显示庆祝信息
+                    if (data.is_completed) {
+                        showCompletionCelebration(goalId);
+                    }
+                } else {
+                    console.error('更新失败:', data.message);
+                    // 可以显示错误提示
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function showCompletionCelebration(goalId) {
+            // 创建庆祝效果
+            const goalItem = document.querySelector(`[data-goal-id="${goalId}"]`).closest('.goal-item');
+            goalItem.style.animation = 'celebrate 1s ease-in-out';
+
+            setTimeout(() => {
+                alert('🎉 恭喜！目标已完成！');
+            }, 500);
+        }
+
+        function saveProgress(goalId) {
+            const numericGoalId = parseInt(goalId);
+
+            // 检查是否有待保存的更改
+            if (!pendingChanges.has(numericGoalId)) {
+                // 显示无更改提示
+                showNoChangesMessage(goalId);
+                return;
+            }
+
+            // 获取当前UI中的完成小时数
+            const hoursInput = document.getElementById(`hours-input-${goalId}`);
+            const completedHours = parseInt(hoursInput ? hoursInput.value : 0) || 0;
+
+            fetch(`/talent/employee_management/smart_goals/${goalId}/update_hours`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    completed_hours: completedHours
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 显示保存成功提示
+                    showSaveSuccess(goalId);
+
+                    // 从待保存列表中移除
+                    pendingChanges.delete(goalId);
+                    updateSaveButtonState();
+
+                    // 更新UI显示
+                    const progressText = document.getElementById(`progress-text-${goalId}`);
+                    const remainingHours = document.getElementById(`remaining-hours-${goalId}`);
+                    const progressFill = document.getElementById(`progress-fill-${goalId}`);
+                    const progressHandle = document.getElementById(`progress-handle-${goalId}`);
+
+                    if (progressText) progressText.textContent = data.progress + '%';
+                    if (remainingHours) remainingHours.textContent = data.remaining_hours;
+                    if (progressFill) progressFill.style.width = data.progress + '%';
+                    if (progressHandle) progressHandle.style.left = data.progress + '%';
+                    if (hoursInput) hoursInput.value = data.completed_hours;
+
+                    // 显示成功提示
+                    showSaveSuccess(goalId);
+
+                    // 如果目标完成，显示庆祝信息
+                    if (data.is_completed) {
+                        showCompletionCelebration(goalId);
+                    }
+                } else {
+                    alert('保存失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('保存失败，请稍后重试');
+            });
+        }
+
+        function showSaveSuccess(goalId) {
+            const button = document.querySelector(`[data-goal-id="${goalId}"].save-progress-btn`);
+            if (button) {
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> 已保存';
+                button.style.background = 'linear-gradient(135deg, #34C759 0%, #30D158 100%)';
+
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.style.background = '';
+                    updateSaveButtonState();
+                }, 2000);
+            }
+        }
+
+        function showNoChangesMessage(goalId) {
+            const button = document.querySelector(`[data-goal-id="${goalId}"].save-progress-btn`);
+            if (button) {
+                const originalHTML = button.innerHTML;
+                const originalBackground = button.style.background;
+
+                button.innerHTML = '<i class="fas fa-info-circle"></i> 无更改';
+                button.style.background = 'linear-gradient(135deg, #8E8E93 0%, #636366 100%)';
+
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.style.background = originalBackground;
+                }, 1500);
+            }
+        }
+
+        function completeGoal(goalId) {
+            const notes = prompt('请输入完成备注 (可选):');
+
+            fetch(`/talent/employee_management/smart_goals/${goalId}/complete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
                     completion_notes: notes || ''
                 })
             })
@@ -638,5 +991,13 @@
             alert('目标详情功能开发中...');
         }
     </script>
+
+    <style>
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
 </body>
 </html>
