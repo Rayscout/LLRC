@@ -87,7 +87,7 @@ def employee_auth():
                 session['user_type'] = 'employee'
                 flash('员工登录成功！', 'success')
                 # 重定向到员工仪表盘
-                return redirect(url_for('talent_management.employee_auth.employee_dashboard'))
+                return redirect(url_for('talent_management.employee_management.employee_dashboard'))
             else:
                 flash('邮箱或密码错误，或该账号不是员工账号。', 'danger')
                 return redirect(url_for('talent_management.employee_auth.employee_auth'))

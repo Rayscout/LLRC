@@ -3,10 +3,14 @@ from .profile import profile_bp
 from .jobs import jobs_bp
 from .applications import applications_bp
 from .interview import interview_bp
+from .ai_analysis_routes import ai_analysis_bp
 from app.utils import extract_text_from_resume, ai_analyze_resume_text
 
 # 创建求职者主蓝图
 candidate_bp = Blueprint('candidate', __name__, url_prefix='/candidate')
+
+# 注册子蓝图
+candidate_bp.register_blueprint(ai_analysis_bp)
 
 @candidate_bp.route('/')
 def home():
@@ -33,8 +37,14 @@ def home():
     except Exception:
         resume_analysis = None
 
-    # 使用新版首页（与全站新基座一致的风格）
-    return render_template('smartrecruit/candidate/home_recommend.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
+    # 使用可用的首页模板（带回退）
+    try:
+        return render_template('smartrecruit/candidate/home_recommend.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
+    except Exception:
+        try:
+            return render_template('smartrecruit/candidate/home_new.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
+        except Exception:
+            return render_template('smartrecruit/candidate/home.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
 
 @candidate_bp.route('/dashboard')
 def dashboard():
@@ -66,12 +76,12 @@ def dashboard():
     # 计算资料完整度
     profile_completion = calculate_profile_completion(g.user)
 
-    return render_template('smartrecruit/candidate/candidate_dashboard.html', 
-                         user=g.user,
-                         user_skills=user_skills,
-                         applications_count=applications_count,
-                         saved_jobs_count=saved_jobs_count,
-                         profile_completion=profile_completion)
+    return render_template('smartrecruit/candidate/candidate_dashboard.html',
+                          user=g.user,
+                          user_skills=user_skills,
+                          applications_count=applications_count,
+                          saved_jobs_count=saved_jobs_count,
+                          profile_completion=profile_completion)
 
 def calculate_profile_completion(user):
     """计算用户资料完整度"""
@@ -101,7 +111,11 @@ def settings():
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
     
-    return render_template('smartrecruit/candidate/settings.html', user=g.user)
+    # 设置页模板回退
+    try:
+        return render_template('smartrecruit/candidate/settings.html', user=g.user)
+    except Exception:
+        return render_template('smartrecruit/candidate/candidate_dashboard.html', user=g.user)
 
 # 注册求职者子蓝图
 candidate_bp.register_blueprint(profile_bp)
