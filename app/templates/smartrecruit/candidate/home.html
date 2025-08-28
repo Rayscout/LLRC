@@ -2,6 +2,10 @@
 
 {% block title %}智能推荐{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='candidate_dashboard_fix.css') }}">
+{% endblock %}
+
 {% block content %}
 <!-- 欢迎Section -->
 <section class="section" id="welcome">
