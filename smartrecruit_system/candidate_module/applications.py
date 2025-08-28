@@ -99,7 +99,7 @@ def withdraw_application(application_id):
         return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
 
     try:
-        app_rec.status = 'Withdrawn'
+        app_rec.status = 'withdrawn'
         app_rec.is_active = False
         app_rec.message = (app_rec.message or '') + ' (用户已撤销申请)'
         db.session.commit()
@@ -275,7 +275,7 @@ def apply(job_id):
         application = Application(
             user_id=g.user.id,
             job_id=job_id,
-            status='submitted',
+            status='pending',
             message=message,
             is_active=True
         )
