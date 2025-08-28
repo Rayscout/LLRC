@@ -506,7 +506,8 @@
       viAnswer.value = '';
       try {
         if(a){
-          const resp = await fetch('{{ url_for('smartrecruit.candidate.applications.api_vi_score') }}', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ question:q, answer:a }) });
+          const url = '{{ url_for('smartrecruit.candidate.applications.api_vi_score') }}' + window.location.search;
+          const resp = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ question:q, answer:a }) });
           const js = await resp.json();
           if(js && js.success && js.feedback){ alert(js.feedback); }
         }
