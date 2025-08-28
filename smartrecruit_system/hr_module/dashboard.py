@@ -1,545 +1,460 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, g, current_app, jsonify
-from datetime import datetime, timedelta
-import random
-import logging
-from app.models import User, Job, Application, db
+from flask import Blueprint, render_template, g, redirect, url_for, flash, request, abort
+from datetime import datetime
+try:
+    from app.models import db, User, Application, Job
+except Exception:
+    db = None
+    User = Application = Job = None
 
+# HR Dashboard blueprint
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
-@dashboard_bp.route('/test')
-def test():
-    """测试路由"""
-    return "测试路由工作正常！"
 
-@dashboard_bp.route('/hr_dashboard')
-def hr_dashboard():
-    """HR仪表盘"""
+@dashboard_bp.route('/', endpoint='hr_dashboard')
+def index():
+    if g.get('user') is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    if not getattr(g.user, 'is_hr', False):
+        flash('只有HR用户可以访问该页面。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    # Prefer iOS-styled dashboard if present
     try:
-        if g.user is None:
-            flash('请先登录。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        if not getattr(g.user, 'is_hr', False):
-            flash('只有HR用户才能访问此页面。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        # 获取统计数据
-        try:
-            total_jobs = Job.query.filter_by(user_id=g.user.id).count()
-        except Exception as e:
-            logging.error(f"查询职位数量失败: {e}")
-            total_jobs = 0
-        
-        try:
-            total_applications = Application.query.join(Job).filter(Job.user_id == g.user.id).count()
-        except Exception as e:
-            logging.error(f"查询申请数量失败: {e}")
-            total_applications = 0
-        
-        # 获取最近的职位
-        try:
-            recent_jobs = Job.query.filter_by(user_id=g.user.id).order_by(Job.date_posted.desc()).limit(5).all()
-        except Exception as e:
-            logging.error(f"查询最近职位失败: {e}")
-            recent_jobs = []
-        
-        # 获取最近的申请
-        try:
-            recent_applications = Application.query.join(Job).filter(Job.user_id == g.user.id).order_by(Application.timestamp.desc()).limit(5).all()
-        except Exception as e:
-            logging.error(f"查询最近申请失败: {e}")
-            recent_applications = []
-        
-        return render_template('smartrecruit/hr/hr_dashboard_ios.html',
-                             total_jobs=total_jobs,
-                             total_applications=total_applications,
-                             recent_jobs=recent_jobs,
-                             recent_applications=recent_applications)
-    except Exception as e:
-        logging.error(f"HR仪表盘加载失败: {e}")
-        flash('加载仪表盘时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_dashboard_ios.html',
-                             total_jobs=0,
-                             total_applications=0,
-                             recent_jobs=[],
-                             recent_applications=[])
+        return render_template('smartrecruit/hr/hr_dashboard_ios.html')
+    except Exception:
+        return render_template('smartrecruit/hr/hr_dashboard.html')
 
-@dashboard_bp.route('/candidates')
-def candidates():
-    """候选人管理"""
-    try:
-        if g.user is None:
-            flash('请先登录。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        if not getattr(g.user, 'is_hr', False):
-            flash('只有HR用户才能访问此页面。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        # 获取所有候选人及其申请信息
-        try:
-            # 获取HR发布的职位
-            hr_jobs = Job.query.filter_by(user_id=g.user.id).all()
-            job_ids = [job.id for job in hr_jobs]
-            
-            # 获取申请了这些职位的候选人
-            applications = Application.query.filter(Application.job_id.in_(job_ids)).all()
-            
-            # 构建候选人数据
-            candidates_data = []
-            for app in applications:
-                user = User.query.get(app.user_id)
-                if user:
-                    # 计算技能匹配度（基于职位要求）
-                    job = Job.query.get(app.job_id)
-                    skills_match = calculate_skills_match(user, job) if job else 0
-                    
-                    # 获取申请时间
-                    applied_date = app.timestamp.strftime('%Y-%m-%d') if app.timestamp else '未知'
-                    
-                    # 获取最后更新时间
-                    last_updated = app.timestamp.strftime('%Y-%m-%d %H:%M') if app.timestamp else '未知'
-                    
-                    candidates_data.append({
-                        'id': user.id,
-                        'user': user,
-                        'first_name': user.first_name,
-                        'last_name': user.last_name,
-                        'email': user.email,
-                        'profile_photo': user.profile_photo,
-                        'position': job.title if job else '未知职位',
-                        'skills_match': skills_match,
-                        'status': app.status,
-                        'applied_date': applied_date,
-                        'last_updated': last_updated
-                    })
-        except Exception as e:
-            logging.error(f"查询候选人数据失败: {e}")
-            candidates_data = []
-        
-        return render_template('smartrecruit/hr/hr_candidates_ios.html', candidates=candidates_data)
-    except Exception as e:
-        logging.error(f"候选人管理页面加载失败: {e}")
-        flash('加载候选人管理页面时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_candidates_ios.html', candidates=[])
 
-@dashboard_bp.route('/interviews')
-def interviews():
-    """面试安排管理"""
-    try:
-        print("开始加载面试安排页面")  # 调试信息
-        
-        if g.user is None:
-            print("用户未登录")  # 调试信息
-            flash('请先登录。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        if not getattr(g.user, 'is_hr', False):
-            print("用户不是HR")  # 调试信息
-            flash('只有HR用户才能访问此页面。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        print(f"用户ID: {g.user.id}")  # 调试信息
-        
-        # 获取所有候选人（用于面试安排表单）
-        try:
-            print("开始查询候选人数据")  # 调试信息
-            hr_jobs = Job.query.filter_by(user_id=g.user.id).all()
-            print(f"找到职位数量: {len(hr_jobs)}")  # 调试信息
-            
-            job_ids = [job.id for job in hr_jobs]
-            applications = Application.query.filter(Application.job_id.in_(job_ids)).all()
-            print(f"找到申请数量: {len(applications)}")  # 调试信息
-            
-            candidates_data = []
-            for app in applications:
-                user = User.query.get(app.user_id)
-                if user:
-                    candidates_data.append({
-                        'id': user.id,
-                        'first_name': user.first_name,
-                        'last_name': user.last_name,
-                        'position': Job.query.get(app.job_id).title if Job.query.get(app.job_id) else '未知职位'
-                    })
-            
-            print(f"构建候选人数据: {len(candidates_data)}")  # 调试信息
-            
-        except Exception as e:
-            print(f"查询候选人数据失败: {e}")  # 调试信息
-            logging.error(f"查询候选人数据失败: {e}")
-            candidates_data = []
-        
-        # 模拟面试数据（实际应用中应该从数据库获取）
-        interviews_data = [
-            {
-                'id': 1,
-                'candidate_name': '张三',
-                'candidate_email': 'zhangsan@example.com',
-                'position': '前端工程师',
-                'interviewer_name': '王经理',
-                'date': '2024-01-15',
-                'start_time': '10:00',
-                'end_time': '11:00',
-                'method': 'online',
-                'status': 'scheduled'
-            },
-            {
-                'id': 2,
-                'candidate_name': '李四',
-                'candidate_email': 'lisi@example.com',
-                'position': '后端工程师',
-                'interviewer_name': '李总监',
-                'date': '2024-01-16',
-                'start_time': '14:00',
-                'end_time': '15:00',
-                'method': 'offline',
-                'status': 'completed'
-            }
-        ]
-        
-        print("准备渲染模板")  # 调试信息
-        return render_template('smartrecruit/hr/hr_interviews_ios.html', 
-                             candidates=candidates_data,
-                             interviews=interviews_data)
-    except Exception as e:
-        print(f"面试安排页面加载失败: {e}")  # 调试信息
-        logging.error(f"面试安排页面加载失败: {e}")
-        flash('加载面试安排页面时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_interviews_ios.html', 
-                             candidates=[],
-                             interviews=[])
-
-def calculate_skills_match(user, job):
-    """计算技能匹配度"""
-    if not job or not job.skills_required:
-        return 75  # 默认匹配度
-    
-    # 这里可以实现更复杂的技能匹配算法
-    # 目前返回一个基于职位要求的模拟匹配度
-    required_skills = job.skills_required.lower().split(',') if job.skills_required else []
-    if not required_skills:
-        return 75
-    
-    # 模拟匹配度计算
-    base_match = 60
-    skill_bonus = min(len(required_skills) * 5, 30)
-    return min(base_match + skill_bonus, 95)
-
-def calculate_experience_years(birthday_str):
-    """根据生日计算工作经验年数"""
-    try:
-        if not birthday_str:
-            return 0
-        
-        # 假设18岁开始工作
-        birth_year = int(birthday_str.split('-')[0])
-        current_year = datetime.now().year
-        age = current_year - birth_year
-        experience = max(0, age - 18)
-        return min(experience, 30)  # 最大30年经验
-    except:
-        return 0
-
-def get_education_level(user):
-    """获取教育水平"""
-    # 这里可以根据实际需求扩展
-    return "本科"  # 默认值
-
-def get_sample_candidates_data():
-    """获取示例候选人数据"""
-    return [
-        {
-            'id': 1,
-            'user': None,
-            'application': None,
-            'job': None,
-            'position': '高级软件工程师',
-            'skills_match': 85,
-            'status': 'interview',
-            'applied_date': '2024-01-15',
-            'last_updated': '2024-01-20 14:30',
-            'experience_years': 5,
-            'education': '本科',
-            'phone': '138****8888',
-            'cv_file': 'resume_1.pdf',
-            'profile_photo': None,
-            'first_name': '张三',
-            'last_name': '',
-            'email': 'zhangsan@email.com'
-        },
-        {
-            'id': 2,
-            'user': None,
-            'application': None,
-            'job': None,
-            'position': '产品经理',
-            'skills_match': 92,
-            'status': 'offer',
-            'applied_date': '2024-01-10',
-            'last_updated': '2024-01-18 16:45',
-            'experience_years': 7,
-            'education': '硕士',
-            'phone': '139****9999',
-            'cv_file': 'resume_2.pdf',
-            'profile_photo': None,
-            'first_name': '李四',
-            'last_name': '',
-            'email': 'lisi@email.com'
-        },
-        {
-            'id': 3,
-            'user': None,
-            'application': None,
-            'job': None,
-            'position': 'UI设计师',
-            'skills_match': 78,
-            'status': 'screened',
-            'applied_date': '2024-01-12',
-            'last_updated': '2024-01-19 10:20',
-            'experience_years': 3,
-            'education': '本科',
-            'phone': '137****7777',
-            'cv_file': 'resume_3.pdf',
-            'profile_photo': None,
-            'first_name': '王五',
-            'last_name': '',
-            'email': 'wangwu@email.com'
-        },
-        {
-            'id': 4,
-            'user': None,
-            'application': None,
-            'job': None,
-            'position': '前端开发工程师',
-            'skills_match': 88,
-            'status': 'applied',
-            'applied_date': '2024-01-22',
-            'last_updated': '2024-01-22 09:15',
-            'experience_years': 4,
-            'education': '本科',
-            'phone': '136****6666',
-            'cv_file': 'resume_4.pdf',
-            'profile_photo': None,
-            'first_name': '赵六',
-            'last_name': '',
-            'email': 'zhaoliu@email.com'
-        }
-    ]
-
-@dashboard_bp.route('/reports')
-def reports():
-    """数据报告"""
-    try:
-        if g.user is None:
-            flash('请先登录。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        if not getattr(g.user, 'is_hr', False):
-            flash('只有HR用户才能访问此页面。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        # 生成报告数据
-        try:
-            jobs = Job.query.filter_by(user_id=g.user.id).all()
-            applications = Application.query.join(Job).filter(Job.user_id == g.user.id).all()
-        except Exception as e:
-            logging.error(f"查询报告数据失败: {e}")
-            jobs = []
-            applications = []
-        
-        # 计算招聘周期（从职位发布到入职的平均天数）
-        recruitment_cycle = calculate_recruitment_cycle(jobs, applications)
-        
-        # 计算招聘成本（模拟数据）
-        recruitment_cost = calculate_recruitment_cost(len(jobs), len(applications))
-        
-        # 计算Offer接受率
-        offer_acceptance_rate = calculate_offer_acceptance_rate(applications)
-        
-        # 漏斗数据
-        funnel_data = calculate_funnel_data(applications)
-        
-        # 团队绩效数据
-        team_performance = calculate_team_performance(jobs, applications)
-        
-        # 月度趋势数据
-        monthly_trends = calculate_monthly_trends(jobs, applications)
-        
-        report_data = {
-            'total_jobs': len(jobs),
-            'total_applications': len(applications),
-            'avg_applications_per_job': len(applications) / len(jobs) if jobs else 0,
-            'recruitment_cycle': recruitment_cycle,
-            'recruitment_cost': recruitment_cost,
-            'offer_acceptance_rate': offer_acceptance_rate,
-            'funnel_data': funnel_data,
-            'team_performance': team_performance,
-            'monthly_trends': monthly_trends,
-            'jobs_by_status': {}
-        }
-        
-        return render_template('smartrecruit/hr/hr_reports_ios.html', report_data=report_data)
-    except Exception as e:
-        logging.error(f"数据报告页面加载失败: {e}")
-        flash('加载数据报告页面时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_reports_simple.html', report_data={
-            'total_jobs': 0,
-            'total_applications': 0,
-            'avg_applications_per_job': 0,
-            'recruitment_cycle': 30,
-            'recruitment_cost': 0,
-            'offer_acceptance_rate': 0,
-            'funnel_data': {},
-            'team_performance': [],
-            'monthly_trends': [],
-            'jobs_by_status': {}
-        })
-
-@dashboard_bp.route('/insights')
+@dashboard_bp.route('/insights', endpoint='insights')
 def insights():
-    """AI洞察"""
+    if g.get('user') is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    if not getattr(g.user, 'is_hr', False):
+        flash('只有HR用户可以访问该页面。', 'danger')
+        return redirect(url_for('common.auth.sign'))
     try:
-        if g.user is None:
-            flash('请先登录。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        if not getattr(g.user, 'is_hr', False):
-            flash('只有HR用户才能访问此页面。', 'danger')
-            return redirect(url_for('common.auth.sign'))
-        
-        # AI洞察数据
-        insights = {
-            'top_skills': ['Python', 'JavaScript', 'React', 'Node.js', 'SQL'],
-            'trending_positions': ['Full Stack Developer', 'Data Scientist', 'DevOps Engineer'],
-            'candidate_quality_score': 85.5
-        }
-        
-        return render_template('smartrecruit/hr/hr_insights_ios.html', insights=insights)
+        return render_template('smartrecruit/hr/hr_insights_ios.html')
+    except Exception:
+        return render_template('smartrecruit/hr/hr_dashboard.html')
+
+
+@dashboard_bp.route('/interviews', endpoint='interviews')
+def interviews():
+    if g.get('user') is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    if not getattr(g.user, 'is_hr', False):
+        flash('只有HR用户可以访问该页面。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    try:
+        return render_template('smartrecruit/hr/hr_interviews_ios.html')
+    except Exception:
+        return render_template('smartrecruit/hr/hr_dashboard.html')
+
+
+@dashboard_bp.route('/candidates', endpoint='candidates')
+@dashboard_bp.route('/candidates/', endpoint='candidates_slash')
+def candidates():
+    if g.get('user') is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    if not getattr(g.user, 'is_hr', False):
+        flash('只有HR用户可以访问该页面。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    # 准备概览统计与最近候选人（最多5条）
+    recent = []
+    total = pending = interview = approved = 0
+    try:
+        if db is None:
+            raise RuntimeError('DB unavailable')
+        app_rows = (
+            Application.query
+            .order_by(Application.timestamp.desc())
+            .limit(50)
+            .all()
+        )
+        for app_row in app_rows:
+            user = User.query.get(app_row.user_id)
+            if not user:
+                continue
+            job = Job.query.get(app_row.job_id)
+            if job and job.user_id != g.user.id:
+                continue
+            status = (getattr(app_row, 'status', 'pending') or 'pending')
+            total += 1
+            if status == 'pending':
+                pending += 1
+            elif status == 'interview':
+                interview += 1
+            elif status == 'approved':
+                approved += 1
+            # 仅收集前5个用于首页展示
+            if len(recent) < 5:
+                recent.append({
+                    'user': user,
+                    'first_name': getattr(user, 'first_name', ''),
+                    'last_name': getattr(user, 'last_name', ''),
+                    'email': getattr(user, 'email', ''),
+                    'position': getattr(user, 'position', ''),
+                    'applied_date': app_row.timestamp.strftime('%Y-%m-%d %H:%M') if getattr(app_row, 'timestamp', None) else '',
+                    'status': status,
+                })
+    except Exception:
+        recent = []
+
+    try:
+        return render_template(
+            'smartrecruit/hr/hr_candidates_ios.html',
+            candidates=recent,
+            total_applications=total,
+            pending_applications=pending,
+            interview_applications=interview,
+            approved_applications=approved,
+        )
+    except Exception:
+        return redirect(url_for('smartrecruit.hr.dashboard.candidates_list'))
+
+
+@dashboard_bp.route('/reports', endpoint='reports')
+def reports():
+    if g.get('user') is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    if not getattr(g.user, 'is_hr', False):
+        flash('只有HR用户可以访问该页面。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    try:
+        return render_template('smartrecruit/hr/hr_reports_ios.html')
+    except Exception:
+        return render_template('smartrecruit/hr/hr_dashboard.html')
+
+
+@dashboard_bp.route('/candidates/list', endpoint='candidates_list')
+@dashboard_bp.route('/candidates/list/', endpoint='candidates_list_slash')
+def candidates_list():
+    if g.get('user') is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    if not getattr(g.user, 'is_hr', False):
+        flash('只有HR用户可以访问该页面。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    # 汇总最近候选人申请（可选关键词/状态过滤）
+    recent = []
+    q_keyword = (request.args.get('q') or '').strip().lower()
+    q_status = (request.args.get('status') or '').strip().lower()
+    try:
+        if db is None:
+            raise RuntimeError('DB unavailable')
+        app_query = Application.query.order_by(Application.timestamp.desc()).limit(200)
+        app_rows = app_query.all()
+        for app_row in app_rows:
+            user = User.query.get(app_row.user_id)
+            if not user:
+                continue
+            job = Job.query.get(app_row.job_id)
+            if job and job.user_id != g.user.id:
+                # 仅显示当前HR发布职位的申请
+                continue
+            full_name = f"{getattr(user, 'first_name', '')} {getattr(user, 'last_name', '')}".strip()
+            item_status = (getattr(app_row, 'status', 'pending') or 'pending').lower()
+            candidate_item = {
+                'id': user.id,
+                'name': full_name or getattr(user, 'email', '') or f"用户{user.id}",
+                'job_title': getattr(user, 'position', '') or (job.title if job else ''),
+                'email': getattr(user, 'email', ''),
+                'phone': getattr(user, 'phone_number', ''),
+                'application_date': app_row.timestamp.strftime('%Y-%m-%d %H:%M') if getattr(app_row, 'timestamp', None) else '',
+                'has_resume': bool(getattr(user, 'cv_file', None)),
+                'status': item_status,
+            }
+            # 关键词过滤（姓名/邮箱/职位）
+            if q_keyword:
+                blob = ' '.join([
+                    candidate_item['name'].lower(),
+                    candidate_item['email'].lower(),
+                    (candidate_item['job_title'] or '').lower(),
+                ])
+                if q_keyword not in blob:
+                    continue
+            # 状态过滤
+            if q_status and q_status != item_status:
+                continue
+            recent.append(candidate_item)
+    except Exception:
+        recent = []
+
+    # 统计
+    total = len(recent)
+    pending = len([x for x in recent if x['status'] == 'pending'])
+    interview = len([x for x in recent if x['status'] == 'interview'])
+    approved = len([x for x in recent if x['status'] == 'approved'])
+    withdrawn = len([x for x in recent if x['status'] == 'withdrawn'])
+
+    # 复用 iOS 模板所需变量命名
+    return render_template(
+        'smartrecruit/hr/candidate_list.html',
+        candidates=recent,
+        total_applications=total,
+        pending_applications=pending,
+        interview_applications=interview,
+        approved_applications=approved,
+        withdrawn_applications=withdrawn,
+        q=q_keyword,
+        status=q_status,
+    )
+
+
+@dashboard_bp.route('/candidates/filter', endpoint='candidates_filter')
+@dashboard_bp.route('/candidates/filter/', endpoint='candidates_filter_slash')
+def candidates_filter():
+    if g.get('user') is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    if not getattr(g.user, 'is_hr', False):
+        flash('只有HR用户可以访问该页面。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    # 读取筛选参数
+    search_query = (request.args.get('search') or '').strip()
+    status_filter = (request.args.get('status') or '').strip().lower()
+    job_filter = (request.args.get('job') or '').strip()
+    sort_by = (request.args.get('sort') or 'date_desc').strip()
+    auto_filter = (request.args.get('auto_filter') or 'false').lower() == 'true'
+    min_skills_match = int((request.args.get('min_skills_match') or '0') or 0)
+    min_experience = int((request.args.get('min_experience') or '0') or 0)
+    education_required = (request.args.get('education_required') or '').strip()
+    location_match = (request.args.get('location_match') or '').strip()
+
+    # 可选职位列表（当前HR发布）
+    available_jobs = []
+    try:
+        if db is not None:
+            available_jobs = Job.query.filter_by(user_id=g.user.id).order_by(Job.id.desc()).all()
+    except Exception:
+        available_jobs = []
+
+    # 构建候选人池（当前HR职位的申请）
+    candidates = []
+    try:
+        if db is None:
+            raise RuntimeError('DB unavailable')
+        app_query = Application.query.join(Job, Job.id == Application.job_id).filter(Job.user_id == g.user.id)
+        if job_filter:
+            try:
+                app_query = app_query.filter(Application.job_id == int(job_filter))
+            except Exception:
+                pass
+        app_query = app_query.order_by(Application.timestamp.desc()).limit(300)
+        app_rows = app_query.all()
+        for app_row in app_rows:
+            user = User.query.get(app_row.user_id)
+            job = Job.query.get(app_row.job_id) if app_row.job_id else None
+            if not user:
+                continue
+            # 计算轻量匹配指标（非AI）
+            skills_text = (getattr(user, 'skills', '') or '') + ' ' + (getattr(user, 'bio', '') or '')
+            job_title = (job.title if job else '')
+            name = f"{getattr(user, 'first_name', '')} {getattr(user, 'last_name', '')}".strip() or getattr(user, 'email', '')
+            skills_match = 0
+            try:
+                # 粗略：职位名中的词是否出现在技能/简介中
+                import re
+                tokens = [t for t in re.split(r'[\s,;，。/]+', job_title.lower()) if t]
+                hit = sum(1 for t in tokens if t and t in skills_text.lower())
+                skills_match = int(100 * hit / max(1, len(tokens))) if tokens else 0
+            except Exception:
+                skills_match = 0
+            try:
+                experience_years = int(getattr(user, 'experience_years', 0) or 0)
+            except Exception:
+                experience_years = 0
+            education_level = (getattr(user, 'education', '') or '')
+            location_text = (getattr(user, 'location', '') or '')
+            status = (getattr(app_row, 'status', 'pending') or 'pending').lower()
+
+            item = {
+                'id': user.id,
+                'name': name,
+                'job_title': job_title,
+                'email': getattr(user, 'email', ''),
+                'phone': getattr(user, 'phone_number', ''),
+                'applied_date': app_row.timestamp.strftime('%Y-%m-%d %H:%M') if getattr(app_row, 'timestamp', None) else '',
+                'status': status,
+                'skills_match': skills_match,
+                'experience_years': experience_years,
+                'education_level': education_level,
+            }
+
+            # 文本搜索
+            if search_query:
+                blob = ' '.join([
+                    name.lower(),
+                    (item['email'] or '').lower(),
+                    (job_title or '').lower(),
+                ])
+                if search_query.lower() not in blob:
+                    continue
+
+            # 状态过滤
+            if status_filter and status_filter != status:
+                continue
+
+            # 教育过滤
+            if education_required and education_required not in education_level:
+                continue
+
+            # 位置过滤
+            if location_match and location_match not in location_text:
+                continue
+
+            # 智能（规则）过滤：不用AI，仅按阈值剔除
+            if auto_filter:
+                if skills_match < min_skills_match:
+                    continue
+                if experience_years < min_experience:
+                    continue
+
+            candidates.append(item)
+
+        # 排序
+        def sort_key(c):
+            if sort_by == 'date_asc':
+                return c['applied_date']
+            if sort_by == 'name_asc':
+                return c['name']
+            if sort_by == 'name_desc':
+                return ('~' + c['name'])  # 简化逆序
+            if sort_by == 'skills_match':
+                return -c['skills_match']
+            if sort_by == 'ai_score':
+                return 0  # 未接AI，置0
+            return c['applied_date']
+        reverse = sort_by in ('date_desc', 'skills_match')
+        candidates.sort(key=sort_key, reverse=reverse)
+    except Exception:
+        candidates = []
+
+    return render_template(
+        'smartrecruit/hr/candidate_filter.html',
+        candidates=candidates,
+        available_jobs=available_jobs,
+        search_query=search_query,
+        status_filter=status_filter,
+        job_filter=job_filter,
+        sort_by=sort_by,
+        auto_filter=auto_filter,
+        min_skills_match=min_skills_match,
+        min_experience=min_experience,
+        education_required=education_required,
+        location_match=location_match,
+    )
+
+
+@dashboard_bp.route('/candidates/filter/apply', methods=['GET', 'POST'], endpoint='candidates_filter_apply')
+def candidates_filter_apply():
+    if g.get('user') is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    if not getattr(g.user, 'is_hr', False):
+        flash('只有HR用户可以访问该页面。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    # 读取筛选条件，不接AI，仅服务器端过滤
+    keyword = (request.values.get('q') or '').strip()
+    status = (request.values.get('status') or '').strip()
+    return redirect(url_for('smartrecruit.hr.dashboard.candidates_list', q=keyword, status=status))
+
+
+@dashboard_bp.route('/candidates/filter/smart', methods=['POST'], endpoint='candidates_filter_smart')
+def candidates_filter_smart():
+    # 预留智能筛选端口：当前不接AI，返回占位响应
+    return {'ok': False, 'message': '智能筛选尚未启用（接口占位）'}, 501
+
+
+@dashboard_bp.route('/candidates/view/<int:candidate_id>', endpoint='view_candidate')
+def view_candidate(candidate_id: int):
+    # 直接复用现有的候选人简历视图
+    return redirect(url_for('smartrecruit.hr.candidates.view_candidate_resume', user_id=candidate_id))
+
+
+def _find_latest_app_for_user(candidate_id: int):
+    if db is None:
+        return None
+    try:
+        # 在当前HR发布的职位里找该候选人最新申请
+        apps = (
+            Application.query
+            .join(Job, Job.id == Application.job_id)
+            .filter(Application.user_id == candidate_id, Job.user_id == g.user.id)
+            .order_by(Application.timestamp.desc())
+            .all()
+        )
+        return apps[0] if apps else None
+    except Exception:
+        return None
+
+
+@dashboard_bp.route('/candidates/approve/<int:candidate_id>', methods=['POST'], endpoint='approve_candidate')
+def approve_candidate(candidate_id: int):
+    if g.get('user') is None:
+        abort(401)
+    if not getattr(g.user, 'is_hr', False):
+        abort(403)
+    app_row = _find_latest_app_for_user(candidate_id)
+    if not app_row:
+        flash('未找到该候选人的申请记录。', 'warning')
+        return redirect(url_for('smartrecruit.hr.dashboard.candidates_list'))
+    try:
+        app_row.status = 'approved'
+        db.session.commit()
+        flash('已通过该候选人的最新申请。', 'success')
+    except Exception:
+        if db:
+            db.session.rollback()
+        flash('操作失败，请稍后重试。', 'danger')
+    return redirect(url_for('smartrecruit.hr.dashboard.candidates_list'))
+
+
+@dashboard_bp.route('/candidates/reject/<int:candidate_id>', methods=['POST'], endpoint='reject_candidate')
+def reject_candidate(candidate_id: int):
+    if g.get('user') is None:
+        abort(401)
+    if not getattr(g.user, 'is_hr', False):
+        abort(403)
+    app_row = _find_latest_app_for_user(candidate_id)
+    if not app_row:
+        flash('未找到该候选人的申请记录。', 'warning')
+        return redirect(url_for('smartrecruit.hr.dashboard.candidates_list'))
+    try:
+        app_row.status = 'rejected'
+        db.session.commit()
+        flash('已拒绝该候选人的最新申请。', 'success')
+    except Exception:
+        if db:
+            db.session.rollback()
+        flash('操作失败，请稍后重试。', 'danger')
+    return redirect(url_for('smartrecruit.hr.dashboard.candidates_list'))
+
+
+@dashboard_bp.route('/candidates/schedule/<int:candidate_id>', methods=['GET', 'POST'], endpoint='schedule_interview')
+def schedule_interview(candidate_id: int):
+    if g.get('user') is None:
+        abort(401)
+    if not getattr(g.user, 'is_hr', False):
+        abort(403)
+    # 简化：此处仅跳转到面试列表/页面，实际排期表单可后续实现
+    flash('请在“面试”模块中安排面试。', 'info')
+    return redirect(url_for('smartrecruit.hr.dashboard.interviews'))
+
+
+@dashboard_bp.route('/candidates/notify', methods=['POST'], endpoint='send_interview_notification')
+def send_interview_notification():
+    # 仅返回成功，预留实际发送逻辑
+    try:
+        return {'success': True}, 200
     except Exception as e:
-        logging.error(f"AI洞察页面加载失败: {e}")
-        flash('加载AI洞察页面时出现错误，请稍后重试。', 'danger')
-        return render_template('smartrecruit/hr/hr_insights_ios.html', insights={
-            'top_skills': [],
-            'trending_positions': [],
-            'candidate_quality_score': 0
-        })
+        return {'success': False, 'message': str(e)}, 500
 
-def calculate_recruitment_cycle(jobs, applications):
-    """计算平均招聘周期"""
-    if not jobs or not applications:
-        return 30  # 默认30天
-    
-    total_days = 0
-    count = 0
-    
-    for job in jobs:
-        job_applications = [app for app in applications if app.job_id == job.id and app.status == 'hired']
-        if job_applications:
-            # 计算从职位发布到入职的天数
-            for app in job_applications:
-                if job.date_posted and app.timestamp:
-                    days = (app.timestamp - job.date_posted).days
-                    if days > 0:
-                        total_days += days
-                        count += 1
-    
-    return round(total_days / count, 1) if count > 0 else 30
 
-def calculate_recruitment_cost(total_jobs, total_applications):
-    """计算招聘成本（模拟数据）"""
-    # 基础成本：每个职位1000元
-    base_cost = total_jobs * 1000
-    
-    # 面试成本：每次面试200元
-    interview_cost = total_applications * 200
-    
-    # 其他成本：每个职位500元
-    other_cost = total_jobs * 500
-    
-    total_cost = base_cost + interview_cost + other_cost
-    return round(total_cost, 2)
-
-def calculate_offer_acceptance_rate(applications):
-    """计算Offer接受率"""
-    if not applications:
-        return 0
-    
-    offer_count = len([app for app in applications if app.status == 'offer'])
-    hired_count = len([app for app in applications if app.status == 'hired'])
-    
-    total_offers = offer_count + hired_count
-    if total_offers == 0:
-        return 0
-    
-    return round((hired_count / total_offers) * 100, 1)
-
-def calculate_funnel_data(applications):
-    """计算漏斗数据"""
-    if not applications:
-        return {
-            'applied': 0,
-            'screened': 0,
-            'interview': 0,
-            'offer': 0,
-            'hired': 0
-        }
-    
-    status_counts = {}
-    for app in applications:
-        status = app.status
-        status_counts[status] = status_counts.get(status, 0) + 1
-    
-    return {
-        'applied': status_counts.get('applied', 0),
-        'screened': status_counts.get('screened', 0),
-        'interview': status_counts.get('interview', 0),
-        'offer': status_counts.get('offer', 0),
-        'hired': status_counts.get('hired', 0)
-    }
-
-def calculate_team_performance(jobs, applications):
-    """计算团队绩效"""
-    # 模拟招聘人员数据
-    recruiters = [
-        {'name': '张HR', 'id': 'zhang'},
-        {'name': '李HR', 'id': 'li'},
-        {'name': '王HR', 'id': 'wang'}
-    ]
-    
-    performance_data = []
-    for recruiter in recruiters:
-        # 模拟数据
-        interview_count = random.randint(10, 50)
-        hire_count = random.randint(2, 15)
-        hire_rate = round((hire_count / interview_count) * 100, 1) if interview_count > 0 else 0
-        
-        performance_data.append({
-            'name': recruiter['name'],
-            'interview_count': interview_count,
-            'hire_count': hire_count,
-            'hire_rate': hire_rate
-        })
-    
-    return performance_data
-
-def calculate_monthly_trends(jobs, applications):
-    """计算月度趋势"""
-    # 模拟月度数据
-    months = ['1月', '2月', '3月', '4月', '5月', '6月']
-    job_trends = [random.randint(5, 20) for _ in months]
-    application_trends = [random.randint(20, 80) for _ in months]
-    interview_trends = [random.randint(10, 40) for _ in months]
-    offer_trends = [random.randint(5, 20) for _ in months]
-    hire_trends = [random.randint(2, 10) for _ in months]
-    
-    return [
-        {
-            'month': month,
-            'jobs': job_trends[i],
-            'applications': application_trends[i],
-            'interviews': interview_trends[i],
-            'offers': offer_trends[i],
-            'hires': hire_trends[i]
-        }
-        for i, month in enumerate(months)
-    ]
