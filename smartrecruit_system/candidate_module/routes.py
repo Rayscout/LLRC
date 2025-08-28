@@ -3,10 +3,14 @@ from .profile import profile_bp
 from .jobs import jobs_bp
 from .applications import applications_bp
 from .interview import interview_bp
+from .ai_analysis_routes import ai_analysis_bp
 from app.utils import extract_text_from_resume, ai_analyze_resume_text
 
 # 创建求职者主蓝图
 candidate_bp = Blueprint('candidate', __name__, url_prefix='/candidate')
+
+# 注册子蓝图
+candidate_bp.register_blueprint(ai_analysis_bp)
 
 @candidate_bp.route('/')
 def home():
