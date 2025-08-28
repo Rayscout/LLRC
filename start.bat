@@ -8,7 +8,7 @@ call venv\Scripts\activate.bat
 
 REM 安装依赖（如果需要）
 echo 检查并安装依赖...
-pip install -r requirements_simple.txt
+pip install -r requirements.txt
 
 REM 启动应用
 echo 启动应用...

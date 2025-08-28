@@ -314,7 +314,7 @@
 </head>
 <body>
     <div class="container">
-        <a href="{{ url_for('talent_management.employee_manager.smart_goals.goals_dashboard') }}" class="back-link">
+        <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="back-link">
             <i class="fas fa-arrow-left"></i> 返回目标管理
         </a>
 
@@ -606,7 +606,7 @@
             .then(data => {
                 if (data.success) {
                     alert('目标创建成功！');
-                    window.location.href = '{{ url_for("talent_management.employee_manager.smart_goals.goals_dashboard") }}';
+                    window.location.href = '{{ url_for("talent_management.employee_management.smart_goals.goals_dashboard") }}';
                 } else {
                     alert('创建失败: ' + data.message);
                 }

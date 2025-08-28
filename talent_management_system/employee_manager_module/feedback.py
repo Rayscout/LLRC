@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app.models import User, Feedback, FeedbackNotification, db
+from app.talent_analysis_service import TalentAnalysisService
 from datetime import datetime, timedelta
 import json
 import uuid
@@ -408,7 +409,7 @@ def create_response_notification(feedback_id, sender_id, responder_id):
     try:
         responder = User.query.get(responder_id)
         responder_name = f"{responder.first_name} {responder.last_name}"
-        
+
         notification = FeedbackNotification(
             user_id=sender_id,
             feedback_id=feedback_id,
@@ -424,3 +425,74 @@ def create_response_notification(feedback_id, sender_id, responder_id):
         print(f"创建回复通知失败: {e}")
         db.session.rollback()
         return False
+
+@feedback_bp.route('/api/generate_feedback_summary')
+def api_generate_feedback_summary():
+    """生成反馈总结API"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'success': False, 'message': '请先登录'})
+
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'employee':
+            return jsonify({'success': False, 'message': '用户信息获取失败'})
+
+        # 创建AI分析服务实例
+        analysis_service = TalentAnalysisService()
+
+        # 生成反馈总结
+        summary_result = analysis_service.generate_feedback_summary(user.id)
+
+        if "error" in summary_result:
+            return jsonify({
+                'success': False,
+                'message': f'生成反馈总结失败: {summary_result["error"]}'
+            })
+
+        return jsonify({
+            'success': True,
+            'data': summary_result
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'生成反馈总结时发生错误: {str(e)}'})
+
+@feedback_bp.route('/api/generate_course_recommendations')
+def api_generate_course_recommendations():
+    """生成课程推荐API"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'success': False, 'message': '请先登录'})
+
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'employee':
+            return jsonify({'success': False, 'message': '用户信息获取失败'})
+
+        # 创建AI分析服务实例
+        analysis_service = TalentAnalysisService()
+
+        # 先获取反馈总结
+        feedback_summary = analysis_service.generate_feedback_summary(user.id)
+
+        if "error" in feedback_summary:
+            return jsonify({
+                'success': False,
+                'message': f'获取反馈总结失败: {feedback_summary["error"]}'
+            })
+
+        # 基于反馈总结生成课程推荐
+        recommendations_result = analysis_service.generate_course_recommendations(feedback_summary, user.id)
+
+        if "error" in recommendations_result:
+            return jsonify({
+                'success': False,
+                'message': f'生成课程推荐失败: {recommendations_result["error"]}'
+            })
+
+        return jsonify({
+            'success': True,
+            'data': recommendations_result
+        })
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'生成课程推荐时发生错误: {str(e)}'})

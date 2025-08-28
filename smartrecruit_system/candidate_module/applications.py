@@ -213,6 +213,24 @@ def virtual_feedback():
 
     return render_template('smartrecruit/candidate/virtual_feedback.html')
 
+@applications_bp.route('/emotion_demo', methods=['GET'])
+def emotion_demo():
+    """表情识别演示页面"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    return render_template('smartrecruit/candidate/emotion_demo.html')
+
+@applications_bp.route('/emotion_test', methods=['GET'])
+def emotion_test():
+    """表情识别测试页面"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+
+    return render_template('smartrecruit/candidate/emotion_test.html')
+
 @applications_bp.route('/apply/<int:job_id>', methods=['GET', 'POST'])
 def apply(job_id):
     """申请职位：可使用已有简历或上传新简历，创建申请并跳转到“我的申请”。"""
