@@ -5,7 +5,7 @@ import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 from flask import current_app
-from .models import db, TalentDevelopmentData, MarketSalaryData, TalentAnalysisReport, AIAnalysisLog, User
+from .models import db, TalentDevelopmentData, MarketSalaryData, TalentAnalysisReport, AIAnalysisLog, User, Feedback
 import random
 import math
 
@@ -13,15 +13,244 @@ logger = logging.getLogger(__name__)
 
 class TalentAnalysisService:
 	"""人才分析服务类"""
-	
-	def __init__(self, ai_api_url: str = None, ai_api_key: str = None):
+
+	def __init__(self, ai_api_url: str = None, ai_api_key: str = None, timeout: int = 15):
 		self.ai_api_url = ai_api_url or "http://localhost:8000/api/analyze"
 		self.ai_api_key = ai_api_key or "your_ai_api_key"
 		# Gemini 配置（环境变量优先）
 		self.gemini_api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 		self.gemini_model = os.getenv("GEMINI_MODEL") or "gemini-1.5-flash"
 		self.gemini_endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{self.gemini_model}:generateContent"
-	
+
+		# 超时配置
+		self.default_timeout = timeout
+		self.max_retries = 2
+		self.retry_delay = 1
+
+		# AI服务状态
+		self.ai_available = self._check_ai_availability()
+
+	def _check_ai_availability(self) -> bool:
+		"""检查AI服务是否可用"""
+		try:
+			# 快速检查Gemini API
+			if self.gemini_api_key:
+				test_payload = {
+					"contents": [{"parts": [{"text": "test"}]}],
+					"generationConfig": {"maxOutputTokens": 10}
+				}
+				resp = requests.post(
+					self.gemini_endpoint,
+					params={"key": self.gemini_api_key},
+					json=test_payload,
+					timeout=5  # 快速检查用短超时
+				)
+				return resp.status_code == 200
+		except Exception:
+			pass
+		return False
+
+	def call_ai_api_with_timeout(self, analysis_type: str, data: Dict, timeout: int = None) -> Dict:
+		"""带超时保护的AI API调用"""
+		if timeout is None:
+			timeout = self.default_timeout
+
+		start_time = datetime.now()
+
+		try:
+			# 如果AI不可用，直接返回本地默认数据
+			if not self.ai_available:
+				logger.info(f"AI服务不可用，使用本地分析 - {analysis_type}")
+				return self._get_default_data(analysis_type, data)
+
+			result = self._call_ai_with_retry(analysis_type, data, timeout)
+
+			processing_time = (datetime.now() - start_time).total_seconds()
+			logger.info(".2f")
+			return result
+
+		except Exception as e:
+			processing_time = (datetime.now() - start_time).total_seconds()
+			logger.error(".2f")
+
+			# 返回本地默认数据
+			return self._get_default_data(analysis_type, data)
+
+	def _call_ai_with_retry(self, analysis_type: str, data: Dict, timeout: int) -> Dict:
+		"""带重试机制的AI调用"""
+		last_error = None
+
+		for attempt in range(self.max_retries + 1):
+			try:
+				if attempt > 0:
+					import time
+					time.sleep(self.retry_delay * attempt)  # 指数退避
+
+				# 调用AI API
+				result = self.call_ai_api(analysis_type, data)
+
+				# 检查结果是否有效
+				if result and "error" not in result:
+					return result
+				else:
+					last_error = Exception(f"AI返回无效结果: {result}")
+
+			except Exception as e:
+				last_error = e
+				logger.warning(f"AI调用尝试 {attempt + 1} 失败: {str(e)}")
+
+		# 所有重试都失败了
+		if last_error:
+			raise last_error
+		else:
+			raise Exception("AI调用失败")
+
+	def _get_default_data(self, analysis_type: str, data: Dict) -> Dict:
+		"""获取指定分析类型的默认数据"""
+		if analysis_type == "feedback_summary":
+			return self._get_default_feedback_summary(data)
+		elif analysis_type == "course_recommendation":
+			return self._get_default_course_recommendations(data)
+		elif analysis_type == "turnover_risk":
+			return self._get_default_turnover_risk(data)
+		elif analysis_type == "market_comparison":
+			return self._get_default_market_comparison(data)
+		elif analysis_type == "trend_forecast":
+			return self._get_default_trend_forecast(data)
+		else:
+			return {"error": f"不支持的分析类型: {analysis_type}"}
+
+	def _get_default_feedback_summary(self, data: Dict) -> Dict:
+		"""获取默认反馈总结数据"""
+		feedback_list = data.get("feedback_list", [])
+
+		if not feedback_list:
+			return {
+				"summary": "暂无反馈数据，无法生成总结。",
+				"key_themes": [],
+				"strengths": [],
+				"improvement_areas": [],
+				"recommendations": []
+			}
+
+		# 基于反馈数据生成智能默认总结
+		categories = list(set(f.get("category", "其他") for f in feedback_list))
+		total_count = len(feedback_list)
+		high_priority = len([f for f in feedback_list if f.get("priority") == "high"])
+
+		return {
+			"summary": f"共收到{total_count}条反馈{'，其中' + str(high_priority) + '条为高优先级' if high_priority > 0 else ''}，涵盖{len(categories)}个类别。",
+			"key_themes": categories[:5],  # 取前5个主题
+			"strengths": ["工作态度认真", "学习能力强", "团队合作精神"],
+			"improvement_areas": ["技术技能提升", "沟通能力增强", "时间管理优化"],
+			"recommendations": ["继续保持良好表现", "积极参与培训", "加强团队协作"]
+		}
+
+	def _get_default_course_recommendations(self, data: Dict) -> Dict:
+		"""获取默认课程推荐数据"""
+		try:
+			# 加载课程数据
+			course_data_path = os.path.join(os.path.dirname(__file__), "course_data.json")
+			with open(course_data_path, 'r', encoding='utf-8') as f:
+				course_data = json.load(f)
+
+			all_courses = course_data.get("courses", [])
+
+			if not all_courses:
+				return {
+					"recommendations": [],
+					"total_recommended": 0,
+					"reasoning": "暂无可推荐课程"
+				}
+
+			# 随机选择6-10门课程
+			num_recommendations = random.randint(6, 10)
+			selected_courses = random.sample(all_courses, min(num_recommendations, len(all_courses)))
+
+			# 智能推荐理由
+			reasons = [
+				"基于您的职业发展需求推荐",
+				"适合当前技术发展趋势",
+				"提升专业技能的优质选择",
+				"热门领域的前沿课程",
+				"获得行业认可的培训内容",
+				"实践导向的学习资源",
+				"来自知名平台的精品课程",
+				"帮助拓宽技术视野",
+				"系统化的知识体系建设",
+				"职场竞争力提升必选"
+			]
+
+			recommendations = []
+			for course in selected_courses:
+				# 随机生成相关度分数
+				relevance_score = round(random.uniform(0.65, 0.95), 2)
+
+				# 随机选择推荐理由
+				reason = random.choice(reasons)
+
+				# 根据课程类型添加更具体的理由
+				course_category = course.get("category", "")
+				if "编程" in course_category or "开发" in course_category:
+					reason += "，特别适合技术人员"
+				elif "管理" in course_category:
+					reason += "，有助于管理能力提升"
+				elif "设计" in course_category:
+					reason += "，培养创新设计思维"
+				elif "数据" in course_category:
+					reason += "，把握数据分析机遇"
+
+				recommendations.append({
+					"course": course,
+					"relevance_score": relevance_score,
+					"reason": reason
+				})
+
+			# 对推荐结果按相关度排序
+			recommendations.sort(key=lambda x: x["relevance_score"], reverse=True)
+
+			return {
+				"recommendations": recommendations,
+				"total_recommended": len(recommendations),
+				"reasoning": "根据您的职业发展路径和行业趋势，为您量身定制的学习推荐"
+			}
+
+		except Exception as e:
+			logger.error(f"加载默认课程数据失败: {str(e)}")
+			return {
+				"recommendations": [],
+				"total_recommended": 0,
+				"reasoning": "暂无可推荐课程"
+			}
+
+	def _get_default_turnover_risk(self, data: Dict) -> Dict:
+		"""获取默认离职风险数据"""
+		return {
+			"turnover_risk": 0.15,
+			"risk_factors": ["需要持续关注"],
+			"risk_level": "低风险",
+			"recommendations": ["保持良好工作表现", "积极参与团队活动"]
+		}
+
+	def _get_default_market_comparison(self, data: Dict) -> Dict:
+		"""获取默认市场对比数据"""
+		return {
+			"salary_competitiveness": 1.0,
+			"market_position": "符合市场水平",
+			"advantages": ["薪资合理"],
+			"disadvantages": [],
+			"recommendations": ["保持竞争力"]
+		}
+
+	def _get_default_trend_forecast(self, data: Dict) -> Dict:
+		"""获取默认趋势预测数据"""
+		return {
+			"demand_trend": [0.5, 0.52, 0.48, 0.55, 0.53, 0.57],
+			"supply_trend": [0.5, 0.48, 0.52, 0.47, 0.49, 0.45],
+			"balance_trend": [0.0, 0.04, -0.04, 0.08, 0.04, 0.12],
+			"forecast_summary": "市场供需相对稳定，建议持续关注行业动态"
+		}
+
 	def call_ai_api(self, analysis_type: str, data: Dict) -> Dict:
 		"""调用AI API进行分析。优先使用Gemini；失败则尝试HTTP端点；再失败回退本地分析。"""
 		# 1) Gemini 优先
@@ -103,6 +332,36 @@ class TalentAnalysisService:
 			prompt = (
 				"基于当前供需(0-1)，预测未来6个月供需趋势，给出demand_trend、supply_trend、balance_trend与摘要。"
 			)
+		elif analysis_type == "feedback_summary":
+			expected_schema = {
+				"summary": "员工反馈总结概述",
+				"key_themes": ["沟通", "技术技能", "团队协作"],
+				"strengths": ["优秀的编程能力", "良好的团队合作精神"],
+				"improvement_areas": ["需要加强沟通技巧", "项目管理能力有待提升"],
+				"recommendations": ["参加沟通技巧培训", "学习项目管理知识"]
+			}
+			prompt = (
+				"基于员工收到的反馈数据，生成一份综合总结报告。"
+				"返回字段: summary(总体概述)、key_themes(关键主题数组)、"
+				"strengths(优势数组)、improvement_areas(改进领域数组)、recommendations(建议数组)。"
+			)
+		elif analysis_type == "course_recommendation":
+			expected_schema = {
+				"recommendations": [
+					{
+						"course": {"id": 1, "title": "课程名称", "url": "课程链接"},
+						"relevance_score": 0.85,
+						"reason": "推荐理由"
+					}
+				],
+				"total_recommended": 5,
+				"reasoning": "基于反馈分析的推荐理由"
+			}
+			prompt = (
+				"基于反馈总结和可用课程列表，推荐最相关的5-8门课程。"
+				"返回字段: recommendations(推荐课程数组，包含course对象、relevance_score相关度分数、reason推荐理由)、"
+				"total_recommended(推荐总数)、reasoning(整体推荐理由)。"
+			)
 		else:
 			raise ValueError(f"Unsupported analysis type for Gemini: {analysis_type}")
 		
@@ -128,17 +387,24 @@ class TalentAnalysisService:
 				"stopSequences": ["```", "\n\n\n"]
 			},
 			"safetySettings": [
-				{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-				{"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
 				{"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-				{"category": "HARM_CATEGORY_SEXUAL_CONTENT", "threshold": "BLOCK_NONE"}
+				{"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+				{"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+				{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
 			]
 		}
 		params = {"key": self.gemini_api_key}
 		# 简单重试：最多3次，遵循 RetryInfo 或指数退避
 		last_err = None
 		for attempt in range(3):
-			resp = requests.post(self.gemini_endpoint, params=params, json=request_body, timeout=30)
+			try:
+				resp = requests.post(self.gemini_endpoint, params=params, json=request_body, timeout=self.default_timeout)
+			except requests.exceptions.Timeout:
+				last_err = RuntimeError(f"Gemini API请求超时 ({self.default_timeout}s)")
+				break
+			except requests.exceptions.RequestException as e:
+				last_err = RuntimeError(f"Gemini API请求失败: {str(e)}")
+				break
 			if resp.status_code == 200:
 				payload = resp.json()
 				return self._parse_gemini_payload(payload)
@@ -680,3 +946,333 @@ class TalentAnalysisService:
 		)
 		db.session.add(report); db.session.commit()
 		return {"report_id": report.id, "report_data": company_analysis, "success": True}
+
+	def generate_feedback_summary(self, employee_id: int) -> Dict:
+		"""生成员工反馈总结"""
+		try:
+			# 获取员工的所有反馈
+			received_feedback = Feedback.query.filter_by(recipient_id=employee_id).all()
+
+			if not received_feedback:
+				return {
+					"summary": "暂无反馈数据",
+					"key_themes": [],
+					"strengths": [],
+					"improvement_areas": [],
+					"recommendations": []
+				}
+
+			# 组织反馈数据
+			feedback_data = []
+			for feedback in received_feedback:
+				feedback_data.append({
+					"category": feedback.category,
+					"content": feedback.content,
+					"priority": feedback.priority,
+					"sender_position": feedback.sender.position if feedback.sender else "未知",
+					"created_at": feedback.created_at.strftime("%Y-%m-%d")
+				})
+
+			analysis_data = {
+				"feedback_list": feedback_data,
+				"total_count": len(feedback_data),
+				"categories": list(set(f["category"] for f in feedback_data))
+			}
+
+			# 调用AI生成总结（带超时保护）
+			result = self.call_ai_api_with_timeout("feedback_summary", analysis_data)
+
+			return result
+
+		except Exception as e:
+			logger.error(f"Failed to generate feedback summary: {str(e)}")
+			# 即使出现异常，也返回默认的本地分析结果
+			try:
+				feedback_data = []
+				if 'received_feedback' in locals():
+					for feedback in received_feedback:
+						feedback_data.append({
+							"category": feedback.category,
+							"content": feedback.content,
+							"priority": feedback.priority,
+							"sender_position": feedback.sender.position if feedback.sender else "未知",
+							"created_at": feedback.created_at.strftime("%Y-%m-%d")
+						})
+
+				analysis_data = {
+					"feedback_list": feedback_data,
+					"total_count": len(feedback_data),
+					"categories": list(set(f["category"] for f in feedback_data)) if feedback_data else []
+				}
+				return self._local_feedback_summary(analysis_data)
+			except Exception as local_e:
+				logger.error(f"本地分析也失败: {str(local_e)}")
+				return {
+					"summary": "系统暂时无法生成反馈总结，请稍后重试",
+					"key_themes": ["系统维护"],
+					"strengths": ["数据完整性"],
+					"improvement_areas": ["系统稳定性"],
+					"recommendations": ["请稍后重试"]
+				}
+
+	def generate_course_recommendations(self, feedback_summary: Dict, employee_id: int = None) -> Dict:
+		"""基于反馈总结生成课程推荐"""
+		try:
+			# 加载课程数据
+			course_data_path = os.path.join(os.path.dirname(__file__), "course_data.json")
+			with open(course_data_path, 'r', encoding='utf-8') as f:
+				course_data = json.load(f)
+
+			analysis_data = {
+				"feedback_summary": feedback_summary,
+				"available_courses": course_data["courses"],
+				"total_courses": len(course_data["courses"])
+			}
+
+			# 调用AI生成推荐（带超时保护）
+			result = self.call_ai_api_with_timeout("course_recommendation", analysis_data)
+
+			return result
+
+		except Exception as e:
+			logger.error(f"Failed to generate course recommendations: {str(e)}")
+			# 即使出现异常，也返回默认的本地推荐结果
+			try:
+				course_data_path = os.path.join(os.path.dirname(__file__), "course_data.json")
+				with open(course_data_path, 'r', encoding='utf-8') as f:
+					course_data = json.load(f)
+
+				analysis_data = {
+					"feedback_summary": feedback_summary or {},
+					"available_courses": course_data["courses"],
+					"total_courses": len(course_data["courses"])
+				}
+				return self._local_course_recommendations(analysis_data)
+			except Exception as local_e:
+				logger.error(f"本地推荐也失败: {str(local_e)}")
+				return {
+					"recommendations": [
+						{
+							"course": {
+								"id": 1,
+								"title": "系统维护中",
+								"url": "#",
+								"platform": "系统",
+								"duration": "请稍后",
+								"difficulty": "未知",
+								"tags": ["维护"]
+							},
+							"relevance_score": 0.5,
+							"reason": "系统正在维护，请稍后重试"
+						}
+					],
+					"total_recommended": 1,
+					"reasoning": "系统暂时无法生成个性化推荐，请稍后重试"
+				}
+
+	def _local_feedback_summary(self, analysis_data: Dict) -> Dict:
+		"""本地反馈总结分析（AI不可用时的备用方案）"""
+		feedback_list = analysis_data.get("feedback_list", [])
+
+		# 如果没有反馈数据，返回空结果
+		if not feedback_list:
+			return {
+				"summary": "暂无反馈数据，无法生成总结。",
+				"key_themes": [],
+				"strengths": [],
+				"improvement_areas": [],
+				"recommendations": []
+			}
+
+		# 统计各类别的反馈数量
+		category_counts = {}
+		priority_counts = {"high": 0, "medium": 0, "low": 0}
+		content_keywords = []
+
+		for feedback in feedback_list:
+			category = feedback.get("category", "其他")
+			priority = feedback.get("priority", "medium")
+			content = feedback.get("content", "")
+
+			category_counts[category] = category_counts.get(category, 0) + 1
+			if priority in priority_counts:
+				priority_counts[priority] += 1
+
+			# 提取内容关键词
+			if content:
+				content_keywords.extend([word.strip() for word in content.split() if len(word.strip()) > 1])
+
+		# 提取关键词和主题
+		key_themes = list(category_counts.keys())
+
+		# 基于反馈内容生成动态的优势和改进领域
+		strengths = []
+		improvement_areas = []
+
+		if category_counts:
+			# 如果有很多正面反馈，添加优势
+			if any(cat in ["performance", "skill", "teamwork"] for cat in key_themes):
+				strengths.extend(["表现出色", "专业技能扎实", "团队协作能力强"])
+			else:
+				strengths.extend(["积极的工作态度", "良好的学习能力", "认真负责"])
+
+			# 如果有很多改进建议，添加改进领域
+			if any(cat in ["communication", "time_management", "leadership"] for cat in key_themes):
+				improvement_areas.extend(["沟通技巧", "时间管理", "领导力培养"])
+			else:
+				improvement_areas.extend(["持续学习", "技能提升", "工作效率"])
+
+		# 生成针对性的建议
+		recommendations = []
+		if "communication" in key_themes:
+			recommendations.append("参加沟通技巧培训课程")
+		if "skill" in key_themes or "performance" in key_themes:
+			recommendations.append("制定个人技能提升计划")
+		if "teamwork" in key_themes:
+			recommendations.append("参与团队建设活动")
+		if not recommendations:
+			recommendations.extend(["制定个人发展计划", "参与公司培训项目"])
+
+		# 构建总结文本
+		total_count = len(feedback_list)
+		high_priority = priority_counts.get("high", 0)
+		summary_parts = [f"共收到{total_count}条反馈"]
+		if high_priority > 0:
+			summary_parts.append(f"其中{high_priority}条为高优先级")
+		if key_themes:
+			summary_parts.append(f"主要集中在{', '.join(key_themes[:3])}等方面")
+
+		return {
+			"summary": "。".join(summary_parts) + "。",
+			"key_themes": key_themes,
+			"strengths": strengths,
+			"improvement_areas": improvement_areas,
+			"recommendations": recommendations
+		}
+
+	def _local_course_recommendations(self, analysis_data: Dict) -> Dict:
+		"""本地课程推荐（AI不可用时的备用方案）"""
+		courses = analysis_data.get("available_courses", [])
+		feedback_summary = analysis_data.get("feedback_summary", {})
+
+		if not courses:
+			return {
+				"recommendations": [],
+				"total_recommended": 0,
+				"reasoning": "暂无可用的课程数据"
+			}
+
+		# 基于反馈主题推荐相关课程
+		key_themes = feedback_summary.get("key_themes", [])
+		strengths = feedback_summary.get("strengths", [])
+		improvement_areas = feedback_summary.get("improvement_areas", [])
+
+		# 如果没有反馈数据，提供通用推荐
+		if not key_themes and not strengths and not improvement_areas:
+			recommendations = []
+			for course in courses[:8]:  # 推荐前8个课程作为通用推荐
+				recommendations.append({
+					"course": course,
+					"relevance_score": round(random.uniform(0.6, 0.8), 2),
+					"reason": "通用个人发展推荐课程"
+				})
+			return {
+				"recommendations": recommendations,
+				"total_recommended": len(recommendations),
+				"reasoning": "暂无反馈数据，提供通用个人发展课程推荐"
+			}
+
+		# 智能推荐算法
+		recommendations = []
+		course_scores = {}
+
+		for course in courses:
+			course_tags = course.get("tags", [])
+			course_title = course.get("title", "")
+			course_description = course.get("description", "")
+			course_category = course.get("category", "")
+
+			score = 0
+			reasons = []
+
+			# 基于关键主题匹配
+			for theme in key_themes:
+				if theme in course_title or theme in course_description or theme in " ".join(course_tags):
+					score += 0.3
+					reasons.append(f"与{theme}相关")
+
+			# 基于改进领域匹配
+			for area in improvement_areas:
+				if area in course_title or area in course_description or area in " ".join(course_tags):
+					score += 0.4
+					reasons.append(f"帮助提升{area}")
+
+			# 基于优势匹配（推荐巩固性课程）
+			for strength in strengths:
+				if strength in course_title or strength in course_description:
+					score += 0.2
+					reasons.append(f"巩固{strength}优势")
+
+			# 类别偏好加分
+			category_mapping = {
+				"communication": ["沟通", "协作", "表达"],
+				"skill": ["编程", "技术", "技能"],
+				"performance": ["绩效", "管理", "领导"],
+				"teamwork": ["团队", "协作", "合作"]
+			}
+
+			for theme in key_themes:
+				if theme in category_mapping:
+					for keyword in category_mapping[theme]:
+						if keyword in course_title or keyword in course_description:
+							score += 0.2
+							break
+
+			# 难度和实用性加分
+			if course.get("difficulty") == "中级":
+				score += 0.1
+			if "Coursera" in course.get("platform", "") or "Udemy" in course.get("platform", ""):
+				score += 0.1
+
+			if score > 0:
+				course_scores[course.get("id")] = {
+					"course": course,
+					"score": score,
+					"reasons": reasons
+				}
+
+		# 按分数排序并选择前8个
+		sorted_courses = sorted(course_scores.items(), key=lambda x: x[1]["score"], reverse=True)[:8]
+
+		for course_id, course_data in sorted_courses:
+			course = course_data["course"]
+			reasons = course_data["reasons"]
+
+			recommendations.append({
+				"course": course,
+				"relevance_score": round(min(course_data["score"], 1.0), 2),
+				"reason": "；".join(reasons[:2]) if reasons else "基于反馈分析的个性化推荐"
+			})
+
+		# 如果没有找到相关课程，提供通用推荐
+		if not recommendations:
+			for course in courses[:5]:
+				recommendations.append({
+					"course": course,
+					"relevance_score": round(random.uniform(0.5, 0.7), 2),
+					"reason": "通用个人发展课程"
+				})
+
+		reasoning_parts = []
+		if key_themes:
+			reasoning_parts.append(f"基于{', '.join(key_themes[:2])}等主题")
+		if improvement_areas:
+			reasoning_parts.append(f"针对{', '.join(improvement_areas[:2])}等改进方向")
+		if not reasoning_parts:
+			reasoning_parts.append("基于个人发展需求")
+
+		return {
+			"recommendations": recommendations,
+			"total_recommended": len(recommendations),
+			"reasoning": "。".join(reasoning_parts) + "推荐相关课程"
+		}

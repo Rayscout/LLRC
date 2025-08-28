@@ -44,7 +44,7 @@ body.dark {
   background: #ffffff;
   padding: 24px;
   position: relative;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 /* 背景装饰元素 */

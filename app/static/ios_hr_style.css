@@ -65,13 +65,13 @@ body {
     background: var(--ios-bg-primary);
     color: var(--ios-text-primary);
     line-height: 1.5;
-    overflow-x: hidden;
-    overflow-y: hidden; /* prevent outer scrollbar; use .ios-scroll-container instead */
+    overflow-x: auto;
+    overflow-y: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-html { overflow: hidden; }
+html { overflow: auto; }
 
 /* 滚动条样式 */
 ::-webkit-scrollbar {
@@ -101,7 +101,7 @@ html { overflow: hidden; }
     align-items: center;
     padding: var(--ios-spacing-xl);
     position: relative;
-    overflow: hidden;
+    overflow: auto;
     scroll-snap-align: start;
 }
 
@@ -125,7 +125,7 @@ html { overflow: hidden; }
     margin-bottom: var(--ios-spacing-lg);
     transition: all var(--ios-transition-medium);
     position: relative;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .ios-card::before {

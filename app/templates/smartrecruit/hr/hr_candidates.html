@@ -2,6 +2,14 @@
 
 {% block title %}候选人管理{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='hr_scroll_fix.css') }}">
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='hr_scroll_fix.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <!-- iOS风格候选人管理界面 -->
 <style>
@@ -58,7 +66,7 @@
       background: var(--ios-bg);
       color: var(--ios-text);
       line-height: 1.6;
-      overflow-x: hidden;
+      overflow-x: auto;
       scroll-behavior: smooth;
     }
 
@@ -1896,6 +1904,9 @@
                       <button class="ios-btn-action" title="查看详情" onclick="viewCandidateDetail('1')">
                         <i class="uil uil-eye"></i>
                       </button>
+                      <button class="ios-btn-action" title="查看简历" onclick="viewCandidateResume('1')">
+                        <i class="uil uil-file-alt"></i>
+                      </button>
                       <button class="ios-btn-action primary" title="安排面试">
                         <i class="uil uil-calendar-alt"></i>
                       </button>
@@ -1935,6 +1946,9 @@
                     <div class="ios-action-buttons">
                       <button class="ios-btn-action" title="查看详情" onclick="viewCandidateDetail('2')">
                         <i class="uil uil-eye"></i>
+                      </button>
+                      <button class="ios-btn-action" title="查看简历" onclick="viewCandidateResume('2')">
+                        <i class="uil uil-file-alt"></i>
                       </button>
                       <button class="ios-btn-action primary" title="安排面试">
                         <i class="uil uil-calendar-alt"></i>
@@ -1976,6 +1990,9 @@
                       <button class="ios-btn-action" title="查看详情" onclick="viewCandidateDetail('3')">
                         <i class="uil uil-eye"></i>
                       </button>
+                      <button class="ios-btn-action" title="查看简历" onclick="viewCandidateResume('3')">
+                        <i class="uil uil-file-alt"></i>
+                      </button>
                       <button class="ios-btn-action" title="发送邮件">
                         <i class="uil uil-envelope"></i>
                       </button>
@@ -2012,6 +2029,9 @@
                     <div class="ios-action-buttons">
                       <button class="ios-btn-action" title="查看详情" onclick="viewCandidateDetail('4')">
                         <i class="uil uil-eye"></i>
+                      </button>
+                      <button class="ios-btn-action" title="查看简历" onclick="viewCandidateResume('4')">
+                        <i class="uil uil-file-alt"></i>
                       </button>
                       <button class="ios-btn-action" title="重新考虑">
                         <i class="uil uil-redo"></i>
@@ -2224,6 +2244,21 @@ function applyFilters() {
 function viewCandidateDetail(candidateId) {
     // 这里可以根据candidateId加载具体数据
     openModal('candidateDetailModal');
+}
+
+// 查看候选人简历
+function viewCandidateResume(candidateId) {
+    // 跳转到候选人简历详情页面
+    // 这里需要根据实际的候选人ID进行跳转
+    // 由于是示例数据，我们先跳转到一个通用的简历查看页面
+    const resumeUrl = `/smartrecruit/hr/candidates/view_candidate_resume/${candidateId}`;
+    
+    // 检查URL是否有效
+    if (resumeUrl && resumeUrl !== '/smartrecruit/hr/candidates/view_candidate_resume/undefined') {
+        window.open(resumeUrl, '_blank');
+    } else {
+        showNotification('无法获取候选人简历信息', 'error');
+    }
 }
 
 // 批量操作
