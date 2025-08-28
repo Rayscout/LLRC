@@ -12,11 +12,11 @@
             min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         .form-container {
             padding: 2rem 0;
         }
-        
+
         .card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -24,324 +24,223 @@
             border-radius: 15px;
             box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
         }
-        
+
         .card-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 15px 15px 0 0 !important;
             padding: 1.5rem;
         }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-        
-        .form-control, .form-select {
-            border-radius: 10px;
-            border: 2px solid #e9ecef;
-            padding: 0.75rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus, .form-select:focus {
+
+        .form-control:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
         }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            padding: 0.75rem 2rem;
+
+        .form-label {
             font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-secondary {
-            border-radius: 10px;
-            padding: 0.75rem 2rem;
-            font-weight: 600;
-        }
-        
-        .technology-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        
-        .technology-tag {
-            background: #e9ecef;
             color: #495057;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
-        
-        .technology-tag:hover {
-            background: #667eea;
-            color: white;
-        }
-        
-        .technology-tag.selected {
-            background: #667eea;
-            color: white;
-        }
-        
-        .achievement-item {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 0.75rem;
+
+        .tech-checkbox {
+            display: inline-block;
+            margin-right: 1rem;
             margin-bottom: 0.5rem;
         }
-        
-        .achievement-item .form-control {
+
+        .achievements-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            background: transparent;
-            padding: 0.25rem;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
         }
-        
-        .achievement-item .form-control:focus {
-            box-shadow: none;
-            background: white;
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
         }
-        
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
+
+        .status-radio {
+            margin-right: 1rem;
+        }
+
+        .help-text {
             font-size: 0.875rem;
-            font-weight: 500;
+            color: #6c757d;
+            margin-top: 0.25rem;
         }
-        
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .status-completed {
-            background: #cce5ff;
-            color: #004085;
-        }
-        
-        .status-suspended {
-            background: #fff3cd;
-            color: #856404;
+
+        .section-title {
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: #495057;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="form-container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
+    <div class="form-container">
+        <div class="container">
+            <!-- 页面标题 -->
+            <div class="row mb-4">
+                <div class="col-12">
                     <div class="card">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h2 class="mb-0">
-                                        <i class="fas fa-plus-circle me-2"></i>
+                                        <i class="fas fa-plus me-2"></i>
                                         添加项目经验
                                     </h2>
                                     <p class="mb-0 mt-2">记录您的项目经历和技术成长</p>
                                 </div>
-                                <div>
-                                    <a href="{{ url_for('talent_management.employee_manager.projects.projects_dashboard') }}" class="btn btn-outline-light">
-                                        <i class="fas fa-arrow-left me-2"></i>返回项目列表
-                                    </a>
-                                </div>
+                                <a href="{{ url_for('talent_management.employee_manager.projects.projects_dashboard') }}" class="btn btn-outline-light">
+                                    <i class="fas fa-arrow-left me-2"></i>返回项目列表
+                                </a>
                             </div>
                         </div>
-                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- 添加项目表单 -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
                         <div class="card-body p-4">
-                            <form id="addProjectForm" method="POST">
-                                <div class="row">
-                                    <!-- 基本信息 -->
+                            <form method="POST" id="projectForm">
+                                <!-- 基本信息 -->
+                                <div class="section-title">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    基本信息
+                                </div>
+
+                                <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <h5 class="text-primary mb-3">
-                                            <i class="fas fa-info-circle me-2"></i>基本信息
-                                        </h5>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">项目名称 *</label>
-                                            <input type="text" class="form-control" name="name" required 
-                                                   placeholder="例如：企业管理系统重构">
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">担任角色 *</label>
-                                            <input type="text" class="form-control" name="role" required 
-                                                   placeholder="例如：后端开发工程师">
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">项目状态 *</label>
-                                            <select class="form-select" name="status" required>
-                                                <option value="">请选择项目状态</option>
-                                                <option value="active">进行中</option>
-                                                <option value="completed">已完成</option>
-                                                <option value="suspended">暂停</option>
-                                            </select>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">团队规模</label>
-                                            <input type="number" class="form-control" name="team_size" 
-                                                   placeholder="例如：8" min="1">
-                                        </div>
+                                        <label for="name" class="form-label required-field">项目名称</label>
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                        <div class="help-text">请输入项目名称</div>
                                     </div>
-                                    
-                                    <!-- 时间信息 -->
                                     <div class="col-md-6">
-                                        <h5 class="text-primary mb-3">
-                                            <i class="fas fa-calendar me-2"></i>时间信息
-                                        </h5>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">开始日期 *</label>
-                                            <input type="date" class="form-control" name="start_date" required>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">结束日期</label>
-                                            <input type="date" class="form-control" name="end_date" 
-                                                   id="endDate">
-                                            <small class="text-muted">如果项目仍在进行中，请留空</small>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">预计完成时间</label>
-                                            <input type="date" class="form-control" name="estimated_end_date" 
-                                                   id="estimatedEndDate">
-                                        </div>
+                                        <label for="role" class="form-label required-field">担任角色</label>
+                                        <input type="text" class="form-control" id="role" name="role" required>
+                                        <div class="help-text">例如：后端开发工程师、全栈开发工程师</div>
                                     </div>
                                 </div>
-                                
-                                <hr class="my-4">
-                                
-                                <!-- 项目详情 -->
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h5 class="text-primary mb-3">
-                                            <i class="fas fa-file-alt me-2"></i>项目详情
-                                        </h5>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">项目描述 *</label>
-                                            <textarea class="form-control" name="description" rows="4" required
-                                                      placeholder="请详细描述项目背景、目标、您的职责等"></textarea>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">主要贡献</label>
-                                            <textarea class="form-control" name="contribution" rows="3"
-                                                      placeholder="描述您在项目中的主要贡献和职责"></textarea>
-                                        </div>
+
+                                <div class="mb-3">
+                                    <label for="description" class="form-label required-field">项目描述</label>
+                                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                                    <div class="help-text">简要描述项目的背景、目标和主要功能</div>
+                                </div>
+
+                                <!-- 时间信息 -->
+                                <div class="section-title">
+                                    <i class="fas fa-calendar me-2"></i>
+                                    时间信息
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="start_date" class="form-label required-field">开始日期</label>
+                                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="end_date" class="form-label">结束日期</label>
+                                        <input type="date" class="form-control" id="end_date" name="end_date">
+                                        <div class="help-text">留空表示项目正在进行中</div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="status" class="form-label required-field">项目状态</label>
+                                        <select class="form-control" id="status" name="status" required>
+                                            <option value="进行中">进行中</option>
+                                            <option value="已完成">已完成</option>
+                                            <option value="已暂停">已暂停</option>
+                                        </select>
                                     </div>
                                 </div>
-                                
-                                <hr class="my-4">
-                                
-                                <!-- 技术栈 -->
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h5 class="text-primary mb-3">
-                                            <i class="fas fa-code me-2"></i>技术栈
-                                        </h5>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">使用技术</label>
-                                            <input type="text" class="form-control" name="technologies" 
-                                                   placeholder="例如：Python, Django, PostgreSQL, Redis, Docker">
-                                            <small class="text-muted">多个技术用逗号分隔</small>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">常用技术标签</label>
-                                            <div class="technology-tags">
-                                                <span class="technology-tag" data-tech="Python">Python</span>
-                                                <span class="technology-tag" data-tech="Java">Java</span>
-                                                <span class="technology-tag" data-tech="JavaScript">JavaScript</span>
-                                                <span class="technology-tag" data-tech="React">React</span>
-                                                <span class="technology-tag" data-tech="Vue">Vue</span>
-                                                <span class="technology-tag" data-tech="Node.js">Node.js</span>
-                                                <span class="technology-tag" data-tech="Django">Django</span>
-                                                <span class="technology-tag" data-tech="Spring">Spring</span>
-                                                <span class="technology-tag" data-tech="MySQL">MySQL</span>
-                                                <span class="technology-tag" data-tech="PostgreSQL">PostgreSQL</span>
-                                                <span class="technology-tag" data-tech="MongoDB">MongoDB</span>
-                                                <span class="technology-tag" data-tech="Redis">Redis</span>
-                                                <span class="technology-tag" data-tech="Docker">Docker</span>
-                                                <span class="technology-tag" data-tech="AWS">AWS</span>
-                                                <span class="technology-tag" data-tech="Git">Git</span>
+
+                                <!-- 技术信息 -->
+                                <div class="section-title">
+                                    <i class="fas fa-code me-2"></i>
+                                    技术信息
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="team_size" class="form-label">团队规模</label>
+                                        <input type="number" class="form-control" id="team_size" name="team_size" min="1" value="1">
+                                        <div class="help-text">项目团队的总人数</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">使用技术</label>
+                                    <div class="border p-3 rounded">
+                                        {% set common_technologies = [
+                                            'Python', 'Java', 'JavaScript', 'C++', 'C#', 'PHP', 'Ruby', 'Go',
+                                            'HTML', 'CSS', 'React', 'Vue', 'Angular', 'Node.js', 'Django', 'Flask', 'Spring',
+                                            'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Oracle', 'SQL Server',
+                                            'Docker', 'Kubernetes', 'AWS', 'Azure', 'Git', 'Linux', 'Windows'
+                                        ] %}
+                                        {% for tech in common_technologies %}
+                                            <div class="form-check tech-checkbox">
+                                                <input class="form-check-input" type="checkbox" name="technologies[]" value="{{ tech }}" id="tech_{{ tech }}">
+                                                <label class="form-check-label" for="tech_{{ tech }}">
+                                                    {{ tech }}
+                                                </label>
                                             </div>
-                                        </div>
+                                        {% endfor %}
                                     </div>
+                                    <div class="help-text">选择项目中使用的技术栈，可多选</div>
                                 </div>
-                                
-                                <hr class="my-4">
-                                
-                                <!-- 项目成果 -->
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h5 class="text-primary mb-3">
-                                            <i class="fas fa-trophy me-2"></i>项目成果
-                                        </h5>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">主要成就</label>
-                                            <div id="achievementsContainer">
-                                                <div class="achievement-item">
-                                                    <input type="text" class="form-control" name="achievements[]" 
-                                                           placeholder="例如：系统响应时间提升40%">
-                                                </div>
-                                            </div>
-                                            <button type="button" class="btn btn-outline-primary btn-sm mt-2" 
-                                                    onclick="addAchievement()">
-                                                <i class="fas fa-plus me-1"></i>添加成就
-                                            </button>
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">项目链接</label>
-                                            <input type="url" class="form-control" name="project_url" 
-                                                   placeholder="项目演示链接或代码仓库地址">
-                                        </div>
-                                        
-                                        <div class="form-group">
-                                            <label class="form-label">备注</label>
-                                            <textarea class="form-control" name="notes" rows="3"
-                                                      placeholder="其他需要说明的信息"></textarea>
-                                        </div>
-                                    </div>
+
+                                <!-- 项目贡献 -->
+                                <div class="section-title">
+                                    <i class="fas fa-user-cog me-2"></i>
+                                    项目贡献
                                 </div>
-                                
-                                <hr class="my-4">
-                                
+
+                                <div class="mb-3">
+                                    <label for="contribution" class="form-label">主要贡献</label>
+                                    <textarea class="form-control" id="contribution" name="contribution" rows="3"></textarea>
+                                    <div class="help-text">描述您在项目中的主要贡献和职责</div>
+                                </div>
+
+                                <!-- 项目成就 -->
+                                <div class="section-title">
+                                    <i class="fas fa-trophy me-2"></i>
+                                    项目成就
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="achievements" class="form-label">项目成就</label>
+                                    <textarea class="form-control achievements-textarea" id="achievements" name="achievements" rows="4"></textarea>
+                                    <div class="help-text">每行一个成就，例如：<br>• 系统响应时间提升40%<br>• 获得团队优秀员工奖</div>
+                                </div>
+
                                 <!-- 提交按钮 -->
-                                <div class="row">
-                                    <div class="col-12 text-center">
-                                        <button type="submit" class="btn btn-primary me-3">
-                                            <i class="fas fa-save me-2"></i>保存项目经验
-                                        </button>
-                                        <a href="{{ url_for('talent_management.employee_manager.projects.projects_dashboard') }}" 
-                                           class="btn btn-secondary">
-                                            <i class="fas fa-times me-2"></i>取消
-                                        </a>
-                                    </div>
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('talent_management.employee_manager.projects.projects_dashboard') }}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>取消
+                                    </a>
+                                    <button type="submit" class="btn btn-custom">
+                                        <i class="fas fa-save me-2"></i>保存项目
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -353,98 +252,40 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // 技术标签选择
-        document.querySelectorAll('.technology-tag').forEach(tag => {
-            tag.addEventListener('click', function() {
-                this.classList.toggle('selected');
-                updateTechnologiesInput();
-            });
-        });
-        
-        function updateTechnologiesInput() {
-            const selectedTags = document.querySelectorAll('.technology-tag.selected');
-            const technologies = Array.from(selectedTags).map(tag => tag.textContent);
-            document.querySelector('input[name="technologies"]').value = technologies.join(', ');
-        }
-        
-        // 添加成就项
-        function addAchievement() {
-            const container = document.getElementById('achievementsContainer');
-            const achievementItem = document.createElement('div');
-            achievementItem.className = 'achievement-item d-flex align-items-center';
-            achievementItem.innerHTML = `
-                <input type="text" class="form-control me-2" name="achievements[]" 
-                       placeholder="例如：系统响应时间提升40%">
-                <button type="button" class="btn btn-outline-danger btn-sm" 
-                        onclick="removeAchievement(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            `;
-            container.appendChild(achievementItem);
-        }
-        
-        // 删除成就项
-        function removeAchievement(button) {
-            button.parentElement.remove();
-        }
-        
-        // 项目状态变化时处理结束日期
-        document.querySelector('select[name="status"]').addEventListener('change', function() {
-            const endDateInput = document.getElementById('endDate');
-            const estimatedEndDateInput = document.getElementById('estimatedEndDate');
-            
-            if (this.value === 'completed') {
-                endDateInput.required = true;
-                estimatedEndDateInput.required = false;
-            } else if (this.value === 'active') {
-                endDateInput.required = false;
-                estimatedEndDateInput.required = true;
-            } else {
-                endDateInput.required = false;
-                estimatedEndDateInput.required = false;
+        // 表单验证
+        document.getElementById('projectForm').addEventListener('submit', function(e) {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            if (endDate && startDate > endDate) {
+                e.preventDefault();
+                alert('结束日期不能早于开始日期！');
+                return;
             }
-        });
-        
-        // 表单提交处理
-        document.getElementById('addProjectForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // 显示加载状态
+
+            // 显示提交状态
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>保存中...';
             submitBtn.disabled = true;
-            
-            // 提交表单
-            const formData = new FormData(this);
-            
-            fetch(window.location.href, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
-                } else {
-                    return response.text();
+
+            // 如果保存失败，恢复按钮状态
+            setTimeout(() => {
+                if (submitBtn.disabled) {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
                 }
-            })
-            .then(data => {
-                if (data) {
-                    // 如果返回的是HTML页面，说明有错误
-                    console.error('提交失败:', data);
-                    alert('项目保存失败，请检查输入信息');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('保存失败，请稍后重试');
-            })
-            .finally(() => {
-                // 恢复按钮状态
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            });
+            }, 5000);
+        });
+
+        // 动态显示/隐藏结束日期
+        document.getElementById('status').addEventListener('change', function() {
+            const endDateField = document.getElementById('end_date').parentElement;
+            if (this.value === '已完成') {
+                endDateField.style.display = 'block';
+            } else {
+                endDateField.style.display = 'block'; // 仍然显示，但可以留空
+            }
         });
     </script>
 </body>

@@ -259,11 +259,152 @@ class AIAnalysisLog(db.Model):
     processing_time = db.Column(db.Float)  # 处理时间（秒）
     status = db.Column(db.String(20), default='success')  # 状态：success, error
     error_message = db.Column(db.Text)  # 错误信息
-    
+
     # 时间戳
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
-    
+
     # 关系
     user = db.relationship('User', backref=db.backref('ai_analysis_logs', lazy=True))
+
+class SmartGoal(db.Model):
+    """SMART目标数据模型"""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    # 基本信息
+    title = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(50), default='custom')  # technical, soft_skills, business, custom
+    priority = db.Column(db.String(20), default='medium')  # high, medium, low
+
+    # SMART原则字段
+    specific = db.Column(db.Text, nullable=False)  # S - Specific
+    measurable = db.Column(db.Text, nullable=False)  # M - Measurable
+    achievable = db.Column(db.Text, nullable=False)  # A - Achievable
+    relevant = db.Column(db.Text, nullable=False)  # R - Relevant
+    time_bound = db.Column(db.Text, nullable=False)  # T - Time-bound
+
+    # 进度跟踪
+    target_date = db.Column(db.Date, nullable=False)
+    estimated_hours = db.Column(db.Integer, default=0)  # 预计总学习小时数
+    completed_hours = db.Column(db.Integer, default=0)  # 已完成的学习小时数
+    progress = db.Column(db.Float, default=0.0)  # 进度百分比 (0-100)
+
+    # 状态管理
+    status = db.Column(db.String(20), default='active')  # active, completed, paused, cancelled
+    notes = db.Column(db.Text)  # 进度备注
+
+    # 时间戳
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # 关系
+    user = db.relationship('User', backref=db.backref('smart_goals', lazy=True))
+
+    @property
+    def progress_percentage(self):
+        """根据已学习小时数计算进度百分比"""
+        if self.estimated_hours <= 0:
+            return 0.0
+        return min(100.0, (self.completed_hours / self.estimated_hours) * 100.0)
+
+    @property
+    def remaining_hours(self):
+        """剩余学习小时数"""
+        return max(0, self.estimated_hours - self.completed_hours)
+
+    @property
+    def is_overdue(self):
+        """是否已过期"""
+        return datetime.utcnow().date() > self.target_date
+
+    def update_progress_from_hours(self, new_completed_hours):
+        """根据新的已学习小时数更新进度"""
+        self.completed_hours = max(0, min(self.estimated_hours, new_completed_hours))
+        self.progress = self.progress_percentage
+        self.last_updated = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
+
+        # 如果进度达到100%，自动标记为完成
+        if self.progress >= 100:
+            self.status = 'completed'
+
+class Project(db.Model):
+    """项目经验数据模型"""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    # 基本信息
+    name = db.Column(db.String(200), nullable=False)  # 项目名称
+    role = db.Column(db.String(100), nullable=False)  # 担任角色
+    description = db.Column(db.Text, nullable=False)  # 项目描述
+
+    # 时间信息
+    start_date = db.Column(db.Date, nullable=False)  # 开始日期
+    end_date = db.Column(db.Date)  # 结束日期（可选，为进行中的项目）
+
+    # 项目状态
+    status = db.Column(db.String(20), default='进行中')  # 已完成、进行中、已暂停
+
+    # 技术信息
+    technologies = db.Column(db.Text)  # 使用的技术栈（JSON格式存储）
+    team_size = db.Column(db.Integer, default=1)  # 团队规模
+
+    # 项目贡献
+    contribution = db.Column(db.Text)  # 主要贡献描述
+    achievements = db.Column(db.Text)  # 项目成就（JSON格式存储）
+
+    # 时间戳
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # 关系
+    user = db.relationship('User', backref=db.backref('projects', lazy=True))
+
+    @property
+    def technologies_list(self):
+        """获取技术栈列表"""
+        if not self.technologies:
+            return []
+        try:
+            import json
+            return json.loads(self.technologies)
+        except:
+            return []
+
+    @property
+    def achievements_list(self):
+        """获取成就列表"""
+        if not self.achievements:
+            return []
+        try:
+            import json
+            return json.loads(self.achievements)
+        except:
+            return []
+
+    def set_technologies(self, technologies_list):
+        """设置技术栈"""
+        import json
+        self.technologies = json.dumps(technologies_list)
+
+    def set_achievements(self, achievements_list):
+        """设置成就列表"""
+        import json
+        self.achievements = json.dumps(achievements_list)
+
+    @property
+    def duration_months(self):
+        """计算项目持续时间（月）"""
+        if not self.end_date:
+            # 进行中的项目计算到当前时间
+            end_date = datetime.utcnow().date()
+        else:
+            end_date = self.end_date
+
+        if self.start_date and end_date:
+            delta = end_date - self.start_date
+            return delta.days // 30  # 粗略计算月数
+        return 0
 

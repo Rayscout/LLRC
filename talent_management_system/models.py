@@ -1,8 +1,10 @@
 # 人才管理系统数据模型
 # 包含人才管理相关的所有数据模型定义
 
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from app import db
+
+db = SQLAlchemy()
 
 class Employee(db.Model):
     """员工模型"""
@@ -19,71 +21,6 @@ class Employee(db.Model):
     performance_score = db.Column(db.Float, default=0.0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-class SmartGoal(db.Model):
-    """SMART目标模型"""
-    __tablename__ = 'smart_goal'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    title = db.Column(db.String(200), nullable=False)
-    specific = db.Column(db.Text, nullable=False)
-    measurable = db.Column(db.Text, nullable=False)
-    achievable = db.Column(db.Text, nullable=False)
-    relevant = db.Column(db.Text, nullable=False)
-    time_bound = db.Column(db.Text, nullable=False)
-    category = db.Column(db.String(50), default='custom')
-    priority = db.Column(db.String(20), default='medium')
-    target_date = db.Column(db.Date, nullable=False)
-    estimated_hours = db.Column(db.Integer, default=0)
-    status = db.Column(db.String(20), default='active')  # active, completed, paused, cancelled
-    progress = db.Column(db.Float, default=0.0)  # 0-100
-    completed_hours = db.Column(db.Float, default=0.0)
-    notes = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # 关系
-    user = db.relationship('User', backref='smart_goals')
-
-class GoalProgress(db.Model):
-    """目标进度历史记录模型"""
-    __tablename__ = 'goal_progress'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    goal_id = db.Column(db.Integer, db.ForeignKey('smart_goal.id'), nullable=False)
-    progress = db.Column(db.Float, nullable=False)
-    completed_hours = db.Column(db.Float, nullable=False)
-    notes = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # 关系
-    goal = db.relationship('SmartGoal', backref='progress_history')
-
-class EmployeeProjectExperience(db.Model):
-    """员工项目经验模型"""
-    __tablename__ = 'employee_project_experience'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    name = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    start_date = db.Column(db.Date, nullable=False)
-    end_date = db.Column(db.Date)
-    estimated_end_date = db.Column(db.Date)
-    status = db.Column(db.String(20), default='active')  # active, completed, suspended
-    team_size = db.Column(db.Integer)
-    technologies = db.Column(db.Text)  # 存储为逗号分隔的字符串
-    achievements = db.Column(db.Text)  # 存储为JSON字符串
-    contribution = db.Column(db.Text)
-    project_url = db.Column(db.String(500))
-    notes = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # 关系
-    user = db.relationship('User', backref='project_experiences')
 
 class Performance(db.Model):
     """绩效模型"""
@@ -160,7 +97,18 @@ class EmployeeCourse(db.Model):
     completed_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-# Feedback模型已在app/models.py中定义，此处移除重复定义
+class Feedback(db.Model):
+    """反馈模型"""
+    __tablename__ = 'feedback'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False)
+    feedback_type = db.Column(db.String(50))  # performance, learning, general
+    content = db.Column(db.Text, nullable=False)
+    rating = db.Column(db.Integer)  # 1-5
+    from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Goal(db.Model):
     """目标模型"""
@@ -202,9 +150,6 @@ def init_relationships():
     Employee.user = db.relationship('User', foreign_keys=[Employee.user_id], backref='employee_profile')
     Employee.supervisor = db.relationship('User', foreign_keys=[Employee.supervisor_id], backref='subordinates')
     
-    # SmartGoal 关系
-    SmartGoal.user = db.relationship('User', backref='smart_goals')
-
     # Performance 关系
     Performance.employee = db.relationship('Employee', backref='performances')
     Performance.evaluator = db.relationship('User', foreign_keys=[Performance.evaluator_id])
@@ -226,7 +171,10 @@ def init_relationships():
     EmployeeCourse.employee = db.relationship('Employee', backref='course_enrollments')
     EmployeeCourse.course = db.relationship('Course', backref='enrollments')
     
-    # Feedback关系已在app/models.py中定义
+    # Feedback 关系
+    Feedback.employee = db.relationship('Employee', backref='feedbacks')
+    Feedback.from_user = db.relationship('User', foreign_keys=[Feedback.from_user_id])
+    Feedback.to_user = db.relationship('User', foreign_keys=[Feedback.to_user_id])
     
     # Goal 关系
     Goal.employee = db.relationship('Employee', backref='goals')

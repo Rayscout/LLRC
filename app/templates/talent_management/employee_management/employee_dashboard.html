@@ -51,9 +51,28 @@
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 20px;
             margin-bottom: 30px;
+        }
+
+        /* 响应式设计 - 小屏幕时调整为2行 */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
         
         .stat-card {
@@ -264,30 +283,36 @@
         </div>
         
         <div class="content">
-            <!-- 统计卡片 -->
+                        <!-- 统计卡片 -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <i class="fas fa-trophy"></i>
-                    <div class="stat-value">{{ "%.1f"|format(performance_score) }}</div>
+                    <div class="stat-value">{{ "%.1f"|format(performance_score) if performance_score > 0 else "暂无" }}</div>
                     <div class="stat-label">绩效评分</div>
                 </div>
-                
+
                 <div class="stat-card">
                     <i class="fas fa-book"></i>
-                    <div class="stat-value">{{ "%.1f"|format(learning_progress) }}%</div>
+                    <div class="stat-value">{{ learning_progress }}%</div>
                     <div class="stat-label">学习进度</div>
                 </div>
-                
+
                 <div class="stat-card">
                     <i class="fas fa-calendar-check"></i>
-                    <div class="stat-value">{{ task_completion }}</div>
+                    <div class="stat-value">{{ task_completion.completed }}/{{ task_completion.total }}</div>
                     <div class="stat-label">任务完成</div>
                 </div>
-                
+
                 <div class="stat-card">
                     <i class="fas fa-star"></i>
-                    <div class="stat-value">{{ "%.1f"|format(overall_score) }}</div>
+                    <div class="stat-value">{{ "%.1f"|format(overall_score) if overall_score > 0 else "暂无" }}</div>
                     <div class="stat-label">综合评分</div>
+                </div>
+
+                <div class="stat-card">
+                    <i class="fas fa-project-diagram"></i>
+                    <div class="stat-value">{{ stats_data.project_count }}</div>
+                    <div class="stat-label">项目经验</div>
                 </div>
             </div>
             
@@ -345,7 +370,7 @@
             <!-- 最近活动 -->
             <div class="recent-activity">
                 <h3><i class="fas fa-clock"></i> 最近活动</h3>
-                
+
                 {% if recent_activities %}
                     {% for activity in recent_activities %}
                     <div class="activity-item">
@@ -356,7 +381,7 @@
                             <h4>{{ activity.title }}</h4>
                             <p>{{ activity.description }}</p>
                         </div>
-                        <div class="activity-time">{{ activity.time }}</div>
+                        <div class="activity-time">{{ activity.time_ago }}</div>
                     </div>
                     {% endfor %}
                 {% else %}
@@ -366,9 +391,9 @@
                         </div>
                         <div class="activity-content">
                             <h4>暂无活动记录</h4>
-                            <p>开始使用系统功能来生成活动记录</p>
+                            <p>您的最近活动将显示在这里</p>
                         </div>
-                        <div class="activity-time">-</div>
+                        <div class="activity-time">刚刚</div>
                     </div>
                 {% endif %}
             </div>
@@ -377,141 +402,6 @@
     
     <!-- 引入账号状态检查器 -->
     <script src="{{ url_for('static', filename='js/account_status_checker.js') }}"></script>
-    
-    <!-- 仪表盘数据自动刷新脚本 -->
-    <script>
-        // 使用AJAX刷新仪表盘数据
-        function refreshDashboardData() {
-            fetch('/employee_management/api/dashboard_data')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        updateDashboardUI(data.data);
-                    } else {
-                        console.error('获取数据失败:', data.error);
-                    }
-                })
-                .catch(error => {
-                    console.error('请求失败:', error);
-                });
-        }
-        
-        // 更新仪表盘UI
-        function updateDashboardUI(data) {
-            // 更新统计卡片
-            document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = data.performance_score.toFixed(1);
-            document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = data.learning_progress.toFixed(1) + '%';
-            document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = data.task_completion;
-            document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = data.overall_score.toFixed(1);
-            
-            // 更新最近活动
-            updateRecentActivities(data.recent_activities);
-        }
-        
-        // 更新最近活动
-        function updateRecentActivities(activities) {
-            const activityContainer = document.querySelector('.recent-activity');
-            const activityList = activityContainer.querySelector('.activity-item').parentNode;
-            
-            // 清空现有活动
-            activityContainer.querySelectorAll('.activity-item').forEach(item => item.remove());
-            
-            if (activities && activities.length > 0) {
-                activities.forEach(activity => {
-                    const activityItem = document.createElement('div');
-                    activityItem.className = 'activity-item';
-                    activityItem.innerHTML = `
-                        <div class="activity-icon">
-                            <i class="${activity.icon}"></i>
-                        </div>
-                        <div class="activity-content">
-                            <h4>${activity.title}</h4>
-                            <p>${activity.description}</p>
-                        </div>
-                        <div class="activity-time">${activity.time}</div>
-                    `;
-                    activityContainer.appendChild(activityItem);
-                });
-            } else {
-                const noActivityItem = document.createElement('div');
-                noActivityItem.className = 'activity-item';
-                noActivityItem.innerHTML = `
-                    <div class="activity-icon">
-                        <i class="fas fa-info-circle"></i>
-                    </div>
-                    <div class="activity-content">
-                        <h4>暂无活动记录</h4>
-                        <p>开始使用系统功能来生成活动记录</p>
-                    </div>
-                    <div class="activity-time">-</div>
-                `;
-                activityContainer.appendChild(noActivityItem);
-            }
-        }
-        
-        // 每5分钟自动刷新一次数据
-        setInterval(refreshDashboardData, 5 * 60 * 1000);
-        
-        // 页面可见性变化时刷新数据
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                // 页面变为可见时刷新数据
-                refreshDashboardData();
-            }
-        });
-        
-        // 添加手动刷新按钮功能
-        function addRefreshButton() {
-            const header = document.querySelector('.header');
-            const refreshBtn = document.createElement('button');
-            refreshBtn.className = 'btn';
-            refreshBtn.style.cssText = 'position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); color: white; border: 2px solid white;';
-            refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> 刷新数据';
-            refreshBtn.onclick = refreshDashboardData;
-            header.appendChild(refreshBtn);
-        }
-        
-        // 页面加载完成后添加刷新按钮
-        document.addEventListener('DOMContentLoaded', addRefreshButton);
-        
-        // 监听来自其他页面的数据更新事件
-        window.addEventListener('storage', function(e) {
-            if (e.key === 'dashboard_data_updated') {
-                // 当其他页面更新了数据时，刷新仪表盘
-                refreshDashboardData();
-            }
-        });
-        
-        // 在用户操作后自动刷新相关数据
-        function refreshAfterAction(actionType) {
-            // 根据操作类型刷新相应的数据
-            switch(actionType) {
-                case 'goal_updated':
-                    // 目标更新后刷新学习进度和任务完成数据
-                    setTimeout(refreshDashboardData, 1000);
-                    break;
-                case 'performance_updated':
-                    // 绩效更新后刷新绩效评分
-                    setTimeout(refreshDashboardData, 1000);
-                    break;
-                case 'project_updated':
-                    // 项目更新后刷新项目数量
-                    setTimeout(refreshDashboardData, 1000);
-                    break;
-                case 'feedback_received':
-                    // 收到反馈后刷新最近活动
-                    setTimeout(refreshDashboardData, 1000);
-                    break;
-            }
-        }
-        
-        // 暴露给全局，供其他页面调用
-        window.refreshAfterAction = refreshAfterAction;
-        
-        // 页面加载完成后自动刷新一次数据
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(refreshDashboardData, 1000);
-        });
-    </script>
 </body>
 </html>
+    

@@ -1,9 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, g, jsonify
-from app.models import User, db
-from talent_management_system.models import EmployeeProjectExperience
+from app.models import User, Project, db
 from datetime import datetime, timedelta
-import json
 import random
+import json
 
 projects_bp = Blueprint('projects', __name__, url_prefix='/projects')
 
@@ -24,9 +23,48 @@ def projects_dashboard():
         flash('用户信息获取失败，请重新登录', 'warning')
         return redirect(url_for('common.auth.sign'))
     
-    # 从数据库获取项目经验数据
-    projects_data = get_user_projects_data(user)
-    
+    # 从数据库获取项目数据
+    projects = Project.query.filter_by(user_id=user.id).order_by(Project.created_at.desc()).all()
+
+    # 转换项目数据为前端需要的格式
+    formatted_projects = []
+    for project in projects:
+        formatted_projects.append({
+            'id': project.id,
+            'name': project.name,
+            'role': project.role,
+            'start_date': project.start_date.strftime('%Y-%m-%d'),
+            'end_date': project.end_date.strftime('%Y-%m-%d') if project.end_date else None,
+            'status': project.status,
+            'description': project.description,
+            'technologies': project.technologies_list,
+            'achievements': project.achievements_list,
+            'team_size': project.team_size,
+            'contribution': project.contribution
+        })
+
+    # 计算项目统计
+    total_projects = len(formatted_projects)
+    completed_projects = len([p for p in formatted_projects if p['status'] == '已完成'])
+    ongoing_projects = len([p for p in formatted_projects if p['status'] == '进行中'])
+
+    # 技术栈统计
+    all_technologies = []
+    for project in formatted_projects:
+        all_technologies.extend(project['technologies'])
+    unique_technologies = list(set(all_technologies))
+
+    projects_data = {
+        'projects': formatted_projects,
+        'stats': {
+            'total': total_projects,
+            'completed': completed_projects,
+            'ongoing': ongoing_projects,
+            'technologies': len(unique_technologies)
+        },
+        'technologies': unique_technologies
+    }
+
     return render_template('talent_management/employee_management/projects_dashboard.html',
                          user=user,
                          projects_data=projects_data)
@@ -51,152 +89,179 @@ def add_project():
     if request.method == 'POST':
         try:
             # 获取表单数据
-            project_data = {
-                'user_id': user.id,
-                'name': request.form.get('name'),
-                'role': request.form.get('role'),
-                'description': request.form.get('description'),
-                'start_date': datetime.strptime(request.form.get('start_date'), '%Y-%m-%d').date(),
-                'status': request.form.get('status'),
-                'team_size': int(request.form.get('team_size')) if request.form.get('team_size') else None,
-                'technologies': request.form.get('technologies', ''),
-                'contribution': request.form.get('contribution', ''),
-                'project_url': request.form.get('project_url', ''),
-                'notes': request.form.get('notes', '')
-            }
-            
-            # 处理结束日期
-            if request.form.get('end_date'):
-                project_data['end_date'] = datetime.strptime(request.form.get('end_date'), '%Y-%m-%d').date()
-            
-            # 处理预计结束日期
-            if request.form.get('estimated_end_date'):
-                project_data['estimated_end_date'] = datetime.strptime(request.form.get('estimated_end_date'), '%Y-%m-%d').date()
-            
-            # 处理成就数据
-            achievements = request.form.getlist('achievements[]')
-            if achievements:
-                # 过滤空值并转换为JSON字符串
-                achievements = [achievement.strip() for achievement in achievements if achievement.strip()]
-                project_data['achievements'] = json.dumps(achievements, ensure_ascii=False)
-            
-            # 保存项目经验到数据库
-            project_id = save_project_experience_to_database(project_data)
-            
-            if project_id:
-                flash('项目经验添加成功！', 'success')
-                return redirect(url_for('talent_management.employee_manager.projects.projects_dashboard'))
-            else:
-                flash('项目经验添加失败，请稍后重试', 'error')
-                
+            name = request.form.get('name')
+            role = request.form.get('role')
+            description = request.form.get('description')
+            start_date_str = request.form.get('start_date')
+            end_date_str = request.form.get('end_date')
+            status = request.form.get('status')
+            team_size = int(request.form.get('team_size', 1))
+            contribution = request.form.get('contribution')
+
+            # 处理技术栈（支持多选）
+            technologies = request.form.getlist('technologies[]')
+
+            # 处理成就（支持多行输入）
+            achievements_text = request.form.get('achievements', '')
+            achievements = [achievement.strip() for achievement in achievements_text.split('\n') if achievement.strip()]
+
+            # 验证必填字段
+            if not all([name, role, description, start_date_str, status]):
+                flash('请填写所有必填字段', 'danger')
+                return redirect(request.url)
+
+            # 转换日期
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
+            except ValueError:
+                flash('日期格式错误', 'danger')
+                return redirect(request.url)
+
+            # 创建新项目
+            new_project = Project(
+                user_id=user.id,
+                name=name,
+                role=role,
+                description=description,
+                start_date=start_date,
+                end_date=end_date,
+                status=status,
+                team_size=team_size,
+                contribution=contribution
+            )
+
+            # 设置技术栈和成就
+            new_project.set_technologies(technologies)
+            new_project.set_achievements(achievements)
+
+            # 保存到数据库
+            db.session.add(new_project)
+            db.session.commit()
+
+            flash('项目添加成功！', 'success')
+            return redirect(url_for('talent_management.employee_manager.projects.projects_dashboard'))
+
         except Exception as e:
-            flash(f'添加项目经验失败: {str(e)}', 'error')
-            print(f"添加项目经验失败: {e}")
-    
+            db.session.rollback()
+            flash(f'项目添加失败: {str(e)}', 'danger')
+            return redirect(request.url)
+
     return render_template('talent_management/employee_management/add_project.html', user=user)
 
-def get_user_projects_data(user):
-    """从数据库获取用户项目经验数据"""
-    try:
-        # 查询用户的项目经验
-        projects = EmployeeProjectExperience.query.filter_by(user_id=user.id).order_by(EmployeeProjectExperience.start_date.desc()).all()
-        
-        if not projects:
-            # 如果没有项目经验，返回空数据
-            return {
-                'projects': [],
-                'stats': {
-                    'total': 0,
-                    'completed': 0,
-                    'ongoing': 0,
-                    'technologies': 0
-                },
-                'technologies': []
-            }
-        
-        # 转换数据库对象为字典格式
-        projects_data = []
-        all_technologies = []
-        
-        for project in projects:
-            # 解析成就数据
-            achievements = []
-            if project.achievements:
-                try:
-                    achievements = json.loads(project.achievements)
-                except:
-                    achievements = []
-            
-            # 解析技术栈
-            technologies = []
-            if project.technologies:
-                technologies = [tech.strip() for tech in project.technologies.split(',') if tech.strip()]
-                all_technologies.extend(technologies)
-            
-            project_dict = {
-                'id': project.id,
-                'name': project.name,
-                'role': project.role,
-                'start_date': project.start_date.strftime('%Y-%m-%d') if project.start_date else '',
-                'end_date': project.end_date.strftime('%Y-%m-%d') if project.end_date else None,
-                'status': project.status,
-                'description': project.description,
-                'technologies': technologies,
-                'achievements': achievements,
-                'team_size': project.team_size,
-                'contribution': project.contribution
-            }
-            projects_data.append(project_dict)
-        
-        # 计算统计信息
-        total_projects = len(projects_data)
-        completed_projects = len([p for p in projects_data if p['status'] == 'completed'])
-        ongoing_projects = len([p for p in projects_data if p['status'] == 'active'])
-        unique_technologies = list(set(all_technologies))
-        
-        return {
-            'projects': projects_data,
-            'stats': {
-                'total': total_projects,
-                'completed': completed_projects,
-                'ongoing': ongoing_projects,
-                'technologies': len(unique_technologies)
-            },
-            'technologies': unique_technologies
-        }
-        
-    except Exception as e:
-        print(f"获取项目经验数据失败: {e}")
-        # 返回空数据
-        return {
-            'projects': [],
-            'stats': {
-                'total': 0,
-                'completed': 0,
-                'ongoing': 0,
-                'technologies': 0
-            },
-            'technologies': []
-        }
+@projects_bp.route('/edit/<int:project_id>', methods=['GET', 'POST'])
+def edit_project(project_id):
+    """编辑项目经验"""
+    # 检查用户是否登录
+    from flask import session
+    if 'user_id' not in session:
+        flash('请先登录', 'warning')
+        return redirect(url_for('common.auth.sign'))
 
-def save_project_experience_to_database(project_data):
-    """保存项目经验到数据库"""
+    # 获取用户信息
+    user = User.query.get(session['user_id'])
+    if not user:
+        session.clear()
+        flash('用户信息获取失败，请重新登录', 'warning')
+        return redirect(url_for('common.auth.sign'))
+
+    # 查找项目
+    project = Project.query.filter_by(id=project_id, user_id=user.id).first()
+    if not project:
+        flash('项目不存在', 'danger')
+        return redirect(url_for('talent_management.employee_manager.projects.projects_dashboard'))
+
+    if request.method == 'POST':
+        try:
+            # 获取表单数据
+            name = request.form.get('name')
+            role = request.form.get('role')
+            description = request.form.get('description')
+            start_date_str = request.form.get('start_date')
+            end_date_str = request.form.get('end_date')
+            status = request.form.get('status')
+            team_size = int(request.form.get('team_size', 1))
+            contribution = request.form.get('contribution')
+
+            # 处理技术栈（支持多选）
+            technologies = request.form.getlist('technologies[]')
+
+            # 处理成就（支持多行输入）
+            achievements_text = request.form.get('achievements', '')
+            achievements = [achievement.strip() for achievement in achievements_text.split('\n') if achievement.strip()]
+
+            # 验证必填字段
+            if not all([name, role, description, start_date_str, status]):
+                flash('请填写所有必填字段', 'danger')
+                return redirect(request.url)
+
+            # 转换日期
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
+            except ValueError:
+                flash('日期格式错误', 'danger')
+                return redirect(request.url)
+
+            # 更新项目数据
+            project.name = name
+            project.role = role
+            project.description = description
+            project.start_date = start_date
+            project.end_date = end_date
+            project.status = status
+            project.team_size = team_size
+            project.contribution = contribution
+
+            # 更新技术栈和成就
+            project.set_technologies(technologies)
+            project.set_achievements(achievements)
+
+            # 保存到数据库
+            db.session.commit()
+
+            flash('项目修改成功！', 'success')
+            return redirect(url_for('talent_management.employee_manager.projects.projects_dashboard'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f'项目修改失败: {str(e)}', 'danger')
+            return redirect(request.url)
+
+    return render_template('talent_management/employee_management/edit_project.html',
+                         user=user, project=project)
+
+@projects_bp.route('/delete/<int:project_id>', methods=['POST'])
+def delete_project(project_id):
+    """删除项目经验"""
+    # 检查用户是否登录
+    from flask import session
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': '请先登录'})
+
+    # 获取用户信息
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'success': False, 'message': '用户信息获取失败'})
+
     try:
-        # 创建新的项目经验记录
-        new_project = EmployeeProjectExperience(**project_data)
-        
-        # 添加到数据库
-        db.session.add(new_project)
+        # 查找项目
+        project = Project.query.filter_by(id=project_id, user_id=user.id).first()
+        if not project:
+            return jsonify({'success': False, 'message': '项目不存在'})
+
+        # 删除项目
+        db.session.delete(project)
         db.session.commit()
-        
-        return new_project.id
+
+        return jsonify({'success': True, 'message': '项目删除成功'})
+
     except Exception as e:
         db.session.rollback()
-        print(f"保存项目经验失败: {e}")
-        return None
+        return jsonify({'success': False, 'message': f'删除失败: {str(e)}'})
 
 def generate_mock_projects_data(user):
-    """生成模拟项目数据（保留作为备用）"""
+    """生成模拟项目数据"""
     current_date = datetime.now()
     
     projects = [

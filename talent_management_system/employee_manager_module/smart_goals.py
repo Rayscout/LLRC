@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
-from app.models import User, db
-from talent_management_system.models import SmartGoal, GoalProgress
+from app.models import User, SmartGoal, db
 from datetime import datetime, timedelta
 import json
 import re
@@ -113,29 +112,54 @@ def goals_dashboard():
         if 'user_id' not in session:
             flash('请先登录', 'warning')
             return redirect(url_for('common.auth.sign'))
-        
+
         user = User.query.get(session['user_id'])
         if not user or user.user_type != 'employee':
             flash('用户信息获取失败', 'warning')
             return redirect(url_for('common.auth.sign'))
-        
-        # 获取用户的目标
-        user_goals = get_user_goals(user.id)
-        
+
+        # 从数据库获取用户的目标
+        user_goals = SmartGoal.query.filter_by(user_id=user.id).order_by(SmartGoal.created_at.desc()).all()
+
+        # 转换目标数据为前端需要的格式
+        formatted_goals = []
+        for goal in user_goals:
+            formatted_goals.append({
+                'id': goal.id,
+                'title': goal.title,
+                'specific': goal.specific,
+                'measurable': goal.measurable,
+                'achievable': goal.achievable,
+                'relevant': goal.relevant,
+                'time_bound': goal.time_bound,
+                'category': goal.category,
+                'priority': goal.priority,
+                'status': goal.status,
+                'progress': goal.progress,
+                'target_date': goal.target_date,
+                'estimated_hours': goal.estimated_hours,
+                'completed_hours': goal.completed_hours,
+                'created_at': goal.created_at,
+                'last_updated': goal.last_updated,
+                'notes': goal.notes or '',
+                'is_overdue': goal.is_overdue,
+                'remaining_hours': goal.remaining_hours
+            })
+
         # 分析技能差距并推荐目标
         skill_gaps = analyze_skill_gaps(user)
         recommended_goals = generate_recommended_goals(user, skill_gaps)
-        
+
         # 计算目标完成统计
-        goal_stats = calculate_goal_stats(user_goals)
-        
+        goal_stats = calculate_goal_stats(formatted_goals)
+
         return render_template('talent_management/employee_management/smart_goals_dashboard.html',
                              user=user,
-                             user_goals=user_goals,
+                             user_goals=formatted_goals,
                              recommended_goals=recommended_goals,
                              goal_stats=goal_stats,
                              skill_gaps=skill_gaps)
-                             
+
     except Exception as e:
         flash(f'加载目标页面时发生错误: {str(e)}', 'danger')
         return redirect(url_for('talent_management.employee_auth.employee_dashboard'))
@@ -147,111 +171,125 @@ def create_goal():
         try:
             if 'user_id' not in session:
                 return jsonify({'success': False, 'message': '请先登录'})
-            
+
             user = User.query.get(session['user_id'])
             if not user:
                 return jsonify({'success': False, 'message': '用户信息获取失败'})
-            
-            # 获取表单数据
-            goal_data = {
-                'user_id': user.id,
-                'title': request.form.get('title'),
-                'specific': request.form.get('specific'),
-                'measurable': request.form.get('measurable'),
-                'achievable': request.form.get('achievable'),
-                'relevant': request.form.get('relevant'),
-                'time_bound': request.form.get('time_bound'),
-                'category': request.form.get('category', 'custom'),
-                'priority': request.form.get('priority', 'medium'),
-                'target_date': datetime.strptime(request.form.get('target_date'), '%Y-%m-%d').date(),
-                'estimated_hours': int(request.form.get('estimated_hours', 0)),
-                'status': 'active',
-                'progress': 0,
-                'completed_hours': 0,
-                'created_at': datetime.now(),
-                'last_updated': datetime.now(),
-                'notes': ''
-            }
-            
-            # 保存目标到数据库
-            goal_id = save_goal_to_database(goal_data)
-            
-            if goal_id:
-                return jsonify({
-                    'success': True, 
-                    'message': '目标创建成功',
-                    'goal_id': goal_id
-                })
-            else:
-                return jsonify({'success': False, 'message': '目标创建失败'})
-            
+
+            # 创建新的SMART目标
+            new_goal = SmartGoal(
+                user_id=user.id,
+                title=request.form.get('title'),
+                specific=request.form.get('specific'),
+                measurable=request.form.get('measurable'),
+                achievable=request.form.get('achievable'),
+                relevant=request.form.get('relevant'),
+                time_bound=request.form.get('time_bound'),
+                category=request.form.get('category', 'custom'),
+                priority=request.form.get('priority', 'medium'),
+                target_date=datetime.strptime(request.form.get('target_date'), '%Y-%m-%d').date(),
+                estimated_hours=int(request.form.get('estimated_hours', 0)),
+                completed_hours=0,
+                progress=0.0,
+                status='active'
+            )
+
+            # 保存到数据库
+            db.session.add(new_goal)
+            db.session.commit()
+
+            return jsonify({
+                'success': True,
+                'message': '目标创建成功',
+                'goal_id': new_goal.id
+            })
+
         except Exception as e:
+            db.session.rollback()
             return jsonify({'success': False, 'message': f'创建目标失败: {str(e)}'})
-    
+
     return render_template('talent_management/employee_management/create_goal.html')
 
 @smart_goals_bp.route('/<int:goal_id>/update_progress', methods=['POST'])
-def update_progress(goal_id):
+def update_progress():
     """更新目标进度"""
     try:
         if 'user_id' not in session:
             return jsonify({'success': False, 'message': '请先登录'})
-        
-        # 允许从URL参数或JSON体中获取goal_id
-        json_body = request.get_json(silent=True) or {}
-        goal_id = json_body.get('goal_id') or goal_id
 
-        # 获取进度数据
-        completed_hours = json_body.get('completed_hours', 0)
-        notes = str(json_body.get('notes', '') or '')
-        
-        # 验证输入数据
-        try:
-            completed_hours = float(completed_hours)
-            if completed_hours < 0:
-                return jsonify({'success': False, 'message': '已完成时间不能为负数'})
-        except (ValueError, TypeError):
-            return jsonify({'success': False, 'message': '已完成时间格式不正确'})
-        
-        # 获取目标信息
-        goal = SmartGoal.query.filter_by(id=goal_id, user_id=session['user_id']).first()
-        
+        user = User.query.get(session['user_id'])
+        if not user:
+            return jsonify({'success': False, 'message': '用户信息获取失败'})
+
+        goal_id = request.json.get('goal_id')
+        completed_hours = request.json.get('completed_hours')
+        notes = request.json.get('notes', '')
+
+        # 获取目标
+        goal = SmartGoal.query.filter_by(id=goal_id, user_id=user.id).first()
         if not goal:
-            return jsonify({'success': False, 'message': '目标不存在或无权限访问'})
-        
-        # 验证已完成时间不超过预计总时间
-        if completed_hours > goal.estimated_hours:
-            return jsonify({'success': False, 'message': '已完成时间不能超过预计总时间'})
-        
-        # 计算新的进度百分比
-        if goal.estimated_hours > 0:
-            progress = min(100, round((completed_hours / goal.estimated_hours) * 100))
-        else:
-            progress = 0
-        
+            return jsonify({'success': False, 'message': '目标不存在'})
+
         # 更新目标进度
-        success = update_goal_progress(goal_id, progress, completed_hours, notes)
-        
-        if success:
-            # 重新获取更新后的目标信息
-            updated_goal = SmartGoal.query.get(goal_id)
-            
-            return jsonify({
-                'success': True, 
-                'message': '进度更新成功', 
-                'goal_id': goal_id, 
-                'progress': progress,
-                'completed_hours': completed_hours,
-                'notes': notes,
-                'status': updated_goal.status,
-                'last_updated': updated_goal.last_updated.strftime('%Y-%m-%d %H:%M:%S') if updated_goal.last_updated else None
-            })
-        else:
-            return jsonify({'success': False, 'message': '进度更新失败'})
-            
+        old_progress = goal.progress
+        goal.update_progress_from_hours(completed_hours)
+        if notes:
+            goal.notes = notes
+
+        # 保存到数据库
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': '进度更新成功',
+            'progress': round(goal.progress, 1),
+            'completed_hours': goal.completed_hours,
+            'remaining_hours': goal.remaining_hours,
+            'status': goal.status
+        })
+
     except Exception as e:
-        print(f"更新进度失败: {e}")
+        db.session.rollback()
         return jsonify({'success': False, 'message': f'更新进度失败: {str(e)}'})
+
+@smart_goals_bp.route('/<int:goal_id>/update_hours', methods=['POST'])
+def update_goal_hours(goal_id):
+    """通过拖拽进度条更新学习小时数"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'success': False, 'message': '请先登录'})
+
+        user = User.query.get(session['user_id'])
+        if not user:
+            return jsonify({'success': False, 'message': '用户信息获取失败'})
+
+        completed_hours = int(request.json.get('completed_hours', 0))
+
+        # 获取目标
+        goal = SmartGoal.query.filter_by(id=goal_id, user_id=user.id).first()
+        if not goal:
+            return jsonify({'success': False, 'message': '目标不存在'})
+
+        # 更新学习小时数和进度
+        old_completed_hours = goal.completed_hours
+        goal.update_progress_from_hours(completed_hours)
+
+        # 保存到数据库
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': '学习小时数更新成功',
+            'progress': round(goal.progress, 1),
+            'completed_hours': goal.completed_hours,
+            'remaining_hours': goal.remaining_hours,
+            'status': goal.status,
+            'is_completed': goal.status == 'completed'
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'更新失败: {str(e)}'})
 
 @smart_goals_bp.route('/<int:goal_id>/complete', methods=['POST'])
 def complete_goal(goal_id):
@@ -259,20 +297,32 @@ def complete_goal(goal_id):
     try:
         if 'user_id' not in session:
             return jsonify({'success': False, 'message': '请先登录'})
-        
-        json_body = request.get_json(silent=True) or {}
-        goal_id = json_body.get('goal_id') or goal_id
-        completion_notes = json_body.get('completion_notes', '')
-        
+
+        user = User.query.get(session['user_id'])
+        if not user:
+            return jsonify({'success': False, 'message': '用户信息获取失败'})
+
+        completion_notes = request.json.get('completion_notes', '')
+
+        # 获取目标
+        goal = SmartGoal.query.filter_by(id=goal_id, user_id=user.id).first()
+        if not goal:
+            return jsonify({'success': False, 'message': '目标不存在'})
+
         # 标记目标为完成
-        success = mark_goal_complete(goal_id, completion_notes)
-        
-        if success:
-            return jsonify({'success': True, 'message': '目标完成！恭喜！'})
-        else:
-            return jsonify({'success': False, 'message': '操作失败'})
-            
+        goal.status = 'completed'
+        if completion_notes:
+            goal.notes = (goal.notes or '') + f'\n完成备注: {completion_notes}'
+        goal.last_updated = datetime.utcnow()
+        goal.updated_at = datetime.utcnow()
+
+        # 保存到数据库
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': '目标完成！恭喜！'})
+
     except Exception as e:
+        db.session.rollback()
         return jsonify({'success': False, 'message': f'操作失败: {str(e)}'})
 
 def analyze_skill_gaps(user):
@@ -453,37 +503,7 @@ def create_skill_goal(skill_gap):
         'estimated_hours': hours
     }
 
-def get_user_goals(user_id):
-    """获取用户的目标（从数据库）"""
-    try:
-        goals = SmartGoal.query.filter_by(user_id=user_id).order_by(SmartGoal.created_at.desc()).all()
-        
-        goals_list = []
-        for goal in goals:
-            goals_list.append({
-                'id': goal.id,
-                'title': goal.title,
-                'specific': goal.specific,
-                'measurable': goal.measurable,
-                'achievable': goal.achievable,
-                'relevant': goal.relevant,
-                'time_bound': goal.time_bound,
-                'category': goal.category,
-                'priority': goal.priority,
-                'status': goal.status,
-                'progress': goal.progress,
-                'target_date': goal.target_date,
-                'estimated_hours': goal.estimated_hours,
-                'completed_hours': goal.completed_hours,
-                'created_at': goal.created_at,
-                'last_updated': goal.last_updated,
-                'notes': goal.notes
-            })
-        
-        return goals_list
-    except Exception as e:
-        print(f"获取用户目标失败: {e}")
-        return []
+# get_user_goals函数已被移除，现在使用数据库查询
 
 def calculate_goal_stats(user_goals):
     """计算目标统计信息"""
@@ -507,90 +527,4 @@ def calculate_goal_stats(user_goals):
         'completion_rate': round(completed_goals / total_goals * 100, 1) if total_goals > 0 else 0
     }
 
-def save_goal_to_database(goal_data):
-    """保存目标到数据库"""
-    try:
-        # 创建新的SMART目标
-        new_goal = SmartGoal(
-            user_id=goal_data['user_id'],
-            title=goal_data['title'],
-            specific=goal_data['specific'],
-            measurable=goal_data['measurable'],
-            achievable=goal_data['achievable'],
-            relevant=goal_data['relevant'],
-            time_bound=goal_data['time_bound'],
-            category=goal_data['category'],
-            priority=goal_data['priority'],
-            target_date=goal_data['target_date'],
-            estimated_hours=goal_data['estimated_hours'],
-            status=goal_data['status'],
-            progress=goal_data['progress'],
-            completed_hours=goal_data['completed_hours'],
-            notes=goal_data['notes'],
-            created_at=goal_data['created_at'],
-            last_updated=goal_data['last_updated']
-        )
-        
-        # 添加到数据库
-        db.session.add(new_goal)
-        db.session.commit()
-        
-        return new_goal.id
-    except Exception as e:
-        db.session.rollback()
-        print(f"保存目标失败: {e}")
-        return None
-
-def update_goal_progress(goal_id, progress, completed_hours, notes):
-    """更新目标进度"""
-    try:
-        # 获取目标
-        goal = SmartGoal.query.get(goal_id)
-        if not goal:
-            return False
-        
-        # 更新目标进度
-        goal.progress = progress
-        goal.completed_hours = completed_hours
-        goal.notes = notes
-        goal.last_updated = datetime.now()
-        
-        # 如果进度达到100%，标记为完成
-        if progress >= 100:
-            goal.status = 'completed'
-        
-        # 创建进度历史记录
-        progress_record = GoalProgress(
-            goal_id=goal_id,
-            progress=progress,
-            completed_hours=completed_hours,
-            notes=notes
-        )
-        
-        db.session.add(progress_record)
-        db.session.commit()
-        
-        return True
-    except Exception as e:
-        db.session.rollback()
-        print(f"更新目标进度失败: {e}")
-        return False
-
-def mark_goal_complete(goal_id, completion_notes):
-    """标记目标完成"""
-    try:
-        goal = SmartGoal.query.get(goal_id)
-        if not goal:
-            return False
-        
-        goal.status = 'completed'
-        goal.progress = 100
-        goal.notes = completion_notes
-        goal.last_updated = datetime.now()
-        
-        db.session.commit()
-        return True
-    except Exception as e:
-        db.session.rollback()
-        print(f"标记目标完成失败: {e}")
-        return False
+# 模拟数据函数已被移除，现在使用真正的数据库操作

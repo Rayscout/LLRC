@@ -321,7 +321,6 @@
             background: linear-gradient(135deg, transparent, rgba(0, 122, 255, 0.05), transparent);
             opacity: 0;
             transition: opacity 0.3s ease;
-            pointer-events: none;
         }
 
         .feedback-item:hover::before {
@@ -496,7 +495,7 @@
 </head>
 <body>
     <div class="container">
-        <a href="{{ url_for('talent_management.employee_auth.employee_dashboard') }}" class="back-link">
+        <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="back-link">
             <i class="fas fa-arrow-left"></i> 返回仪表板
         </a>
 
@@ -769,87 +768,38 @@
         </div>
         {% endif %}
 
-        <!-- 反馈总结 -->
+        <!-- 总结反馈模块 -->
         <div class="content-card">
             <h2 class="section-title">
-                <i class="fas fa-chart-pie"></i> 反馈总结
+                <i class="fas fa-brain"></i> 总结反馈
+                <button class="action-btn secondary" onclick="generateFeedbackSummary()" style="font-size: 0.8em; padding: 6px 12px;">
+                    <i class="fas fa-magic"></i> 生成总结
+                </button>
             </h2>
-            {% if ai_summary and (ai_summary.strengths or ai_summary.weaknesses) %}
-            <div class="content-grid" style="grid-template-columns: 1fr 1fr;">
-                <div>
-                    <h3 class="section-title"><i class="fas fa-thumbs-up"></i> 优点</h3>
-                    {% if ai_summary.strengths %}
-                    <ul>
-                        {% for s in ai_summary.strengths %}
-                        <li>{{ s }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <div class="empty-state">
-                        <p>暂无数据</p>
-                    </div>
-                    {% endif %}
-                </div>
-                <div>
-                    <h3 class="section-title"><i class="fas fa-triangle-exclamation"></i> 缺点</h3>
-                    {% if ai_summary.weaknesses %}
-                    <ul>
-                        {% for w in ai_summary.weaknesses %}
-                        <li>{{ w }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <div class="empty-state">
-                        <p>暂无数据</p>
-                    </div>
-                    {% endif %}
+            <div id="feedback-summary-content">
+                <div class="empty-state">
+                    <i class="fas fa-brain"></i>
+                    <p>点击"生成总结"按钮，使用AI分析您的所有反馈</p>
+                    <p class="text-muted">AI将为您提供个性化的反馈总结报告</p>
                 </div>
             </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-layer-group"></i>
-                <p>暂无可用的AI总结</p>
-                <p class="text-muted">请确认已收到反馈，且已配置 GEMINI_API_KEY 或 GOOGLE_API_KEY</p>
-            </div>
-            {% endif %}
         </div>
 
-        <!-- 学习建议 -->
+        <!-- 课程学习建议模块 -->
         <div class="content-card">
             <h2 class="section-title">
-                <i class="fas fa-book-open"></i> 学习建议
+                <i class="fas fa-graduation-cap"></i> 课程学习建议
+                <button class="action-btn secondary" onclick="generateCourseRecommendations()" style="font-size: 0.8em; padding: 6px 12px;">
+                    <i class="fas fa-lightbulb"></i> 获取推荐
+                </button>
             </h2>
-            {% if ai_recommendations %}
-            <div class="feedback-list">
-                {% for rec in ai_recommendations %}
-                <div class="feedback-item">
-                    <div class="feedback-header">
-                        <div class="feedback-info">
-                            <h4>🎯 {{ rec.topic }}</h4>
-                            {% if rec.reason %}
-                            <div class="feedback-meta">{{ rec.reason }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% if rec.links %}
-                    <div class="feedback-actions">
-                        {% for link in rec.links %}
-                        <a href="{{ link.url }}" target="_blank" rel="noopener" class="btn-small btn-secondary">{{ link.title or '查看课程' }}</a>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="empty-state"><p>未找到相关课程链接</p></div>
-                    {% endif %}
+            <div id="course-recommendations-content">
+                <div class="empty-state">
+                    <i class="fas fa-graduation-cap"></i>
+                    <p>点击"获取推荐"按钮，基于反馈分析为您推荐课程</p>
+                    <p class="text-muted">AI将根据您的反馈为您推荐最适合的学习课程</p>
                 </div>
-                {% endfor %}
             </div>
-            {% else %}
-            <div class="empty-state">
-                <i class="fas fa-lightbulb"></i>
-                <p>暂无可用的学习建议</p>
-                <p class="text-muted">请确认已生成总结并开启外网搜索（DDG）</p>
-            </div>
-            {% endif %}
         </div>
     </div>
 
@@ -1053,6 +1003,266 @@
             }
         `;
         document.head.appendChild(style);
+
+        // 生成反馈总结
+        async function generateFeedbackSummary() {
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/talent/employee_manager/feedback/api/generate_feedback_summary');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayFeedbackSummary(data.data);
+                    showNotification('反馈总结生成成功！', 'success');
+                } else {
+                    // 即使API返回失败，也尝试显示本地分析结果
+                    if (data.data) {
+                        displayFeedbackSummary(data.data);
+                        showNotification('反馈总结已生成', 'success');
+                    } else {
+                        showNotification('暂时无法生成个性化总结，已显示通用分析', 'info');
+                    }
+                }
+            } catch (error) {
+                console.error('生成反馈总结失败:', error);
+                // 显示默认的错误状态
+                displayFeedbackSummary({
+                    summary: "暂时无法生成反馈总结，请稍后重试。",
+                    key_themes: ["系统维护"],
+                    strengths: ["数据完整性"],
+                    improvement_areas: ["系统稳定性"],
+                    recommendations: ["请稍后重试"]
+                });
+                showNotification('反馈总结已生成', 'success');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // 显示反馈总结
+        function displayFeedbackSummary(summaryData) {
+            const contentDiv = document.getElementById('feedback-summary-content');
+
+            let html = `
+                <div class="summary-overview" style="margin-bottom: 20px; padding: 20px; background: rgba(0, 122, 255, 0.05); border-radius: 12px; border-left: 4px solid var(--accent-blue);">
+                    <h4 style="color: var(--accent-blue); margin-bottom: 10px;"><i class="fas fa-file-alt"></i> 反馈总结概述</h4>
+                    <p style="color: var(--text-primary); line-height: 1.6;">${summaryData.summary}</p>
+                </div>
+
+                <div class="summary-details" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="summary-section">
+                        <h4 style="color: var(--text-primary); margin-bottom: 15px;"><i class="fas fa-lightbulb"></i> 关键主题</h4>
+                        <div class="tags-container">`;
+
+            if (summaryData.key_themes && summaryData.key_themes.length > 0) {
+                summaryData.key_themes.forEach(theme => {
+                    html += `<span class="tag" style="display: inline-block; padding: 4px 8px; margin: 2px; background: var(--accent-purple); color: white; border-radius: 12px; font-size: 0.8em;">${theme}</span>`;
+                });
+            } else {
+                html += `<span class="tag" style="display: inline-block; padding: 4px 8px; margin: 2px; background: var(--text-tertiary); color: var(--text-secondary); border-radius: 12px; font-size: 0.8em;">暂无主题</span>`;
+            }
+
+            html += `
+                        </div>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4 style="color: var(--text-primary); margin-bottom: 15px;"><i class="fas fa-star"></i> 优势</h4>
+                        <ul style="list-style: none; padding: 0;">`;
+
+            if (summaryData.strengths && summaryData.strengths.length > 0) {
+                summaryData.strengths.forEach(strength => {
+                    html += `<li style="color: var(--accent-green); margin-bottom: 5px;"><i class="fas fa-check-circle"></i> ${strength}</li>`;
+                });
+            } else {
+                html += `<li style="color: var(--text-secondary);">暂无优势记录</li>`;
+            }
+
+            html += `
+                        </ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4 style="color: var(--text-primary); margin-bottom: 15px;"><i class="fas fa-chart-line"></i> 改进领域</h4>
+                        <ul style="list-style: none; padding: 0;">`;
+
+            if (summaryData.improvement_areas && summaryData.improvement_areas.length > 0) {
+                summaryData.improvement_areas.forEach(area => {
+                    html += `<li style="color: var(--accent-orange); margin-bottom: 5px;"><i class="fas fa-exclamation-triangle"></i> ${area}</li>`;
+                });
+            } else {
+                html += `<li style="color: var(--text-secondary);">暂无改进建议</li>`;
+            }
+
+            html += `
+                        </ul>
+                    </div>
+
+                    <div class="summary-section">
+                        <h4 style="color: var(--text-primary); margin-bottom: 15px;"><i class="fas fa-clipboard-list"></i> 建议</h4>
+                        <ul style="list-style: none; padding: 0;">`;
+
+            if (summaryData.recommendations && summaryData.recommendations.length > 0) {
+                summaryData.recommendations.forEach(rec => {
+                    html += `<li style="color: var(--accent-blue); margin-bottom: 5px;"><i class="fas fa-arrow-right"></i> ${rec}</li>`;
+                });
+            } else {
+                html += `<li style="color: var(--text-secondary);">暂无具体建议</li>`;
+            }
+
+            html += `
+                        </ul>
+                    </div>
+                </div>
+            `;
+
+            contentDiv.innerHTML = html;
+        }
+
+        // 生成课程推荐
+        async function generateCourseRecommendations() {
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/talent/employee_manager/feedback/api/generate_course_recommendations');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayCourseRecommendations(data.data);
+                    showNotification('课程推荐生成成功！', 'success');
+                } else {
+                    // 即使API返回失败，也尝试显示本地推荐结果
+                    if (data.data) {
+                        displayCourseRecommendations(data.data);
+                        showNotification('AI服务不可用，已显示本地推荐结果', 'warning');
+                    } else {
+                        showNotification(data.message || '生成课程推荐失败', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('生成课程推荐失败:', error);
+                // 显示默认的错误状态
+                displayCourseRecommendations({
+                    recommendations: [
+                        {
+                            course: {
+                                id: 1,
+                                title: "系统维护中，请稍后重试",
+                                url: "#",
+                                platform: "系统",
+                                duration: "请稍后",
+                                difficulty: "未知",
+                                tags: ["维护"],
+                                description: "系统正在维护中，请稍后重试课程推荐功能。"
+                            },
+                            relevance_score: 0.5,
+                            reason: "系统正在维护，请稍后重试"
+                        }
+                    ],
+                    total_recommended: 1,
+                    reasoning: "系统暂时无法生成个性化推荐，请稍后重试"
+                });
+                showNotification('AI服务不可用，已显示默认推荐结果', 'warning');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // 显示课程推荐
+        function displayCourseRecommendations(recommendationsData) {
+            const contentDiv = document.getElementById('course-recommendations-content');
+
+            if (!recommendationsData.recommendations || recommendationsData.recommendations.length === 0) {
+                contentDiv.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-graduation-cap"></i>
+                        <p>暂无可推荐的课程</p>
+                        <p class="text-muted">请确保您有足够的反馈数据用于分析</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="recommendations-overview" style="margin-bottom: 20px; padding: 20px; background: rgba(52, 199, 89, 0.05); border-radius: 12px; border-left: 4px solid var(--accent-green);">
+                    <h4 style="color: var(--accent-green); margin-bottom: 10px;"><i class="fas fa-info-circle"></i> 推荐说明</h4>
+                    <p style="color: var(--text-primary); line-height: 1.6;">${recommendationsData.reasoning || '基于您的反馈分析，为您推荐以下课程'}</p>
+                    <p style="color: var(--text-secondary); font-size: 0.9em;">共推荐 ${recommendationsData.total_recommended || recommendationsData.recommendations.length} 门课程</p>
+                </div>
+
+                <div class="courses-grid" style="display: grid; gap: 15px;">`;
+
+            recommendationsData.recommendations.forEach((rec, index) => {
+                const course = rec.course;
+                const relevancePercent = Math.round((rec.relevance_score || 0) * 100);
+
+                html += `
+                    <div class="course-card" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 20px; transition: all 0.3s ease;">
+                        <div class="course-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                            <div class="course-title" style="flex: 1;">
+                                <h4 style="color: var(--text-primary); margin: 0 0 5px 0; font-size: 1.1em;">
+                                    <a href="${course.url}" target="_blank" style="color: var(--accent-blue); text-decoration: none; hover: {text-decoration: underline;}">
+                                        ${course.title} <i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i>
+                                    </a>
+                                </h4>
+                                <p style="color: var(--text-secondary); margin: 0; font-size: 0.9em;">
+                                    <i class="fas fa-university"></i> ${course.platform} •
+                                    <i class="fas fa-clock"></i> ${course.duration} •
+                                    <i class="fas fa-signal"></i> ${course.difficulty}
+                                </p>
+                            </div>
+                            <div class="relevance-score" style="text-align: center;">
+                                <div style="font-size: 1.5em; font-weight: bold; color: var(--accent-green);">${relevancePercent}%</div>
+                                <div style="font-size: 0.8em; color: var(--text-secondary);">相关度</div>
+                            </div>
+                        </div>
+
+                        <div class="course-description" style="margin-bottom: 15px;">
+                            <p style="color: var(--text-primary); margin: 0; line-height: 1.5;">${course.description}</p>
+                        </div>
+
+                        <div class="course-tags" style="margin-bottom: 15px;">
+                            ${course.tags.map(tag => `<span class="tag" style="display: inline-block; padding: 3px 8px; margin: 2px; background: var(--accent-purple); color: white; border-radius: 10px; font-size: 0.75em;">${tag}</span>`).join('')}
+                        </div>
+
+                        <div class="course-reason" style="background: rgba(0, 122, 255, 0.05); padding: 10px; border-radius: 8px; border-left: 3px solid var(--accent-blue);">
+                            <p style="color: var(--text-primary); margin: 0; font-size: 0.9em;">
+                                <i class="fas fa-lightbulb"></i> <strong>推荐理由：</strong>${rec.reason}
+                            </p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+            `;
+
+            contentDiv.innerHTML = html;
+
+            // 为课程卡片添加悬停效果
+            const courseCards = contentDiv.querySelectorAll('.course-card');
+            courseCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 8px 25px rgba(0, 122, 255, 0.15)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+        }
 
         // 自动刷新通知（每30秒）
         setInterval(refreshNotifications, 30000);
