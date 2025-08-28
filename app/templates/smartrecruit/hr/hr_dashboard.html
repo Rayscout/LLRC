@@ -2,6 +2,14 @@
 
 {% block title %}HR仪表板{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='hr_scroll_fix.css') }}">
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='hr_scroll_fix.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <style>
     html{scroll-behavior:smooth}
