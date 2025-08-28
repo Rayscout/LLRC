@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMART目标管理 - 员工仪表板</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-primary: #F2F2F7;
@@ -385,196 +385,6 @@
             margin-right: 8px;
         }
 
-        /* 进度更新模态框样式 */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.show {
-            opacity: 1;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border-radius: var(--border-radius-large);
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-medium);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.show .modal-content {
-            transform: scale(1);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .modal-title {
-            font-size: 1.5em;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 50%;
-            transition: var(--transition-fast);
-        }
-
-        .modal-close:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-        }
-
-        .progress-input-group {
-            margin-bottom: 25px;
-        }
-
-        .progress-label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 10px;
-            color: var(--text-primary);
-        }
-
-        .progress-slider {
-            width: 100%;
-            height: 8px;
-            border-radius: 4px;
-            background: rgba(0, 122, 255, 0.1);
-            outline: none;
-            -webkit-appearance: none;
-            margin-bottom: 15px;
-        }
-
-        .progress-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: var(--accent-blue);
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0, 122, 255, 0.3);
-            transition: var(--transition-fast);
-        }
-
-        .progress-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);
-        }
-
-        .progress-value {
-            font-size: 2em;
-            font-weight: 700;
-            color: var(--accent-blue);
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .progress-notes {
-            width: 100%;
-            min-height: 100px;
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: var(--border-radius);
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-size: 1em;
-            resize: vertical;
-            transition: var(--transition-fast);
-        }
-
-        .progress-notes:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .progress-history {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .history-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--text-primary);
-        }
-
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .history-progress {
-            font-weight: 600;
-            color: var(--accent-blue);
-        }
-
-        .history-date {
-            font-size: 0.9em;
-            color: var(--text-secondary);
-        }
-
-        .history-notes {
-            font-size: 0.9em;
-            color: var(--text-secondary);
-            font-style: italic;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
         @media (max-width: 768px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -586,15 +396,6 @@
             
             .goal-details {
                 grid-template-columns: 1fr;
-            }
-
-            .modal-content {
-                padding: 20px;
-                margin: 20px;
-            }
-
-            .modal-actions {
-                flex-direction: column;
             }
         }
     </style>
@@ -639,7 +440,7 @@
 
                 {% if user_goals %}
                     {% for goal in user_goals %}
-                        <div class="goal-item" data-goal-id="{{ goal.id }}">
+                        <div class="goal-item">
                             <div class="goal-header">
                                 <div class="goal-title">{{ goal.title }}</div>
                                 <span class="goal-priority priority-{{ goal.priority }}">
@@ -652,8 +453,8 @@
                                     <div class="progress-fill" style="width: {{ goal.progress }}%"></div>
                                 </div>
                                 <div class="progress-text">
+                                    <span>进度: {{ goal.progress }}%</span>
                                     <span>{{ goal.completed_hours }}/{{ goal.estimated_hours }} 小时</span>
-                                    <span>进度: <span class="progress-display">{{ goal.progress }}%</span></span>
                                 </div>
                             </div>
 
@@ -684,7 +485,7 @@
                             {% endif %}
 
                             <div class="goal-actions">
-                                <button class="btn btn-primary" onclick="openProgressModal({{ goal.id }}, '{{ goal.title }}', {{ goal.progress }}, {{ goal.estimated_hours }}, {{ goal.completed_hours }})">
+                                <button class="btn btn-primary" onclick="updateProgress({{ goal.id }})">
                                     <i class="fas fa-edit"></i> 更新进度
                                 </button>
                                 <button class="btn btn-secondary" onclick="viewDetails({{ goal.id }})">
@@ -771,383 +572,37 @@
         </div>
     </div>
 
-    <!-- 进度更新模态框 -->
-    <div class="modal-overlay" id="progressModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">更新目标进度</h3>
-                <button class="modal-close" onclick="closeProgressModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="progress-input-group">
-                <label class="progress-label">目标信息</label>
-                <div style="background: var(--bg-secondary); padding: 15px; border-radius: var(--border-radius); margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="color: var(--text-secondary);">目标标题:</span>
-                        <span style="font-weight: 600;" id="modalGoalTitle"></span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="color: var(--text-secondary);">预计总时间:</span>
-                        <span style="font-weight: 600;" id="modalGoalTotalHours">0</span> 小时
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-secondary);">当前进度:</span>
-                        <span style="font-weight: 600; color: var(--accent-blue);" id="modalGoalCurrentProgress">0%</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="progress-input-group">
-                <label class="progress-label">已完成时间（小时）</label>
-                <input type="number" class="form-input" id="completedHoursInput" 
-                       min="0" step="0.5" placeholder="输入已完成的学习时间">
-                <div style="margin-top: 10px; text-align: center;">
-                    <div class="progress-value" id="progressValue">0%</div>
-                    <div class="progress-bar" style="margin: 15px 0;">
-                        <div class="progress-fill" id="modalProgressFill" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="progress-input-group">
-                <label class="progress-label">进度备注</label>
-                <textarea class="progress-notes" id="progressNotes" 
-                          placeholder="描述您在这个目标上的进展，遇到的挑战，或者下一步计划..."></textarea>
-            </div>
-
-            <!-- 进度历史记录 -->
-            <div class="progress-history" id="progressHistory" style="display: none;">
-                <h4 class="history-title">进度历史</h4>
-                <div id="historyList">
-                    <!-- 历史记录将在这里显示 -->
-                </div>
-            </div>
-
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeProgressModal()">取消</button>
-                <button class="btn btn-primary" onclick="saveProgress()">
-                    <i class="fas fa-save"></i> 保存进度
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        let currentGoalId = null;
-        let currentGoalTitle = '';
-        let currentProgress = 0;
-        let currentTotalHours = 0;
-        let currentCompletedHours = 0;
-
-        // 打开进度更新模态框
-        function openProgressModal(goalId, goalTitle, currentProgressValue, totalHours, completedHours) {
-            currentGoalId = goalId;
-            currentGoalTitle = goalTitle;
-            currentProgress = currentProgressValue;
-            currentTotalHours = totalHours || 0;
-            currentCompletedHours = completedHours || 0;
-            
-            // 设置模态框信息
-            document.getElementById('modalGoalTitle').textContent = goalTitle;
-            document.getElementById('modalGoalTotalHours').textContent = currentTotalHours;
-            document.getElementById('modalGoalCurrentProgress').textContent = currentProgress + '%';
-            document.getElementById('completedHoursInput').value = currentCompletedHours;
-            document.getElementById('progressValue').textContent = currentProgress + '%';
-            document.getElementById('modalProgressFill').style.width = currentProgress + '%';
-            document.getElementById('progressNotes').value = '';
-            
-            // 显示模态框
-            document.getElementById('progressModal').style.display = 'flex';
-            setTimeout(() => {
-                document.getElementById('progressModal').classList.add('show');
-            }, 10);
-            
-            // 加载进度历史
-            loadProgressHistory(goalId);
-        }
-
-        // 关闭进度更新模态框
-        function closeProgressModal() {
-            document.getElementById('progressModal').classList.remove('show');
-            setTimeout(() => {
-                document.getElementById('progressModal').style.display = 'none';
-            }, 300);
-        }
-
-        // 小时数输入变化事件
-        document.getElementById('completedHoursInput').addEventListener('input', function() {
-            const completedHours = parseFloat(this.value) || 0;
-            const totalHours = currentTotalHours;
-            
-            if (totalHours > 0) {
-                const progress = Math.min(100, Math.round((completedHours / totalHours) * 100));
-                document.getElementById('progressValue').textContent = progress + '%';
-                document.getElementById('modalProgressFill').style.width = progress + '%';
-                document.getElementById('modalGoalCurrentProgress').textContent = progress + '%';
-            }
-        });
-
-        // 保存进度
-        function saveProgress() {
-            const completedHours = parseFloat(document.getElementById('completedHoursInput').value) || 0;
-            const notes = document.getElementById('progressNotes').value.trim();
-            
-            console.log('保存进度:', {
-                goalId: currentGoalId,
-                completedHours: completedHours,
-                totalHours: currentTotalHours,
-                notes: notes
-            });
-            
-            if (completedHours < 0) {
-                showNotification('已完成时间不能为负数', 'error');
-                return;
-            }
-
-            if (completedHours > currentTotalHours) {
-                showNotification('已完成时间不能超过预计总时间', 'error');
-                return;
-            }
-
-            // 计算进度百分比
-            const progress = currentTotalHours > 0 ? Math.min(100, Math.round((completedHours / currentTotalHours) * 100)) : 0;
-
-            // 显示加载状态
-            const saveBtn = document.querySelector('.modal-actions .btn-primary');
-            const originalText = saveBtn.innerHTML;
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
-            saveBtn.disabled = true;
-
-            // 发送更新请求
-            fetch(`/talent/employee_manager/smart_goals/${currentGoalId}/update_progress`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    goal_id: currentGoalId,
-                    completed_hours: completedHours,
-                    notes: notes
+        function updateProgress(goalId) {
+            const progress = prompt('请输入新的进度百分比 (0-100):');
+            if (progress !== null && !isNaN(progress) && progress >= 0 && progress <= 100) {
+                const notes = prompt('请输入进度备注 (可选):');
+                
+                fetch(`/talent/employee_manager/smart_goals/${goalId}/update_progress`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        goal_id: goalId,
+                        progress: parseInt(progress),
+                        notes: notes || ''
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // 更新页面上的进度显示
-                    updateGoalProgressOnPage(currentGoalId, data.progress, data.completed_hours, data.notes);
-                    
-                    // 显示成功消息
-                    showNotification('进度更新成功！', 'success');
-                    
-                    // 关闭模态框
-                    closeProgressModal();
-                    
-                    // 刷新统计数据
-                    refreshGoalStats();
-                    
-                    // 不再自动刷新页面，让用户看到实时更新的效果
-                } else {
-                    showNotification('更新失败: ' + data.message, 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('更新失败，请稍后重试', 'error');
-            })
-            .finally(() => {
-                // 恢复按钮状态
-                saveBtn.innerHTML = originalText;
-                saveBtn.disabled = false;
-            });
-        }
-
-        // 更新页面上的进度显示
-        function updateGoalProgressOnPage(goalId, progress, completedHours, notes) {
-            const goalItem = document.querySelector(`[data-goal-id="${goalId}"]`);
-            if (goalItem) {
-                // 更新进度条
-                const progressFill = goalItem.querySelector('.progress-fill');
-                const progressDisplay = goalItem.querySelector('.progress-display');
-                
-                if (progressFill) {
-                    progressFill.style.width = progress + '%';
-                    // 更新进度条颜色
-                    if (progress >= 100) {
-                        progressFill.style.backgroundColor = '#28a745'; // 绿色 - 已完成
-                    } else if (progress >= 50) {
-                        progressFill.style.backgroundColor = '#17a2b8'; // 蓝色 - 进行中
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('进度更新成功！');
+                        location.reload();
                     } else {
-                        progressFill.style.backgroundColor = '#ffc107'; // 黄色 - 进行中
+                        alert('更新失败: ' + data.message);
                     }
-                }
-                if (progressDisplay) progressDisplay.textContent = progress + '%';
-                
-                // 更新已完成时间显示
-                const progressText = goalItem.querySelector('.progress-text');
-                if (progressText) {
-                    const timeSpan = progressText.querySelector('span:first-child');
-                    if (timeSpan) {
-                        // 获取目标的总时间
-                        const goalDetails = goalItem.querySelector('.goal-details');
-                        const estimatedHoursElement = goalDetails.querySelector('.detail-item:has(.detail-label:contains("预计时间")) .detail-value');
-                        if (estimatedHoursElement) {
-                            const totalHours = estimatedHoursElement.textContent.replace(' 小时', '');
-                            timeSpan.textContent = completedHours + '/' + totalHours + ' 小时';
-                        } else {
-                            // 如果没有找到预计时间元素，直接显示已完成时间
-                            timeSpan.textContent = completedHours + ' 小时';
-                        }
-                    }
-                }
-                
-                // 更新备注
-                let notesElement = goalItem.querySelector('.detail-item[style*="grid-column: 1 / -1"]');
-                if (!notesElement && notes) {
-                    // 如果没有备注元素，创建一个
-                    const goalDetails = goalItem.querySelector('.goal-details');
-                    notesElement = document.createElement('div');
-                    notesElement.className = 'detail-item';
-                    notesElement.style = 'grid-column: 1 / -1;';
-                    notesElement.innerHTML = 
-                        '<div class="detail-label">备注</div>' +
-                        '<div class="detail-value">' + notes + '</div>';
-                    goalDetails.appendChild(notesElement);
-                } else if (notesElement && notes) {
-                    notesElement.querySelector('.detail-value').textContent = notes;
-                }
-                
-                // 如果进度达到100%，显示完成按钮
-                if (progress >= 100) {
-                    const actions = goalItem.querySelector('.goal-actions');
-                    if (actions && !actions.querySelector('.btn[onclick*="completeGoal"]')) {
-                        const completeBtn = document.createElement('button');
-                        completeBtn.className = 'btn btn-secondary';
-                        completeBtn.onclick = () => completeGoal(goalId);
-                        completeBtn.innerHTML = '<i class="fas fa-check"></i> 标记完成';
-                        actions.appendChild(completeBtn);
-                    }
-                }
-                
-                // 更新目标状态显示 - 修复选择器
-                const statusElement = goalItem.querySelector('.detail-item .detail-label');
-                if (statusElement && statusElement.textContent.includes('状态')) {
-                    const statusValue = statusElement.nextElementSibling;
-                    if (statusValue) {
-                        if (progress >= 100) {
-                            statusValue.textContent = 'Completed';
-                        } else if (progress > 0) {
-                            statusValue.textContent = 'Active';
-                        } else {
-                            statusValue.textContent = 'Pending';
-                        }
-                    }
-                }
-                
-                // 更新最后更新时间
-                const lastUpdatedElement = goalItem.querySelector('.detail-item .detail-label');
-                if (lastUpdatedElement && lastUpdatedElement.textContent.includes('最后更新')) {
-                    const lastUpdatedValue = lastUpdatedElement.nextElementSibling;
-                    if (lastUpdatedValue) {
-                        const now = new Date();
-                        lastUpdatedValue.textContent = now.toLocaleString('zh-CN');
-                    }
-                }
-            }
-        }
-
-        // 加载进度历史
-        function loadProgressHistory(goalId) {
-            // 这里可以调用API获取进度历史记录
-            // 目前使用模拟数据
-            const historyData = [
-                { progress: 25, date: '2024-01-15', notes: '开始学习基础知识' },
-                { progress: 50, date: '2024-01-20', notes: '完成了一半的学习内容' },
-                { progress: 75, date: '2024-01-25', notes: '进入实践阶段' }
-            ];
-            
-            if (historyData.length > 0) {
-                document.getElementById('progressHistory').style.display = 'block';
-                const historyList = document.getElementById('historyList');
-                historyList.innerHTML = '';
-                
-                historyData.forEach(item => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-item';
-                    historyItem.innerHTML = 
-                        '<span class="history-progress">' + item.progress + '%</span>' +
-                        '<span class="history-notes">' + item.notes + '</span>' +
-                        '<span class="history-date">' + item.date + '</span>';
-                    historyList.appendChild(historyItem);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('更新失败，请稍后重试');
                 });
-            } else {
-                document.getElementById('progressHistory').style.display = 'none';
             }
-        }
-
-        // 刷新目标统计
-        function refreshGoalStats() {
-            // 这里可以调用API刷新统计数据
-            // 目前简单更新页面显示
-            const goalItems = document.querySelectorAll('.goal-item');
-            let totalProgress = 0;
-            let activeGoals = 0;
-            
-            goalItems.forEach(item => {
-                const progress = parseInt(item.querySelector('.progress-display').textContent);
-                totalProgress += progress;
-                activeGoals++;
-            });
-            
-            if (activeGoals > 0) {
-                const avgProgress = Math.round(totalProgress / activeGoals);
-                document.querySelector('.stat-value:nth-child(3)').textContent = avgProgress + '%';
-            }
-        }
-
-        // 显示通知消息
-        function showNotification(message, type = 'info') {
-            // 创建通知元素
-            const notification = document.createElement('div');
-            notification.style.cssText = 
-                'position: fixed;' +
-                'top: 20px;' +
-                'right: 20px;' +
-                'padding: 15px 20px;' +
-                'border-radius: 8px;' +
-                'color: white;' +
-                'font-weight: 500;' +
-                'z-index: 1001;' +
-                'transform: translateX(100%);' +
-                'transition: transform 0.3s ease;' +
-                'max-width: 300px;' +
-                'word-wrap: break-word;';
-            
-            // 设置背景色
-            if (type === 'success') {
-                notification.style.background = 'var(--accent-green)';
-            } else if (type === 'error') {
-                notification.style.background = 'var(--accent-red)';
-            } else {
-                notification.style.background = 'var(--accent-blue)';
-            }
-            
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            // 显示通知
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 100);
-            
-            // 自动隐藏
-            setTimeout(() => {
-                notification.style.transform = 'translateX(100%)';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
         }
 
         function completeGoal(goalId) {
@@ -1166,36 +621,22 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showNotification('目标完成！恭喜！', 'success');
+                    alert('目标完成！恭喜！');
                     location.reload();
                 } else {
-                    showNotification('操作失败: ' + data.message, 'error');
+                    alert('操作失败: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showNotification('操作失败，请稍后重试', 'error');
+                alert('操作失败，请稍后重试');
             });
         }
 
         function viewDetails(goalId) {
             // 这里可以实现查看目标详情的功能
-            showNotification('目标详情功能开发中...', 'info');
+            alert('目标详情功能开发中...');
         }
-
-        // 点击模态框外部关闭
-        document.getElementById('progressModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeProgressModal();
-            }
-        });
-
-        // ESC键关闭模态框
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeProgressModal();
-            }
-        });
     </script>
 </body>
 </html>
