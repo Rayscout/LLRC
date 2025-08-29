@@ -375,3 +375,148 @@ def get_ai_analysis_summary(user_id: int) -> dict:
         return {"error": f"获取分析摘要失败: {str(e)}"}
 
 
+def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict:
+    """
+    使用Gemini 1.5 Flash进行语音识别
+    
+    Args:
+        audio_data: 音频文件的二进制数据
+        filename: 文件名（可选）
+        
+    Returns:
+        dict: 语音识别结果
+    """
+    try:
+        import base64
+        import os
+        import requests
+        from io import BytesIO
+        
+        # 获取Gemini API配置
+        api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
+        model_name = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
+        
+        if not api_key:
+            logger.error("Gemini API密钥未配置")
+            return {"error": "语音识别服务未配置"}
+        
+        # 将音频数据转换为base64
+        audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+        
+        # 构建Gemini API请求
+        url = f'https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent'
+        
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        
+        # 构建请求体，包含音频数据
+        payload = {
+            "contents": [{
+                "parts": [
+                    {
+                        "text": "请将这段音频转换为文字。请只返回转写的文字内容，不要添加任何解释或标点符号。"
+                    },
+                    {
+                        "inline_data": {
+                            "mime_type": _get_mime_type(filename),
+                            "data": audio_base64
+                        }
+                    }
+                ]
+            }],
+            "generationConfig": {
+                "maxOutputTokens": 1000,
+                "temperature": 0.1
+            }
+        }
+        
+        # 发送请求到Gemini API
+        response = requests.post(
+            url,
+            headers=headers,
+            params={'key': api_key},
+            json=payload,
+            timeout=60
+        )
+        
+        if response.status_code != 200:
+            logger.error(f"Gemini API请求失败: {response.status_code} - {response.text}")
+            return {"error": f"语音识别API请求失败: {response.status_code}"}
+        
+        # 解析响应
+        data = response.json()
+        candidates = data.get('candidates', [])
+        
+        if not candidates:
+            return {"error": "语音识别未返回结果"}
+        
+        content = candidates[0].get('content', {})
+        parts = content.get('parts', [])
+        
+        # 提取转写文本
+        transcribed_text = ""
+        for part in parts:
+            if 'text' in part:
+                transcribed_text += part['text']
+        
+        if not transcribed_text.strip():
+            return {"error": "语音识别结果为空"}
+        
+        # 返回结果
+        result = {
+            "success": True,
+            "transcribed_text": transcribed_text.strip(),
+            "audio_duration": _estimate_audio_duration(audio_data),
+            "confidence": "high",  # Gemini不提供置信度，设为high
+            "language": "zh-CN",  # 假设为中文
+            "model_used": model_name
+        }
+        
+        logger.info(f"语音识别成功，文本长度: {len(transcribed_text)}")
+        return result
+        
+    except Exception as e:
+        logger.error(f"语音识别失败: {e}")
+        return {"error": f"语音识别失败: {str(e)}"}
+
+
+def _get_mime_type(filename: str) -> str:
+    """
+    根据文件名获取MIME类型
+    
+    Args:
+        filename: 文件名
+        
+    Returns:
+        str: MIME类型
+    """
+    if not filename:
+        return "audio/wav"
+    
+    ext = filename.lower().split('.')[-1]
+    mime_types = {
+        'wav': 'audio/wav',
+        'mp3': 'audio/mpeg',
+        'm4a': 'audio/mp4',
+        'ogg': 'audio/ogg',
+        'webm': 'audio/webm'
+    }
+    
+    return mime_types.get(ext, 'audio/wav')
+
+
+def _estimate_audio_duration(audio_data: bytes) -> float:
+    """
+    估算音频时长（简单估算）
+    
+    Args:
+        audio_data: 音频数据
+        
+    Returns:
+        float: 估算的时长（秒）
+    """
+    # 这是一个简单的估算，实际项目中可以使用更准确的方法
+    # 假设平均比特率为128kbps
+    estimated_duration = len(audio_data) / (128 * 1024 / 8)  # 字节数 / (比特率 / 8)
+    return round(estimated_duration, 2)

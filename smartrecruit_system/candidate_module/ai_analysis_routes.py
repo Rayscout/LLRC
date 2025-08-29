@@ -5,7 +5,8 @@ import logging
 from .candidate_ai import (
     analyze_candidate_emotion_from_image,
     analyze_interview_performance,
-    get_ai_analysis_summary
+    get_ai_analysis_summary,
+    recognize_speech_from_audio
 )
 
 # 配置日志
@@ -17,6 +18,7 @@ ai_analysis_bp = Blueprint('ai_analysis', __name__, url_prefix='/ai-analysis')
 # 允许的文件扩展名
 ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
 ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv'}
+ALLOWED_AUDIO_EXTENSIONS = {'wav', 'mp3', 'm4a', 'ogg', 'webm'}
 
 def allowed_file(filename, allowed_extensions):
     """检查文件扩展名是否允许"""
@@ -227,6 +229,13 @@ def demo_info():
             "method": "GET",
             "input": "无",
             "output": "分析历史、统计信息、建议"
+        },
+        "speech_recognition": {
+            "description": "上传音频文件进行语音转文字",
+            "endpoint": "/ai-analysis/speech-recognition",
+            "method": "POST",
+            "input": "audio file (wav, mp3, m4a, ogg, webm)",
+            "output": "语音识别结果、转写文本"
         }
     }
     
@@ -234,3 +243,57 @@ def demo_info():
         "success": True,
         "data": demo_info
     })
+
+@ai_analysis_bp.route('/speech-recognition', methods=['POST'])
+def speech_recognition():
+    """
+    语音识别接口
+    
+    接收音频文件，使用Gemini 1.5 Flash进行语音转文字
+    """
+    if g.user is None:
+        return jsonify({"error": "请先登录"}), 401
+    
+    try:
+        # 检查是否有文件
+        if 'audio' not in request.files:
+            return jsonify({"error": "没有上传音频文件"}), 400
+        
+        file = request.files['audio']
+        if file.filename == '':
+            return jsonify({"error": "没有选择文件"}), 400
+        
+        # 检查文件类型
+        if not allowed_file(file.filename, ALLOWED_AUDIO_EXTENSIONS):
+            return jsonify({"error": "不支持的文件类型，请上传音频文件"}), 400
+        
+        # 检查文件大小（限制为50MB）
+        file.seek(0, 2)  # 移动到文件末尾
+        file_size = file.tell()
+        file.seek(0)  # 重置到文件开头
+        
+        if file_size > 50 * 1024 * 1024:  # 50MB
+            return jsonify({"error": "文件大小超过限制（50MB）"}), 400
+        
+        # 读取文件数据
+        file_data = file.read()
+        filename = secure_filename(file.filename)
+        
+        # 进行语音识别
+        result = recognize_speech_from_audio(file_data, filename)
+        
+        if "error" in result:
+            return jsonify(result), 400
+        
+        # 记录分析日志
+        logger.info(f"用户 {g.user.id} 进行了语音识别，文件: {filename}")
+        
+        return jsonify({
+            "success": True,
+            "message": "语音识别完成",
+            "data": result
+        })
+        
+    except Exception as e:
+        logger.error(f"语音识别接口错误: {e}")
+        return jsonify({"error": f"服务器内部错误: {str(e)}"}), 500
