@@ -2,6 +2,10 @@
 
 {% block title %}仪表盘 - 智能招聘系统{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='candidate_dashboard_fix.css') }}">
+{% endblock %}
+
 {% block navbar_title %}仪表盘{% endblock %}
 
 {% block content %}

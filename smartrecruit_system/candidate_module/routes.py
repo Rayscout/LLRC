@@ -37,8 +37,14 @@ def home():
     except Exception:
         resume_analysis = None
 
-    # 使用新版首页（与全站新基座一致的风格）
-    return render_template('smartrecruit/candidate/home_recommend.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
+    # 使用可用的首页模板（带回退）
+    try:
+        return render_template('smartrecruit/candidate/home_recommend.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
+    except Exception:
+        try:
+            return render_template('smartrecruit/candidate/home_new.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
+        except Exception:
+            return render_template('smartrecruit/candidate/home.html', user=g.user, user_skills=user_skills, resume_analysis=resume_analysis)
 
 @candidate_bp.route('/dashboard')
 def dashboard():
@@ -70,12 +76,12 @@ def dashboard():
     # 计算资料完整度
     profile_completion = calculate_profile_completion(g.user)
 
-    return render_template('smartrecruit/candidate/candidate_dashboard.html', 
-                         user=g.user,
-                         user_skills=user_skills,
-                         applications_count=applications_count,
-                         saved_jobs_count=saved_jobs_count,
-                         profile_completion=profile_completion)
+    return render_template('smartrecruit/candidate/candidate_dashboard.html',
+                          user=g.user,
+                          user_skills=user_skills,
+                          applications_count=applications_count,
+                          saved_jobs_count=saved_jobs_count,
+                          profile_completion=profile_completion)
 
 def calculate_profile_completion(user):
     """计算用户资料完整度"""
@@ -105,7 +111,50 @@ def settings():
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
     
-    return render_template('smartrecruit/candidate/settings.html', user=g.user)
+    # 设置页模板回退
+    try:
+        return render_template('smartrecruit/candidate/settings.html', user=g.user)
+    except Exception:
+        return render_template('smartrecruit/candidate/candidate_dashboard.html', user=g.user)
+
+# 收信箱（候选人与HR交流的消息列表）
+@candidate_bp.route('/messages/inbox')
+def messages_inbox():
+    if g.user is None:
+        from flask import redirect, url_for, flash
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    # 收件箱：优先从SQL的 FeedbackNotification 读取，其次从Mongo兜底
+    messages = []
+    try:
+        from app.models import FeedbackNotification
+        notifs = (FeedbackNotification.query
+                  .filter_by(user_id=g.user.id)
+                  .order_by(FeedbackNotification.created_at.desc())
+                  .limit(50)
+                  .all())
+        for n in notifs:
+            messages.append({
+                'title': getattr(n, 'title', 'HR消息') or 'HR消息',
+                'content': getattr(n, 'message', '') or '（无内容）',
+                'time': n.created_at
+            })
+    except Exception:
+        pass
+    # Mongo 兜底
+    if not messages:
+        try:
+            from app import applications_collection
+            cur = applications_collection.find({ 'user_id': str(g.user.id) }).sort('created_at', -1).limit(50)
+            for doc in cur:
+                messages.append({
+                    'title': 'HR消息',
+                    'content': doc.get('message') or '（无内容）',
+                    'time': (doc.get('created_at') or ''),
+                })
+        except Exception:
+            messages = []
+    return render_template('smartrecruit/candidate/inbox.html', user=g.user, messages=messages)
 
 # 注册求职者子蓝图
 candidate_bp.register_blueprint(profile_bp)
