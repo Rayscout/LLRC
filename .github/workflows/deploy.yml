@@ -1,0 +1,56 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          echo "🚀 开始自动部署..."
+          
+          cd /var/www/llrc
+          
+          # 备份当前代码
+          echo "📦 备份当前代码..."
+          cp -r app app_backup_$(date +%Y%m%d_%H%M%S)
+          
+          # 拉取最新代码
+          echo "📥 拉取最新代码..."
+          git fetch origin
+          git reset --hard origin/main
+          
+          # 设置权限
+          echo "🔐 设置文件权限..."
+          sudo chown -R www-data:www-data /var/www/llrc
+          sudo chmod +x deploy.sh
+          
+          # 运行部署脚本
+          echo "⚙️ 运行部署脚本..."
+          ./deploy.sh
+          
+          # 检查服务状态
+          echo "📊 检查服务状态..."
+          sudo systemctl status llrc --no-pager
+          sudo systemctl status nginx --no-pager
+          
+          echo "✅ 自动部署完成！"
+          
+          # 显示访问信息
+          echo "🌐 应用现在可以通过以下地址访问："
+          echo "http://${{ secrets.HOST }}"
+          echo "健康检查: http://${{ secrets.HOST }}/health"
