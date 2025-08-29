@@ -1,0 +1,43 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.SSH_KEY }}
+        port: ${{ secrets.PORT }}
+        script: |
+          cd /var/www/llrc
+          
+          # 备份当前代码
+          cp -r app app_backup_$(date +%Y%m%d_%H%M%S)
+          
+          # 拉取最新代码
+          git fetch origin
+          git reset --hard origin/main
+          
+          # 安装新的依赖（如果有）
+          source venv/bin/activate
+          pip install -r requirements.txt
+          
+          # 重启服务
+          systemctl restart llrc
+          
+          # 检查服务状态
+          systemctl status llrc --no-pager
+          
+          echo "✅ 部署完成！"

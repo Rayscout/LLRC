@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# Git post-receive钩子 - 自动部署
+echo "🔄 检测到代码更新，开始自动部署..."
+
+# 项目目录
+PROJECT_DIR="/var/www/llrc"
+
+# 切换到项目目录
+cd $PROJECT_DIR
+
+# 拉取最新代码
+git pull origin main
+
+# 安装新依赖
+source venv/bin/activate
+pip install -r requirements.txt
+
+# 重启服务
+systemctl restart llrc
+
+echo "✅ 自动部署完成！"
