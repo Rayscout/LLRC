@@ -353,12 +353,7 @@
                         <span class="ios-nav-text">我的职位</span>
                     </a>
                 </li>
-                <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.interviews' else '' }}">
-                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
-                        <span class="ios-nav-text">面试</span>
-                    </a>
-                </li>
+                <!-- 面试导航已移除，请从候选人管理页面进入安排面试 -->
                 <li class="ios-nav-item">
                     <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.reports' else '' }}">
                         <i class="ios-nav-icon uil uil-chart-pie"></i>

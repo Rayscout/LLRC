@@ -111,25 +111,47 @@
         <i class="uil uil-comments icon"></i>
         <h1 class="page-title">面试反馈</h1>
     </div>
-    <div class="feedback-list">
-        {% for feedback in feedback_list %}
-        <div class="feedback-item">
-            <h3>问题:</h3>
-            <p>{{ feedback.question }}</p>
-            <h3>回答:</h3>
-            <p>{{ feedback.response }}</p>
-            <h3>反馈:</h3>
-            <p>{{ feedback.feedback }}</p>
-        </div>
+    
+    <!-- AI面试状态显示 -->
+    <div class="feedback-item" style="background: #e7f3ff; border-color: #b3d9ff;">
+        <h3 style="color: #0066cc;">AI面试状态</h3>
+        {% if interview_details and interview_details.status == 'passed' %}
+            <p style="color: #28a745; font-weight: bold;">✓ 已通过AI面试</p>
+            <p>该候选人已通过AI面试，可以进行线下面试安排。</p>
         {% else %}
-        <p>该候选人暂无反馈。</p>
-        {% endfor %}
+            <p style="color: #dc3545; font-weight: bold;">✗ 未通过AI面试</p>
+            <p>该候选人尚未通过AI面试，无法进行线下面试安排。</p>
+        {% endif %}
     </div>
+    
+    <div class="feedback-list">
+        {% if interview_details and interview_details.feedback %}
+            <div class="feedback-item">
+                <h3>AI面试反馈:</h3>
+                <p>{{ interview_details.feedback }}</p>
+                {% if interview_details.score %}
+                <h3>面试评分:</h3>
+                <p>{{ interview_details.score }}/100</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <p>该候选人暂无AI面试反馈。</p>
+        {% endif %}
+    </div>
+    
     <div class="action-buttons">
-                        <form method="post" action="{{ url_for('smartrecruit.hr.candidates.accept_application', application_id=application_id) }}">
+        {% if interview_details and interview_details.status == 'passed' %}
+        <a href="{{ url_for('smartrecruit.hr.candidates.schedule_interview', application_id=application.id) }}" 
+           class="schedule-interview-btn" style="background-color: #28a745; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin: 5px; display: inline-block;">
+            <i class="uil uil-calendar-alt"></i> 安排面试
+        </a>
+        {% endif %}
+        
+        <form method="post" action="{{ url_for('smartrecruit.hr.candidates.accept_application', application_id=application.id) }}" style="display: inline;">
             <button type="submit">接受</button>
         </form>
-                        <form method="post" action="{{ url_for('smartrecruit.hr.candidates.reject_application', application_id=application_id) }}">
+        
+        <form method="post" action="{{ url_for('smartrecruit.hr.candidates.reject_application', application_id=application.id) }}" style="display: inline;">
             <button type="submit" class="reject-button">拒绝</button>
         </form>
     </div>

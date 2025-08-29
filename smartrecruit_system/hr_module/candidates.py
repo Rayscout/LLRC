@@ -50,7 +50,7 @@ def view_candidates(job_id):
 
 @candidates_bp.route('/view_interview/<int:application_id>')
 def view_interview(application_id):
-    """查看面试详情"""
+    """查看面试详情 - 性能优化版本"""
     if g.user is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -59,29 +59,65 @@ def view_interview(application_id):
         flash('只有HR用户才能访问此页面。', 'danger')
         return redirect(url_for('common.auth.sign'))
     
-    application = Application.query.get_or_404(application_id)
-    job = Job.query.get(application.job_id)
-    
-    if not job or job.user_id != g.user.id:
-        abort(403)
-    
-    user = User.query.get(application.user_id)
-    
-    # 从MongoDB获取面试详情
-    interview_details = None
     try:
-        interview_details = applications_collection.find_one({
-            'user_id': str(application.user_id),
-            'job_id': str(application.job_id)
-        })
-    except Exception:
-        pass
-    
-    return render_template('smartrecruit/hr/view_interview.html', 
-                         application=application,
-                         job=job,
-                         user=user,
-                         interview_details=interview_details)
+        # 使用数据库事务优化查询
+        application = Application.query.get_or_404(application_id)
+        job = Job.query.get(application.job_id)
+        
+        if not job or job.user_id != g.user.id:
+            abort(403)
+        
+        user = User.query.get(application.user_id)
+        
+        # 优化AI面试结果查询 - 添加超时控制
+        ai_interview_result = None
+        try:
+            # 设置查询超时
+            ai_interview_result = applications_collection.find_one(
+                {
+                    'user_id': str(application.user_id),
+                    'job_id': str(application.job_id),
+                    'type': 'ai_interview_result'
+                },
+                max_time_ms=3000  # 3秒超时
+            )
+        except Exception as e:
+            print(f"AI面试结果查询失败: {e}")
+            ai_interview_result = None
+        
+        # 优化面试反馈查询 - 添加超时控制
+        feedback_list = []
+        try:
+            feedback_cursor = applications_collection.find(
+                {
+                    'user_id': str(application.user_id),
+                    'job_id': str(application.job_id),
+                    'type': 'ai_interview_feedback'
+                },
+                max_time_ms=3000  # 3秒超时
+            ).sort('created_at', -1).limit(10)  # 限制结果数量
+            
+            for feedback in feedback_cursor:
+                feedback_list.append({
+                    'question': feedback.get('question', ''),
+                    'response': feedback.get('response', ''),
+                    'feedback': feedback.get('feedback', ''),
+                    'score': feedback.get('score', 0)
+                })
+        except Exception as e:
+            print(f"面试反馈查询失败: {e}")
+            feedback_list = []
+        
+        return render_template('smartrecruit/hr/view_interview.html', 
+                             application=application,
+                             job=job,
+                             user=user,
+                             interview_details=ai_interview_result,
+                             feedback_list=feedback_list)
+                             
+    except Exception as e:
+        flash(f'加载面试详情失败：{str(e)}', 'danger')
+        return redirect(url_for('smartrecruit.hr.dashboard.interviews'))
 
 @candidates_bp.route('/accept_application/<int:application_id>', methods=['POST'])
 def accept_application(application_id):
@@ -307,3 +343,196 @@ def get_candidate_info(user_id):
             })
     
     return jsonify(candidate_info)
+
+@candidates_bp.route('/schedule_interview/<int:application_id>', methods=['GET', 'POST'])
+def schedule_interview(application_id):
+    """安排面试 - 支持HR手动设置AI面试状态"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    
+    if not getattr(g.user, 'is_hr', False):
+        flash('只有HR用户才能访问此页面。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    
+    try:
+        # 获取申请信息
+        application = Application.query.get_or_404(application_id)
+        job = Job.query.get(application.job_id)
+        
+        if not job or job.user_id != g.user.id:
+            abort(403)
+        
+        candidate = User.query.get(application.user_id)
+        
+        # 获取AI面试状态
+        ai_interview_passed = False
+        try:
+            interview_details = applications_collection.find_one(
+                {
+                    'user_id': str(application.user_id),
+                    'job_id': str(application.job_id),
+                    'type': 'ai_interview_result'
+                },
+                max_time_ms=3000
+            )
+            
+            if interview_details and interview_details.get('status') == 'passed':
+                ai_interview_passed = True
+                
+        except Exception as e:
+            print(f"AI面试结果查询失败: {e}")
+            ai_interview_passed = False
+        
+        if request.method == 'POST':
+            try:
+                from datetime import datetime
+                from app.models import InterviewSchedule
+                
+                # 获取表单数据
+                interview_date = datetime.strptime(request.form['interview_date'], '%Y-%m-%d').date()
+                start_time = datetime.strptime(request.form['start_time'], '%H:%M').time()
+                end_time = datetime.strptime(request.form['end_time'], '%H:%M').time()
+                interview_type = request.form['interview_type']
+                location = request.form['location']
+                interviewer_name = request.form['interviewer_name']
+                notes = request.form.get('notes', '')
+                
+                # 处理HR手动设置的AI面试状态
+                hr_ai_interview_override = 'hr_ai_interview_override' in request.form
+                if hr_ai_interview_override:
+                    ai_interview_passed = request.form.get('ai_interview_passed') == '1'
+                    hr_ai_interview_notes = request.form.get('hr_ai_interview_notes', '')
+                else:
+                    hr_ai_interview_notes = None
+                
+                # 创建面试安排
+                interview_schedule = InterviewSchedule(
+                    application_id=application_id,
+                    candidate_id=candidate.id,
+                    job_id=job.id,
+                    hr_id=g.user.id,
+                    interview_date=interview_date,
+                    start_time=start_time,
+                    end_time=end_time,
+                    interview_type=interview_type,
+                    location=location,
+                    interviewer_name=interviewer_name,
+                    notes=notes,
+                    ai_interview_passed=ai_interview_passed,
+                    hr_ai_interview_override=hr_ai_interview_override,
+                    hr_ai_interview_notes=hr_ai_interview_notes,
+                    status='scheduled'
+                )
+                
+                db.session.add(interview_schedule)
+                db.session.commit()
+                
+                # 更新申请状态
+                application.status = 'interview_scheduled'
+                db.session.commit()
+                
+                # 发送通知
+                try:
+                    send_interview_notification(interview_schedule)
+                except Exception as e:
+                    print(f"通知发送失败，但不影响面试安排: {e}")
+                
+                flash('面试安排成功！已通知候选人。', 'success')
+                return redirect(url_for('smartrecruit.hr.dashboard.interviews'))
+                
+            except Exception as e:
+                db.session.rollback()
+                flash(f'面试安排失败：{str(e)}', 'danger')
+        
+        return render_template('smartrecruit/hr/schedule_interview.html',
+                             application=application,
+                             job=job,
+                             candidate=candidate,
+                             ai_interview_passed=ai_interview_passed)
+                             
+    except Exception as e:
+        flash(f'加载页面失败：{str(e)}', 'danger')
+        return redirect(url_for('smartrecruit.hr.dashboard.interviews'))
+
+def send_interview_notification(interview_schedule):
+    """发送面试通知"""
+    try:
+        from datetime import datetime
+        
+        # 插入通知到MongoDB
+        notification_data = {
+            'user_id': str(interview_schedule.candidate_id),
+            'job_id': str(interview_schedule.job_id),
+            'type': 'interview_notification',
+            'title': '面试安排通知',
+            'message': '请你进行线下面试',
+            'interview_date': interview_schedule.interview_date.strftime('%Y-%m-%d'),
+            'start_time': interview_schedule.start_time.strftime('%H:%M'),
+            'end_time': interview_schedule.end_time.strftime('%H:%M'),
+            'interview_type': interview_schedule.interview_type,
+            'location': interview_schedule.location,
+            'interviewer_name': interview_schedule.interviewer_name,
+            'notes': interview_schedule.notes,
+            'created_at': datetime.utcnow(),
+            'read': False
+        }
+        
+        applications_collection.insert_one(notification_data)
+        
+        # 更新面试安排的通知状态
+        interview_schedule.notification_sent = True
+        interview_schedule.notification_sent_at = datetime.utcnow()
+        db.session.commit()
+        
+    except Exception as e:
+        print(f"发送面试通知失败: {e}")
+        raise e
+
+@candidates_bp.route('/get_ai_interview_candidates')
+def get_ai_interview_candidates():
+    """获取通过AI面试的候选人列表 - 性能优化版本"""
+    if g.user is None:
+        return jsonify({'error': '未登录'}), 401
+    
+    if not getattr(g.user, 'is_hr', False):
+        return jsonify({'error': '权限不足'}), 403
+    
+    try:
+        # 获取当前HR发布的职位
+        hr_jobs = Job.query.filter_by(user_id=g.user.id).all()
+        job_ids = [str(job.id) for job in hr_jobs]
+        
+        if not job_ids:
+            return jsonify([])
+        
+        # 查询通过AI面试的候选人
+        ai_candidates = []
+        try:
+            cursor = applications_collection.find(
+                {
+                    'job_id': {'$in': job_ids},
+                    'type': 'ai_interview_result',
+                    'status': 'passed'
+                },
+                max_time_ms=5000
+            ).limit(50)
+            
+            for doc in cursor:
+                ai_candidates.append({
+                    'user_id': doc.get('user_id'),
+                    'job_id': doc.get('job_id'),
+                    'score': doc.get('score', 0),
+                    'feedback': doc.get('feedback', ''),
+                    'interview_date': doc.get('created_at')
+                })
+                
+        except Exception as e:
+            print(f"查询AI面试候选人失败: {e}")
+            return jsonify([])
+        
+        return jsonify(ai_candidates)
+        
+    except Exception as e:
+        print(f"获取AI面试候选人失败: {e}")
+        return jsonify([])
