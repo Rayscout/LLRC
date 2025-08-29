@@ -648,7 +648,136 @@
         }
         
         function openScheduleModal() {
-            alert('面试安排功能开发中...');
+            // 获取通过AI面试的候选人列表
+            fetch('/smartrecruit/hr/candidates/get_ai_interview_candidates')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.candidates.length > 0) {
+                        showCandidateSelectionModal(data.candidates);
+                    } else {
+                        alert('暂无可安排面试的候选人。请确保有候选人已通过AI面试。');
+                    }
+                })
+                .catch(error => {
+                    console.error('获取候选人列表失败:', error);
+                    alert('获取候选人列表失败，请稍后重试。');
+                });
+        }
+        
+        function showCandidateSelectionModal(candidates) {
+            // 创建候选人选择模态框
+            const modal = document.createElement('div');
+            modal.className = 'ios-modal';
+            modal.innerHTML = `
+                <div class="ios-modal-content">
+                    <div class="ios-modal-header">
+                        <h3>选择候选人安排面试</h3>
+                        <button class="ios-modal-close" onclick="this.closest('.ios-modal').remove()">&times;</button>
+                    </div>
+                    <div class="ios-modal-body">
+                        <div class="candidate-list">
+                            ${candidates.map(candidate => `
+                                <div class="candidate-item" onclick="scheduleInterviewForCandidate(${candidate.application_id})">
+                                    <div class="candidate-info">
+                                        <div class="candidate-name">${candidate.name}</div>
+                                        <div class="candidate-details">
+                                            <span>${candidate.email}</span>
+                                            <span>${candidate.job_title}</span>
+                                        </div>
+                                    </div>
+                                    <div class="candidate-score">
+                                        AI面试评分: ${candidate.ai_interview_score}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 添加样式
+            const style = document.createElement('style');
+            style.textContent = `
+                .ios-modal {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                }
+                .ios-modal-content {
+                    background: white;
+                    border-radius: 20px;
+                    width: 90%;
+                    max-width: 500px;
+                    max-height: 80%;
+                    overflow: hidden;
+                }
+                .ios-modal-header {
+                    padding: 20px;
+                    border-bottom: 1px solid #eee;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .ios-modal-header h3 {
+                    margin: 0;
+                    color: #333;
+                }
+                .ios-modal-close {
+                    background: none;
+                    border: none;
+                    font-size: 24px;
+                    cursor: pointer;
+                    color: #999;
+                }
+                .ios-modal-body {
+                    padding: 20px;
+                    max-height: 400px;
+                    overflow-y: auto;
+                }
+                .candidate-item {
+                    padding: 15px;
+                    border: 1px solid #eee;
+                    border-radius: 10px;
+                    margin-bottom: 10px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                }
+                .candidate-item:hover {
+                    background: #f8f9fa;
+                    border-color: #007aff;
+                }
+                .candidate-name {
+                    font-weight: 600;
+                    color: #333;
+                    margin-bottom: 5px;
+                }
+                .candidate-details {
+                    display: flex;
+                    gap: 15px;
+                    color: #666;
+                    font-size: 14px;
+                }
+                .candidate-score {
+                    margin-top: 10px;
+                    color: #007aff;
+                    font-weight: 500;
+                }
+            `;
+            
+            document.head.appendChild(style);
+            document.body.appendChild(modal);
+        }
+        
+        function scheduleInterviewForCandidate(applicationId) {
+            // 跳转到面试安排页面
+            window.location.href = `/smartrecruit/hr/candidates/schedule_interview/${applicationId}`;
         }
         
         function exportSchedule() {
