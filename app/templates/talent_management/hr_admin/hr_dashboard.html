@@ -432,11 +432,11 @@
                 <i class="fas fa-people-carry"></i><span>TalentSuite</span>
             </a>
             <div class="nav-group">
-                <a class="nav-item active" href="{{ url_for('talent_management.hr_admin.dashboard.dashboard') }}"><i class="fas fa-grid-2"></i><span>仪表板</span></a>
-                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.employees.employees_dashboard') }}"><i class="fas fa-users"></i><span>员工管理</span></a>
-                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.departments.departments_dashboard') }}"><i class="fas fa-sitemap"></i><span>组织架构</span></a>
+                <a class="nav-item active" href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}"><i class="fas fa-grid-2"></i><span>仪表板</span></a>
+                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.employee_management.employee_list') }}"><i class="fas fa-users"></i><span>员工管理</span></a>
+                
                 <a class="nav-item" href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}"><i class="fas fa-user-minus"></i><span>流失预警</span></a>
-                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.dashboard.dashboard') }}"><i class="fas fa-chart-bar"></i><span>数据分析</span></a>
+                <a class="nav-item" href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}"><i class="fas fa-chart-bar"></i><span>数据分析</span></a>
             </div>
         </aside>
 
@@ -500,7 +500,7 @@
 
         <!-- 快速操作 -->
         <div class="quick-actions">
-            <a href="{{ url_for('talent_management.hr_admin.employees.employees_dashboard') }}" class="action-card card">
+            <a href="{{ url_for('talent_management.hr_admin.employee_management.employee_list') }}" class="action-card card">
                 <div class="action-icon">
                     <i class="fas fa-users"></i>
                 </div>
@@ -516,15 +516,9 @@
                 <p class="action-description">实时监控离职趋势，识别高风险岗位，生成预警报告，预防人才流失</p>
             </a>
 
-            <a href="{{ url_for('talent_management.hr_admin.departments.departments_dashboard') }}" class="action-card card">
-                <div class="action-icon">
-                    <i class="fas fa-building"></i>
-                </div>
-                <h3 class="action-title">部门管理</h3>
-                <p class="action-description">管理组织架构、部门设置、岗位配置，优化人力资源结构</p>
-            </a>
+            
 
-            <a href="{{ url_for('talent_management.hr_admin.dashboard.dashboard') }}" class="action-card card">
+            <a href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}" class="action-card card">
                 <div class="action-icon">
                     <i class="fas fa-chart-bar"></i>
                 </div>
