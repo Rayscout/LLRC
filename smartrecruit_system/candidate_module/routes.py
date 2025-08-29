@@ -117,6 +117,45 @@ def settings():
     except Exception:
         return render_template('smartrecruit/candidate/candidate_dashboard.html', user=g.user)
 
+# 收信箱（候选人与HR交流的消息列表）
+@candidate_bp.route('/messages/inbox')
+def messages_inbox():
+    if g.user is None:
+        from flask import redirect, url_for, flash
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    # 收件箱：优先从SQL的 FeedbackNotification 读取，其次从Mongo兜底
+    messages = []
+    try:
+        from app.models import FeedbackNotification
+        notifs = (FeedbackNotification.query
+                  .filter_by(user_id=g.user.id)
+                  .order_by(FeedbackNotification.created_at.desc())
+                  .limit(50)
+                  .all())
+        for n in notifs:
+            messages.append({
+                'title': getattr(n, 'title', 'HR消息') or 'HR消息',
+                'content': getattr(n, 'message', '') or '（无内容）',
+                'time': n.created_at
+            })
+    except Exception:
+        pass
+    # Mongo 兜底
+    if not messages:
+        try:
+            from app import applications_collection
+            cur = applications_collection.find({ 'user_id': str(g.user.id) }).sort('created_at', -1).limit(50)
+            for doc in cur:
+                messages.append({
+                    'title': 'HR消息',
+                    'content': doc.get('message') or '（无内容）',
+                    'time': (doc.get('created_at') or ''),
+                })
+        except Exception:
+            messages = []
+    return render_template('smartrecruit/candidate/inbox.html', user=g.user, messages=messages)
+
 # 注册求职者子蓝图
 candidate_bp.register_blueprint(profile_bp)
 candidate_bp.register_blueprint(jobs_bp)

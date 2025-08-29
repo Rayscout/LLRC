@@ -23,6 +23,7 @@ function initializeApp() {
     initializeScrollEffects();
     initializeAnimations();
     initializeLoadingStates();
+    initializeNotifications();
 }
 
 /**
@@ -507,3 +508,80 @@ window.toggleUserMenu = toggleUserMenu;
 window.scrollToTop = scrollToTop;
 window.showNotification = showNotification;
 window.copyToClipboard = copyToClipboard;
+
+/**
+ * 通知：面试安排轮询与下拉
+ */
+function initializeNotifications() {
+    const btn = document.getElementById('notificationButton');
+    const dropdown = document.getElementById('notificationDropdown');
+    const badge = document.getElementById('notificationBadge');
+    const list = document.getElementById('notificationList');
+    if (!btn || !dropdown || !badge || !list) return;
+
+    // 点击外部关闭
+    document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    // 定时轮询
+    const url = btn.getAttribute('data-notify-url');
+    if (!url) return;
+
+    async function fetchNotifications() {
+        try {
+            const resp = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if (!resp.ok) return;
+            const data = await resp.json();
+            const items = Array.isArray(data.items) ? data.items : [];
+            // 更新角标
+            if (items.length > 0) {
+                badge.style.display = 'inline-block';
+                badge.textContent = String(items.length);
+            } else {
+                badge.style.display = 'none';
+            }
+            // 渲染列表
+            list.innerHTML = '';
+            if (items.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'notification-empty';
+                empty.textContent = '暂无新的面试通知';
+                list.appendChild(empty);
+            } else {
+                items.forEach(it => {
+                    const el = document.createElement('div');
+                    el.className = 'notification-item';
+                    el.innerHTML = `
+                        <div class="title">${escapeHtml(it.title || '面试安排')}</div>
+                        <div class="meta">${escapeHtml(it.time || '')} · ${escapeHtml(it.location || '')}</div>
+                    `;
+                    list.appendChild(el);
+                });
+            }
+        } catch (err) {
+            // 静默失败，避免影响其他功能
+        }
+    }
+
+    fetchNotifications();
+    setInterval(fetchNotifications, 30000);
+}
+
+function toggleNotificationDropdown() {
+    const dropdown = document.getElementById('notificationDropdown');
+    if (dropdown) dropdown.classList.toggle('show');
+}
+
+function escapeHtml(str) {
+    return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+window.toggleNotificationDropdown = toggleNotificationDropdown;
