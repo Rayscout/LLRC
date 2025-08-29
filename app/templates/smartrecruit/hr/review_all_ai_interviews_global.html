@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI面试结果审核 - iOS风格</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .ios-ai-review-hero { 
+            background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%); 
+        }
+        
+        .ios-ai-review-content { 
+            background: var(--ios-bg-tertiary); 
+        }
+        
+        .ios-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-xl);
+        }
+        
+        .ios-stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-lg);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--ios-blue);
+            margin-bottom: var(--ios-spacing-xs);
+        }
+        
+        .ios-stat-label {
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+            color: var(--ios-blue);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: var(--ios-spacing-lg);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-back-button:hover {
+            color: var(--ios-blue-dark);
+            transform: translateX(-4px);
+        }
+        
+        .ios-candidate-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            margin-bottom: var(--ios-spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-candidate-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-candidate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-candidate-info {
+            flex: 1;
+        }
+        
+        .ios-candidate-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-candidate-title {
+            font-size: 1.1rem;
+            color: var(--ios-text-secondary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-candidate-meta {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            flex-wrap: wrap;
+        }
+        
+        .ios-candidate-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-xs);
+            font-size: 0.875rem;
+            color: var(--ios-text-tertiary);
+        }
+        
+        .ios-score-section {
+            text-align: center;
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-score-display {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: var(--ios-spacing-md) var(--ios-spacing-lg);
+            border-radius: var(--ios-radius-large);
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: var(--ios-spacing-sm);
+            box-shadow: var(--ios-shadow-light);
+        }
+        
+        .ios-score-label {
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-score-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--ios-spacing-md);
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-score-detail {
+            background: rgba(16, 185, 129, 0.1);
+            padding: var(--ios-spacing-sm);
+            border-radius: var(--ios-radius-small);
+            text-align: center;
+        }
+        
+        .ios-score-detail-label {
+            font-size: 0.75rem;
+            color: var(--ios-text-tertiary);
+            margin-bottom: var(--ios-spacing-xs);
+        }
+        
+        .ios-score-detail-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #10b981;
+        }
+        
+        .ios-actions {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .ios-action-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+            padding: var(--ios-spacing-sm) var(--ios-spacing-lg);
+            border-radius: var(--ios-radius);
+            font-weight: 500;
+            text-decoration: none;
+            transition: all var(--ios-transition-medium);
+            border: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+        
+        .ios-action-button.approve {
+            background: var(--ios-green);
+            color: white;
+        }
+        
+        .ios-action-button.approve:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-action-button.reject {
+            background: var(--ios-red);
+            color: white;
+        }
+        
+        .ios-action-button.reject:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-action-button.details {
+            background: var(--ios-blue);
+            color: white;
+        }
+        
+        .ios-action-button.details:hover {
+            background: var(--ios-blue-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-empty-state {
+            text-align: center;
+            padding: var(--ios-spacing-xxl);
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: var(--ios-spacing-md);
+            color: var(--ios-text-primary);
+        }
+        
+        .ios-empty-state p {
+            font-size: 1rem;
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-empty-icon {
+            font-size: 4rem;
+            color: var(--ios-text-quaternary);
+            margin-bottom: var(--ios-spacing-lg);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-brand">
+                <div class="ios-nav-brand-icon">
+                    <i class="uil uil-briefcase"></i>
+                </div>
+                <span>智能招聘系统-HR</span>
+            </a>
+            
+            <ul class="ios-nav-menu">
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-dashboard"></i>
+                        <span class="ios-nav-text">仪表板</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-briefcase"></i>
+                        <span class="ios-nav-text">发布职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-nav-link active">
+                        <i class="ios-nav-icon uil uil-users-alt"></i>
+                        <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-briefcase-alt"></i>
+                        <span class="ios-nav-text">我的职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-chart-pie"></i>
+                        <span class="ios-nav-text">报表</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-lightbulb"></i>
+                        <span class="ios-nav-text">AI洞察</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="ios-nav-actions">
+                <div class="ios-nav-search">
+                    <i class="uil uil-search"></i>
+                    <input type="text" placeholder="搜索..." />
+                </div>
+                
+                <div class="ios-nav-divider"></div>
+                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
+                
+                <button class="ios-nav-button" data-action="profile">
+                    <i class="uil uil-user"></i>
+                    <span>HR</span>
+                </button>
+            </div>
+            
+            <!-- 移动端菜单切换按钮 -->
+            <button class="ios-nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="ios-parallax-bg"></div>
+    
+    <div class="ios-scroll-container">
+        <!-- 欢迎Section -->
+        <section class="ios-section ios-ai-review-hero">
+            <div class="ios-container">
+                <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-back-button">
+                    <i class="uil uil-arrow-left"></i>
+                    返回候选人管理
+                </a>
+                
+                <h1 class="ios-title ios-fade-in">AI面试结果审核</h1>
+                <p class="ios-subtitle ios-fade-in">查看和审核所有AI面试结果，快速筛选优秀候选人</p>
+                
+                <!-- 统计概览 -->
+                <div class="ios-stats-grid ios-fade-in-up">
+                    <div class="ios-stat-card">
+                        <div class="ios-stat-number">{{ total_candidates }}</div>
+                        <div class="ios-stat-label">总候选人</div>
+                    </div>
+                    <div class="ios-stat-card">
+                        <div class="ios-stat-number">{{ total_passed }}</div>
+                        <div class="ios-stat-label">通过AI面试</div>
+                    </div>
+                    <div class="ios-stat-card">
+                        <div class="ios-stat-number">{{ pass_rate }}%</div>
+                        <div class="ios-stat-label">通过率</div>
+                    </div>
+                    <div class="ios-stat-card">
+                        <div class="ios-stat-number">{{ avg_score }}</div>
+                        <div class="ios-stat-label">平均分数</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 候选人列表Section -->
+        <section class="ios-section ios-ai-review-content">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">AI面试结果</h2>
+                <p class="ios-subtitle ios-fade-in">查看所有通过AI面试的候选人详细信息</p>
+                
+                {% if passed_candidates %}
+                    {% for candidate in passed_candidates %}
+                    <div class="ios-candidate-card ios-fade-in-up">
+                        <div class="ios-candidate-header">
+                            <div class="ios-candidate-info">
+                                <div class="ios-candidate-name">{{ candidate.first_name }} {{ candidate.last_name }}</div>
+                                <div class="ios-candidate-title">{{ candidate.job_title }}</div>
+                                <div class="ios-candidate-meta">
+                                    <div class="ios-candidate-meta-item">
+                                        <i class="uil uil-envelope"></i>
+                                        {{ candidate.email }}
+                                    </div>
+                                    <div class="ios-candidate-meta-item">
+                                        <i class="uil uil-phone"></i>
+                                        {{ candidate.phone_number }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ios-score-section">
+                            <div class="ios-score-display">{{ candidate.ai_interview_score }}分</div>
+                            <div class="ios-score-label">AI面试总分</div>
+                            
+                            <div class="ios-score-details">
+                                <div class="ios-score-detail">
+                                    <div class="ios-score-detail-label">技术能力</div>
+                                    <div class="ios-score-detail-value">{{ candidate.ai_interview_details.technical_score }}分</div>
+                                </div>
+                                <div class="ios-score-detail">
+                                    <div class="ios-score-detail-label">沟通能力</div>
+                                    <div class="ios-score-detail-value">{{ candidate.ai_interview_details.communication_score }}分</div>
+                                </div>
+                                <div class="ios-score-detail">
+                                    <div class="ios-score-detail-label">逻辑思维</div>
+                                    <div class="ios-score-detail-value">{{ candidate.ai_interview_details.logic_score }}分</div>
+                                </div>
+                                <div class="ios-score-detail">
+                                    <div class="ios-score-detail-label">学习能力</div>
+                                    <div class="ios-score-detail-value">{{ candidate.ai_interview_details.learning_score }}分</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="ios-actions">
+                            <button class="ios-action-button approve" onclick="approveCandidate({{ candidate.application_id }})">
+                                <i class="uil uil-check"></i>
+                                通过审核
+                            </button>
+                            <button class="ios-action-button reject" onclick="rejectCandidate({{ candidate.application_id }})">
+                                <i class="uil uil-times"></i>
+                                拒绝
+                            </button>
+                            <a href="{{ url_for('smartrecruit.hr.candidates.review_ai_interview', application_id=candidate.application_id) }}" class="ios-action-button details">
+                                <i class="uil uil-eye"></i>
+                                查看详情
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="ios-empty-state">
+                    <div class="ios-empty-icon">
+                        <i class="uil uil-clipboard-notes"></i>
+                    </div>
+                    <h3>暂无AI面试结果</h3>
+                    <p>目前还没有候选人通过AI面试，请稍后再查看。</p>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 审核功能
+        function approveCandidate(applicationId) {
+            if (confirm('确定要通过这个候选人的审核吗？')) {
+                fetch(`/candidates/approve_ai_interview/${applicationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('审核通过成功！');
+                        // 刷新页面以更新状态
+                        location.reload();
+                    } else {
+                        alert('操作失败：' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('操作失败，请重试');
+                });
+            }
+        }
+        
+        function rejectCandidate(applicationId) {
+            if (confirm('确定要拒绝这个候选人吗？')) {
+                fetch(`/candidates/reject_ai_interview/${applicationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('拒绝成功！');
+                        // 刷新页面以更新状态
+                        location.reload();
+                    } else {
+                        alert('操作失败：' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('操作失败，请重试');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
