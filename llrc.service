@@ -1,0 +1,27 @@
+[Unit]
+Description=LLRC Flask Application
+After=network.target
+Wants=network.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/llrc
+Environment=PATH=/var/www/llrc/venv/bin
+Environment=FLASK_ENV=production
+ExecStart=/var/www/llrc/venv/bin/gunicorn --config gunicorn.conf.py wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# 安全设置
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/www/llrc /var/log/llrc /var/run/llrc /tmp
+
+[Install]
+WantedBy=multi-user.target
