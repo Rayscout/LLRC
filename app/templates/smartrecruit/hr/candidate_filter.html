@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>筛选候选人 - iOS风格</title>
+    <title>初筛 - iOS风格</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
@@ -360,7 +360,7 @@
             <!-- 页面标题 -->
             <div class="ios-filter-hero">
                 <div class="ios-hero-content">
-                    <h1 class="ios-hero-title">智能筛选候选人</h1>
+                    <h1 class="ios-hero-title">初筛</h1>
                     <p class="ios-hero-subtitle">使用智能筛选功能快速找到最合适的候选人</p>
                 </div>
             </div>
@@ -487,6 +487,10 @@
                                     <i class="uil uil-refresh"></i>
                                     清除
                                 </button>
+                                <a href="{{ url_for('smartrecruit.hr.dashboard.candidates_filter', status='approved') }}" class="ios-btn ios-btn-secondary" style="text-decoration:none;">
+                                    <i class="uil uil-check-circle"></i>
+                                    筛选通过简历
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -498,10 +502,6 @@
                 <button type="button" id="selectAllBtn" class="ios-batch-btn secondary">
                     <i class="uil uil-check-square"></i>
                     全选
-                </button>
-                <button type="button" id="sendInterviewBtn" class="ios-batch-btn primary" style="display: none;">
-                    <i class="uil uil-envelope"></i>
-                    发送面试通知
                 </button>
                 <button type="button" id="approveSelectedBtn" class="ios-batch-btn primary" style="display: none;">
                     <i class="uil uil-check-circle"></i>
@@ -583,10 +583,10 @@
                                     <i class="uil uil-eye"></i>
                                     查看详情
                                 </a>
-                                <button type="button" class="ios-btn ios-btn-primary send-interview-btn" 
-                                        data-candidate-id="{{ candidate.id }}" data-candidate-name="{{ candidate.name }}">
-                                    <i class="uil uil-envelope"></i>
-                                    发送通知
+                                <button type="button" class="ios-btn ios-btn-primary approve-notify-btn" 
+                                        data-candidate-id="{{ candidate.id }}" data-candidate-name="{{ candidate.name }}" data-application-id="{{ candidate.application_id if candidate.application_id else '' }}">
+                                    <i class="uil uil-check-circle"></i>
+                                    通过并通知
                                 </button>
                             </div>
                         </div>
@@ -603,49 +603,22 @@
         </div>
     </main>
 
-    <!-- 面试通知模态框 -->
-    <div id="interviewModal" class="ios-modal">
+    <!-- 成功提示模态框 -->
+    <div id="successModal" class="ios-modal">
         <div class="ios-modal-content">
             <div class="ios-modal-header">
-                <h3 class="ios-modal-title">发送面试通知</h3>
-                <button class="ios-modal-close" onclick="closeModal()">&times;</button>
+                <h3 class="ios-modal-title">操作成功</h3>
+                <button class="ios-modal-close" onclick="closeSuccessModal()">&times;</button>
             </div>
             <div class="ios-modal-body">
-                <form id="interviewForm">
-                    <div style="margin-bottom: var(--ios-spacing-md);">
-                        <label style="display: block; margin-bottom: var(--ios-spacing-xs); font-weight: 600;">
-                            候选人：
-                        </label>
-                        <div id="selectedCandidates" style="background: var(--ios-bg-secondary); padding: var(--ios-spacing-sm); border-radius: var(--ios-radius-small);">
-                            <!-- 选中的候选人将在这里显示 -->
-                        </div>
-                    </div>
-                    
-                    <div style="margin-bottom: var(--ios-spacing-md);">
-                        <label for="interviewMessage" style="display: block; margin-bottom: var(--ios-spacing-xs); font-weight: 600;">
-                            通知内容：
-                        </label>
-                        <textarea id="interviewMessage" name="message" rows="6" style="width: 100%; padding: var(--ios-spacing-sm); border: 1px solid var(--ios-border-secondary); border-radius: var(--ios-radius-small); resize: vertical;" placeholder="请输入面试通知内容...">恭喜您通过初筛！我们诚挚地邀请您参加面试。
-
-面试时间：待定
-面试地点：待定
-面试形式：待定
-
-请保持手机畅通，我们会尽快与您联系安排具体面试时间。
-
-如有疑问，请随时联系我们。
-
-祝好！
-HR团队</textarea>
-                    </div>
-                </form>
+                <p id="successMessage" style="margin:0; color: var(--ios-text-primary);">已通过并通知候选人：请你在三天之内完成AI正式面试。</p>
             </div>
             <div class="ios-modal-footer">
-                <button type="button" class="ios-btn ios-btn-secondary" onclick="closeModal()">取消</button>
-                <button type="button" class="ios-btn ios-btn-primary" onclick="sendInterviewNotification()">发送通知</button>
+                <button type="button" class="ios-btn ios-btn-primary" onclick="closeSuccessModal()">确定</button>
             </div>
         </div>
     </div>
+
 
     <script>
         // 智能筛选开关
@@ -695,82 +668,69 @@ HR团队</textarea>
             });
         }
         
-        // 发送面试通知
-        const sendInterviewBtn = document.getElementById('sendInterviewBtn');
-        const interviewModal = document.getElementById('interviewModal');
-        
-        sendInterviewBtn.addEventListener('click', function() {
-            const selectedCandidates = Array.from(document.querySelectorAll('.candidate-checkbox:checked'))
-                .map(cb => ({
-                    id: cb.dataset.candidateId,
-                    name: cb.dataset.candidateName
-                }));
-            
-            const candidatesList = document.getElementById('selectedCandidates');
-            candidatesList.innerHTML = selectedCandidates.map(c => c.name).join(', ');
-            
-            interviewModal.style.display = 'block';
-        });
-        
-        // 单个候选人发送通知
-        document.querySelectorAll('.send-interview-btn').forEach(btn => {
+
+        // 单个通过并通知（AI面试通知）
+        let notifyInProgress = false;
+        document.querySelectorAll('.approve-notify-btn').forEach(btn => {
             btn.addEventListener('click', function() {
+                if (notifyInProgress) return;
+                notifyInProgress = true;
                 const candidateId = this.dataset.candidateId;
-                const candidateName = this.dataset.candidateName;
-                
-                const candidatesList = document.getElementById('selectedCandidates');
-                candidatesList.innerHTML = candidateName;
-                
-                // 设置隐藏字段
-                const form = document.getElementById('interviewForm');
-                if (!form.querySelector('input[name="candidate_ids"]')) {
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = 'candidate_ids';
-                    hiddenInput.value = candidateId;
-                    form.appendChild(hiddenInput);
-                } else {
-                    form.querySelector('input[name="candidate_ids"]').value = candidateId;
-                }
-                
-                interviewModal.style.display = 'block';
+                const appId = this.dataset.applicationId || '';
+                const formData = new FormData();
+                formData.append('candidate_ids', candidateId);
+                if (appId) formData.append('application_id', appId);
+                formData.append('message', '请你在三天之内完成AI正式面试');
+                fetch('{{ url_for("smartrecruit.hr.dashboard.approve_and_notify") }}', { method: 'POST', body: formData })
+                    .then(async (r) => {
+                        let d = {};
+                        try { d = await r.json(); } catch(e) { d = { success:false, message:'解析失败' }; }
+                        if (d && d.success) { showSuccess('已通过并通知。'); }
+                        else { notifyInProgress = false; alert('操作失败：' + (d.message || '')); }
+                    })
+                    .catch(() => { if (!notifyInProgress) alert('网络错误，请稍后重试'); notifyInProgress = false; });
             });
         });
-        
-        function closeModal() {
-            interviewModal.style.display = 'none';
-        }
-        
-        function sendInterviewNotification() {
-            const form = document.getElementById('interviewForm');
-            const formData = new FormData(form);
-            
-            // 获取选中的候选人ID
-            const selectedCandidates = Array.from(document.querySelectorAll('.candidate-checkbox:checked'))
-                .map(cb => cb.dataset.candidateId);
-            
-            if (!formData.get('candidate_ids')) {
-                formData.append('candidate_ids', selectedCandidates.join(','));
-            }
-            
-            fetch('{{ url_for("smartrecruit.hr.dashboard.send_interview_notification") }}', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('面试通知发送成功！');
-                    closeModal();
-                    location.reload(); // 刷新页面更新状态
-                } else {
-                    alert('发送失败：' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('发送失败，请稍后重试');
+
+        // 批量通过并通知（AI面试通知）
+        const approveSelectedBtn = document.getElementById('approveSelectedBtn');
+        if (approveSelectedBtn) {
+            approveSelectedBtn.addEventListener('click', function() {
+                if (notifyInProgress) return;
+                const ids = Array.from(document.querySelectorAll('.candidate-checkbox:checked')).map(cb => cb.dataset.candidateId);
+                if (ids.length === 0) { alert('请先选择候选人'); return; }
+                const formData = new FormData();
+                formData.append('candidate_ids', ids.join(','));
+                formData.append('message', '请你在三天之内完成AI正式面试');
+                notifyInProgress = true;
+                fetch('{{ url_for("smartrecruit.hr.dashboard.approve_and_notify") }}', { method: 'POST', body: formData })
+                    .then(async (r) => {
+                        let d = {};
+                        try { d = await r.json(); } catch(e) { d = { success:false, message:'解析失败' }; }
+                        if (d && d.success) { showSuccess('已通过并通知 ' + (d.updated || ids.length) + ' 人。'); }
+                        else { notifyInProgress = false; alert('操作失败：' + (d.message || '')); }
+                    })
+                    .catch(() => { if (!notifyInProgress) alert('网络错误，请稍后重试'); notifyInProgress = false; });
             });
+        }
+
+        // 成功提示弹窗
+        function showSuccess(text){
+            const modal = document.getElementById('successModal');
+            const msg = document.getElementById('successMessage');
+            if (msg && text) msg.textContent = text;
+            if (modal){
+                modal.style.display = 'block';
+                setTimeout(()=>{ closeSuccessModal(); }, 2000);
+            } else {
+                alert(text || '操作成功');
+                location.reload();
+            }
+        }
+        function closeSuccessModal(){
+            const modal = document.getElementById('successModal');
+            if (modal){ modal.style.display = 'none'; }
+            location.reload();
         }
         
         // 清除筛选
@@ -778,12 +738,6 @@ HR团队</textarea>
             window.location.href = '{{ url_for("smartrecruit.hr.dashboard.candidates_filter") }}';
         });
         
-        // 点击模态框外部关闭
-        window.addEventListener('click', function(event) {
-            if (event.target === interviewModal) {
-                closeModal();
-            }
-        });
     </script>
 </body>
 </html>

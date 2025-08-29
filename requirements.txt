@@ -13,3 +13,7 @@ Pillow==11.0.0
 reportlab==4.1.0
 matplotlib==3.8.3
 numpy==1.26.4
+
+# 生产环境依赖
+gunicorn==21.2.0
+gevent==23.9.1
