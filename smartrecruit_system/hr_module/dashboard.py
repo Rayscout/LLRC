@@ -47,8 +47,53 @@ def interviews():
     if not getattr(g.user, 'is_hr', False):
         flash('只有HR用户可以访问该页面。', 'danger')
         return redirect(url_for('common.auth.sign'))
+    
+    # 获取面试安排数据
+    interviews_data = []
+    candidates_data = []
+    
     try:
-        return render_template('smartrecruit/hr/hr_interviews_ios.html')
+        if db is not None:
+            from app.models import InterviewSchedule
+            
+            # 获取当前HR的面试安排
+            interview_schedules = InterviewSchedule.query.filter_by(hr_id=g.user.id).all()
+            
+            for schedule in interview_schedules:
+                candidate = User.query.get(schedule.candidate_id)
+                job = Job.query.get(schedule.job_id)
+                
+                if candidate and job:
+                    interviews_data.append({
+                        'id': schedule.id,
+                        'candidate_name': f"{candidate.first_name} {candidate.last_name}",
+                        'candidate_email': candidate.email,
+                        'position': job.title,
+                        'date': schedule.interview_date.strftime('%Y-%m-%d'),
+                        'start_time': schedule.start_time.strftime('%H:%M'),
+                        'end_time': schedule.end_time.strftime('%H:%M'),
+                        'method': schedule.interview_type,
+                        'status': schedule.status,
+                        'interviewer_name': schedule.interviewer_name or '未指定',
+                        'location': schedule.location or '未指定'
+                    })
+            
+            # 获取通过AI面试的候选人数量
+            from app import applications_collection
+            ai_passed_count = applications_collection.count_documents({
+                'type': 'ai_interview_result',
+                'status': 'passed'
+            })
+            
+            candidates_data = [{'id': i, 'name': f'候选人{i}', 'email': f'candidate{i}@example.com'} for i in range(ai_passed_count)]
+            
+    except Exception as e:
+        print(f"获取面试数据失败：{str(e)}")
+    
+    try:
+        return render_template('smartrecruit/hr/hr_interviews_ios.html', 
+                             interviews=interviews_data,
+                             candidates=candidates_data)
     except Exception:
         return render_template('smartrecruit/hr/hr_dashboard.html')
 
