@@ -74,11 +74,15 @@
                 <i class="fas fa-file-alt"></i>
                 <span>我的申请</span>
             </a>
-            <a href="{{ url_for('smartrecruit.candidate.applications.virtual_interview') }}" class="menu-item {% if 'virtual_interview' in request.endpoint or 'interview' in request.endpoint %}active{% endif %}">
+            <a href="{{ url_for('smartrecruit.candidate.applications.ai_interview_hub') }}" class="menu-item {% if request.endpoint == 'smartrecruit.candidate.applications.ai_interview_hub' %}active{% endif %}">
                 <i class="fas fa-microphone"></i>
-                <span>AI面试训练</span>
+                <span>AI面试</span>
             </a>
             
+            <a href="{{ url_for('smartrecruit.candidate.messages_inbox') }}" class="menu-item {% if request.endpoint == 'smartrecruit.candidate.messages_inbox' %}active{% endif %}">
+                <i class="fas fa-inbox"></i>
+                <span>收信箱</span>
+            </a>
             <a href="{{ url_for('smartrecruit.candidate.profile.career_path') }}" class="menu-item {% if 'career_path' in request.endpoint %}active{% endif %}">
                 <i class="fas fa-road"></i>
                 <span>职业路径</span>

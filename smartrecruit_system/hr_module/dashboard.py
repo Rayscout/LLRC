@@ -458,3 +458,113 @@ def send_interview_notification():
         return {'success': False, 'message': str(e)}, 500
 
 
+@dashboard_bp.route('/candidates/approve_and_notify', methods=['POST'], endpoint='approve_and_notify')
+def approve_and_notify():
+    """将候选人设为通过并写入通知信息（用于筛选页面一键通过并通知）。"""
+    if g.get('user') is None:
+        abort(401)
+    if not getattr(g.user, 'is_hr', False):
+        abort(403)
+    try:
+        from app.models import Application
+    except Exception:
+        return {'success': False, 'message': 'DB unavailable'}, 500
+
+    ids = (request.values.get('candidate_ids') or '').strip()
+    application_id_val = (request.values.get('application_id') or '').strip()
+    message = (request.values.get('message') or '请你在三天之内完成AI正式面试').strip()
+    id_list = [int(x) for x in ids.split(',') if x.strip().isdigit()]
+    updated = 0
+    try:
+        target_apps = []
+        if application_id_val.isdigit():
+            try:
+                app_obj = Application.query.get(int(application_id_val))
+                if app_obj:
+                    target_apps.append(app_obj)
+            except Exception:
+                pass
+        if not target_apps:
+            for candidate_id in id_list:
+                # 优先在当前HR发布的职位中查找该候选人的最近申请
+                app_row = _find_latest_app_for_user(candidate_id)
+                if not app_row:
+                    # 回退：不限定职位归属，取候选人最近一条申请
+                    try:
+                        app_row = (
+                            Application.query
+                            .filter_by(user_id=candidate_id)
+                            .order_by(Application.timestamp.desc())
+                            .first()
+                        )
+                    except Exception:
+                        app_row = None
+                if app_row:
+                    target_apps.append(app_row)
+        if not target_apps:
+            return {'success': False, 'message': '未找到可更新的申请'}, 404
+        updated_candidates = set()
+        for app_row in target_apps:
+            # 标记通过，确保激活，并更新时间戳
+            app_row.status = 'approved'
+            try:
+                app_row.is_active = True
+            except Exception:
+                pass
+            try:
+                # 尽量更新为当前时间，便于列表刷新排序
+                app_row.timestamp = datetime.utcnow()
+            except Exception:
+                pass
+            try:
+                old_msg = getattr(app_row, 'message', '') or ''
+                sep = '\n' if old_msg else ''
+                app_row.message = f"{old_msg}{sep}{message}"
+            except Exception:
+                app_row.message = message
+            updated += 1
+            try:
+                updated_candidates.add(int(getattr(app_row, 'user_id', 0) or 0))
+            except Exception:
+                pass
+        if updated:
+            db.session.commit()
+            # 同步写入候选人消息收件箱（Mongo）
+            try:
+                from app import applications_collection
+                from datetime import datetime as _dt
+                for candidate_id in (updated_candidates or set(id_list)):
+                    applications_collection.insert_one({
+                        'user_id': str(candidate_id),
+                        'message': message,
+                        'created_at': _dt.utcnow(),
+                        'type': 'ai_interview_notice'
+                    })
+            except Exception:
+                pass
+            # 同步写入SQL通知，供收件箱读取
+            try:
+                from app.models import FeedbackNotification
+                from datetime import datetime as _dt
+                for candidate_id in (updated_candidates or set(id_list)):
+                    notif = FeedbackNotification(
+                        user_id=candidate_id,
+                        feedback_id=0,
+                        notification_type='ai_interview_notice',
+                        title='AI面试通知',
+                        message=message,
+                        is_read=False,
+                        created_at=_dt.utcnow()
+                    )
+                    db.session.add(notif)
+                db.session.commit()
+            except Exception:
+                if db:
+                    db.session.rollback()
+        return {'success': True, 'updated': updated}, 200
+    except Exception as e:
+        if db:
+            db.session.rollback()
+        return {'success': False, 'message': str(e)}, 500
+
+
