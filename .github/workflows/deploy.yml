@@ -2,7 +2,7 @@ name: Deploy to Server
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ RayScout ]
   workflow_dispatch:
 
 jobs:
@@ -15,6 +15,15 @@ jobs:
       
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.3
+      env:
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        API_TOKEN: ${{ secrets.API_TOKEN }}
+        MONGO_URI: ${{ secrets.MONGO_URI }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        YOLO_FACE_WEIGHTS: ${{ secrets.YOLO_FACE_WEIGHTS }}
+        EMOTION_MODEL_PATH: ${{ secrets.EMOTION_MODEL_PATH }}
+        GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
@@ -32,7 +41,23 @@ jobs:
           # 拉取最新代码
           echo "📥 拉取最新代码..."
           git fetch origin
-          git reset --hard origin/main
+          git reset --hard origin/RayScout
+
+          # 写入/更新 .env（从 GitHub Secrets 注入）
+          echo "🔑 注入环境变量到 .env..."
+          umask 077
+          cat > /var/www/llrc/.env << 'EOF'
+SECRET_KEY=${SECRET_KEY}
+API_TOKEN=${API_TOKEN}
+MONGO_URI=${MONGO_URI}
+DATABASE_URL=${DATABASE_URL}
+YOLO_FACE_WEIGHTS=${YOLO_FACE_WEIGHTS}
+EMOTION_MODEL_PATH=${EMOTION_MODEL_PATH}
+GOOGLE_API_KEY=${GOOGLE_API_KEY}
+GEMINI_API_KEY=${GEMINI_API_KEY}
+EOF
+          chown ${USER}:/var/www/llrc/.env || true
+          chmod 600 /var/www/llrc/.env || true
           
           # 设置权限
           echo "🔐 设置文件权限..."
