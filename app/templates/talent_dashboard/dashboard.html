@@ -58,10 +58,13 @@
     <div class="container-fluid">
         <!-- 页面标题 -->
         <div class="row mt-4">
-            <div class="col-12">
-                <h1 class="text-center mb-4">
+            <div class="col-12 d-flex align-items-center justify-content-between">
+                <h1 class="mb-4">
                     <i class="bi bi-graph-up"></i> 人才发展大盘
                 </h1>
+                <a class="btn btn-outline-secondary" href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}">
+                    ← 返回高管首页
+                </a>
             </div>
         </div>
 
