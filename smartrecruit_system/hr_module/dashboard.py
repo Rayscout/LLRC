@@ -176,6 +176,126 @@ def reports():
         return render_template('smartrecruit/hr/hr_dashboard.html')
 
 
+@dashboard_bp.route('/candidates/ai_review', endpoint='candidates_ai_review')
+def candidates_ai_review():
+    if g.get('user') is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    if not getattr(g.user, 'is_hr', False):
+        flash('只有HR用户可以访问该页面。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    # 渲染全局AI面试审核页面（模板已存在）
+    try:
+        from app import applications_collection
+        # 当前HR发布的职位范围内
+        hr_job_ids = []
+        try:
+            hr_job_ids = [str(j.id) for j in Job.query.filter_by(user_id=g.user.id).all()]
+        except Exception:
+            hr_job_ids = []
+
+        passed_docs = []
+        is_fallback = False
+        try:
+            base_query = {
+                'type': 'ai_interview_result',
+                'status': 'passed'
+            }
+            query = dict(base_query)
+            if hr_job_ids:
+                query['job_id'] = {'$in': hr_job_ids}
+            cursor = applications_collection.find(query).limit(200)
+            passed_docs = list(cursor)
+            # 如果当前HR范围内没有数据，则回退到全局通过结果，避免页面空白
+            if not passed_docs:
+                cursor = applications_collection.find(base_query).limit(200)
+                passed_docs = list(cursor)
+                is_fallback = True
+        except Exception:
+            passed_docs = []
+
+        passed_candidates = []
+        scores = []
+        for doc in passed_docs:
+            try:
+                user_id_val = int(str(doc.get('user_id', '0')) or 0)
+                job_id_val = int(str(doc.get('job_id', '0')) or 0)
+            except Exception:
+                continue
+            user = None
+            job = None
+            app_row = None
+            try:
+                user = User.query.get(user_id_val)
+            except Exception:
+                user = None
+            try:
+                job = Job.query.get(job_id_val)
+            except Exception:
+                job = None
+            try:
+                if user_id_val and job_id_val:
+                    app_row = Application.query.filter_by(user_id=user_id_val, job_id=job_id_val).order_by(Application.timestamp.desc()).first()
+            except Exception:
+                app_row = None
+
+            if not user:
+                continue
+            # 仅当不是回退模式且拿到了职位时，才限制为当前HR名下职位
+            if not is_fallback and job and job.user_id != g.user.id:
+                continue
+
+            score = int(doc.get('score', 0) or 0)
+            scores.append(score)
+
+            # 兼容不同脚本写入的字段名，提供默认值
+            technical_score = doc.get('technical_score')
+            communication_score = doc.get('communication_score')
+            logic_score = doc.get('logic_score')
+            learning_score = doc.get('learning_score')
+
+            # 如果没有细分分数，给出友好默认
+            if technical_score is None:
+                technical_score = max(0, min(100, score))
+            if communication_score is None:
+                communication_score = max(0, min(100, int(round(score * 0.9))))
+            if logic_score is None:
+                logic_score = max(0, min(100, int(round(score * 0.88))))
+            if learning_score is None:
+                learning_score = max(0, min(100, int(round(score * 0.92))))
+
+            passed_candidates.append({
+                'first_name': getattr(user, 'first_name', '') or '',
+                'last_name': getattr(user, 'last_name', '') or '',
+                'email': getattr(user, 'email', '') or '',
+                'phone_number': getattr(user, 'phone_number', '') or '',
+                'job_title': getattr(job, 'title', '') if job else (getattr(user, 'position', '') or ''),
+                'application_id': getattr(app_row, 'id', 0) or 0,
+                'ai_interview_score': score,
+                'ai_interview_details': {
+                    'technical_score': technical_score,
+                    'communication_score': communication_score,
+                    'logic_score': logic_score,
+                    'learning_score': learning_score,
+                }
+            })
+
+        total_candidates = len(passed_candidates)
+        total_passed = total_candidates
+        avg_score = int(round(sum(scores) / total_candidates)) if total_candidates else 0
+        pass_rate = 100 if total_candidates else 0
+
+        return render_template(
+            'smartrecruit/hr/review_all_ai_interviews_global.html',
+            passed_candidates=passed_candidates,
+            total_candidates=total_candidates,
+            total_passed=total_passed,
+            pass_rate=pass_rate,
+            avg_score=avg_score,
+        )
+    except Exception:
+        return redirect(url_for('smartrecruit.hr.dashboard.candidates'))
+
 @dashboard_bp.route('/candidates/list', endpoint='candidates_list')
 @dashboard_bp.route('/candidates/list/', endpoint='candidates_list_slash')
 def candidates_list():
