@@ -8,14 +8,19 @@ class AIConfig:
         # 获取项目根目录
         self.project_root = Path(__file__).parent.parent.parent.parent
         
-        # YOLO模型路径配置
-        self.yolo_base_path = self.project_root / "YOLO" / "Facial-Expression-Recognition"
+        # YOLO模型路径配置（允许通过环境变量覆盖）
+        env_yolo_base = os.getenv("YOLO_BASE_PATH")
+        self.yolo_base_path = Path(env_yolo_base) if env_yolo_base else self.project_root / "YOLO" / "Facial-Expression-Recognition"
         
         # 人脸检测模型路径
-        self.face_detection_model = self.yolo_base_path / "yolov11n-face.pt"
+        # 优先使用环境变量 YOLO_FACE_WEIGHTS，其次使用默认路径
+        env_face_weights = os.getenv("YOLO_FACE_WEIGHTS")
+        self.face_detection_model = Path(env_face_weights) if env_face_weights else self.yolo_base_path / "yolov11n-face.pt"
         
         # 表情识别模型路径（优先使用训练好的模型）
         self.emotion_model_paths = [
+            # 环境变量指定的权重（最高优先级）
+            Path(os.getenv("EMOTION_MODEL_PATH")) if os.getenv("EMOTION_MODEL_PATH") else None,
             # 训练好的表情识别模型（最高优先级）
             Path(__file__).parent / "trained_models" / "emotion_recognition_best.pt",
             Path(__file__).parent / "trained_models" / "emotion_quick_train.pt",
@@ -29,7 +34,9 @@ class AIConfig:
         ]
         
         # 字体配置
+        env_font_path = os.getenv("FONT_PATH")
         self.font_paths = [
+            env_font_path if env_font_path else None,
             "C:/Windows/Fonts/simhei.ttf",
             "C:/Windows/Fonts/simsun.ttc", 
             "C:/Windows/Fonts/msyh.ttc",
@@ -83,14 +90,14 @@ class AIConfig:
     def get_emotion_recognition_model_path(self) -> str:
         """获取表情识别模型路径，返回第一个存在的路径"""
         for path in self.emotion_model_paths:
-            if path.exists():
+            if path and Path(path).exists():
                 return str(path)
         return None
     
     def get_font_path(self) -> str:
         """获取字体路径，返回第一个存在的路径"""
         for path in self.font_paths:
-            if os.path.exists(path):
+            if path and os.path.exists(path):
                 return path
         return None
     
