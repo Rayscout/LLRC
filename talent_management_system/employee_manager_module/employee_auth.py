@@ -112,17 +112,50 @@ def employee_dashboard():
     supervisor = None
     if user.supervisor_id:
         supervisor = User.query.get(user.supervisor_id)
-    
+
+    # 获取任务完成情况
+    try:
+        from app.models import SmartGoal
+        smart_goals = SmartGoal.query.filter_by(user_id=user.id).all()
+        completed_tasks = len([goal for goal in smart_goals if goal.status == 'completed'])
+        total_tasks = len(smart_goals)
+
+        task_completion = {
+            'completed': completed_tasks,
+            'total': total_tasks
+        }
+    except Exception as e:
+        print(f"获取任务完成情况失败: {e}")
+        task_completion = {
+            'completed': 0,
+            'total': 0
+        }
+
+    # 计算综合评分
+    overall_score = 0
+    try:
+        if total_tasks > 0:
+            # 基于任务完成率计算评分
+            completion_rate = completed_tasks / total_tasks
+            overall_score = min(100, completion_rate * 80 + 20)  # 基础分20分，完成率占80分
+        else:
+            overall_score = 20  # 没有任务时的基础分
+    except Exception as e:
+        print(f"计算综合评分失败: {e}")
+        overall_score = 0
+
     # 模拟数据用于展示界面效果
     dashboard_data = {
         'profile_completeness': 85,
         'performance_score': 92,
         'project_count': 5,
         'learning_progress': 78,
-        'skills_count': 12
+        'skills_count': 12,
+        'task_completion': task_completion,
+        'overall_score': overall_score
     }
-    
-    return render_template('talent_management/employee_management/employee_dashboard.html', 
+
+    return render_template('talent_management/employee_management/employee_dashboard.html',
                          user=user, supervisor=supervisor, **dashboard_data)
 
 @employee_auth_bp.route('/logout')
