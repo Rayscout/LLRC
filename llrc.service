@@ -5,8 +5,8 @@ Wants=network.target
 
 [Service]
 Type=notify
-User=www-data
-Group=www-data
+User=llrcuser
+Group=llrcuser
 WorkingDirectory=/var/www/llrc
 Environment=PATH=/var/www/llrc/venv/bin
 Environment=FLASK_ENV=production
@@ -18,8 +18,8 @@ StandardOutput=journal
 StandardError=journal
 
 # 安全设置
-NoNewPrivileges=true
-PrivateTmp=true
+NoNewPrivileges=false
+PrivateTmp=false
 ProtectSystem=strict
 ReadWritePaths=/var/www/llrc /var/log/llrc /var/run/llrc /tmp
 

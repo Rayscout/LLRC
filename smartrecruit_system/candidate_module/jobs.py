@@ -71,6 +71,36 @@ def job_detail(job_id):
         flash('获取职位详情失败，请稍后重试。', 'danger')
         return redirect(url_for('smartrecruit.candidate.jobs.job_list'))
 
+@jobs_bp.route('/view-all')
+def view_all_jobs():
+    """查看所有岗位页面 - iOS风格展示"""
+    if g.user is None:
+        flash('请先登录。', 'danger')
+        return redirect(url_for('common.auth.sign'))
+    
+    try:
+        # 获取所有岗位，按发布时间排序
+        all_jobs = Job.query.order_by(Job.date_posted.desc()).all()
+        
+        # 获取用户技能（用于匹配度计算）
+        user_skills = extract_user_skills(g.user)
+        
+        # 计算每个岗位与用户的匹配度
+        for job in all_jobs:
+            job.match_score = calculate_job_match_score(job, user_skills)
+        
+        # 按匹配度排序
+        all_jobs.sort(key=lambda x: x.match_score, reverse=True)
+        
+    except Exception as e:
+        flash('获取岗位信息失败，请稍后重试。', 'danger')
+        all_jobs = []
+        user_skills = []
+    
+    return render_template('smartrecruit/candidate/view_all_jobs.html', 
+                         jobs=all_jobs, 
+                         user_skills=user_skills)
+
 @jobs_bp.route('/search')
 def job_search():
     """职位搜索页面"""
@@ -497,3 +527,30 @@ def get_user_saved_jobs_count(user_id):
         return 3  # 模拟数据
     except Exception:
         return 0
+
+def calculate_job_match_score(job, user_skills):
+    """计算岗位与用户的匹配度"""
+    if not user_skills:
+        return 0
+    
+    score = 0
+    job_skills = []
+    
+    # 提取岗位要求的技能
+    if hasattr(job, 'skills_required') and job.skills_required:
+        job_skills = [skill.strip().lower() for skill in job.skills_required.split(',') if skill.strip()]
+    
+    # 计算技能匹配度
+    for user_skill in user_skills:
+        user_skill_lower = user_skill.lower()
+        for job_skill in job_skills:
+            if user_skill_lower in job_skill or job_skill in user_skill_lower:
+                score += 10
+    
+    # 根据经验要求调整分数
+    if hasattr(job, 'experience_years') and job.experience_years:
+        # 这里可以根据用户的实际工作经验进行更精确的匹配
+        # 暂时给一个基础分数
+        score += 5
+    
+    return min(score, 100)  # 最高100分

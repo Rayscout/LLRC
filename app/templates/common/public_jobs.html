@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最新岗位 - 智能招聘系统</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_jobs_style.css') }}">
+    <style>
+        /* CSS变量定义 - 与首页保持一致 */
+        :root {
+            /* iOS-inspired tokens */
+            --ios-blue: #007AFF;
+            --ios-blue-dark: #0056CC;
+            --ios-text-primary: #000000;
+            --ios-text-secondary: #3C3C43;
+            --ios-border-primary: #D1D1D6;
+            --ios-bg-primary: #F2F2F7;
+            --ios-bg-secondary: #FFFFFF;
+            --ios-ease: cubic-bezier(0.25,1,0.5,1);
+
+            /* map existing tokens */
+            --bg: var(--ios-bg-primary);
+            --fg: var(--ios-text-primary);
+            --muted: var(--ios-text-secondary);
+            --primary: var(--ios-blue);
+            --primary-600: var(--ios-blue-dark);
+            --border: var(--ios-border-primary);
+            --card: var(--ios-bg-secondary);
+            --surface: #F9F9FB;
+            --ease: var(--ios-ease);
+        }
+
+        /* Dark mode variables */
+        body.dark {
+            --bg: #000000;
+            --fg: #FFFFFF;
+            --muted: #EBEBF5;
+            --border: #38383A;
+            --card: #1C1C1E;
+            --surface: #2C2C2E;
+        }
+
+        /* 首页特定样式 - 与首页保持一致 */
+        .home-header {
+            background: var(--bg);
+            color: var(--fg);
+            padding: 80px 0 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .home-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--surface);
+            opacity: 0.5;
+        }
+        
+        .home-header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .home-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--fg);
+        }
+        
+        .home-subtitle {
+            font-size: 1.25rem;
+            color: var(--muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .home-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .home-btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .home-btn.primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,122,255,0.25);
+        }
+        
+        .home-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,122,255,0.4);
+            background: var(--primary-600);
+        }
+        
+        .home-btn.secondary {
+            background: var(--card);
+            color: var(--fg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .home-btn.secondary:hover {
+            background: var(--surface);
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+        
+        .stats-section {
+            background: var(--surface);
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--muted);
+            font-size: 1rem;
+        }
+        
+        .jobs-intro {
+            background: var(--card);
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .jobs-intro h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--fg);
+            margin-bottom: 1rem;
+        }
+        
+        .jobs-intro p {
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .home-title {
+                font-size: 2rem;
+            }
+            
+            .home-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .home-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .home-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 首页头部 -->
+    <header class="home-header">
+        <div class="home-header-content">
+            <h1 class="home-title">发现理想岗位</h1>
+            <p class="home-subtitle">
+                探索最新招聘机会，找到最适合您的职业发展道路<br>
+                智能匹配，精准推荐，助您开启职业新篇章
+            </p>
+            <div class="home-actions">
+                <a href="{{ url_for('common.auth.sign') }}" class="home-btn primary">
+                    <i class="uil uil-user-plus"></i>
+                    立即注册
+                </a>
+                <a href="{{ url_for('common.auth.sign') }}" class="home-btn secondary">
+                    <i class="uil uil-signin"></i>
+                    登录系统
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 统计信息 -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">{{ total_jobs }}</div>
+                <div class="stat-label">最新岗位</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ jobs_by_company|length }}</div>
+                <div class="stat-label">合作企业</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">24h</div>
+                <div class="stat-label">实时更新</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 岗位介绍 -->
+    <section class="jobs-intro">
+        <h2>精选热门岗位</h2>
+        <p>我们精选了最新发布的优质岗位，涵盖各个行业和职位类型。点击查看详情，找到最适合您的机会。</p>
+    </section>
+
+    <!-- iOS风格岗位展示 -->
+    <div class="ios-jobs-container">
+        <!-- 顶部导航栏 -->
+        <header class="ios-navbar">
+            <div class="nav-content">
+                <div class="nav-left">
+                    <a href="{{ url_for('root') }}" class="nav-back-btn">
+                        <i class="uil uil-home"></i>
+                    </a>
+                </div>
+                <div class="nav-center">
+                    <h1 class="nav-title">最新岗位</h1>
+                </div>
+                <div class="nav-right">
+                    <button class="nav-theme-btn" id="iosThemeToggle" title="切换主题">
+                        <i class="uil uil-moon"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 搜索和筛选区域 -->
+        <section class="search-section">
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <i class="uil uil-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="搜索岗位、技能或公司..." id="jobSearchInput">
+                    <button class="search-clear-btn" id="searchClearBtn" style="display: none;">
+                        <i class="uil uil-times"></i>
+                    </button>
+                </div>
+                <div class="filter-tags">
+                    <span class="filter-tag active" data-filter="all">全部</span>
+                    <span class="filter-tag" data-filter="recent">最新</span>
+                    <span class="filter-tag" data-filter="remote">远程</span>
+                    <span class="filter-tag" data-filter="high-salary">高薪</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 岗位列表区域 -->
+        <section class="jobs-section">
+            <div class="jobs-container">
+                {% if jobs_by_company %}
+                    <div class="jobs-grid" id="jobsGrid">
+                        {% for company, jobs in jobs_by_company.items() %}
+                            {% for job in jobs %}
+                            <article class="job-card" data-job-id="{{ job.id }}" data-company="{{ company }}">
+                                <!-- 岗位信息 -->
+                                <div class="job-header">
+                                    <h3 class="job-title">{{ job.title }}</h3>
+                                    <div class="company-info">
+                                        <span class="company-name">{{ company }}</span>
+                                        <span class="job-location">
+                                            <i class="uil uil-map-marker"></i>
+                                            {{ job.location }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- 岗位详情 -->
+                                <div class="job-details">
+                                    <div class="job-meta">
+                                        <span class="job-type">{{ job.job_type or '全职' }}</span>
+                                        <span class="job-salary">{{ job.salary }}</span>
+                                        {% if job.experience_years %}
+                                        <span class="job-experience">{{ job.experience_years }}年经验</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="job-description">
+                                        {{ job.description[:150] }}{% if job.description|length > 150 %}...{% endif %}
+                                    </div>
+
+                                    {% if job.skills_required %}
+                                    <div class="job-skills">
+                                        {% for skill in job.skills_required.split(',')[:3] %}
+                                        <span class="skill-tag">{{ skill.strip() }}</span>
+                                        {% endfor %}
+                                        {% if job.skills_required.split(',')|length > 3 %}
+                                        <span class="skill-more">+{{ job.skills_required.split(',')|length - 3 }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- 岗位操作 -->
+                                <div class="job-actions">
+                                    <button class="action-btn primary" onclick="checkAuthAndViewJob('{{ job.id }}')">
+                                        <i class="uil uil-eye"></i>
+                                        查看详情
+                                    </button>
+                                    <button class="action-btn secondary" onclick="checkAuthAndApplyJob('{{ job.id }}')">
+                                        <i class="uil uil-heart"></i>
+                                        申请岗位
+                                    </button>
+                                </div>
+
+                                <!-- 发布时间 -->
+                                <div class="job-posted">
+                                    <i class="uil uil-clock"></i>
+                                    {{ job.date_posted.strftime('%m-%d') if job.date_posted else '未知' }}
+                                </div>
+                            </article>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+
+                    <!-- 查看更多按钮 -->
+                    <div class="load-more-container">
+                        <button class="load-more-btn" onclick="checkAuthAndViewMore()">
+                            <i class="uil uil-user-plus"></i>
+                            注册账号查看更多岗位
+                        </button>
+                    </div>
+                {% else %}
+                    <!-- 空状态 -->
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="uil uil-briefcase"></i>
+                        </div>
+                        <h3 class="empty-title">暂无岗位</h3>
+                        <p class="empty-description">目前没有可用的岗位信息，请稍后再试。</p>
+                        <button class="home-btn primary" style="margin-top: 20px;" onclick="checkAuthAndPostJob()">
+                            <i class="uil uil-user-plus"></i>
+                            注册账号发布岗位
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- 岗位详情模态框 -->
+        <div class="job-modal" id="jobModal">
+            <div class="modal-overlay" onclick="closeJobModal()"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalJobTitle"></h2>
+                    <button class="modal-close" onclick="closeJobModal()">
+                        <i class="uil uil-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalJobBody">
+                    <!-- 动态加载岗位详情 -->
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn secondary" onclick="closeJobModal()">关闭</button>
+                    <button class="modal-btn primary" onclick="checkAuthAndApplyJob('{{ job.id }}')">立即申请</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部CTA -->
+    <section style="background: var(--bg-tertiary); padding: 60px 0; text-align: center;">
+        <div class="container">
+            <h2 style="font-size: 2rem; color: var(--text-primary); margin-bottom: 1rem;">
+                准备开始您的职业之旅？
+            </h2>
+            <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                注册账号，获取更多岗位信息，享受个性化推荐服务
+            </p>
+            <button class="home-btn primary" onclick="checkAuthAndRegister()">
+                <i class="uil uil-user-plus"></i>
+                立即注册
+            </button>
+        </div>
+    </section>
+
+    <script src="{{ url_for('static', filename='ios_jobs_script.js') }}"></script>
+    <script>
+        // 公开岗位页面的特殊处理
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化主题切换
+            const themeBtn = document.getElementById('iosThemeToggle');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', function() {
+                    const html = document.documentElement;
+                    const currentTheme = html.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                    
+                    // 更新图标
+                    if (newTheme === 'dark') {
+                        this.innerHTML = '<i class="uil uil-sun"></i>';
+                        this.classList.add('active');
+                    } else {
+                        this.innerHTML = '<i class="uil uil-moon"></i>';
+                        this.classList.remove('active');
+                    }
+                });
+                
+                // 应用保存的主题
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                if (savedTheme === 'dark') {
+                    themeBtn.innerHTML = '<i class="uil uil-sun"></i>';
+                    themeBtn.classList.add('active');
+                }
+            }
+            
+            // 搜索功能
+            const searchInput = document.getElementById('jobSearchInput');
+            const clearBtn = document.getElementById('searchClearBtn');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const query = this.value.toLowerCase();
+                    const jobCards = document.querySelectorAll('.job-card');
+                    
+                    jobCards.forEach(card => {
+                        const title = card.querySelector('.job-title').textContent.toLowerCase();
+                        const company = card.querySelector('.company-name').textContent.toLowerCase();
+                        const description = card.querySelector('.job-description').textContent.toLowerCase();
+                        
+                        if (title.includes(query) || company.includes(query) || description.includes(query)) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                    
+                    // 显示/隐藏清除按钮
+                    if (clearBtn) {
+                        clearBtn.style.display = query ? 'block' : 'none';
+                    }
+                });
+            }
+            
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                });
+            }
+            
+            // 筛选功能
+            const filterTags = document.querySelectorAll('.filter-tag');
+            filterTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    // 移除其他标签的活跃状态
+                    filterTags.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filter = this.dataset.filter;
+                    const jobCards = document.querySelectorAll('.job-card');
+                    
+                    jobCards.forEach(card => {
+                        let show = true;
+                        
+                        switch (filter) {
+                            case 'recent':
+                                // 这里可以根据实际需求实现最新筛选逻辑
+                                break;
+                            case 'remote':
+                                const jobType = card.querySelector('.job-type').textContent;
+                                const description = card.querySelector('.job-description').textContent;
+                                show = jobType.includes('远程') || description.includes('远程');
+                                break;
+                            case 'high-salary':
+                                const salary = card.querySelector('.job-salary').textContent;
+                                // 简单的薪资筛选逻辑
+                                show = salary.includes('K') || salary.includes('万') || parseInt(salary) > 10000;
+                                break;
+                        }
+                        
+                        card.style.display = show ? 'block' : 'none';
+                    });
+                });
+            });
+        });
+        
+        // 全局函数
+        function isAuthenticated() {
+            // 检查用户是否已登录
+            // 这里可以根据实际的认证机制来判断
+            // 例如检查localStorage、sessionStorage或cookie中的用户信息
+            return false; // 暂时返回false，表示未登录
+        }
+        
+        function checkAuthAndViewJob(jobId) {
+            if (isAuthenticated()) {
+                viewJobDetail(jobId);
+            } else {
+                // 未登录，跳转到登录/注册页面
+                window.location.href = "{{ url_for('common.auth.sign') }}";
+            }
+        }
+
+        function checkAuthAndApplyJob(jobId) {
+            if (isAuthenticated()) {
+                applyForJob(jobId);
+            } else {
+                // 未登录，跳转到登录/注册页面
+                window.location.href = "{{ url_for('common.auth.sign') }}";
+            }
+        }
+        
+        function checkAuthAndViewMore() {
+            if (isAuthenticated()) {
+                // 已登录，可以查看更多岗位
+                alert('已登录，正在加载更多岗位...');
+            } else {
+                // 未登录，跳转到登录/注册页面
+                window.location.href = "{{ url_for('common.auth.sign') }}";
+            }
+        }
+        
+        function checkAuthAndPostJob() {
+            if (isAuthenticated()) {
+                // 已登录，可以发布岗位
+                alert('已登录，正在跳转到岗位发布页面...');
+            } else {
+                // 未登录，跳转到登录/注册页面
+                window.location.href = "{{ url_for('common.auth.sign') }}";
+            }
+        }
+        
+        function checkAuthAndRegister() {
+            if (isAuthenticated()) {
+                // 已登录，跳转到用户中心
+                alert('您已登录，正在跳转到用户中心...');
+            } else {
+                // 未登录，跳转到登录/注册页面
+                window.location.href = "{{ url_for('common.auth.sign') }}";
+            }
+        }
+
+        function viewJobDetail(jobId) {
+            // 获取岗位信息并显示详情
+            const jobCards = document.querySelectorAll('.job-card');
+            let targetJob = null;
+            
+            jobCards.forEach(card => {
+                if (card.dataset.jobId === jobId) {
+                    targetJob = {
+                        id: card.dataset.jobId,
+                        title: card.querySelector('.job-title').textContent,
+                        company_name: card.querySelector('.company-name').textContent,
+                        location: card.querySelector('.job-location').textContent,
+                        job_type: card.querySelector('.job-type').textContent,
+                        salary: card.querySelector('.job-salary').textContent,
+                        experience_years: card.querySelector('.job-experience') ? card.querySelector('.job-experience').textContent : '',
+                        description: card.querySelector('.job-description').textContent,
+                        skills_required: card.querySelector('.job-skills') ? card.querySelector('.job-skills').textContent : ''
+                    };
+                }
+            });
+            
+            if (targetJob) {
+                showJobModal(targetJob);
+            }
+        }
+
+        function applyForJob(jobId) {
+            // 这里可以实现申请岗位的逻辑
+            alert('请注册账号申请该岗位');
+        }
+        
+        function closeJobModal() {
+            const modal = document.getElementById('jobModal');
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function showJobModal(job) {
+            const modal = document.getElementById('jobModal');
+            const modalTitle = document.getElementById('modalJobTitle');
+            const modalBody = document.getElementById('modalJobBody');
+            
+            if (modal && modalTitle && modalBody) {
+                modalTitle.textContent = job.title;
+                
+                modalBody.innerHTML = `
+                    <div class="job-detail-content">
+                        <div class="detail-section">
+                            <h3>公司信息</h3>
+                            <p><strong>公司名称：</strong>${job.company_name}</p>
+                            <p><strong>工作地点：</strong>${job.location}</p>
+                            <p><strong>职位类型：</strong>${job.job_type}</p>
+                            <p><strong>薪资范围：</strong>${job.salary}</p>
+                            ${job.experience_years ? `<p><strong>经验要求：</strong>${job.experience_years}</p>` : ''}
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3>职位描述</h3>
+                            <p>${job.description}</p>
+                        </div>
+                        
+                        ${job.skills_required ? `
+                        <div class="detail-section">
+                            <h3>技能要求</h3>
+                            <div class="skills-list">
+                                ${job.skills_required.split(',').map(skill => 
+                                    `<span class="skill-tag">${skill.trim()}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="detail-section">
+                            <h3>温馨提示</h3>
+                            <p style="color: var(--accent-primary); font-weight: 500;">
+                                💡 注册账号后可以申请该岗位，享受更多个性化服务！
+                            </p>
+                        </div>
+                    </div>
+                `;
+                
+                // 更新申请按钮的onclick事件
+                const applyBtn = modal.querySelector('.modal-btn.primary');
+                if (applyBtn) {
+                    applyBtn.onclick = function() {
+                        checkAuthAndApplyJob(job.id);
+                    };
+                }
+                
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+    </script>
+</body>
+</html>

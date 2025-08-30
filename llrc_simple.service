@@ -1,0 +1,20 @@
+[Unit]
+Description=LLRC Flask Application (Simple)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=llrcuser
+Group=llrcuser
+WorkingDirectory=/var/www/llrc
+Environment=PATH=/var/www/llrc/venv/bin
+Environment=FLASK_ENV=production
+ExecStart=/var/www/llrc/venv/bin/python run.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
