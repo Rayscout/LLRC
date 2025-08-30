@@ -14,7 +14,7 @@
         <div class="executive-nav-container">
             <a href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}" class="executive-nav-brand">
                 <div class="executive-nav-brand-icon">
-                    <i class="uil uil-chart-line"></i>
+                    📊
                 </div>
                 <span>高管人才发展</span>
             </a>
@@ -22,37 +22,37 @@
             <ul class="executive-nav-menu">
                 <li class="executive-nav-item">
                     <a href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}" class="executive-nav-link">
-                        <i class="uil uil-exclamation-triangle executive-nav-icon"></i>
+                        <span class="executive-nav-icon">⚠️</span>
                         <span>人才流失预警</span>
                     </a>
                 </li>
                 <li class="executive-nav-item">
                     <a href="{{ url_for('talent_management.hr_admin.salary_analysis.salary_dashboard') }}" class="executive-nav-link">
-                        <i class="uil uil-money-bill executive-nav-icon"></i>
+                        <span class="executive-nav-icon">💰</span>
                         <span>薪酬分析</span>
                     </a>
                 </li>
                 <li class="executive-nav-item">
                     <a href="{{ url_for('talent_management.hr_admin.org_health.org_health_dashboard') }}" class="executive-nav-link">
-                        <i class="uil uil-heart executive-nav-icon"></i>
+                        <span class="executive-nav-icon">❤️</span>
                         <span>组织健康度</span>
                     </a>
                 </li>
                 <li class="executive-nav-item">
                     <a href="{{ url_for('talent_management.hr_admin.career_tracking.career_tracking_dashboard') }}" class="executive-nav-link">
-                        <i class="uil uil-graph-bar executive-nav-icon"></i>
+                        <span class="executive-nav-icon">📈</span>
                         <span>职业发展追踪</span>
                     </a>
                 </li>
                 <li class="executive-nav-item">
                     <a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_dashboard') }}" class="executive-nav-link">
-                        <i class="uil uil-comment-dots executive-nav-icon"></i>
+                        <span class="executive-nav-icon">👥</span>
                         <span>团队管理</span>
                     </a>
                 </li>
                 <li class="executive-nav-item">
                     <a href="{{ url_for('talent_management.hr_admin.employee_management.employee_list') }}" class="executive-nav-link">
-                        <i class="uil uil-users executive-nav-icon"></i>
+                        <span class="executive-nav-icon">👤</span>
                         <span>员工管理</span>
                     </a>
                 </li>
@@ -62,16 +62,16 @@
             <div class="executive-nav-actions">
                 
                 <button class="theme-toggle" id="themeToggle" title="切换深色模式">
-                    <i class="uil uil-moon"></i>
+                    <span class="theme-icon">🌙</span>
                 </button>
                 
                 <button class="executive-nav-button" data-action="profile">
-                    <i class="uil uil-user"></i>
+                    👤
                     <span>{{ user.first_name if user else '高管' }}</span>
                 </button>
                 
                 <a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="executive-nav-button">
-                    <i class="uil uil-signout"></i>
+                    🚪
                     <span>退出</span>
                 </a>
             </div>
@@ -93,8 +93,8 @@
         <!-- 欢迎Section -->
         <section class="executive-section">
             <div class="executive-container">
-                <h1 class="executive-title executive-fade-in">人才发展大盘</h1>
-                <p class="executive-subtitle executive-fade-in">战略决策支持系统 - {{ user.first_name }} {{ user.last_name }} ({{ user.position }})</p>
+                                 <h1 class="executive-title" style="display: block !important; visibility: visible !important; opacity: 1 !important; color: #1E3A8A !important; font-size: 3.5rem !important; font-weight: 800 !important; text-align: center !important; margin-bottom: 24px !important; position: relative !important; z-index: 100 !important;">人才发展大盘</h1>
+                <p class="executive-subtitle executive-fade-in" style="display: block !important; visibility: visible !important; opacity: 1 !important; color: #333 !important; font-size: 1.2rem !important; text-align: center !important; margin-bottom: 16px !important; position: relative !important; z-index: 100 !important;">战略决策支持系统 - {{ user.first_name }} {{ user.last_name }} ({{ user.position }})</p>
                 
                 <!-- 关键指标 -->
                 <div class="executive-grid executive-grid-4 executive-fade-in-up">
@@ -122,36 +122,50 @@
                 <!-- 快速操作 -->
                 <div class="executive-fade-in-up" style="text-align: center; margin-top: var(--ios-spacing-xxl);">
                     <div class="executive-grid executive-grid-4" style="max-width: 1000px; margin: 0 auto;">
-                        <a href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}" class="executive-button large">
-                            <i class="uil uil-exclamation-triangle"></i>
-                            人才流失预警
-                        </a>
-                        <a href="{{ url_for('talent_management.hr_admin.salary_analysis.salary_dashboard') }}" class="executive-button large secondary">
-                            <i class="uil uil-money-bill"></i>
-                            薪酬分析
-                        </a>
-                        <a href="{{ url_for('talent_management.hr_admin.org_health.org_health_dashboard') }}" class="executive-button large secondary">
-                            <i class="uil uil-heart"></i>
-                            组织健康度
-                        </a>
-                        <a href="{{ url_for('talent_management.hr_admin.employee_management.employee_list') }}" class="executive-button large secondary">
-                            <i class="uil uil-users"></i>
-                            员工管理
-                        </a>
-                        <a href="{{ url_for('talent_management.hr_admin.talent_demand.publish') }}" class="executive-button large">
-                            <i class="uil uil-megaphone"></i>
-                            发布人才需求
-                        </a>
-                        <!-- 新增：AI 人才大盘入口（接入 Gemini） -->
-                        <a href="/talent-dashboard" class="executive-button large" title="AI 驱动的人才大盘（Gemini 1.5 Flash）">
-                            <i class="uil uil-robot"></i>
-                            AI 人才大盘
-                        </a>
-                        <!-- 新增：生成 AI 公司报告（PDF） -->
-                        <button class="executive-button large secondary" onclick="generateAICompanyReport()" title="调用 Gemini 1.5 Flash 生成综合PDF">
-                            <i class="uil uil-file-graph"></i>
-                            生成AI公司报告
-                        </button>
+                                                 <a href="{{ url_for('talent_management.hr_admin.turnover_alert.turnover_dashboard') }}" class="executive-button large">
+                             <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/>
+                             </svg>
+                             人才流失预警
+                         </a>
+                                                 <a href="{{ url_for('talent_management.hr_admin.salary_analysis.salary_dashboard') }}" class="executive-button large secondary">
+                             <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                             </svg>
+                             薪酬分析
+                         </a>
+                                                 <a href="{{ url_for('talent_management.hr_admin.org_health.org_health_dashboard') }}" class="executive-button large secondary">
+                             <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                             </svg>
+                             组织健康度
+                         </a>
+                                                 <a href="{{ url_for('talent_management.hr_admin.employee_management.employee_list') }}" class="executive-button large secondary">
+                             <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zm4 18v-6h2.5l-2.54-7.63A1.5 1.5 0 0 0 18.54 8H17c-.8 0-1.54.37-2.01.99L14 10.5V8c0-.55-.45-1-1-1H9c-.55 0-1 .45-1 1v2.5L9.01 8.99A2.5 2.5 0 0 0 7 8H5.46c-.8 0-1.54.37-2.01.99L1 14.37V22h2v-6h2.5l2.54-7.63A1.5 1.5 0 0 1 9.54 10H11v2.5c0 .55.45 1 1 1s1-.45 1-1V10h1.46c.8 0 1.54.37 2.01.99L17.5 16H20v6h2z"/>
+                             </svg>
+                             员工管理
+                         </a>
+                                                 <a href="{{ url_for('talent_management.hr_admin.talent_demand.publish') }}" class="executive-button large">
+                             <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                             </svg>
+                             发布人才需求
+                         </a>
+                                                 <!-- 新增：AI 人才大盘入口（接入 Gemini） -->
+                         <a href="/talent-dashboard" class="executive-button large" title="AI 驱动的人才大盘（Gemini 1.5 Flash）">
+                             <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                             </svg>
+                             AI 人才大盘
+                         </a>
+                                                 <!-- 新增：生成 AI 公司报告（PDF） -->
+                         <button class="executive-button large secondary" onclick="generateAICompanyReport()" title="调用 Gemini 1.5 Flash 生成综合PDF">
+                             <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                             </svg>
+                             生成AI公司报告
+                         </button>
                     </div>
                 </div>
             </div>
@@ -160,25 +174,29 @@
         <!-- 人才发展趋势Section -->
         <section class="executive-section">
             <div class="executive-container">
-                <h2 class="executive-title executive-fade-in">人才发展趋势分析</h2>
+                                 <h2 class="executive-title executive-fade-in animated-title">人才发展趋势分析</h2>
                 <p class="executive-subtitle executive-fade-in">实时监控人才变化趋势，为战略决策提供数据支持</p>
                 
                 <div class="executive-grid executive-grid-2">
                     <div class="executive-card executive-slide-in-left">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
-                            <i class="uil uil-chart-line" style="color: var(--ios-blue); margin-right: var(--ios-spacing-sm);"></i>
-                            年度人才变化趋势
-                        </h3>
+                                                 <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
+                             <svg class="chart-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                             </svg>
+                             年度人才变化趋势
+                         </h3>
                         <div style="height: 400px;">
                             <canvas id="talentTrendChart"></canvas>
             </div>
         </div>
         
                     <div class="executive-card executive-slide-in-right">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
-                            <i class="uil uil-money-bill" style="color: var(--ios-green); margin-right: var(--ios-spacing-sm);"></i>
-                            薪酬分析概览
-                        </h3>
+                                                 <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
+                             <svg class="chart-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                             </svg>
+                             薪酬分析概览
+                         </h3>
                         <div class="executive-grid executive-grid-2" style="gap: var(--ios-spacing-md);">
                             <div style="text-align: center; padding: var(--ios-spacing-md);">
                                 <div style="font-size: 2rem; font-weight: 700; color: var(--ios-blue); margin-bottom: var(--ios-spacing-sm);">¥15,800</div>
@@ -188,10 +206,10 @@
                                 <div style="font-size: 2rem; font-weight: 700; color: var(--ios-green); margin-bottom: var(--ios-spacing-sm);">+12%</div>
                                 <div style="color: var(--ios-text-secondary);">市场竞争力</div>
                             </div>
-                            <div style="text-align: center; padding: var(--ios-spacing-md);">
-                                <div style="font-size: 2rem; font-weight: 700; color: var(--ios-orange); margin-bottom: var(--ios-spacing-sm);">78%</div>
-                                <div style="color: var(--ios-text-secondary);">薪酬满意度</div>
-                            </div>
+                                                         <div style="text-align: center; padding: var(--ios-spacing-md);">
+                                 <div style="font-size: 2rem; font-weight: 700; color: #D2691E; margin-bottom: var(--ios-spacing-sm);">78%</div>
+                                 <div style="color: var(--ios-text-secondary);">薪酬满意度</div>
+                             </div>
                             <div style="text-align: center; padding: var(--ios-spacing-md);">
                                 <div style="font-size: 2rem; font-weight: 700; color: var(--ios-red); margin-bottom: var(--ios-spacing-sm);">需关注</div>
                                 <div style="color: var(--ios-text-secondary);">调薪建议</div>
@@ -205,25 +223,29 @@
         <!-- 薪酬对比分析Section -->
         <section class="executive-section">
             <div class="executive-container">
-                <h2 class="executive-title executive-fade-in">薪酬对比分析</h2>
+                                 <h2 class="executive-title executive-fade-in animated-title">薪酬对比分析</h2>
                 <p class="executive-subtitle executive-fade-in">公司与行业薪酬对比，识别竞争力差距</p>
                 
                 <div class="executive-grid executive-grid-2">
                     <div class="executive-card executive-slide-in-left">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
-                            <i class="uil uil-chart-bar" style="color: var(--ios-purple); margin-right: var(--ios-spacing-sm);"></i>
-                            公司与行业薪酬对比
-                        </h3>
+                                                 <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
+                             <svg class="chart-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                             </svg>
+                             公司与行业薪酬对比
+                         </h3>
                         <div style="height: 300px;">
                             <canvas id="salaryComparisonChart"></canvas>
                         </div>
                     </div>
                     
                     <div class="executive-card executive-slide-in-right">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
-                            <i class="uil uil-trending-up" style="color: var(--ios-pink); margin-right: var(--ios-spacing-sm);"></i>
-                            未来6个月供需趋势
-                        </h3>
+                                                 <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
+                             <svg class="chart-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                 <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                             </svg>
+                             未来6个月供需趋势
+                         </h3>
                         <div style="height: 300px;">
                             <canvas id="supplyDemandChart"></canvas>
                         </div>
@@ -235,15 +257,17 @@
         <!-- 离职风险分析Section -->
         <section class="executive-section">
             <div class="executive-container">
-                <h2 class="executive-title executive-fade-in">离职风险分析</h2>
+                                 <h2 class="executive-title executive-fade-in animated-title">离职风险分析</h2>
                 <p class="executive-subtitle executive-fade-in">识别高风险岗位，制定预防措施</p>
                 
                 <div class="executive-grid executive-grid-3">
                     <div class="executive-card executive-fade-in-up">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-red);">
-                            <i class="uil uil-exclamation-triangle"></i>
-                            高风险岗位 (3个)
-                        </h3>
+                                                                                                   <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-red);">
+                              <svg class="chart-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                              </svg>
+                              高风险岗位 (3个)
+                          </h3>
                         <div style="margin-bottom: var(--ios-spacing-md);">
                             <strong>高级工程师</strong>: 离职风险 85%<br>
                             主要原因：薪资竞争力不足、职业发展受限
@@ -256,17 +280,21 @@
                             <strong>销售总监</strong>: 离职风险 68%<br>
                             主要原因：业绩压力、激励机制不完善
                         </div>
-                        <a href="#" class="executive-button secondary">
-                            <i class="uil uil-eye"></i>
-                            查看详情
-                        </a>
+                                                                                                   <a href="#" class="executive-button secondary">
+                              <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                              </svg>
+                              查看详情
+                          </a>
                     </div>
                     
                     <div class="executive-card executive-fade-in-up">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-orange);">
-                            <i class="uil uil-exclamation-circle"></i>
-                            中等风险岗位 (5个)
-                        </h3>
+                                                                                                   <h3 style="margin-bottom: var(--ios-spacing-lg); color: #D2691E;">
+                              <svg class="chart-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                              </svg>
+                              中等风险岗位 (5个)
+                          </h3>
                         <div style="margin-bottom: var(--ios-spacing-md);">
                             <strong>UI设计师</strong>: 离职风险 45%<br>
                             主要原因：技能发展瓶颈
@@ -279,24 +307,30 @@
                             <strong>人事专员</strong>: 离职风险 35%<br>
                             主要原因：工作内容单一
                         </div>
-                        <a href="#" class="executive-button secondary">
-                            <i class="uil uil-graduation-cap"></i>
-                            制定培训计划
-                        </a>
+                                                                                                   <a href="#" class="executive-button secondary">
+                              <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09v6L12 21l-7-3.82v-6L1 9l11-6z"/>
+                              </svg>
+                              制定培训计划
+                          </a>
         </div>
         
                     <div class="executive-card executive-fade-in-up">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-green);">
-                            <i class="uil uil-check-circle"></i>
-                            低风险岗位 (12个)
-                        </h3>
+                                                                                                   <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-green);">
+                              <svg class="chart-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                              </svg>
+                              低风险岗位 (12个)
+                          </h3>
                         <div style="margin-bottom: var(--ios-spacing-lg);">
                             大部分岗位处于稳定状态，建议继续保持良好的工作环境和激励机制。
                         </div>
-                        <a href="#" class="executive-button secondary">
-                            <i class="uil uil-chart-line"></i>
-                            查看详情
-                        </a>
+                                                                                                   <a href="#" class="executive-button secondary">
+                              <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                              </svg>
+                              查看详情
+                          </a>
                     </div>
                 </div>
             </div>
@@ -305,35 +339,41 @@
         <!-- 战略建议Section -->
         <section class="executive-section">
             <div class="executive-container">
-                <h2 class="executive-title executive-fade-in">战略决策建议</h2>
+                                 <h2 class="executive-title executive-fade-in animated-title">战略决策建议</h2>
                 <p class="executive-subtitle executive-fade-in">基于数据分析的战略建议，助力人才发展</p>
                 
                 <div class="executive-grid executive-grid-3">
                     <div class="executive-card executive-fade-in-up">
-                        <h3 style="margin-bottom: var(--ios-spacing-md); color: var(--ios-green);">
-                            <i class="uil uil-heart"></i>
-                            人才保留策略
-                        </h3>
+                                                                                                   <h3 style="margin-bottom: var(--ios-spacing-md); color: var(--ios-green);">
+                              <svg class="chart-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                              </svg>
+                              人才保留策略
+                          </h3>
                         <p style="color: var(--ios-text-secondary); line-height: 1.6;">
                             建议增加关键岗位的薪酬竞争力，提供更多职业发展机会，建立完善的激励机制。
                         </p>
                     </div>
                     
                     <div class="executive-card executive-fade-in-up">
-                        <h3 style="margin-bottom: var(--ios-spacing-md); color: var(--ios-blue);">
-                            <i class="uil uil-graduation-cap"></i>
-                            技能发展计划
-                        </h3>
+                                                                                                   <h3 style="margin-bottom: var(--ios-spacing-md); color: var(--ios-blue);">
+                              <svg class="chart-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09v6L12 21l-7-3.82v-6L1 9l11-6z"/>
+                              </svg>
+                              技能发展计划
+                          </h3>
                         <p style="color: var(--ios-text-secondary); line-height: 1.6;">
                             针对技能缺口，建议制定系统性的培训计划，引入外部专家，建立内部知识分享机制。
                         </p>
                     </div>
                     
                     <div class="executive-card executive-fade-in-up">
-                        <h3 style="margin-bottom: var(--ios-spacing-md); color: var(--ios-orange);">
-                            <i class="uil uil-setting"></i>
-                            组织优化建议
-                        </h3>
+                                                                                                   <h3 style="margin-bottom: var(--ios-spacing-md); color: #D2691E;">
+                              <svg class="chart-icon-svg" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+                              </svg>
+                              组织优化建议
+                          </h3>
                         <p style="color: var(--ios-text-secondary); line-height: 1.6;">
                             建议优化组织架构，明确职责分工，提升管理效率，减少人才流失风险。
                         </p>
@@ -342,14 +382,18 @@
                 
                 <!-- 操作按钮 -->
                 <div style="text-align: center; margin-top: var(--ios-spacing-xxl);">
-                    <button class="executive-button large" onclick="generatePDFReport()">
-                        <i class="uil uil-file-graph"></i>
-                        生成PDF报告
-                    </button>
-                    <button class="executive-button large secondary" onclick="refreshData()" style="margin-left: var(--ios-spacing-md);">
-                        <i class="uil uil-refresh"></i>
-                        刷新数据
-                    </button>
+                                                                                   <button class="executive-button large" onclick="generatePDFReport()">
+                          <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                          </svg>
+                          生成PDF报告
+                      </button>
+                                          <button class="executive-button large secondary" onclick="refreshData()" style="margin-left: var(--ios-spacing-md);">
+                          <svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                          </svg>
+                          刷新数据
+                      </button>
             </div>
         </div>
         </section>
@@ -357,24 +401,60 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成，开始初始化主题切换功能');
+            
             // 主题切换功能
             const themeToggle = document.getElementById('themeToggle');
             const body = document.body;
             
+            if (!themeToggle) {
+                console.error('找不到主题切换按钮元素！');
+                return;
+            }
+            
+            console.log('找到主题切换按钮:', themeToggle);
+            
             // 检查本地存储的主题设置
             const currentTheme = localStorage.getItem('executive-theme');
+            const themeIcon = themeToggle.querySelector('.theme-icon');
+            
+            if (!themeIcon) {
+                console.error('找不到主题图标元素！');
+                return;
+            }
+            
+            console.log('当前主题设置:', currentTheme);
+            console.log('主题图标元素:', themeIcon);
+            
             if (currentTheme === 'dark') {
                 body.classList.add('dark');
                 themeToggle.classList.add('active');
+                themeIcon.textContent = '☀️';
+                console.log('已设置为深色模式，图标应为太阳');
+            } else {
+                themeIcon.textContent = '🌙';
+                console.log('已设置为浅色模式，图标应为月亮');
             }
             
             themeToggle.addEventListener('click', function() {
+                console.log('主题切换按钮被点击');
                 body.classList.toggle('dark');
                 themeToggle.classList.toggle('active');
+                
+                // 切换emoji图标
+                const themeIcon = themeToggle.querySelector('.theme-icon');
+                if (body.classList.contains('dark')) {
+                    themeIcon.textContent = '☀️';
+                    console.log('切换到深色模式，图标改为太阳');
+                } else {
+                    themeIcon.textContent = '🌙';
+                    console.log('切换到浅色模式，图标改为月亮');
+                }
                 
                 // 保存主题设置
                 const isDark = body.classList.contains('dark');
                 localStorage.setItem('executive-theme', isDark ? 'dark' : 'light');
+                console.log('主题设置已保存:', isDark ? 'dark' : 'light');
             });
             
             // 导航栏滚动效果
