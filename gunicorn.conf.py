@@ -20,8 +20,8 @@ access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
 
 # 进程配置
 pidfile = "/var/run/llrc/gunicorn.pid"
-user = "www-data"
-group = "www-data"
+# user = "www-data"  # 注释掉，让systemd管理用户权限
+# group = "www-data"  # 注释掉，让systemd管理用户权限
 
 # 安全配置
 limit_request_line = 4094
