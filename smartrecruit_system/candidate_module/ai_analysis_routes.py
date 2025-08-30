@@ -297,3 +297,60 @@ def speech_recognition():
     except Exception as e:
         logger.error(f"语音识别接口错误: {e}")
         return jsonify({"error": f"服务器内部错误: {str(e)}"}), 500
+
+@ai_analysis_bp.route('/debug', methods=['GET'])
+def debug_info():
+    """调试信息接口"""
+    try:
+        from .emotion_recognition import get_emotion_recognition_ai
+        
+        emotion_ai = get_emotion_recognition_ai()
+        
+        debug_info = {
+            "face_model_loaded": emotion_ai.face_model is not None,
+            "emotion_model_loaded": emotion_ai.emotion_model is not None,
+            "font_loaded": emotion_ai.font is not None,
+            "config": {
+                "face_model_path": emotion_ai.config.get_face_detection_model_path(),
+                "emotion_model_path": emotion_ai.config.get_emotion_recognition_model_path(),
+                "emotion_labels": emotion_ai.emotion_labels
+            }
+        }
+        
+        return jsonify({
+            "success": True,
+            "debug_info": debug_info
+        })
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+@ai_analysis_bp.route('/test-emotion', methods=['POST'])
+def test_emotion():
+    """测试表情识别功能"""
+    try:
+        from .emotion_recognition import get_emotion_recognition_ai
+        import cv2
+        import numpy as np
+        
+        emotion_ai = get_emotion_recognition_ai()
+        
+        # 创建测试图像
+        test_image = np.zeros((224, 224, 3), dtype=np.uint8)
+        
+        # 测试表情识别
+        result = emotion_ai.recognize_emotion_from_image(test_image.tobytes(), "test.jpg")
+        
+        return jsonify({
+            "success": True,
+            "test_result": result
+        })
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
