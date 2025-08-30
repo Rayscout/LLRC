@@ -21,28 +21,28 @@ def get_emotion_recognition_ai():
     """获取表情识别AI实例 - 使用DeepFace"""
     if get_deepface_emotion_ai is None:
         # 如果DeepFace不可用，返回一个简单的模拟实例
-        class MockEmotionAI:
-            def recognize_emotion_from_image(self, image_data, filename=None):
-                return {
-                    "success": True,
-                    "faces_detected": 1,
-                    "faces": [{
-                        "face_id": 1,
-                        "bbox": [100, 100, 200, 200],
-                        "face_confidence": 0.8,
-                        "emotion": "中性",
-                        "emotion_confidence": 0.7
-                    }],
-                    "processed_image": "",
-                    "emotion_summary": {
-                        "total_faces": 1,
-                        "average_confidence": 0.7,
-                        "dominant_emotion": "中性",
-                        "emotion_distribution": {"中性": {"count": 1, "total_confidence": 0.7}}
-                    },
-                    "mock_mode": True
-                }
-        
-        return MockEmotionAI()
+            class MockEmotionAI:
+                def recognize_emotion_from_image(self, image_data, filename=None):
+                    return {
+                        "success": True,
+                        "faces_detected": 1,
+                        "faces": [{
+                            "face_id": 1,
+                            "bbox": [100, 100, 200, 200],
+                            "face_confidence": 0.8,
+                            "emotion": "中性",
+                            "emotion_confidence": 0.7
+                        }],
+                        "processed_image": "",
+                        "emotion_summary": {
+                            "total_faces": 1,
+                            "average_confidence": 0.7,
+                            "dominant_emotion": "中性",
+                            "emotion_distribution": {"中性": {"count": 1, "total_confidence": 0.7}}
+                        },
+                        "mock_mode": True
+                    }
+            
+            return MockEmotionAI()
     
     return get_deepface_emotion_ai()

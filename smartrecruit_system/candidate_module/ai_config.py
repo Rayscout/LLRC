@@ -28,13 +28,13 @@ class AIConfig:
             self.yolo_base_path / "runs" / "classify" / "emotion_simple_train" / "weights" / "best.pt",
             self.yolo_base_path / "runs" / "classify" / "emotion_minimal_train" / "weights" / "best.pt",
             
-            # 训练好的表情识别模型（已禁用，使用DeepFace替代）
-            # Path(__file__).parent / "trained_models" / "emotion_recognition_model.pt",
-            # Path(__file__).parent / "trained_models" / "emotion_recognition_best.pt",
-            # Path(__file__).parent / "trained_models" / "emotion_quick_train.pt",
+            # 训练好的表情识别模型
+            Path(__file__).parent / "trained_models" / "emotion_recognition_model.pt",
+            Path(__file__).parent / "trained_models" / "emotion_recognition_best.pt",
+            Path(__file__).parent / "trained_models" / "emotion_quick_train.pt",
             
-            # 备选：使用通用分类模型（已禁用，使用DeepFace替代）
-            # self.yolo_base_path / "yolo11n-cls.pt",  # 通用分类模型
+            # 备选：使用通用分类模型（如果本地模型不可用）
+            self.yolo_base_path / "yolo11n-cls.pt",  # 通用分类模型
         ]
         
         # 字体配置
@@ -69,15 +69,6 @@ class AIConfig:
             "chinese": ['愤怒', '厌恶', '恐惧', '高兴', '悲伤', '惊讶', '中性'],
             "english": ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral'],
             "fer2013": ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral']
-        }
-        
-        # DeepFace表情识别模型配置
-        self.deepface_config = {
-            "enabled": True,
-            "model_name": "emotion",
-            "detector_backend": "opencv",
-            "enforce_detection": False,
-            "align": True
         }
         
         # 职业评估配置
