@@ -3,7 +3,7 @@ import multiprocessing
 
 # 服务器配置
 bind = "127.0.0.1:5000"
-workers = multiprocessing.cpu_count() * 2 + 1
+workers = 1  # 使用单进程避免权限问题
 worker_class = "sync"
 worker_connections = 1000
 timeout = 30
