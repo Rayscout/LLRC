@@ -167,6 +167,82 @@ def create_app():
             from flask import render_template
             return render_template('common/sign.html')
         
+        # 添加简单测试路由
+        @app.route('/test')
+        def test_page():
+            """简单测试页面"""
+            return """
+            <!DOCTYPE html>
+            <html lang="zh-CN">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>测试页面</title>
+            </head>
+            <body>
+                <h1>测试页面</h1>
+                <p>如果您能看到这个页面，说明Flask应用正在正常运行。</p>
+                <p><a href="/jobs">访问岗位页面</a></p>
+                <p><a href="/">返回首页</a></p>
+            </body>
+            </html>
+            """
+        
+        # 添加公开岗位展示路由
+        @app.route('/jobs')
+        def public_jobs():
+            """公开岗位展示页面 - 无需登录"""
+            from flask import render_template
+            try:
+                from app.models import Job
+                # 获取所有岗位，按发布时间排序
+                all_jobs = Job.query.order_by(Job.date_posted.desc()).limit(20).all()
+                
+                # 按公司分组
+                jobs_by_company = {}
+                for job in all_jobs:
+                    company = getattr(job, 'company_name', '未知公司') or '未知公司'
+                    if company not in jobs_by_company:
+                        jobs_by_company[company] = []
+                    jobs_by_company[company].append(job)
+                
+                logger.info(f"成功获取 {len(all_jobs)} 个岗位，来自 {len(jobs_by_company)} 家公司")
+                
+            except Exception as e:
+                logger.error(f"获取公开岗位失败: {e}")
+                # 返回空数据而不是错误
+                all_jobs = []
+                jobs_by_company = {}
+            
+            try:
+                return render_template('common/public_jobs_simple.html', 
+                                    jobs_by_company=jobs_by_company,
+                                    total_jobs=len(all_jobs))
+            except Exception as e:
+                logger.error(f"渲染岗位页面模板失败: {e}")
+                # 如果模板渲染失败，返回简单的错误页面
+                return f"""
+                <!DOCTYPE html>
+                <html lang="zh-CN">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>岗位页面 - 智能招聘系统</title>
+                    <style>
+                        body {{ font-family: Arial, sans-serif; padding: 40px; text-align: center; }}
+                        .error {{ color: #d32f2f; margin: 20px 0; }}
+                        .info {{ color: #1976d2; margin: 20px 0; }}
+                    </style>
+                </head>
+                <body>
+                    <h1>岗位页面</h1>
+                    <div class="info">共找到 {len(all_jobs)} 个岗位</div>
+                    <div class="error">模板渲染出现问题，请联系管理员</div>
+                    <p><a href="/">返回首页</a></p>
+                </body>
+                </html>
+                """, 200
+        
         # 避免浏览器请求 /favicon.ico 导致 404 噪音
         @app.route('/favicon.ico')
         def favicon():
