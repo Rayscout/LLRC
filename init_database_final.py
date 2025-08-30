@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-数据库初始化脚本
-创建所有必要的表和测试数据
-解决 'no such table: user' 错误
+最终数据库初始化脚本
+解决 'no such table: user' 错误和所有NOT NULL约束问题
 """
 
 import os
 import sys
+from datetime import datetime
 
 def init_database():
     """初始化数据库"""
@@ -35,7 +35,7 @@ def init_database():
             db.create_all()
             print("   ✅ 创建所有数据库表")
             
-            # 创建测试用户
+            # 创建测试用户（包含所有必填字段）
             test_users = [
                 {
                     'first_name': 'HR',
@@ -44,7 +44,18 @@ def init_database():
                     'password': '123456',
                     'user_type': 'recruiter',
                     'is_hr': True,
-                    'is_active': True
+                    'is_active': True,
+                    'company_name': 'LLRC Company',
+                    'position': 'HR Manager',
+                    'phone_number': '13800138000',
+                    'department': 'Human Resources',
+                    'birthday': '1990-01-01',
+                    'hire_date': datetime.now().date(),
+                    'employee_id': 'HR001',
+                    'bio': 'HR Administrator',
+                    'skills': 'Management, HR',
+                    'education': 'Bachelor Degree',
+                    'experience': '5 years'
                 },
                 {
                     'first_name': 'Employee',
@@ -53,7 +64,18 @@ def init_database():
                     'password': '123456',
                     'user_type': 'employee',
                     'is_hr': False,
-                    'is_active': True
+                    'is_active': True,
+                    'company_name': 'LLRC Company',
+                    'position': 'Software Engineer',
+                    'phone_number': '13800138001',
+                    'department': 'Engineering',
+                    'birthday': '1992-05-15',
+                    'hire_date': datetime.now().date(),
+                    'employee_id': 'EMP001',
+                    'bio': 'Software Engineer',
+                    'skills': 'Python, Flask, SQL',
+                    'education': 'Computer Science',
+                    'experience': '3 years'
                 },
                 {
                     'first_name': 'Executive',
@@ -62,7 +84,18 @@ def init_database():
                     'password': '123456',
                     'user_type': 'executive',
                     'is_hr': False,
-                    'is_active': True
+                    'is_active': True,
+                    'company_name': 'LLRC Company',
+                    'position': 'CEO',
+                    'phone_number': '13800138002',
+                    'department': 'Executive',
+                    'birthday': '1985-12-20',
+                    'hire_date': datetime.now().date(),
+                    'employee_id': 'EXE001',
+                    'bio': 'Chief Executive Officer',
+                    'skills': 'Leadership, Strategy',
+                    'education': 'MBA',
+                    'experience': '10 years'
                 },
                 {
                     'first_name': 'Candidate',
@@ -71,7 +104,18 @@ def init_database():
                     'password': '123456',
                     'user_type': 'candidate',
                     'is_hr': False,
-                    'is_active': True
+                    'is_active': True,
+                    'company_name': 'LLRC Company',
+                    'position': 'Job Seeker',
+                    'phone_number': '13800138003',
+                    'department': 'External',
+                    'birthday': '1995-08-10',
+                    'hire_date': None,
+                    'employee_id': None,
+                    'bio': 'Job Candidate',
+                    'skills': 'Python, Web Development',
+                    'education': 'Computer Science',
+                    'experience': '2 years'
                 }
             ]
             
@@ -83,10 +127,21 @@ def init_database():
                         first_name=user_data['first_name'],
                         last_name=user_data['last_name'],
                         email=user_data['email'],
-                        password=user_data['password'],  # 注意：在实际应用中应该加密
+                        password=user_data['password'],
                         user_type=user_data['user_type'],
                         is_hr=user_data['is_hr'],
-                        is_active=user_data['is_active']
+                        is_active=user_data['is_active'],
+                        company_name=user_data['company_name'],
+                        position=user_data['position'],
+                        phone_number=user_data['phone_number'],
+                        department=user_data['department'],
+                        birthday=user_data['birthday'],
+                        hire_date=user_data['hire_date'],
+                        employee_id=user_data['employee_id'],
+                        bio=user_data['bio'],
+                        skills=user_data['skills'],
+                        education=user_data['education'],
+                        experience=user_data['experience']
                     )
                     db.session.add(user)
                     print(f"   ➕ 创建用户: {user_data['email']} ({user_data['user_type']})")
