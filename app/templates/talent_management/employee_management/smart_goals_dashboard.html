@@ -6,20 +6,23 @@
     <title>SMART目标管理 - 员工仪表板</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #F2F2F7;
-            --bg-secondary: rgba(255, 255, 255, 0.8);
-            --bg-card: rgba(255, 255, 255, 0.9);
-            --text-primary: #1D1D1F;
-            --text-secondary: #86868B;
-            --text-tertiary: #C7C7CC;
-            --accent-blue: #007AFF;
+            --bg-primary: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
+            --bg-secondary: rgba(228, 246, 236, 0.3);
+            --bg-card: rgba(228, 246, 236, 0.3);
+            --text-primary: #2F4F4F;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --accent-blue: #20B2AA;
             --accent-green: #34C759;
             --accent-orange: #FF9500;
             --accent-red: #FF3B30;
-            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-light: 0 4px 20px rgba(228, 246, 236, 0.3);
+            --shadow-medium: 0 8px 30px rgba(228, 246, 236, 0.3);
             --border-radius: 16px;
             --border-radius-large: 24px;
             --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
@@ -49,10 +52,11 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
-            background: var(--bg-primary);
+            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
             color: var(--text-primary);
             line-height: 1.6;
             transition: var(--transition);
+            min-height: 100vh;
         }
 
         .container {
@@ -76,7 +80,7 @@
             font-size: 2.5em;
             font-weight: 700;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 100%);
+            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -114,7 +118,7 @@
         .stat-value {
             font-size: 2.5em;
             font-weight: 700;
-            color: var(--accent-blue);
+            color: #20B2AA;
             margin-bottom: 10px;
         }
 
@@ -211,7 +215,7 @@
         .progress-bar {
             width: 100%;
             height: 12px;
-            background: rgba(0, 122, 255, 0.1);
+            background: rgba(32, 178, 170, 0.1);
             border-radius: 6px;
             overflow: visible;
             position: relative;
@@ -220,7 +224,7 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-blue) 0%, #5856D6 100%);
+            background: linear-gradient(90deg, #20B2AA 0%, #2F4F4F 100%);
             border-radius: 6px;
             transition: width 0.3s ease;
             position: absolute;
@@ -235,17 +239,17 @@
             width: 20px;
             height: 20px;
             background: white;
-            border: 2px solid var(--accent-blue);
+            border: 2px solid #20B2AA;
             border-radius: 50%;
             cursor: grab;
-            box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+            box-shadow: 0 2px 6px rgba(32, 178, 170, 0.3);
             z-index: 10;
             transition: all 0.2s ease;
         }
 
         .progress-handle:hover {
             transform: translate(-50%, -50%) scale(1.1);
-            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(32, 178, 170, 0.4);
         }
 
         .progress-handle:active {
@@ -273,8 +277,8 @@
 
         .hours-input:focus {
             outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+            border-color: #20B2AA;
+            box-shadow: 0 0 0 2px rgba(32, 178, 170, 0.1);
         }
 
         .hours-label {
@@ -334,7 +338,7 @@
         }
 
         .btn-primary {
-            background: var(--accent-blue);
+            background: #20B2AA;
             color: white;
         }
 
@@ -388,8 +392,8 @@
         }
 
         .recommended-goal {
-            background: rgba(0, 122, 255, 0.05);
-            border: 1px solid rgba(0, 122, 255, 0.2);
+            background: rgba(32, 178, 170, 0.05);
+            border: 1px solid rgba(32, 178, 170, 0.2);
             border-radius: var(--border-radius);
             padding: 15px;
             margin-bottom: 15px;
@@ -397,12 +401,12 @@
         }
 
         .recommended-goal:hover {
-            background: rgba(0, 122, 255, 0.1);
+            background: rgba(32, 178, 170, 0.1);
             transform: translateY(-2px);
         }
 
         .recommended-goal h4 {
-            color: var(--accent-blue);
+            color: #20B2AA;
             margin-bottom: 8px;
             font-size: 1em;
         }
@@ -434,7 +438,7 @@
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
-            color: var(--accent-blue);
+            color: #20B2AA;
             text-decoration: none;
             font-weight: 600;
             transition: var(--transition-fast);
@@ -991,6 +995,11 @@
             alert('目标详情功能开发中...');
         }
     </script>
+    
+    <!-- 引入图标颜色随机分配器 -->
+    <script src="{{ url_for('static', filename='js/icon_color_randomizer.js') }}"></script>
+    <!-- 引入移动渐变色形状脚本 -->
+    <script src="{{ url_for('static', filename='js/moving_gradient_shapes.js') }}"></script>
 
     <style>
         @keyframes celebrate {

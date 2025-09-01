@@ -27,10 +27,14 @@ report_generator = TalentReportGenerator()
 @login_required
 def dashboard():
 	"""人才发展大盘主页"""
-	if getattr(current_user, 'user_type', 'executive') != 'executive':
-		return jsonify({"error": "权限不足"}), 403
-	
-	return render_template('talent_dashboard/dashboard.html')
+	try:
+		if getattr(current_user, 'user_type', 'executive') != 'executive':
+			return jsonify({"error": "权限不足"}), 403
+		
+		return render_template('talent_dashboard/dashboard.html')
+	except Exception as e:
+		current_app.logger.error(f"AI人才大盘页面加载失败: {str(e)}")
+		return jsonify({"error": "页面加载失败，请稍后重试"}), 500
 
 @talent_dashboard.route('/api/talent/overview')
 @login_required

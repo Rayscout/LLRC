@@ -337,6 +337,29 @@
                 transform: translateY(0);
             }
         }
+        
+        /* 通知动画 */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
 
 
 
@@ -1068,8 +1091,74 @@
                 }, 150);
             }
             
-            // 这里可以实现数据导出功能
-            alert('数据导出功能开发中...');
+            // 调用后端导出API
+            fetch('/talent/hr_admin/turnover_alert/api/export_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // 创建下载链接
+                    return response.blob();
+                } else {
+                    throw new Error('导出失败');
+                }
+            })
+            .then(blob => {
+                // 创建下载链接
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `turnover_alert_report_${new Date().toISOString().slice(0,10)}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                // 显示成功提示
+                showNotification('数据导出成功！', 'success');
+            })
+            .catch(error => {
+                console.error('导出失败:', error);
+                showNotification('数据导出失败，请稍后重试', 'error');
+            });
+        }
+        
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            
+            // 添加样式
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+                ${type === 'success' ? 'background: var(--accent-green);' : 
+                  type === 'error' ? 'background: var(--accent-red);' : 
+                  'background: var(--accent-blue);'}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
 
 

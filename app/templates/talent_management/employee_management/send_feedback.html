@@ -6,21 +6,24 @@
     <title>发送反馈 - 员工仪表板</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #F2F2F7;
-            --bg-secondary: rgba(255, 255, 255, 0.8);
-            --bg-card: rgba(255, 255, 255, 0.9);
-            --text-primary: #1D1D1F;
-            --text-secondary: #86868B;
-            --text-tertiary: #C7C7CC;
-            --accent-blue: #007AFF;
+            --bg-primary: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
+            --bg-secondary: rgba(228, 246, 236, 0.3);
+            --bg-card: rgba(228, 246, 236, 0.3);
+            --text-primary: #2F4F4F;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --accent-blue: #20B2AA;
             --accent-green: #34C759;
             --accent-orange: #FF9500;
             --accent-red: #FF3B30;
-            --accent-purple: #AF52DE;
-            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --accent-purple: #20B2AA;
+            --shadow-light: 0 4px 20px rgba(228, 246, 236, 0.3);
+            --shadow-medium: 0 8px 30px rgba(228, 246, 236, 0.3);
             --border-radius: 16px;
             --border-radius-large: 24px;
             --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
@@ -51,11 +54,12 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
-            background: var(--bg-primary);
+            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
             color: var(--text-primary);
             line-height: 1.6;
             transition: var(--transition);
             animation: fadeIn 0.6s ease-out;
+            min-height: 100vh;
         }
 
         @keyframes fadeIn {
@@ -91,7 +95,7 @@
             font-size: 2.5em;
             font-weight: 700;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--accent-purple) 0%, #5856D6 100%);
+            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -161,9 +165,9 @@
 
         .form-control:focus {
             outline: none;
-            border-color: var(--accent-blue);
+            border-color: #20B2AA;
             background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
         }
 
         .form-control option {
@@ -221,15 +225,15 @@
         }
 
         .btn-primary {
-            background: var(--accent-blue);
+            background: #20B2AA;
             color: white;
             flex: 1;
         }
 
         .btn-primary:hover {
-            background: var(--accent-purple);
+            background: #2F4F4F;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+            box-shadow: 0 8px 25px rgba(32, 178, 170, 0.3);
         }
 
         .btn-secondary {
@@ -245,7 +249,7 @@
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
-            color: var(--accent-blue);
+            color: #20B2AA;
             text-decoration: none;
             font-weight: 600;
             transition: var(--transition-fast);
@@ -275,7 +279,7 @@
         .priority-option input[type="radio"] {
             width: 18px;
             height: 18px;
-            accent-color: var(--accent-blue);
+            accent-color: #20B2AA;
         }
 
         .priority-option label {
@@ -448,11 +452,16 @@
             const minLength = 10;
             
             if (length < minLength) {
-                this.style.borderColor = 'var(--accent-red)';
+                this.style.borderColor = '#FF3B30';
             } else {
-                this.style.borderColor = 'var(--accent-green)';
+                this.style.borderColor = '#34C759';
             }
         });
     </script>
+    
+    <!-- 引入图标颜色随机分配器 -->
+    <script src="{{ url_for('static', filename='js/icon_color_randomizer.js') }}"></script>
+    <!-- 引入移动渐变色形状脚本 -->
+    <script src="{{ url_for('static', filename='js/moving_gradient_shapes.js') }}"></script>
 </body>
 </html>

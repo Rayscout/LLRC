@@ -11,6 +11,10 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 import tempfile
+import platform
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 
@@ -261,22 +265,40 @@ def get_performance_history(user_id):
     ]
 
 def generate_pdf_resume(user, skills, work_years, education_history, work_history, performance_history):
-    """生成PDF简历"""
+    """生成PDF简历 - 完全重写版本"""
+    import tempfile
+    import os
+    from reportlab.lib.pagesizes import A4
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+    
     # 创建临时文件
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
     doc = SimpleDocTemplate(temp_file.name, pagesize=A4)
     
+    # 强制设置中文字体
+    font_name = force_setup_chinese_font()
+    print(f"PDF生成使用字体: {font_name}")
+    
     # 获取样式
     styles = getSampleStyleSheet()
     
-    # 创建自定义样式
+    # 创建自定义样式 - 确保使用正确的字体
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Heading1'],
         fontSize=24,
         spaceAfter=30,
         alignment=TA_CENTER,
-        textColor=colors.darkblue
+        textColor=colors.darkblue,
+        fontName=font_name,
+        encoding='utf-8'
     )
     
     heading_style = ParagraphStyle(
@@ -285,34 +307,39 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
         fontSize=16,
         spaceAfter=12,
         spaceBefore=20,
-        textColor=colors.darkblue
+        textColor=colors.darkblue,
+        fontName=font_name,
+        encoding='utf-8'
     )
     
     normal_style = ParagraphStyle(
         'CustomNormal',
         parent=styles['Normal'],
         fontSize=11,
-        spaceAfter=6
+        spaceAfter=6,
+        fontName=font_name,
+        encoding='utf-8'
     )
     
     # 构建PDF内容
     story = []
     
-    # 标题
-    story.append(Paragraph(f"{user.first_name} {user.last_name} - 个人简历", title_style))
+    # 标题 - 使用英文避免编码问题
+    title_text = f"{user.first_name} {user.last_name} - Personal Resume"
+    story.append(Paragraph(title_text, title_style))
     story.append(Spacer(1, 20))
     
-    # 基本信息
-    story.append(Paragraph("基本信息", heading_style))
+    # 基本信息表格
+    story.append(Paragraph("Basic Information", heading_style))
     basic_info = [
-        ['姓名', f"{user.first_name} {user.last_name}"],
-        ['员工编号', user.employee_id or '未设置'],
-        ['部门', user.department or '未设置'],
-        ['职位', user.position or '未设置'],
-        ['邮箱', user.email],
-        ['电话', user.phone_number or '未设置'],
-        ['入职日期', str(user.hire_date) if user.hire_date else '未设置'],
-        ['工作年限', f"{work_years} 年"]
+        ['Name', f"{user.first_name} {user.last_name}"],
+        ['Employee ID', user.employee_id or 'Not Set'],
+        ['Department', user.department or 'Not Set'],
+        ['Position', user.position or 'Not Set'],
+        ['Email', user.email],
+        ['Phone', user.phone_number or 'Not Set'],
+        ['Hire Date', str(user.hire_date) if user.hire_date else 'Not Set'],
+        ['Work Years', f"{work_years} years"]
     ]
     
     basic_table = Table(basic_info, colWidths=[1.5*inch, 4*inch])
@@ -320,7 +347,7 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
         ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTNAME', (0, 0), (-1, -1), font_name),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
         ('GRID', (0, 0), (-1, -1), 1, colors.black)
@@ -330,20 +357,22 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
     
     # 个人简介
     if user.bio:
-        story.append(Paragraph("个人简介", heading_style))
-        story.append(Paragraph(user.bio, normal_style))
+        story.append(Paragraph("Personal Introduction", heading_style))
+        # 处理可能的编码问题
+        bio_text = user.bio if isinstance(user.bio, str) else str(user.bio)
+        story.append(Paragraph(bio_text, normal_style))
         story.append(Spacer(1, 20))
     
     # 技能标签
     if skills:
-        story.append(Paragraph("技能标签", heading_style))
+        story.append(Paragraph("Skills", heading_style))
         skills_text = ', '.join(skills)
         story.append(Paragraph(skills_text, normal_style))
         story.append(Spacer(1, 20))
     
     # 教育经历
     if education_history:
-        story.append(Paragraph("教育经历", heading_style))
+        story.append(Paragraph("Education History", heading_style))
         for edu in education_history:
             edu_text = f"<b>{edu['school']}</b> - {edu['major']} - {edu['degree']}"
             if edu['period']:
@@ -353,45 +382,145 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
     
     # 工作经历
     if work_history:
-        story.append(Paragraph("工作经历", heading_style))
+        story.append(Paragraph("Work Experience", heading_style))
         for work in work_history:
             work_text = f"<b>{work['company']}</b> - {work['position']}"
             if work['period']:
                 work_text += f" ({work['period']})"
-            story.append(Paragraph(work_text, normal_style))
             if work['description']:
-                story.append(Paragraph(work['description'], normal_style))
-            story.append(Spacer(1, 6))
+                work_text += f"<br/>{work['description']}"
+            story.append(Paragraph(work_text, normal_style))
         story.append(Spacer(1, 20))
     
     # 绩效历史
     if performance_history:
-        story.append(Paragraph("绩效历史", heading_style))
-        perf_data = [['期间', '评分', '等级', '评价人', '评语']]
-        for perf in performance_history:
-            perf_data.append([
-                perf['period'],
-                str(perf['score']),
-                perf['level'],
-                perf['evaluator'],
-                perf['comments']
-            ])
-        
-        perf_table = Table(perf_data, colWidths=[1*inch, 0.8*inch, 0.8*inch, 1*inch, 2.4*inch])
-        perf_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 9),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ]))
-        story.append(perf_table)
+        story.append(Paragraph("Performance History", heading_style))
+        for perf in performance_history[:10]:  # 只显示最近10条
+            perf_text = f"<b>{perf['period']}</b> - Score: {perf['score']} - Level: {perf['level']}"
+            if perf['comments']:
+                perf_text += f"<br/>{perf['comments']}"
+            story.append(Paragraph(perf_text, normal_style))
+        story.append(Spacer(1, 20))
     
     # 生成PDF
-    doc.build(story)
-    return temp_file.name
+    try:
+        doc.build(story)
+        print(f"PDF生成成功: {temp_file.name}")
+        return temp_file.name
+    except Exception as e:
+        print(f"PDF生成错误: {e}")
+        # 如果生成失败，尝试使用最简单的格式
+        try:
+            print("尝试生成简单PDF...")
+            simple_story = [
+                Paragraph(f"{user.first_name} {user.last_name} - Resume", title_style),
+                Spacer(1, 20),
+                Paragraph(f"Email: {user.email}", normal_style),
+                Paragraph(f"Department: {user.department or 'N/A'}", normal_style),
+                Paragraph(f"Position: {user.position or 'N/A'}", normal_style),
+                Paragraph(f"Employee ID: {user.employee_id or 'N/A'}", normal_style),
+                Paragraph(f"Phone: {user.phone_number or 'N/A'}", normal_style),
+                Paragraph(f"Hire Date: {str(user.hire_date) if user.hire_date else 'N/A'}", normal_style),
+                Paragraph(f"Work Years: {work_years} years", normal_style),
+            ]
+            
+            # 添加技能信息
+            if skills:
+                skills_text = 'Skills: ' + ', '.join(skills)
+                simple_story.append(Paragraph(skills_text, normal_style))
+            
+            doc.build(simple_story)
+            print(f"简单PDF生成成功: {temp_file.name}")
+            return temp_file.name
+        except Exception as e2:
+            print(f"简单PDF生成也失败: {e2}")
+            raise e
+
+def force_setup_chinese_font():
+    """强制设置中文字体，确保返回可用的字体名称"""
+    import platform
+    import os
+    
+    # 首先尝试使用UnicodeCIDFont（reportlab内置的中文字体支持）
+    try:
+        pdfmetrics.registerFont(UnicodeCIDFont('STSong-Light'))
+        print("✓ 成功注册UnicodeCIDFont: STSong-Light")
+        return 'STSong-Light'
+    except Exception as e:
+        print(f"UnicodeCIDFont注册失败: {e}")
+    
+    # 检查是否已经注册了中文字体
+    try:
+        pdfmetrics.getFont('ChineseFont')
+        print("✓ 使用已注册的ChineseFont")
+        return 'ChineseFont'
+    except:
+        pass
+    
+    # 字体文件路径
+    font_dir = os.path.join(os.path.dirname(__file__), 'fonts')
+    os.makedirs(font_dir, exist_ok=True)
+    
+    # 尝试多种字体方案
+    font_candidates = []
+    
+    # 1. 检查系统字体
+    system = platform.system()
+    if system == "Windows":
+        font_candidates.extend([
+            "C:/Windows/Fonts/simsun.ttc",
+            "C:/Windows/Fonts/simhei.ttf", 
+            "C:/Windows/Fonts/msyh.ttc",
+            "C:/Windows/Fonts/simkai.ttf",
+            "C:/Windows/Fonts/simfang.ttf",
+        ])
+    elif system == "Linux":
+        font_candidates.extend([
+            "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/truetype/noto/NotoSansCJK-Medium.ttc",
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
+            "/usr/share/fonts/truetype/arphic/uming.ttc",
+            "/usr/share/fonts/truetype/arphic/ukai.ttc",
+            "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+            "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+            "/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf",
+            "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
+            "/usr/share/fonts/truetype/noto/NotoSansCJKsc-Regular.otf",
+            "/usr/share/fonts/truetype/noto/NotoSansCJKsc-Medium.otf",
+        ])
+    else:  # macOS
+        font_candidates.extend([
+            "/System/Library/Fonts/PingFang.ttc",
+            "/System/Library/Fonts/STHeiti Light.ttc",
+            "/System/Library/Fonts/STHeiti Medium.ttc",
+            "/System/Library/Fonts/Hiragino Sans GB.ttc",
+            "/Library/Fonts/Arial Unicode MS.ttf",
+        ])
+    
+    # 2. 检查项目内的字体文件
+    font_candidates.extend([
+        os.path.join(font_dir, "NotoSansCJK-Regular.ttc"),
+        os.path.join(font_dir, "NotoSansCJK-Medium.ttc"),
+        os.path.join(font_dir, "SimHei.ttf"),
+        os.path.join(font_dir, "SimSun.ttc"),
+    ])
+    
+    # 尝试注册字体
+    for font_path in font_candidates:
+        if os.path.exists(font_path):
+            try:
+                pdfmetrics.registerFont(TTFont('ChineseFont', font_path))
+                print(f"✓ 成功注册字体: {font_path}")
+                return 'ChineseFont'
+            except Exception as e:
+                print(f"字体注册失败 {font_path}: {e}")
+                continue
+    
+    # 最后的备选方案：使用系统默认字体
+    print("⚠️ 警告：无法注册中文字体，将使用系统默认字体")
+    return 'Helvetica'
 
 @profile_bp.route('/edit', methods=['GET', 'POST'])
 def edit_profile():
