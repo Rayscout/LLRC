@@ -269,48 +269,8 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
     doc = SimpleDocTemplate(temp_file.name, pagesize=A4)
     
-    # 注册中文字体
-    try:
-        # 尝试注册系统中文字体
-        system = platform.system()
-        if system == "Windows":
-            # Windows系统字体路径
-            font_paths = [
-                "C:/Windows/Fonts/simsun.ttc",  # 宋体
-                "C:/Windows/Fonts/simhei.ttf",  # 黑体
-                "C:/Windows/Fonts/msyh.ttc",    # 微软雅黑
-            ]
-        elif system == "Linux":
-            # Linux系统字体路径
-            font_paths = [
-                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-                "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-                "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
-            ]
-        else:  # macOS
-            font_paths = [
-                "/System/Library/Fonts/PingFang.ttc",
-                "/System/Library/Fonts/STHeiti Light.ttc",
-            ]
-        
-        # 尝试注册字体
-        chinese_font_registered = False
-        for font_path in font_paths:
-            if os.path.exists(font_path):
-                try:
-                    pdfmetrics.registerFont(TTFont('ChineseFont', font_path))
-                    chinese_font_registered = True
-                    break
-                except Exception as e:
-                    print(f"字体注册失败 {font_path}: {e}")
-                    continue
-        
-        if not chinese_font_registered:
-            # 如果无法注册中文字体，使用默认字体
-            print("警告：无法注册中文字体，将使用默认字体")
-            
-    except Exception as e:
-        print(f"字体处理错误: {e}")
+    # 改进的字体处理逻辑
+    font_name = setup_chinese_font()
     
     # 获取样式
     styles = getSampleStyleSheet()
@@ -323,7 +283,7 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
         spaceAfter=30,
         alignment=TA_CENTER,
         textColor=colors.darkblue,
-        fontName='ChineseFont' if 'chinese_font_registered' in locals() and chinese_font_registered else 'Helvetica'
+        fontName=font_name
     )
     
     heading_style = ParagraphStyle(
@@ -333,7 +293,7 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
         spaceAfter=12,
         spaceBefore=20,
         textColor=colors.darkblue,
-        fontName='ChineseFont' if 'chinese_font_registered' in locals() and chinese_font_registered else 'Helvetica'
+        fontName=font_name
     )
     
     normal_style = ParagraphStyle(
@@ -341,7 +301,7 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
         parent=styles['Normal'],
         fontSize=11,
         spaceAfter=6,
-        fontName='ChineseFont' if 'chinese_font_registered' in locals() and chinese_font_registered else 'Helvetica'
+        fontName=font_name
     )
     
     # 构建PDF内容
@@ -369,7 +329,7 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
         ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, -1), 'ChineseFont' if 'chinese_font_registered' in locals() and chinese_font_registered else 'Helvetica'),
+        ('FONTNAME', (0, 0), (-1, -1), font_name),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
         ('GRID', (0, 0), (-1, -1), 1, colors.black)
@@ -430,19 +390,134 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
         print(f"PDF生成错误: {e}")
         # 如果生成失败，尝试使用更简单的格式
         try:
-            # 创建简单的PDF
+            # 创建简单的PDF，使用英文避免字体问题
             simple_story = [
                 Paragraph(f"{user.first_name} {user.last_name} - Resume", title_style),
                 Spacer(1, 20),
                 Paragraph(f"Email: {user.email}", normal_style),
                 Paragraph(f"Department: {user.department or 'N/A'}", normal_style),
                 Paragraph(f"Position: {user.position or 'N/A'}", normal_style),
+                Paragraph(f"Employee ID: {user.employee_id or 'N/A'}", normal_style),
+                Paragraph(f"Phone: {user.phone_number or 'N/A'}", normal_style),
+                Paragraph(f"Hire Date: {str(user.hire_date) if user.hire_date else 'N/A'}", normal_style),
+                Paragraph(f"Work Years: {work_years} years", normal_style),
             ]
+            
+            # 添加技能信息
+            if skills:
+                skills_text = 'Skills: ' + ', '.join(skills)
+                simple_story.append(Paragraph(skills_text, normal_style))
+            
             doc.build(simple_story)
             return temp_file.name
         except Exception as e2:
             print(f"简单PDF生成也失败: {e2}")
             raise e
+
+def setup_chinese_font():
+    """设置中文字体，返回可用的字体名称"""
+    import platform
+    import os
+    import urllib.request
+    import zipfile
+    
+    # 检查是否已经注册了中文字体
+    try:
+        pdfmetrics.getFont('ChineseFont')
+        return 'ChineseFont'
+    except:
+        pass
+    
+    # 字体文件路径
+    font_dir = os.path.join(os.path.dirname(__file__), 'fonts')
+    os.makedirs(font_dir, exist_ok=True)
+    
+    # 尝试多种字体方案
+    font_candidates = []
+    
+    # 1. 检查系统字体
+    system = platform.system()
+    if system == "Windows":
+        font_candidates.extend([
+            "C:/Windows/Fonts/simsun.ttc",
+            "C:/Windows/Fonts/simhei.ttf", 
+            "C:/Windows/Fonts/msyh.ttc",
+            "C:/Windows/Fonts/simkai.ttf",
+            "C:/Windows/Fonts/simfang.ttf",
+        ])
+    elif system == "Linux":
+        font_candidates.extend([
+            "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+            "/usr/share/fonts/truetype/noto/NotoSansCJK-Medium.ttc",
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf",
+            "/usr/share/fonts/truetype/arphic/uming.ttc",
+            "/usr/share/fonts/truetype/arphic/ukai.ttc",
+            "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
+            "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc",
+            "/usr/share/fonts/truetype/droid/DroidSansFallbackFull.ttf",
+            "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
+            "/usr/share/fonts/truetype/noto/NotoSansCJKsc-Regular.otf",
+            "/usr/share/fonts/truetype/noto/NotoSansCJKsc-Medium.otf",
+        ])
+    else:  # macOS
+        font_candidates.extend([
+            "/System/Library/Fonts/PingFang.ttc",
+            "/System/Library/Fonts/STHeiti Light.ttc",
+            "/System/Library/Fonts/STHeiti Medium.ttc",
+            "/System/Library/Fonts/Hiragino Sans GB.ttc",
+            "/Library/Fonts/Arial Unicode MS.ttf",
+        ])
+    
+    # 2. 检查项目内的字体文件
+    font_candidates.extend([
+        os.path.join(font_dir, "NotoSansCJK-Regular.ttc"),
+        os.path.join(font_dir, "NotoSansCJK-Medium.ttc"),
+        os.path.join(font_dir, "SimHei.ttf"),
+        os.path.join(font_dir, "SimSun.ttc"),
+    ])
+    
+    # 尝试注册字体
+    for font_path in font_candidates:
+        if os.path.exists(font_path):
+            try:
+                pdfmetrics.registerFont(TTFont('ChineseFont', font_path))
+                print(f"成功注册字体: {font_path}")
+                return 'ChineseFont'
+            except Exception as e:
+                print(f"字体注册失败 {font_path}: {e}")
+                continue
+    
+    # 3. 如果系统字体都不可用，尝试下载字体
+    try:
+        font_url = "https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/Chinese/NotoSansCJKsc-Regular.otf"
+        font_file = os.path.join(font_dir, "NotoSansCJK-Regular.otf")
+        
+        if not os.path.exists(font_file):
+            print("正在下载中文字体...")
+            urllib.request.urlretrieve(font_url, font_file)
+            print("字体下载完成")
+        
+        if os.path.exists(font_file):
+            pdfmetrics.registerFont(TTFont('ChineseFont', font_file))
+            print("成功注册下载的字体")
+            return 'ChineseFont'
+    except Exception as e:
+        print(f"字体下载失败: {e}")
+    
+    # 4. 尝试使用reportlab内置的中文字体支持
+    try:
+        from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+        pdfmetrics.registerFont(UnicodeCIDFont('STSong-Light'))
+        print("使用内置UnicodeCIDFont字体")
+        return 'STSong-Light'
+    except Exception as e:
+        print(f"内置字体注册失败: {e}")
+    
+    # 5. 最后的备选方案：使用系统默认字体
+    print("警告：无法注册中文字体，将使用系统默认字体")
+    return 'Helvetica'
 
 @profile_bp.route('/edit', methods=['GET', 'POST'])
 def edit_profile():
