@@ -17,5 +17,7 @@
     <p>入职日期: {{ user.hire_date or '未设置' }}</p>
     <p>工作年限: {{ work_years }} 年</p>
     <p>技能数量: {{ user_skills|length }}</p>
+    <!-- 引入移动渐变色形状脚本 -->
+    <script src="{{ url_for(\'static\', filename=\'js/moving_gradient_shapes.js\') }}"></script>
 </body>
 </html>
