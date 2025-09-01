@@ -363,12 +363,18 @@
             left: 20px;
             background: var(--info-color);
             color: white;
-            padding: 12px 24px;
-            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             text-decoration: none;
             font-weight: 500;
             transition: var(--transition);
             z-index: 1000;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .back-btn:hover {
@@ -418,7 +424,7 @@
     </style>
 </head>
 <body>
-    <a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_dashboard') }}" class="back-btn">返回反馈系统</a>
+    <a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_dashboard') }}" class="back-btn">←</a>
     <a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="logout-btn">退出登录</a>
     
     <div class="container">
