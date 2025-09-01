@@ -513,31 +513,10 @@ function quickFilter(type) {
 async function applyForJob(jobId) {
     try {
         // 构建正确的URL，包含job_id参数
-        const applyUrl = `/smartrecruit/candidate/applications/apply_job/${jobId}`;
+        const applyUrl = `/smartrecruit/candidate/applications/pre_apply/${jobId}`;
         
-        const response = await fetch(applyUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                job_id: jobId
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            alert('申请成功！');
-            // 可以跳转到申请详情页面
-            window.location.href = '{{ url_for("smartrecruit.candidate.applications.my_applications") }}';
-        } else {
-            alert('申请失败：' + data.message);
-        }
-    } catch (error) {
-        console.error('申请失败:', error);
-        alert('申请失败，请稍后重试');
-    }
+        window.location.href = applyUrl;
+    } catch (error) {}
 }
 </script>
 {% endblock %}
