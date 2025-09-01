@@ -332,10 +332,16 @@
         <!-- 欢迎Section -->
         <section class="ios-section ios-ai-review-hero">
             <div class="ios-container">
-                <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-back-button">
-                    <i class="uil uil-arrow-left"></i>
-                    返回候选人管理
-                </a>
+                <div style="display: flex; gap: 15px; margin-bottom: var(--ios-spacing-lg); flex-wrap: wrap;">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-back-button">
+                        <i class="uil uil-arrow-left"></i>
+                        返回仪表盘
+                    </a>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-back-button">
+                        <i class="uil uil-arrow-left"></i>
+                        返回候选人管理
+                    </a>
+                </div>
                 
                 <h1 class="ios-title ios-fade-in">AI面试结果审核</h1>
                 <p class="ios-subtitle ios-fade-in">查看和审核所有AI面试结果，快速筛选优秀候选人</p>
