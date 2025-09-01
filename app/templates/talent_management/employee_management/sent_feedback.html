@@ -6,6 +6,8 @@
     <title>已发送的反馈 - 员工仪表板</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
     <style>
         :root {
             --bg-primary: #F2F2F7;
@@ -110,13 +112,10 @@
         }
 
         .stat-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(248, 249, 250, 0.6);
             border-radius: var(--border-radius);
             padding: 25px;
             box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: var(--transition-fast);
             text-align: center;
             animation: slideInUp 0.6s ease-out;
@@ -180,14 +179,11 @@
         }
 
         .action-bar {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.6);
             border-radius: var(--border-radius);
             padding: 20px;
             margin-bottom: 30px;
             box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
@@ -251,13 +247,10 @@
         }
 
         .feedback-list {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.6);
             border-radius: var(--border-radius-large);
             padding: 30px;
             box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
             animation: slideInUp 0.8s ease-out;
         }
 

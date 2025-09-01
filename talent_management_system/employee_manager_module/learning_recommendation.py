@@ -273,7 +273,7 @@ def generate_learning_plan(user_skills, job_requirements, user_level='intermedia
     
     return learning_path
 
-@learning_recommendation_bp.route('/dashboard')
+@learning_recommendation_bp.route('/')
 @login_required
 def dashboard():
     """学习推荐仪表板"""
@@ -291,10 +291,10 @@ def dashboard():
             flash('用户信息获取失败，请重新登录', 'warning')
             return redirect(url_for('common.auth.sign'))
         
-        # 获取用户当前职位（如果有的话）
-        current_job = None
-        if hasattr(user, 'current_position'):
-            current_job = user.current_position
+        # 验证用户类型
+        if user.user_type != 'employee':
+            flash('您没有权限访问此页面', 'warning')
+            return redirect(url_for('common.auth.sign'))
         
         # 获取用户技能
         user_profile = {
@@ -304,19 +304,19 @@ def dashboard():
         }
         user_skills = extract_user_skills(user_profile)
         
-        # 获取推荐职位
-        recommended_jobs = Job.query.limit(5).all()
+        # 获取当前职位信息
+        current_job = {
+            'department': getattr(user, 'department', ''),
+            'position': getattr(user, 'position', ''),
+            'hire_date': getattr(user, 'hire_date', None)
+        }
         
-        # 为每个推荐职位生成学习计划
-        job_recommendations = []
-        for job in recommended_jobs:
-            job_requirements = analyze_job_requirements(job.description)
-            learning_plan = generate_learning_plan(user_skills, job_requirements)
-            
-            job_recommendations.append({
-                'job': job,
-                'learning_plan': learning_plan
-            })
+        # 生成职位推荐
+        try:
+            job_recommendations = generate_job_recommendations(user_skills, current_job)
+        except Exception as job_error:
+            print(f"生成职位推荐失败: {job_error}")
+            job_recommendations = []
         
         return render_template(
             'talent_management/employee_management/learning_dashboard.html',
@@ -327,6 +327,7 @@ def dashboard():
         )
         
     except Exception as e:
+        print(f"学习推荐页面错误: {e}")
         flash(f'加载学习推荐时出错: {str(e)}', 'error')
         return redirect(url_for('talent_management.employee_auth.employee_dashboard'))
 

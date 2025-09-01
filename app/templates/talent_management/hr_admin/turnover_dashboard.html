@@ -220,6 +220,29 @@
                 transform: translateY(0);
             }
         }
+        
+        /* 通知动画 */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
 
 
 
@@ -503,35 +526,48 @@
             font-weight: 500;
         }
 
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: var(--accent-blue);
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
             text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition-fast);
-            animation: slideInLeft 0.6s ease-out;
-            animation-delay: 0.1s;
-            animation-fill-mode: both;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
 
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
         }
 
-        .back-link:hover {
-            transform: translateX(-5px);
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #17a2b8;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .back-link i {
-            margin-right: 8px;
+        .back-btn:hover {
+            background: #138496;
+            transform: translateY(-2px);
         }
 
         .action-bar {
@@ -598,9 +634,8 @@
     <div class="executive-parallax-bg"></div>
     
     <div class="container">
-        <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="back-link">
-            <i class="fas fa-arrow-left"></i> 返回高管首页
-        </a>
+        <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="back-btn">←</a>
+        <a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="logout-btn">退出登录</a>
 
         <div class="header">
             <h1>
@@ -931,8 +966,74 @@
                 }, 150);
             }
             
-            // 这里可以实现数据导出功能
-            alert('数据导出功能开发中...');
+            // 调用后端导出API
+            fetch('/talent/hr_admin/turnover_alert/api/export_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // 创建下载链接
+                    return response.blob();
+                } else {
+                    throw new Error('导出失败');
+                }
+            })
+            .then(blob => {
+                // 创建下载链接
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `turnover_alert_report_${new Date().toISOString().slice(0,10)}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                // 显示成功提示
+                showNotification('数据导出成功！', 'success');
+            })
+            .catch(error => {
+                console.error('导出失败:', error);
+                showNotification('数据导出失败，请稍后重试', 'error');
+            });
+        }
+        
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            
+            // 添加样式
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+                ${type === 'success' ? 'background: var(--accent-green);' : 
+                  type === 'error' ? 'background: var(--accent-red);' : 
+                  'background: var(--accent-blue);'}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
 
 

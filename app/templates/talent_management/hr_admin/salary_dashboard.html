@@ -657,7 +657,6 @@
                 <div class="stat-label">竞争力岗位</div>
             </div>
         </div>
-        </div>
 
         <!-- 操作栏 -->
         <div class="action-bar fade-in">
@@ -665,7 +664,7 @@
                 <i class="fas fa-sync-alt"></i> 刷新数据
             </button>
             <button class="btn btn-outline" onclick="generateReport()">
-                <i class="fas fa-file-alt"></i> 生成预警报告
+                                        <i class="fas fa-file-alt"></i> 生成薪酬分析报告
             </button>
             <button class="btn btn-outline" onclick="exportData()">
                 <i class="fas fa-download"></i> 导出数据
@@ -847,17 +846,48 @@
 
         // 导出数据功能
         function exportData() {
+            console.log('开始导出数据...');
             alert('正在导出薪酬数据报表...');
             
-            // 创建表单并提交
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '{{ url_for("talent_management.hr_admin.salary_analysis.export_salary_data") }}';
-            form.target = '_blank';
-            
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
+            // 使用fetch API发送POST请求
+            fetch('{{ url_for("talent_management.hr_admin.salary_analysis.export_salary_data") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                console.log('响应状态:', response.status);
+                console.log('响应头:', response.headers);
+                
+                if (response.ok) {
+                    return response.blob();
+                } else {
+                    // 尝试获取错误信息
+                    return response.text().then(text => {
+                        console.error('错误响应:', text);
+                        throw new Error(`导出失败: ${response.status} ${response.statusText}`);
+                    });
+                }
+            })
+            .then(blob => {
+                console.log('获取到blob数据:', blob);
+                // 创建下载链接
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `薪酬分析报告_${new Date().toISOString().slice(0,10)}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                alert('导出成功！');
+            })
+            .catch(error => {
+                console.error('导出错误:', error);
+                alert('导出失败，请重试。错误信息: ' + error.message);
+            });
         }
 
         // 刷新数据功能

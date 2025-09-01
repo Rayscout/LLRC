@@ -60,6 +60,9 @@
         </div>
 
         <div class="profile-actions">
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="btn btn-secondary">
+                <i class="uil uil-dashboard"></i> 返回仪表盘
+            </a>
             <a href="{{ url_for('smartrecruit.hr.profile.hr_settings') }}" class="btn btn-primary">
                 <i class="uil uil-setting"></i> 编辑设置
             </a>
@@ -103,6 +106,8 @@ body{ background:#f5f8ff; }
 .btn{ padding:14px 26px; border-radius:12px; text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:8px; transition:all .25s ease }
 .btn-primary{ background:#007AFF; color:#fff; box-shadow:0 8px 18px rgba(0,122,255,.28) }
 .btn-primary:hover{ background:#126BFF; transform:translateY(-2px) }
+.btn-secondary{ background:#fff; color:#007AFF; border:2px solid #007AFF; box-shadow:0 4px 12px rgba(0,122,255,.15) }
+.btn-secondary:hover{ background:#f0f8ff; transform:translateY(-2px) }
 
 /* 深色模式支持 */
 body.dark .profile-content{ background:#0b1e3a; color:#f9fafb }

@@ -71,21 +71,20 @@ def projects_dashboard():
 
 @projects_bp.route('/add', methods=['GET', 'POST'])
 def add_project():
-    """添加新项目经验"""
+    """添加项目经验"""
     # 检查用户是否登录
     from flask import session
     if 'user_id' not in session:
         flash('请先登录', 'warning')
         return redirect(url_for('common.auth.sign'))
-    
+
     # 获取用户信息
-    from app.models import User
     user = User.query.get(session['user_id'])
     if not user:
         session.clear()
         flash('用户信息获取失败，请重新登录', 'warning')
         return redirect(url_for('common.auth.sign'))
-    
+
     if request.method == 'POST':
         try:
             # 获取表单数据
@@ -98,6 +97,11 @@ def add_project():
             team_size = int(request.form.get('team_size', 1))
             contribution = request.form.get('contribution')
 
+            # 验证必填字段
+            if not all([name, role, description, start_date_str, status]):
+                flash('请填写所有必填字段', 'danger')
+                return redirect(request.url)
+
             # 处理技术栈（支持多选）
             technologies = request.form.getlist('technologies[]')
 
@@ -105,17 +109,18 @@ def add_project():
             achievements_text = request.form.get('achievements', '')
             achievements = [achievement.strip() for achievement in achievements_text.split('\n') if achievement.strip()]
 
-            # 验证必填字段
-            if not all([name, role, description, start_date_str, status]):
-                flash('请填写所有必填字段', 'danger')
-                return redirect(request.url)
-
             # 转换日期
             try:
                 start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
                 end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date() if end_date_str else None
-            except ValueError:
-                flash('日期格式错误', 'danger')
+                
+                # 验证日期逻辑
+                if end_date and start_date > end_date:
+                    flash('开始日期不能晚于结束日期', 'danger')
+                    return redirect(request.url)
+                    
+            except ValueError as ve:
+                flash(f'日期格式错误: {str(ve)}', 'danger')
                 return redirect(request.url)
 
             # 创建新项目
@@ -139,11 +144,28 @@ def add_project():
             db.session.add(new_project)
             db.session.commit()
 
+            # 验证数据是否成功保存
+            saved_project = Project.query.filter_by(
+                user_id=user.id,
+                name=name,
+                role=role
+            ).first()
+
+            if not saved_project:
+                db.session.rollback()
+                flash('项目保存失败，请重试', 'danger')
+                return redirect(request.url)
+
             flash('项目添加成功！', 'success')
             return redirect(url_for('talent_management.employee_manager.projects.projects_dashboard'))
 
+        except ValueError as ve:
+            db.session.rollback()
+            flash(f'数据格式错误: {str(ve)}', 'danger')
+            return redirect(request.url)
         except Exception as e:
             db.session.rollback()
+            print(f"项目添加失败: {e}")
             flash(f'项目添加失败: {str(e)}', 'danger')
             return redirect(request.url)
 

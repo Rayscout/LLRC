@@ -281,9 +281,14 @@
 </style>
 
 <div class="review-container">
-    <a href="{{ url_for('smartrecruit.hr.candidates.view_candidates', job_id=job.id) }}" class="back-link">
-        ← 返回候选人列表
-    </a>
+    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+        <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="back-link">
+            ← 返回仪表盘
+        </a>
+        <a href="{{ url_for('smartrecruit.hr.candidates.view_candidates', job_id=job.id) }}" class="back-link">
+            ← 返回候选人列表
+        </a>
+    </div>
 
     <div class="page-header">
         <h1 class="page-title">审核AI面试结果</h1>
@@ -341,11 +346,13 @@
                 <th>候选人姓名</th>
                 <th>邮箱</th>
                 <th>电话</th>
+                <th>应聘职位</th>
                 <th>AI面试分数</th>
                 <th>技术能力</th>
                 <th>沟通能力</th>
                 <th>逻辑思维</th>
                 <th>学习能力</th>
+                <th>面试时间</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -357,6 +364,7 @@
                 <td>{{ candidate.first_name }} {{ candidate.last_name }}</td>
                 <td>{{ candidate.email }}</td>
                 <td>{{ candidate.phone_number or '未提供' }}</td>
+                <td>{{ candidate.job_title or '未指定' }}</td>
                 <td>
                     <span class="score-badge {% if candidate.ai_interview_score >= 80 %}score-high{% elif candidate.ai_interview_score >= 60 %}score-medium{% else %}score-low{% endif %}">
                         {{ candidate.ai_interview_score }}分
@@ -366,6 +374,7 @@
                 <td>{{ candidate.ai_interview_details.get('communication_score', 'N/A') }}分</td>
                 <td>{{ candidate.ai_interview_details.get('logic_score', 'N/A') }}分</td>
                 <td>{{ candidate.ai_interview_details.get('learning_score', 'N/A') }}分</td>
+                <td>{{ candidate.interview_date.strftime('%Y-%m-%d %H:%M') if candidate.interview_date else '未知' }}</td>
                 <td>
                     <div class="action-buttons">
                         <a href="{{ url_for('smartrecruit.hr.candidates.review_ai_interview', application_id=candidate.application_id) }}" class="btn btn-primary">详细审核</a>
