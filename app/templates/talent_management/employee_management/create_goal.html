@@ -6,6 +6,8 @@
     <title>创建SMART目标 - 员工仪表板</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
     <style>
         :root {
             --bg-primary: #F2F2F7;
@@ -49,52 +51,47 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
-            background: var(--bg-primary);
+            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
             color: var(--text-primary);
             line-height: 1.6;
             transition: var(--transition);
+            min-height: 100vh;
+            padding: 20px;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
             padding: 20px;
         }
 
         .header {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--border-radius-large);
+            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
+            color: #2F4F4F;
             padding: 30px;
+            text-align: center;
             margin-bottom: 30px;
-            box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header h1 {
             font-size: 2.5em;
-            font-weight: 700;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--accent-green) 0%, #30D158 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .header p {
             font-size: 1.2em;
-            color: var(--text-secondary);
+            opacity: 0.9;
         }
 
         .form-container {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.6);
             border-radius: var(--border-radius-large);
             padding: 40px;
             box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .form-section {
@@ -135,8 +132,8 @@
 
         .form-input:focus, .form-textarea:focus, .form-select:focus {
             outline: none;
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+            border-color: #20B2AA;
+            box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
         }
 
         .form-textarea {
@@ -191,7 +188,7 @@
         }
 
         .btn-primary {
-            background: var(--accent-blue);
+            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
             color: white;
         }
 
@@ -218,7 +215,7 @@
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
-            color: var(--accent-blue);
+            color: #20B2AA;
             text-decoration: none;
             font-weight: 600;
             transition: var(--transition-fast);
@@ -263,8 +260,8 @@
         }
 
         .progress-circle.active {
-            background: var(--accent-blue);
-            border-color: var(--accent-blue);
+            background: #20B2AA;
+            border-color: #20B2AA;
             color: white;
         }
 
@@ -292,7 +289,7 @@
 
         .progress-fill {
             height: 100%;
-            background: var(--accent-blue);
+            background: #20B2AA;
             transition: width 0.3s ease;
         }
 

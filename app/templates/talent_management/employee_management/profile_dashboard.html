@@ -5,7 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人资料 - 员工仪表板</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #20B2AA;
+            --secondary-color: #2F4F4F;
+            --text-primary: #2F4F4F;
+            --text-secondary: #666;
+            --text-muted: #999;
+            --light-color: #f8f9fa;
+            --border-color: #eee;
+            --shadow: 0 5px 15px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -14,7 +29,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -29,8 +44,8 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
+            color: #2F4F4F;
             padding: 30px;
             text-align: center;
         }
@@ -57,7 +72,7 @@
         }
         
         .profile-card {
-            background: #f8f9fa;
+            background: rgba(248, 249, 250, 0.6);
             border-radius: 15px;
             padding: 25px;
             text-align: center;
@@ -67,7 +82,7 @@
             width: 120px;
             height: 120px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
             margin: 0 auto 20px;
             display: flex;
             align-items: center;
@@ -77,7 +92,7 @@
         }
         
         .profile-info h3 {
-            color: #333;
+            color: #2F4F4F;
             margin-bottom: 15px;
         }
         
@@ -96,19 +111,19 @@
         }
         
         .info-value {
-            color: #333;
+            color: #2F4F4F;
             margin-left: 10px;
         }
         
         .skills-section {
-            background: white;
+            background: rgba(255, 255, 255, 0.6);
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 30px;
         }
         
         .skills-section h3 {
-            color: #333;
+            color: #2F4F4F;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -116,7 +131,7 @@
         
         .skills-section h3 i {
             margin-right: 10px;
-            color: #667eea;
+            color: #20B2AA;
         }
         
         .skills-grid {
@@ -126,7 +141,7 @@
         }
         
         .skill-tag {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
             color: white;
             padding: 10px 15px;
             border-radius: 25px;
@@ -159,14 +174,14 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
             color: white;
         }
         
         .btn-outline {
             background: transparent;
-            color: #667eea;
-            border: 2px solid #667eea;
+            color: #20B2AA;
+            border: 2px solid #20B2AA;
         }
         
         .btn:hover {
@@ -177,7 +192,7 @@
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
-            color: #667eea;
+            color: #20B2AA;
             text-decoration: none;
             font-weight: 600;
         }
@@ -192,7 +207,7 @@
         
         /* 新增样式 */
         .section {
-            background: white;
+            background: rgba(255, 255, 255, 0.6);
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 30px;
@@ -282,7 +297,7 @@
         }
         
         .export-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, rgba(32, 178, 170, 0.6) 0%, rgba(47, 79, 79, 0.6) 100%);
             color: white;
             padding: 25px;
             border-radius: 15px;
@@ -528,5 +543,10 @@
             </div>
         </div>
     </div>
+    
+    <!-- 引入图标颜色随机分配器 -->
+    <script src="{{ url_for('static', filename='js/icon_color_randomizer.js') }}"></script>
+    <!-- 引入移动渐变色形状脚本 -->
+    <script src="{{ url_for('static', filename='js/moving_gradient_shapes.js') }}"></script>
 </body>
 </html>
