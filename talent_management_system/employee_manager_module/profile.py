@@ -11,6 +11,9 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 import tempfile
+import platform
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 
@@ -266,6 +269,49 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
     doc = SimpleDocTemplate(temp_file.name, pagesize=A4)
     
+    # 注册中文字体
+    try:
+        # 尝试注册系统中文字体
+        system = platform.system()
+        if system == "Windows":
+            # Windows系统字体路径
+            font_paths = [
+                "C:/Windows/Fonts/simsun.ttc",  # 宋体
+                "C:/Windows/Fonts/simhei.ttf",  # 黑体
+                "C:/Windows/Fonts/msyh.ttc",    # 微软雅黑
+            ]
+        elif system == "Linux":
+            # Linux系统字体路径
+            font_paths = [
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+                "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc",
+            ]
+        else:  # macOS
+            font_paths = [
+                "/System/Library/Fonts/PingFang.ttc",
+                "/System/Library/Fonts/STHeiti Light.ttc",
+            ]
+        
+        # 尝试注册字体
+        chinese_font_registered = False
+        for font_path in font_paths:
+            if os.path.exists(font_path):
+                try:
+                    pdfmetrics.registerFont(TTFont('ChineseFont', font_path))
+                    chinese_font_registered = True
+                    break
+                except Exception as e:
+                    print(f"字体注册失败 {font_path}: {e}")
+                    continue
+        
+        if not chinese_font_registered:
+            # 如果无法注册中文字体，使用默认字体
+            print("警告：无法注册中文字体，将使用默认字体")
+            
+    except Exception as e:
+        print(f"字体处理错误: {e}")
+    
     # 获取样式
     styles = getSampleStyleSheet()
     
@@ -276,7 +322,8 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
         fontSize=24,
         spaceAfter=30,
         alignment=TA_CENTER,
-        textColor=colors.darkblue
+        textColor=colors.darkblue,
+        fontName='ChineseFont' if 'chinese_font_registered' in locals() and chinese_font_registered else 'Helvetica'
     )
     
     heading_style = ParagraphStyle(
@@ -285,14 +332,16 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
         fontSize=16,
         spaceAfter=12,
         spaceBefore=20,
-        textColor=colors.darkblue
+        textColor=colors.darkblue,
+        fontName='ChineseFont' if 'chinese_font_registered' in locals() and chinese_font_registered else 'Helvetica'
     )
     
     normal_style = ParagraphStyle(
         'CustomNormal',
         parent=styles['Normal'],
         fontSize=11,
-        spaceAfter=6
+        spaceAfter=6,
+        fontName='ChineseFont' if 'chinese_font_registered' in locals() and chinese_font_registered else 'Helvetica'
     )
     
     # 构建PDF内容
@@ -320,7 +369,7 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
         ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
         ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTNAME', (0, 0), (-1, -1), 'ChineseFont' if 'chinese_font_registered' in locals() and chinese_font_registered else 'Helvetica'),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
         ('GRID', (0, 0), (-1, -1), 1, colors.black)
@@ -358,40 +407,42 @@ def generate_pdf_resume(user, skills, work_years, education_history, work_histor
             work_text = f"<b>{work['company']}</b> - {work['position']}"
             if work['period']:
                 work_text += f" ({work['period']})"
-            story.append(Paragraph(work_text, normal_style))
             if work['description']:
-                story.append(Paragraph(work['description'], normal_style))
-            story.append(Spacer(1, 6))
+                work_text += f"<br/>{work['description']}"
+            story.append(Paragraph(work_text, normal_style))
         story.append(Spacer(1, 20))
     
     # 绩效历史
     if performance_history:
         story.append(Paragraph("绩效历史", heading_style))
-        perf_data = [['期间', '评分', '等级', '评价人', '评语']]
-        for perf in performance_history:
-            perf_data.append([
-                perf['period'],
-                str(perf['score']),
-                perf['level'],
-                perf['evaluator'],
-                perf['comments']
-            ])
-        
-        perf_table = Table(perf_data, colWidths=[1*inch, 0.8*inch, 0.8*inch, 1*inch, 2.4*inch])
-        perf_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
-            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 9),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ]))
-        story.append(perf_table)
+        for perf in performance_history[:10]:  # 只显示最近10条
+            perf_text = f"<b>{perf['period']}</b> - 评分: {perf['score']} - {perf['level']}"
+            if perf['comments']:
+                perf_text += f"<br/>{perf['comments']}"
+            story.append(Paragraph(perf_text, normal_style))
+        story.append(Spacer(1, 20))
     
     # 生成PDF
-    doc.build(story)
-    return temp_file.name
+    try:
+        doc.build(story)
+        return temp_file.name
+    except Exception as e:
+        print(f"PDF生成错误: {e}")
+        # 如果生成失败，尝试使用更简单的格式
+        try:
+            # 创建简单的PDF
+            simple_story = [
+                Paragraph(f"{user.first_name} {user.last_name} - Resume", title_style),
+                Spacer(1, 20),
+                Paragraph(f"Email: {user.email}", normal_style),
+                Paragraph(f"Department: {user.department or 'N/A'}", normal_style),
+                Paragraph(f"Position: {user.position or 'N/A'}", normal_style),
+            ]
+            doc.build(simple_story)
+            return temp_file.name
+        except Exception as e2:
+            print(f"简单PDF生成也失败: {e2}")
+            raise e
 
 @profile_bp.route('/edit', methods=['GET', 'POST'])
 def edit_profile():
