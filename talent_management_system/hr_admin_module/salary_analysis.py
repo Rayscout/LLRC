@@ -139,50 +139,66 @@ def export_salary_data():
         # 创建Excel文件
         output = io.BytesIO()
         
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            # 岗位薪酬对比表
-            df_positions = pd.DataFrame(salary_data['detailed_positions'])
-            df_positions = df_positions[['category', 'position', 'company_salary', 'industry_salary', 'gap_percentage', 'gap_status', 'employee_count', 'turnover_rate']]
-            df_positions.columns = ['岗位类别', '具体岗位', '公司薪酬', '行业平均', '差距百分比', '差距状态', '员工数量', '离职率']
-            df_positions.to_excel(writer, sheet_name='岗位薪酬对比', index=False)
+        try:
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                # 岗位薪酬对比表
+                df_positions = pd.DataFrame(salary_data['detailed_positions'])
+                df_positions = df_positions[['category', 'position', 'company_salary', 'industry_salary', 'gap_percentage', 'gap_status', 'employee_count', 'turnover_rate']]
+                df_positions.columns = ['岗位类别', '具体岗位', '公司薪酬', '行业平均', '差距百分比', '差距状态', '员工数量', '离职率']
+                df_positions.to_excel(writer, sheet_name='岗位薪酬对比', index=False)
+                
+                # 12个月趋势数据
+                trend_data = []
+                for i, month in enumerate(salary_data['months']):
+                    for category in salary_data['company_trends'].keys():
+                        trend_data.append({
+                            '月份': month,
+                            '岗位类别': category,
+                            '公司薪酬': salary_data['company_trends'][category][i],
+                            '行业平均': salary_data['industry_trends'][category][i],
+                            '差距': salary_data['company_trends'][category][i] - salary_data['industry_trends'][category][i]
+                        })
+                
+                df_trends = pd.DataFrame(trend_data)
+                df_trends.to_excel(writer, sheet_name='12个月趋势', index=False)
+                
+                # 汇总统计
+                summary_data = [
+                    ['总岗位数', salary_data['summary']['total_positions']],
+                    ['高于行业岗位数', salary_data['summary']['above_industry']],
+                    ['低于行业岗位数', salary_data['summary']['below_industry']],
+                    ['平均差距百分比', f"{salary_data['summary']['average_gap']}%"]
+                ]
+                
+                df_summary = pd.DataFrame(summary_data, columns=['指标', '数值'])
+                df_summary.to_excel(writer, sheet_name='汇总统计', index=False)
             
-            # 12个月趋势数据
-            trend_data = []
-            for i, month in enumerate(salary_data['months']):
-                for category in salary_data['company_trends'].keys():
-                    trend_data.append({
-                        '月份': month,
-                        '岗位类别': category,
-                        '公司薪酬': salary_data['company_trends'][category][i],
-                        '行业平均': salary_data['industry_trends'][category][i],
-                        '差距': salary_data['company_trends'][category][i] - salary_data['industry_trends'][category][i]
-                    })
+            output.seek(0)
             
-            df_trends = pd.DataFrame(trend_data)
-            df_trends.to_excel(writer, sheet_name='12个月趋势', index=False)
+            filename = f"薪酬分析报告_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
             
-            # 汇总统计
-            summary_data = [
-                ['总岗位数', salary_data['summary']['total_positions']],
-                ['高于行业岗位数', salary_data['summary']['above_industry']],
-                ['低于行业岗位数', salary_data['summary']['below_industry']],
-                ['平均差距百分比', f"{salary_data['summary']['average_gap']}%"]
-            ]
+            # 设置响应头
+            response = send_file(
+                output,
+                as_attachment=True,
+                download_name=filename,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
             
-            df_summary = pd.DataFrame(summary_data, columns=['指标', '数值'])
-            df_summary.to_excel(writer, sheet_name='汇总统计', index=False)
-        
-        output.seek(0)
-        
-        filename = f"薪酬分析报告_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-        return send_file(
-            output,
-            as_attachment=True,
-            download_name=filename,
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+            # 添加额外的响应头
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            return response
+            
+        except Exception as excel_error:
+            print(f"Excel生成错误: {excel_error}")
+            return jsonify({'error': f'Excel文件生成失败: {str(excel_error)}'}), 500
         
     except Exception as e:
+        print(f"薪酬数据导出错误: {e}")
         return jsonify({'error': f'导出数据时发生错误: {str(e)}'}), 500
 
 @salary_analysis_bp.route('/api/salary_data', methods=['GET'])

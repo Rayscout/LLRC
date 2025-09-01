@@ -223,78 +223,94 @@ def export_org_health_report():
         # 创建Excel文件
         output = io.BytesIO()
         
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            # 部门健康度对比表
-            dept_data = []
-            for dept_name, dept_info in org_health_data['departments'].items():
-                dept_data.append({
-                    '部门': dept_name,
-                    '员工数量': dept_info['employee_count'],
-                    '流失率': f"{dept_info['turnover_rate']*100:.1f}%",
-                    '储备率': f"{dept_info['reserve_rate']*100:.1f}%",
-                    '稳定性': f"{dept_info['stability_rate']*100:.1f}%",
-                    '满意度': f"{dept_info['satisfaction']*100:.1f}%",
-                    '增长率': f"{dept_info['growth_rate']*100:.1f}%",
-                    '综合评分': dept_info['comprehensive_score'],
-                    '风险等级': dept_info['risk_level']
-                })
-            
-            df_dept = pd.DataFrame(dept_data)
-            df_dept.to_excel(writer, sheet_name='部门健康度对比', index=False)
-            
-            # 12个月趋势数据
-            trend_data = []
-            for i, month in enumerate(org_health_data['months']):
-                for dept in org_health_data['historical_data'].keys():
-                    trend_data.append({
-                        '月份': month,
-                        '部门': dept,
-                        '流失率': org_health_data['historical_data'][dept]['turnover_rate'][i],
-                        '储备率': org_health_data['historical_data'][dept]['reserve_rate'][i],
-                        '稳定性': org_health_data['historical_data'][dept]['stability_rate'][i],
-                        '满意度': org_health_data['historical_data'][dept]['satisfaction'][i],
-                        '增长率': org_health_data['historical_data'][dept]['growth_rate'][i]
+        try:
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                # 部门健康度对比表
+                dept_data = []
+                for dept_name, dept_info in org_health_data['departments'].items():
+                    dept_data.append({
+                        '部门': dept_name,
+                        '员工数量': dept_info['employee_count'],
+                        '流失率': f"{dept_info['turnover_rate']*100:.1f}%",
+                        '储备率': f"{dept_info['reserve_rate']*100:.1f}%",
+                        '稳定性': f"{dept_info['stability_rate']*100:.1f}%",
+                        '满意度': f"{dept_info['satisfaction']*100:.1f}%",
+                        '增长率': f"{dept_info['growth_rate']*100:.1f}%",
+                        '综合评分': dept_info['comprehensive_score'],
+                        '风险等级': dept_info['risk_level']
                     })
+                
+                df_dept = pd.DataFrame(dept_data)
+                df_dept.to_excel(writer, sheet_name='部门健康度对比', index=False)
+                
+                # 12个月趋势数据
+                trend_data = []
+                for i, month in enumerate(org_health_data['months']):
+                    for dept in org_health_data['historical_data'].keys():
+                        trend_data.append({
+                            '月份': month,
+                            '部门': dept,
+                            '流失率': org_health_data['historical_data'][dept]['turnover_rate'][i],
+                            '储备率': org_health_data['historical_data'][dept]['reserve_rate'][i],
+                            '稳定性': org_health_data['historical_data'][dept]['stability_rate'][i],
+                            '满意度': org_health_data['historical_data'][dept]['satisfaction'][i],
+                            '增长率': org_health_data['historical_data'][dept]['growth_rate'][i]
+                        })
+                
+                df_trends = pd.DataFrame(trend_data)
+                df_trends.to_excel(writer, sheet_name='12个月趋势', index=False)
+                
+                # 改进建议
+                suggestion_data = []
+                for dept, suggestions in org_health_data['improvement_suggestions'].items():
+                    for i, suggestion in enumerate(suggestions, 1):
+                        suggestion_data.append({
+                            '部门': dept,
+                            '建议序号': i,
+                            '改进建议': suggestion
+                        })
+                
+                df_suggestions = pd.DataFrame(suggestion_data)
+                df_suggestions.to_excel(writer, sheet_name='改进建议', index=False)
+                
+                # 汇总统计
+                summary_data = [
+                    ['总员工数', org_health_data['summary']['total_employees']],
+                    ['平均综合评分', f"{org_health_data['summary']['avg_comprehensive_score']}分"],
+                    ['高风险部门数', org_health_data['summary']['high_risk_depts']],
+                    ['中等风险部门数', org_health_data['summary']['medium_risk_depts']],
+                    ['低风险部门数', org_health_data['summary']['low_risk_depts']]
+                ]
+                
+                df_summary = pd.DataFrame(summary_data, columns=['指标', '数值'])
+                df_summary.to_excel(writer, sheet_name='汇总统计', index=False)
             
-            df_trends = pd.DataFrame(trend_data)
-            df_trends.to_excel(writer, sheet_name='12个月趋势', index=False)
+            output.seek(0)
             
-            # 改进建议
-            suggestion_data = []
-            for dept, suggestions in org_health_data['improvement_suggestions'].items():
-                for i, suggestion in enumerate(suggestions, 1):
-                    suggestion_data.append({
-                        '部门': dept,
-                        '建议序号': i,
-                        '改进建议': suggestion
-                    })
+            filename = f"组织健康度评估报告_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
             
-            df_suggestions = pd.DataFrame(suggestion_data)
-            df_suggestions.to_excel(writer, sheet_name='改进建议', index=False)
+            # 设置响应头
+            response = send_file(
+                output,
+                as_attachment=True,
+                download_name=filename,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
             
-            # 汇总统计
-            summary_data = [
-                ['总员工数', org_health_data['summary']['total_employees']],
-                ['平均综合评分', f"{org_health_data['summary']['avg_comprehensive_score']}分"],
-                ['高风险部门数', org_health_data['summary']['high_risk_depts']],
-                ['中等风险部门数', org_health_data['summary']['medium_risk_depts']],
-                ['低风险部门数', org_health_data['summary']['low_risk_depts']]
-            ]
+            # 添加额外的响应头
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
             
-            df_summary = pd.DataFrame(summary_data, columns=['指标', '数值'])
-            df_summary.to_excel(writer, sheet_name='汇总统计', index=False)
-        
-        output.seek(0)
-        
-        filename = f"组织健康度评估报告_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-        return send_file(
-            output,
-            as_attachment=True,
-            download_name=filename,
-            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        )
+            return response
+            
+        except Exception as excel_error:
+            print(f"Excel生成错误: {excel_error}")
+            return jsonify({'error': f'Excel文件生成失败: {str(excel_error)}'}), 500
         
     except Exception as e:
+        print(f"组织健康度报告导出错误: {e}")
         return jsonify({'error': f'导出报告时发生错误: {str(e)}'}), 500
 
 @org_health_bp.route('/api/org_health_data', methods=['GET'])

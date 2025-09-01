@@ -107,12 +107,36 @@ def test_web_endpoints():
             print(f"✗ 主页访问失败，状态码: {response.status_code}")
             return False
         
-        # 测试员工认证页面
-        response = requests.get('http://localhost:5000/employee/auth', timeout=5)
+        # 测试员工认证页面 - 使用正确的路由
+        response = requests.get('http://localhost:5000/talent/employee/auth', timeout=5)
         if response.status_code == 200:
             print("✓ 员工认证页面访问成功")
         else:
             print(f"✗ 员工认证页面访问失败，状态码: {response.status_code}")
+            # 尝试其他可能的员工相关路由
+            print("尝试其他员工相关路由...")
+            
+            # 测试员工仪表板
+            response = requests.get('http://localhost:5000/talent/employee/dashboard', timeout=5)
+            if response.status_code == 200:
+                print("✓ 员工仪表板页面访问成功")
+            else:
+                print(f"✗ 员工仪表板页面访问失败，状态码: {response.status_code}")
+            
+            # 测试反馈页面
+            response = requests.get('http://localhost:5000/talent/feedback/', timeout=5)
+            if response.status_code == 200:
+                print("✓ 反馈页面访问成功")
+            else:
+                print(f"✗ 反馈页面访问失败，状态码: {response.status_code}")
+            
+            # 测试个人资料页面
+            response = requests.get('http://localhost:5000/talent/profile/', timeout=5)
+            if response.status_code == 200:
+                print("✓ 个人资料页面访问成功")
+            else:
+                print(f"✗ 个人资料页面访问失败，状态码: {response.status_code}")
+            
             return False
         
         return True
