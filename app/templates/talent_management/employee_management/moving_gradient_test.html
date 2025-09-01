@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>移动渐变色背景测试 - 员工系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            border: 1px solid rgba(228, 246, 236, 0.3);
+        }
+        
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-section h3 i {
+            color: #20B2AA;
+        }
+        
+        .color-palette {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .color-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            border: 1px solid rgba(228, 246, 236, 0.3);
+        }
+        
+        .color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .color-box.light-green-1 { background: #e4f6ec; }
+        .color-box.light-green-2 { background: #e0f5e9; }
+        .color-box.light-green-3 { background: #ddf4e7; }
+        .color-box.sky-blue { background: #A8D8EA; }
+        .color-box.light-green { background: #98FB98; }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(228, 246, 236, 0.4);
+        }
+        
+        .btn-primary {
+            background: #e4f6ec;
+            color: #2F4F4F;
+        }
+        
+        .btn-secondary {
+            background: #e0f5e9;
+            color: #2F4F4F;
+        }
+        
+        .btn-success {
+            background: #ddf4e7;
+            color: #2F4F4F;
+        }
+        
+        .btn-warning {
+            background: #FF7F7F;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #20B2AA;
+            color: white;
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #555;
+        }
+        
+        .feature-list li i {
+            color: #20B2AA;
+            width: 20px;
+        }
+        
+        .info-box {
+            background: rgba(228, 246, 236, 0.1);
+            border: 1px solid rgba(228, 246, 236, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box h4 {
+            color: #2F4F4F;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-box p {
+            color: #666;
+            margin: 0;
+            line-height: 1.6;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #20B2AA;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: color 0.3s ease;
+        }
+        
+        .back-link:hover {
+            color: #2F4F4F;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <a href="{{ url_for('talent_management.employee_management.dashboard.employee_dashboard') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            返回员工仪表板
+        </a>
+        
+        <div class="header">
+            <h1><i class="fas fa-palette"></i> 移动渐变色背景测试</h1>
+            <p>测试员工系统的移动渐变色背景效果，基于图中的三种浅绿色</p>
+        </div>
+        
+        <div class="test-section">
+            <h3><i class="fas fa-swatchbook"></i> 颜色调色板</h3>
+            <div class="color-palette">
+                <div class="color-item">
+                    <div class="color-box light-green-1"></div>
+                    <span>浅绿色 #e4f6ec</span>
+                </div>
+                <div class="color-item">
+                    <div class="color-box light-green-2"></div>
+                    <span>浅绿色 #e0f5e9</span>
+                </div>
+                <div class="color-item">
+                    <div class="color-box light-green-3"></div>
+                    <span>浅绿色 #ddf4e7</span>
+                </div>
+                <div class="color-item">
+                    <div class="color-box sky-blue"></div>
+                    <span>天蓝色/浅蓝色</span>
+                </div>
+                <div class="color-item">
+                    <div class="color-box light-green"></div>
+                    <span>浅绿色/薄荷绿</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3><i class="fas fa-cogs"></i> 背景控制</h3>
+            <div class="controls">
+                <button class="btn btn-primary" onclick="refreshGradientBackground()">
+                    <i class="fas fa-sync-alt"></i>
+                    刷新背景
+                </button>
+                <button class="btn btn-secondary" onclick="toggleBackground()">
+                    <i class="fas fa-eye"></i>
+                    切换显示
+                </button>
+                <button class="btn btn-success" onclick="changeSpeed()">
+                    <i class="fas fa-tachometer-alt"></i>
+                    改变速度
+                </button>
+                <button class="btn btn-warning" onclick="changeSize()">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    改变大小
+                </button>
+                <button class="btn btn-info" onclick="changeOpacity()">
+                    <i class="fas fa-adjust"></i>
+                    改变透明度
+                </button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3><i class="fas fa-info-circle"></i> 功能特性</h3>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> 基于三种浅绿色的移动渐变色形状</li>
+                <li><i class="fas fa-check"></i> 多种大小的圆形形状 (小、中、大)</li>
+                <li><i class="fas fa-check"></i> 平滑的移动动画效果</li>
+                <li><i class="fas fa-check"></i> 响应式设计，适配不同屏幕尺寸</li>
+                <li><i class="fas fa-check"></i> 半透明背景，不影响内容可读性</li>
+                <li><i class="fas fa-check"></i> 自动适应窗口大小变化</li>
+                <li><i class="fas fa-check"></i> 低性能消耗，流畅运行</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3><i class="fas fa-lightbulb"></i> 使用说明</h3>
+            <div class="info-box">
+                <h4><i class="fas fa-paint-brush"></i> 背景效果</h4>
+                <p>移动渐变色背景会在页面加载时自动创建，包含多个不同大小的圆形形状，以三种浅绿色为主色调，在页面背景中缓慢移动。</p>
+            </div>
+            <div class="info-box">
+                <h4><i class="fas fa-mobile-alt"></i> 响应式设计</h4>
+                <p>背景形状会根据屏幕大小自动调整，在小屏幕设备上形状会相应缩小，确保最佳显示效果。</p>
+            </div>
+            <div class="info-box">
+                <h4><i class="fas fa-eye"></i> 可读性保证</h4>
+                <p>所有内容容器都使用半透明白色背景和模糊效果，确保文字和内容在移动背景上清晰可读。</p>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3><i class="fas fa-code"></i> 技术实现</h3>
+            <ul class="feature-list">
+                <li><i class="fas fa-check"></i> CSS3 动画和变换</li>
+                <li><i class="fas fa-check"></i> JavaScript DOM 操作</li>
+                <li><i class="fas fa-check"></i> 响应式媒体查询</li>
+                <li><i class="fas fa-check"></i> 半透明和模糊效果</li>
+                <li><i class="fas fa-check"></i> 事件监听和动态更新</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- 引入图标颜色随机分配器 -->
+    <script src="{{ url_for('static', filename='js/icon_color_randomizer.js') }}"></script>
+    <!-- 引入移动渐变色形状脚本 -->
+    <script src="{{ url_for('static', filename='js/moving_gradient_shapes.js') }}"></script>
+    
+    <script>
+        let backgroundVisible = true;
+        let currentSpeed = 1;
+        let currentSize = 1;
+        let currentOpacity = 0.6;
+        
+        function toggleBackground() {
+            const background = document.querySelector('.moving-gradient-background');
+            if (background) {
+                backgroundVisible = !backgroundVisible;
+                background.style.display = backgroundVisible ? 'block' : 'none';
+            }
+        }
+        
+        function changeSpeed() {
+            currentSpeed = currentSpeed === 1 ? 2 : currentSpeed === 2 ? 0.5 : 1;
+            const shapes = document.querySelectorAll('.gradient-shape');
+            shapes.forEach(shape => {
+                shape.style.animationDuration = (20 / currentSpeed) + 's';
+            });
+        }
+        
+        function changeSize() {
+            currentSize = currentSize === 1 ? 1.5 : currentSize === 1.5 ? 0.7 : 1;
+            const shapes = document.querySelectorAll('.gradient-shape');
+            shapes.forEach(shape => {
+                const size = currentSize;
+                if (shape.classList.contains('small')) {
+                    shape.style.width = (60 * size) + 'px';
+                    shape.style.height = (60 * size) + 'px';
+                } else if (shape.classList.contains('medium')) {
+                    shape.style.width = (100 * size) + 'px';
+                    shape.style.height = (100 * size) + 'px';
+                } else if (shape.classList.contains('large')) {
+                    shape.style.width = (150 * size) + 'px';
+                    shape.style.height = (150 * size) + 'px';
+                }
+            });
+        }
+        
+        function changeOpacity() {
+            currentOpacity = currentOpacity === 0.6 ? 0.3 : currentOpacity === 0.3 ? 0.9 : 0.6;
+            const shapes = document.querySelectorAll('.gradient-shape');
+            shapes.forEach(shape => {
+                shape.style.opacity = currentOpacity;
+            });
+        }
+        
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('移动渐变色背景测试页面已加载');
+        });
+    </script>
+</body>
+</html>
