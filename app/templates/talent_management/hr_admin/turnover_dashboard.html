@@ -503,35 +503,48 @@
             font-weight: 500;
         }
 
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: var(--accent-blue);
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
             text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition-fast);
-            animation: slideInLeft 0.6s ease-out;
-            animation-delay: 0.1s;
-            animation-fill-mode: both;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
 
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
         }
 
-        .back-link:hover {
-            transform: translateX(-5px);
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #17a2b8;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .back-link i {
-            margin-right: 8px;
+        .back-btn:hover {
+            background: #138496;
+            transform: translateY(-2px);
         }
 
         .action-bar {
@@ -598,9 +611,8 @@
     <div class="executive-parallax-bg"></div>
     
     <div class="container">
-        <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="back-link">
-            <i class="fas fa-arrow-left"></i> 返回高管首页
-        </a>
+        <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="back-btn">←</a>
+        <a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="logout-btn">退出登录</a>
 
         <div class="header">
             <h1>
