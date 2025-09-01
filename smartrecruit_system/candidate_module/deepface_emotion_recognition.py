@@ -68,6 +68,10 @@ class DeepFaceEmotionRecognition:
                 logger.warning("无法解析图片数据，使用默认图像")
                 image = np.zeros((224, 224, 3), dtype=np.uint8)
             
+            # 记录图片信息
+            logger.info(f"图片尺寸: {image.shape if image is not None else 'None'}")
+            logger.info(f"图片数据类型: {image.dtype if image is not None else 'None'}")
+            
             # 保存临时文件
             with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as tmp_file:
                 cv2.imwrite(tmp_file.name, image)
@@ -75,7 +79,22 @@ class DeepFaceEmotionRecognition:
             
             try:
                 # 使用DeepFace进行表情识别
-                from deepface import DeepFace
+                try:
+                    from deepface import DeepFace
+                except ImportError as e:
+                    logger.error(f"DeepFace导入失败: {e}")
+                    raise Exception("DeepFace库未安装或导入失败")
+                
+                # 检查文件是否存在
+                if not os.path.exists(temp_path):
+                    raise Exception(f"临时文件不存在: {temp_path}")
+                
+                # 检查文件大小
+                file_size = os.path.getsize(temp_path)
+                logger.info(f"临时文件大小: {file_size} bytes")
+                
+                if file_size == 0:
+                    raise Exception("临时文件为空")
                 
                 result = DeepFace.analyze(
                     img_path=temp_path,
@@ -84,8 +103,31 @@ class DeepFaceEmotionRecognition:
                     detector_backend='opencv'
                 )
                 
+                # 记录DeepFace返回的结果类型和内容
+                logger.info(f"DeepFace返回结果类型: {type(result)}")
+                logger.info(f"DeepFace返回结果内容: {result}")
+                
+                # 检查结果是否为空
+                if result is None:
+                    logger.warning("DeepFace返回了None结果")
+                    result = []
+                
                 # 处理结果
                 processed_result = self._process_deepface_result(result, image)
+                
+                # 如果处理失败，返回默认结果
+                if processed_result.get("error"):
+                    logger.warning(f"DeepFace处理失败，返回默认结果: {processed_result['error']}")
+                    # 返回一个基本的成功结果，即使没有检测到人脸
+                    processed_result = {
+                        "success": True,
+                        "faces_detected": 0,
+                        "faces": [],
+                        "processed_image": self._image_to_base64(image),
+                        "emotion_summary": self._generate_emotion_summary([]),
+                        "deepface_mode": True,
+                        "warning": "未检测到人脸或处理失败"
+                    }
                 
                 # 添加文件名信息
                 if filename:
@@ -100,14 +142,17 @@ class DeepFaceEmotionRecognition:
             
         except Exception as e:
             logger.error(f"DeepFace表情识别失败: {e}")
+            logger.error(f"错误类型: {type(e)}")
+            import traceback
+            logger.error(f"错误堆栈: {traceback.format_exc()}")
             return {"error": f"表情识别失败: {str(e)}"}
     
-    def _process_deepface_result(self, deepface_result: List[Dict], original_image: np.ndarray) -> Dict:
+    def _process_deepface_result(self, deepface_result, original_image: np.ndarray) -> Dict:
         """
         处理DeepFace的结果
         
         Args:
-            deepface_result: DeepFace的原始结果
+            deepface_result: DeepFace的原始结果（可能是字典、列表或字符串）
             original_image: 原始图片
             
         Returns:
@@ -117,7 +162,42 @@ class DeepFaceEmotionRecognition:
             faces_detected = []
             processed_image = original_image.copy()
             
+            # 处理不同的返回类型
+            if isinstance(deepface_result, str):
+                logger.warning(f"DeepFace返回字符串结果: {deepface_result}")
+                return {
+                    "success": False,
+                    "error": f"DeepFace返回错误: {deepface_result}",
+                    "faces_detected": 0,
+                    "faces": [],
+                    "processed_image": self._image_to_base64(processed_image),
+                    "emotion_summary": self._generate_emotion_summary([]),
+                    "deepface_mode": True
+                }
+            
+            # 如果是字典，转换为列表
+            if isinstance(deepface_result, dict):
+                deepface_result = [deepface_result]
+            
+            # 确保是列表
+            if not isinstance(deepface_result, list):
+                logger.error(f"DeepFace返回了意外的数据类型: {type(deepface_result)}")
+                return {
+                    "success": False,
+                    "error": f"DeepFace返回了意外的数据类型: {type(deepface_result)}",
+                    "faces_detected": 0,
+                    "faces": [],
+                    "processed_image": self._image_to_base64(processed_image),
+                    "emotion_summary": self._generate_emotion_summary([]),
+                    "deepface_mode": True
+                }
+            
             for i, face_data in enumerate(deepface_result):
+                # 确保face_data是字典
+                if not isinstance(face_data, dict):
+                    logger.warning(f"跳过非字典类型的face_data: {type(face_data)}")
+                    continue
+                
                 # 获取表情信息
                 emotion_data = face_data.get('emotion', {})
                 dominant_emotion = face_data.get('dominant_emotion', 'unknown')
