@@ -1025,25 +1025,38 @@
     </div>
 
     <script>
+        // 预处理数据，避免在JavaScript中直接使用Jinja2语法
+        const orgHealthData = {
+            months: {{ org_health_data.months | tojson }},
+            departments: {{ org_health_data.departments | tojson }},
+            historicalData: {{ org_health_data.historical_data | tojson }}
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
             // 组织健康度趋势图表
             const ctx = document.getElementById('orgHealthChart').getContext('2d');
+            
+            // 准备图表数据
+            const chartLabels = orgHealthData.months;
+            const chartDatasets = [];
+            
+            // 处理部门数据
+            Object.keys(orgHealthData.departments).forEach((deptName, index) => {
+                chartDatasets.push({
+                    label: `${deptName} - 综合评分`,
+                    data: orgHealthData.historicalData[deptName]?.stability_rate || [],
+                    borderColor: getDepartmentColor(index + 1),
+                    backgroundColor: getDepartmentColor(index + 1, 0.1),
+                    tension: 0.4,
+                    fill: false
+                });
+            });
+            
             const orgHealthChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: {{ org_health_data.months | tojson }},
-                    datasets: [
-                        {% for dept_name in org_health_data.departments.keys() %}
-                        {
-                            label: '{{ dept_name }} - 综合评分',
-                            data: {{ org_health_data.historical_data[dept_name].stability_rate | tojson }},
-                            borderColor: getDepartmentColor('{{ loop.index }}'),
-                            backgroundColor: getDepartmentColor('{{ loop.index }}', 0.1),
-                            tension: 0.4,
-                            fill: false
-                        }{% if not loop.last %},{% endif %}
-                        {% endfor %}
-                    ]
+                    labels: chartLabels,
+                    datasets: chartDatasets
                 },
                 options: {
                     responsive: true,
@@ -1135,7 +1148,27 @@
 
         function refreshData() {
             alert('正在刷新数据...');
-            location.reload();
+            
+            fetch('{{ url_for("talent_management.hr_admin.org_health.refresh_org_health_data") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('数据刷新成功！');
+                    location.reload();
+                } else {
+                    alert('刷新数据失败：' + (data.error || '未知错误'));
+                }
+            })
+            .catch(error => {
+                console.error('刷新数据失败:', error);
+                alert('刷新数据失败，请重试');
+            });
         }
 
         function toggleView() {
