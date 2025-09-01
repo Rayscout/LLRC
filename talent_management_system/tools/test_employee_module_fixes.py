@@ -6,15 +6,27 @@
 
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from flask import Flask
-from app.models import db, User, Feedback, TaskEvaluation
-from talent_management_system.employee_manager_module.feedback import feedback_bp
-from talent_management_system.employee_manager_module.profile import profile_bp
-from talent_management_system.employee_manager_module.performance import performance_bp
-import tempfile
-import json
+# 添加项目根目录到Python路径
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+sys.path.insert(0, project_root)
+
+# 设置环境变量
+os.environ['FLASK_ENV'] = 'production'
+
+try:
+    from flask import Flask
+    from app.models import db, User, Feedback, TaskEvaluation
+    from talent_management_system.employee_manager_module.feedback import feedback_bp
+    from talent_management_system.employee_manager_module.profile import profile_bp
+    from talent_management_system.employee_manager_module.performance import performance_bp
+    import tempfile
+    import json
+except ImportError as e:
+    print(f"导入模块失败: {e}")
+    print("请确保在正确的目录下运行此脚本")
+    sys.exit(1)
 
 def create_test_app():
     """创建测试应用"""
