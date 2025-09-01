@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}查看所有岗位 - HR招聘系统{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='ios_jobs_style.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- iOS风格岗位展示页面 -->
+<div class="ios-jobs-container">
+    <!-- 顶部导航栏 -->
+    <header class="ios-navbar">
+        <div class="nav-content">
+            <div class="nav-left">
+                <button class="nav-back-btn" onclick="history.back()">
+                    <i class="uil uil-arrow-left"></i>
+                </button>
+            </div>
+            <div class="nav-center">
+                <h1 class="nav-title">查看岗位</h1>
+            </div>
+            <div class="nav-right">
+                <button class="nav-theme-btn" id="iosThemeToggle" title="切换主题">
+                    <i class="uil uil-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 搜索和筛选区域 -->
+    <section class="search-section">
+        <div class="search-container">
+            <div class="search-input-wrapper">
+                <i class="uil uil-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="搜索岗位、技能或公司..." id="jobSearchInput">
+                <button class="search-clear-btn" id="searchClearBtn" style="display: none;">
+                    <i class="uil uil-times"></i>
+                </button>
+            </div>
+            <div class="filter-tags">
+                <span class="filter-tag active" data-filter="all">全部</span>
+                <span class="filter-tag" data-filter="high-match">高匹配</span>
+                <span class="filter-tag" data-filter="recent">最新</span>
+                <span class="filter-tag" data-filter="remote">远程</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 岗位列表区域 -->
+    <section class="jobs-section">
+        <div class="jobs-container">
+            {% if jobs %}
+                <div class="jobs-grid" id="jobsGrid">
+                    {% for job in jobs %}
+                    <article class="job-card" data-job-id="{{ job.id }}" data-match-score="{{ job.match_score }}">
+                        <!-- 匹配度指示器 -->
+                        <div class="match-indicator">
+                            <div class="match-score">{{ job.match_score }}%</div>
+                            <div class="match-bar">
+                                <div class="match-fill" style="width: {{ job.match_score }}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- 岗位信息 -->
+                        <div class="job-header">
+                            <h3 class="job-title">{{ job.title }}</h3>
+                            <div class="company-info">
+                                <span class="company-name">{{ job.company_name or '未知公司' }}</span>
+                                <span class="job-location">
+                                    <i class="uil uil-map-marker"></i>
+                                    {{ job.location }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 岗位详情 -->
+                        <div class="job-details">
+                            <div class="job-meta">
+                                <span class="job-type">{{ job.job_type or '全职' }}</span>
+                                <span class="job-salary">{{ job.salary }}</span>
+                                {% if job.experience_years %}
+                                <span class="job-experience">{{ job.experience_years }}年经验</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="job-description">
+                                {{ job.description[:150] }}{% if job.description|length > 150 %}...{% endif %}
+                            </div>
+
+                            {% if job.skills_required %}
+                            <div class="job-skills">
+                                {% for skill in job.skills_required.split(',')[:3] %}
+                                <span class="skill-tag">{{ skill.strip() }}</span>
+                                {% endfor %}
+                                {% if job.skills_required.split(',')|length > 3 %}
+                                <span class="skill-more">+{{ job.skills_required.split(',')|length - 3 }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- 岗位操作 -->
+                        <div class="job-actions">
+                            <button class="action-btn primary" onclick="viewJobDetail({{ job.id }})">
+                                <i class="uil uil-eye"></i>
+                                查看详情
+                            </button>
+                            <button class="action-btn secondary" onclick="saveJob({{ job.id }})">
+                                <i class="uil uil-heart"></i>
+                                收藏
+                            </button>
+                        </div>
+
+                        <!-- 发布时间 -->
+                        <div class="job-posted">
+                            <i class="uil uil-clock"></i>
+                            {{ job.date_posted.strftime('%m-%d') if job.date_posted else '未知' }}
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+
+                <!-- 加载更多按钮 -->
+                <div class="load-more-container">
+                    <button class="load-more-btn" id="loadMoreBtn">
+                        <i class="uil uil-refresh"></i>
+                        加载更多岗位
+                    </button>
+                </div>
+            {% else %}
+                <!-- 空状态 -->
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="uil uil-briefcase"></i>
+                    </div>
+                    <h3 class="empty-title">暂无岗位</h3>
+                    <p class="empty-description">目前没有可用的岗位信息，请稍后再试。</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- 岗位详情模态框 -->
+    <div class="job-modal" id="jobModal">
+        <div class="modal-overlay" onclick="closeJobModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalJobTitle"></h2>
+                <button class="modal-close" onclick="closeJobModal()">
+                    <i class="uil uil-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalJobBody">
+                <!-- 动态加载岗位详情 -->
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn secondary" onclick="closeJobModal()">关闭</button>
+                <button class="modal-btn primary" id="modalApplyBtn">立即申请</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='ios_jobs_script.js') }}"></script>
+{% endblock %}

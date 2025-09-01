@@ -17,3 +17,7 @@ numpy==1.26.4
 # 生产环境依赖
 gunicorn==21.2.0
 gevent==23.9.1
+
+# 表情识别依赖
+deepface==0.0.79
+opencv-python==4.8.1.78

@@ -302,14 +302,23 @@
         }
 
         .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--accent-blue);
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--info-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             text-decoration: none;
             font-weight: 500;
-            margin-bottom: 20px;
-            transition: var(--transition-fast);
+            transition: var(--transition);
+            z-index: 1000;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         .back-btn:hover {
@@ -355,10 +364,7 @@
 <body>
     <div class="container">
         <!-- 返回按钮 -->
-        <a href="{{ url_for('talent_management.employee_manager.feedback.feedback_dashboard') }}" class="back-btn">
-            <i class="fas fa-arrow-left"></i>
-            返回反馈列表
-        </a>
+        <a href="{{ url_for('talent_management.employee_manager.feedback.feedback_dashboard') }}" class="back-btn">←</a>
 
         <!-- 页面标题 -->
         <div class="header">
