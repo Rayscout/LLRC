@@ -886,20 +886,17 @@
 
         // 更新原因分析图表
         function updateCausesChart() {
-            // 从服务器获取数据或使用默认数据
-            const causesData = {{ causes_analysis | tojson if causes_analysis else '{}' }};
+            const causesData = {{ causes_analysis | tojson }};
             const data = [
-                causesData.salary?.percentage || 0,
-                causesData.skill_development?.percentage || 0,
-                causesData.workload?.percentage || 0,
-                causesData.career_growth?.percentage || 0,
-                causesData.culture?.percentage || 0
+                causesData.salary.percentage,
+                causesData.skill_development.percentage,
+                causesData.workload.percentage,
+                causesData.career_growth.percentage,
+                causesData.culture.percentage
             ];
 
-            if (window.causesChart) {
-                window.causesChart.data.datasets[0].data = data;
-                window.causesChart.update();
-            }
+            window.causesChart.data.datasets[0].data = data;
+            window.causesChart.update();
         }
 
         // 刷新数据
@@ -925,22 +922,15 @@
                 }, 150);
             }
             
-            alert('正在生成预警报告...');
-            
             fetch('/talent/hr_admin/turnover_alert/api/generate_report')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         alert('预警报告已生成！报告ID: ' + data.report.report_id);
                         // 这里可以添加报告下载或预览功能
-                    } else {
-                        alert('生成报告失败：' + (data.error || '未知错误'));
                     }
                 })
-                .catch(error => {
-                    console.error('生成报告失败:', error);
-                    alert('生成报告失败，请重试');
-                });
+                .catch(error => console.error('生成报告失败:', error));
         }
 
         // 导出数据
@@ -953,38 +943,8 @@
                 }, 150);
             }
             
-            alert('正在导出人才流失预警数据...');
-            
-            fetch('/talent/hr_admin/turnover_alert/api/export_data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    return response.blob();
-                } else {
-                    throw new Error('导出失败');
-                }
-            })
-            .then(blob => {
-                // 创建下载链接
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `人才流失预警报告_${new Date().toISOString().slice(0,10)}.xlsx`;
-                document.body.appendChild(a);
-                a.click();
-                window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
-                alert('导出成功！');
-            })
-            .catch(error => {
-                console.error('导出错误:', error);
-                alert('导出失败，请重试');
-            });
+            // 这里可以实现数据导出功能
+            alert('数据导出功能开发中...');
         }
 
 

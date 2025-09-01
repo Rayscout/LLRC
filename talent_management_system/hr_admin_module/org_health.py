@@ -225,6 +225,7 @@ def refresh_org_health_data():
         })
         
     except Exception as e:
+        print(f"刷新组织健康度数据错误: {e}")
         return jsonify({'error': f'刷新数据失败: {str(e)}'}), 500
 
 @org_health_bp.route('/api/export_report', methods=['POST'])
@@ -238,8 +239,13 @@ def export_org_health_report():
         if not user or user.user_type != 'executive':
             return jsonify({'error': '权限不足'}), 403
         
-        if pd is None:
-            return jsonify({'error': 'pandas库未安装，无法导出Excel文件'}), 500
+        # 检查pandas和openpyxl是否可用
+        try:
+            import pandas as pd
+            import openpyxl
+        except ImportError as e:
+            print(f"缺少必要依赖: {e}")
+            return jsonify({'error': '服务器缺少必要的数据处理库，请联系管理员安装'}), 500
         
         org_health_data = generate_org_health_data()
         

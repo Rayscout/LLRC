@@ -281,32 +281,9 @@ def career_tracking_dashboard():
         progress_filter=progress_filter
     )
 
-@career_tracking_bp.route('/api/refresh_data', methods=['POST'])
-def refresh_career_data():
-    """刷新职业发展数据"""
-    try:
-        if 'user_id' not in session:
-            return jsonify({'error': '请先登录'}), 401
-        
-        user = User.query.get(session['user_id'])
-        if not user or user.user_type != 'executive':
-            return jsonify({'error': '权限不足'}), 403
-        
-        # 重新生成数据
-        career_data = generate_career_tracking_data()
-        
-        return jsonify({
-            'success': True,
-            'message': '数据刷新成功！',
-            'data': career_data
-        })
-        
-    except Exception as e:
-        return jsonify({'error': f'刷新数据失败: {str(e)}'}), 500
-
 @career_tracking_bp.route('/api/export_report', methods=['POST'])
 def export_career_report():
-    """导出职业发展报告"""
+    """导出职业发展追踪报告"""
     try:
         if 'user_id' not in session:
             return jsonify({'error': '请先登录'}), 401
@@ -323,108 +300,92 @@ def export_career_report():
         # 创建Excel文件
         output = io.BytesIO()
         
-        try:
-            with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                # 团队成员发展概览
-                member_overview = []
-                for member_name, member_data in career_data['team_members'].items():
-                    member_overview.append({
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            # 团队成员发展概览
+            member_overview = []
+            for member_name, member_data in career_data['team_members'].items():
+                member_overview.append({
+                    '姓名': member_name,
+                    '职位': member_data['position'],
+                    '部门': member_data['department'],
+                    '当前职级': member_data['current_level'],
+                    '目标职级': member_data['target_level'],
+                    '整体进度': f"{member_data['overall_progress']}%",
+                    '培训完成率': f"{member_data['training_completion_rate']}%",
+                    '绩效评分': member_data['performance_score'],
+                    '风险等级': member_data['risk_level'],
+                    '是否滞后': '是' if member_data['is_lagging'] else '否'
+                })
+            
+            df_overview = pd.DataFrame(member_overview)
+            df_overview.to_excel(writer, sheet_name='团队成员发展概览', index=False)
+            
+            # 技能发展详情
+            skill_details = []
+            for member_name, member_data in career_data['team_members'].items():
+                for skill_name, skill_data in member_data['skills'].items():
+                    skill_details.append({
                         '姓名': member_name,
-                        '职位': member_data['position'],
-                        '部门': member_data['department'],
-                        '当前职级': member_data['current_level'],
-                        '目标职级': member_data['target_level'],
-                        '整体进度': f"{member_data['overall_progress']}%",
-                        '培训完成率': f"{member_data['training_completion_rate']}%",
-                        '绩效评分': member_data['performance_score'],
-                        '风险等级': member_data['risk_level'],
-                        '是否滞后': '是' if member_data['is_lagging'] else '否'
+                        '技能名称': skill_name,
+                        '当前水平': skill_data['current'],
+                        '目标水平': skill_data['target'],
+                        '差距': skill_data['target'] - skill_data['current'],
+                        '增长率': f"{skill_data['growth_rate']*100:.1f}%"
                     })
-                
-                df_overview = pd.DataFrame(member_overview)
-                df_overview.to_excel(writer, sheet_name='团队成员发展概览', index=False)
-                
-                # 技能发展详情
-                skill_details = []
-                for member_name, member_data in career_data['team_members'].items():
-                    for skill_name, skill_data in member_data['skills'].items():
-                        skill_details.append({
-                            '姓名': member_name,
-                            '技能名称': skill_name,
-                            '当前水平': skill_data['current'],
-                            '目标水平': skill_data['target'],
-                            '差距': skill_data['target'] - skill_data['current'],
-                            '增长率': f"{skill_data['growth_rate']*100:.1f}%"
-                        })
-                
-                df_skills = pd.DataFrame(skill_details)
-                df_skills.to_excel(writer, sheet_name='技能发展详情', index=False)
-                
-                # 培训完成情况
-                training_details = []
-                for member_name, member_data in career_data['team_members'].items():
-                    for training_name, training_data in member_data['training_progress'].items():
-                        training_details.append({
-                            '姓名': member_name,
-                            '培训课程': training_name,
-                            '状态': training_data['status'],
-                            '得分': training_data['score'],
-                            '完成日期': training_data['completion_date'] or '未完成'
-                        })
-                
-                df_training = pd.DataFrame(training_details)
-                df_training.to_excel(writer, sheet_name='培训完成情况', index=False)
-                
-                # 发展建议
-                suggestion_details = []
-                for member_name, member_data in career_data['team_members'].items():
-                    for i, suggestion in enumerate(member_data['development_suggestions'], 1):
-                        suggestion_details.append({
-                            '姓名': member_name,
-                            '建议序号': i,
-                            '发展建议': suggestion
-                        })
-                
-                df_suggestions = pd.DataFrame(suggestion_details)
-                df_suggestions.to_excel(writer, sheet_name='发展建议', index=False)
-                
-                # 汇总统计
-                summary_data = [
-                    ['总团队成员数', career_data['summary']['total_members']],
-                    ['平均发展进度', f"{career_data['summary']['avg_progress']}%"],
-                    ['滞后成员数', career_data['summary']['lagging_members']],
-                    ['高风险成员数', career_data['summary']['high_risk_members']]
-                ]
-                
-                df_summary = pd.DataFrame(summary_data, columns=['指标', '数值'])
-                df_summary.to_excel(writer, sheet_name='汇总统计', index=False)
             
-            output.seek(0)
+            df_skills = pd.DataFrame(skill_details)
+            df_skills.to_excel(writer, sheet_name='技能发展详情', index=False)
             
-            filename = f"职业发展追踪报告_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            # 培训完成情况
+            training_details = []
+            for member_name, member_data in career_data['team_members'].items():
+                for training_name, training_data in member_data['training_progress'].items():
+                    training_details.append({
+                        '姓名': member_name,
+                        '培训课程': training_name,
+                        '状态': training_data['status'],
+                        '得分': training_data['score'],
+                        '完成日期': training_data['completion_date'] or '未完成'
+                    })
             
-            # 设置响应头
-            response = send_file(
-                output,
-                as_attachment=True,
-                download_name=filename,
-                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
+            df_training = pd.DataFrame(training_details)
+            df_training.to_excel(writer, sheet_name='培训完成情况', index=False)
             
-            # 添加额外的响应头
-            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response.headers['Pragma'] = 'no-cache'
-            response.headers['Expires'] = '0'
-            response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+            # 发展建议
+            suggestion_details = []
+            for member_name, member_data in career_data['team_members'].items():
+                for i, suggestion in enumerate(member_data['development_suggestions'], 1):
+                    suggestion_details.append({
+                        '姓名': member_name,
+                        '建议序号': i,
+                        '发展建议': suggestion
+                    })
             
-            return response
+            df_suggestions = pd.DataFrame(suggestion_details)
+            df_suggestions.to_excel(writer, sheet_name='发展建议', index=False)
             
-        except Exception as excel_error:
-            print(f"Excel生成错误: {excel_error}")
-            return jsonify({'error': f'Excel文件生成失败: {str(excel_error)}'}), 500
+            # 汇总统计
+            summary_data = [
+                ['总团队成员数', career_data['summary']['total_members']],
+                ['平均发展进度', f"{career_data['summary']['avg_progress']}%"],
+                ['滞后成员数', career_data['summary']['lagging_members']],
+                ['高风险成员数', career_data['summary']['high_risk_members']]
+            ]
+            
+            df_summary = pd.DataFrame(summary_data, columns=['指标', '数值'])
+            df_summary.to_excel(writer, sheet_name='汇总统计', index=False)
+        
+        output.seek(0)
+        
+        filename = f"职业发展追踪报告_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        return send_file(
+            output,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
         
     except Exception as e:
-        print(f"职业发展报告导出错误: {e}")
         return jsonify({'error': f'导出报告时发生错误: {str(e)}'}), 500
 
 @career_tracking_bp.route('/api/career_data', methods=['GET'])

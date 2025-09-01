@@ -881,26 +881,6 @@
             });
         }
 
-        // 生成薪酬分析报告功能
-        function generateReport() {
-            alert('正在生成薪酬分析报告...');
-            
-            fetch('{{ url_for("talent_management.hr_admin.salary_analysis.generate_salary_report") }}')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('薪酬分析报告已生成！报告ID: ' + data.report_id);
-                        // 这里可以添加报告下载或预览功能
-                    } else {
-                        alert('生成报告失败：' + (data.error || '未知错误'));
-                    }
-                })
-                .catch(error => {
-                    console.error('生成报告失败:', error);
-                    alert('生成报告失败，请重试');
-                });
-        }
-
         // 刷新数据功能
         function refreshData() {
             alert('正在刷新数据...');
