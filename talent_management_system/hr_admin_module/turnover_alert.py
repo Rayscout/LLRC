@@ -515,19 +515,22 @@ def export_turnover_data():
             
             filename = f"人才流失预警报告_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
             
-            # 设置响应头
+            # 设置响应头 - 修复编码问题
+            # 使用英文文件名避免编码问题
+            safe_filename = f"turnover_alert_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            
             response = send_file(
                 output,
                 as_attachment=True,
-                download_name=filename,
+                download_name=safe_filename,
                 mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
             
-            # 添加额外的响应头
+            # 添加额外的响应头 - 避免中文字符
             response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
             response.headers['Pragma'] = 'no-cache'
             response.headers['Expires'] = '0'
-            response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+            response.headers['Content-Disposition'] = f'attachment; filename="{safe_filename}"'
             
             return response
             
