@@ -846,6 +846,7 @@
 
         // 导出数据功能
         function exportData() {
+            console.log('开始导出数据...');
             alert('正在导出薪酬数据报表...');
             
             // 使用fetch API发送POST请求
@@ -857,13 +858,21 @@
                 }
             })
             .then(response => {
+                console.log('响应状态:', response.status);
+                console.log('响应头:', response.headers);
+                
                 if (response.ok) {
                     return response.blob();
                 } else {
-                    throw new Error('导出失败');
+                    // 尝试获取错误信息
+                    return response.text().then(text => {
+                        console.error('错误响应:', text);
+                        throw new Error(`导出失败: ${response.status} ${response.statusText}`);
+                    });
                 }
             })
             .then(blob => {
+                console.log('获取到blob数据:', blob);
                 // 创建下载链接
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -877,7 +886,7 @@
             })
             .catch(error => {
                 console.error('导出错误:', error);
-                alert('导出失败，请重试');
+                alert('导出失败，请重试。错误信息: ' + error.message);
             });
         }
 
