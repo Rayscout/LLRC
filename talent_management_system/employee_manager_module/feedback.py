@@ -93,14 +93,37 @@ def send_feedback():
                 status='sent'
             )
             
-            db.session.add(new_feedback)
-            db.session.commit()
-            
-            # 创建通知给接收者
-            create_feedback_notification(new_feedback.id, recipient_id, user.id)
-            
-            flash('反馈已成功发送', 'success')
-            return redirect(url_for('talent_management.employee_manager.feedback.feedback_dashboard'))
+            try:
+                db.session.add(new_feedback)
+                db.session.commit()
+                
+                # 验证数据是否成功保存
+                saved_feedback = Feedback.query.filter_by(
+                    sender_id=user.id,
+                    recipient_id=recipient_id,
+                    content=content
+                ).first()
+                
+                if not saved_feedback:
+                    db.session.rollback()
+                    flash('反馈保存失败，请重试', 'danger')
+                    return redirect(url_for('talent_management.employee_manager.feedback.send_feedback'))
+                
+                # 创建通知给接收者
+                try:
+                    create_feedback_notification(new_feedback.id, recipient_id, user.id)
+                except Exception as notification_error:
+                    # 通知创建失败不影响反馈发送
+                    print(f"通知创建失败: {notification_error}")
+                
+                flash('反馈已成功发送', 'success')
+                return redirect(url_for('talent_management.employee_manager.feedback.feedback_dashboard'))
+                
+            except Exception as db_error:
+                db.session.rollback()
+                print(f"数据库操作失败: {db_error}")
+                flash('反馈发送失败，请重试', 'danger')
+                return redirect(url_for('talent_management.employee_manager.feedback.send_feedback'))
         
         # 获取可接收反馈的高管和主管
         executives = User.query.filter(User.user_type.in_(['supervisor', 'executive'])).all()
@@ -109,6 +132,7 @@ def send_feedback():
                              user=user, executives=executives)
                              
     except Exception as e:
+        print(f"发送反馈时发生错误: {str(e)}")
         flash(f'发送反馈时发生错误: {str(e)}', 'danger')
         return redirect(url_for('talent_management.employee_manager.feedback.feedback_dashboard'))
 

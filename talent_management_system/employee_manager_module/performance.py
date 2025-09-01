@@ -41,26 +41,70 @@ def performance_dashboard():
 @performance_bp.route('/history')
 def performance_history():
     """绩效历史记录"""
-    # 检查用户是否登录
-    from flask import session
-    if 'user_id' not in session:
-        flash('请先登录', 'warning')
-        return redirect(url_for('common.auth.sign'))
-    
-    # 获取用户信息
-    from app.models import User
-    user = User.query.get(session['user_id'])
-    if not user:
-        session.clear()
-        flash('用户信息获取失败，请重新登录', 'warning')
-        return redirect(url_for('common.auth.sign'))
-    
-    # 模拟历史绩效数据
-    history_data = generate_mock_performance_history(user)
-    
-    return render_template('talent_management/employee_management/performance_history.html',
-                         user=user,
-                         history_data=history_data)
+    try:
+        # 检查用户是否登录
+        from flask import session
+        if 'user_id' not in session:
+            flash('请先登录', 'warning')
+            return redirect(url_for('common.auth.sign'))
+        
+        # 获取用户信息
+        from app.models import User
+        user = User.query.get(session['user_id'])
+        if not user:
+            session.clear()
+            flash('用户信息获取失败，请重新登录', 'warning')
+            return redirect(url_for('common.auth.sign'))
+        
+        # 验证用户类型
+        if user.user_type != 'employee':
+            flash('您没有权限访问此页面', 'warning')
+            return redirect(url_for('common.auth.sign'))
+        
+        # 获取真实的绩效评价数据
+        real_evaluations = []
+        try:
+            evaluations = TaskEvaluation.query.filter_by(employee_id=user.id)\
+                .order_by(TaskEvaluation.created_at.desc()).all()
+            
+            for eval_item in evaluations:
+                real_evaluations.append({
+                    'period': eval_item.created_at.strftime('%Y-%m-%d'),
+                    'overall_score': eval_item.total_score,
+                    'work_quality': eval_item.score_quality,
+                    'work_efficiency': eval_item.score_efficiency,
+                    'teamwork': eval_item.score_collaboration,
+                    'initiative': (eval_item.score_quality + eval_item.score_efficiency) // 2,  # 模拟数据
+                    'learning_ability': (eval_item.score_efficiency + eval_item.score_collaboration) // 2,  # 模拟数据
+                    'achievements': [
+                        f"{eval_item.task_title} - 质量评分: {eval_item.score_quality}",
+                        f"效率评分: {eval_item.score_efficiency}",
+                        f"协作评分: {eval_item.score_collaboration}"
+                    ],
+                    'comments': eval_item.comment or '无评语'
+                })
+        except Exception as eval_error:
+            print(f"获取绩效评价数据失败: {eval_error}")
+            # 如果获取真实数据失败，使用模拟数据
+            pass
+        
+        # 生成模拟历史绩效数据（补充数据）
+        mock_history = generate_mock_performance_history(user)
+        
+        # 合并真实数据和模拟数据
+        history_data = real_evaluations + mock_history
+        
+        # 按时间排序
+        history_data.sort(key=lambda x: x['period'], reverse=True)
+        
+        return render_template('talent_management/employee_management/performance_history.html',
+                             user=user,
+                             history_data=history_data)
+                             
+    except Exception as e:
+        print(f"绩效历史记录页面错误: {e}")
+        flash('加载绩效历史记录时发生错误，请稍后重试', 'danger')
+        return redirect(url_for('talent_management.employee_manager.performance.performance_dashboard'))
 
 def generate_mock_performance_data(user):
     """生成模拟绩效数据"""

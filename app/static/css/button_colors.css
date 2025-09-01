@@ -1,0 +1,232 @@
+/* 员工系统按钮颜色统一更新 */
+/* 基于图中的天蓝色/浅蓝色 */
+
+/* 定义按钮颜色变量 */
+:root {
+    --button-primary-color: #A8D8EA; /* 天蓝色/浅蓝色 */
+    --button-primary-hover: #8BC8E0; /* 稍深的天蓝色用于悬停 */
+    --button-text-color: #2F4F4F; /* 深色文字确保可读性 */
+    --button-shadow: rgba(168, 216, 234, 0.4); /* 天蓝色阴影 */
+}
+
+/* 主要按钮样式 - 覆盖所有.btn类 */
+.btn {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+/* 主要按钮悬停效果 */
+.btn:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 5px 15px var(--button-shadow) !important;
+}
+
+/* 主要按钮类型 */
+.btn-primary {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-primary:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 5px 15px var(--button-shadow) !important;
+}
+
+/* 次要按钮 */
+.btn-secondary {
+    background: rgba(168, 216, 234, 0.2) !important;
+    color: var(--button-text-color) !important;
+    border: 1px solid var(--button-primary-color) !important;
+}
+
+.btn-secondary:hover {
+    background: rgba(168, 216, 234, 0.3) !important;
+    box-shadow: 0 3px 10px var(--button-shadow) !important;
+}
+
+/* 轮廓按钮 */
+.btn-outline {
+    background: transparent !important;
+    color: var(--button-primary-color) !important;
+    border: 2px solid var(--button-primary-color) !important;
+}
+
+.btn-outline:hover {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+}
+
+/* 成功按钮 */
+.btn-success {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-success:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 5px 15px var(--button-shadow) !important;
+}
+
+/* 警告按钮 */
+.btn-warning {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-warning:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 5px 15px var(--button-shadow) !important;
+}
+
+/* 危险按钮 */
+.btn-danger {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-danger:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 5px 15px var(--button-shadow) !important;
+}
+
+/* 小按钮 */
+.btn-small {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-small:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 3px 8px var(--button-shadow) !important;
+}
+
+/* 自定义按钮 */
+.btn-custom {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-custom:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 5px 15px var(--button-shadow) !important;
+}
+
+/* 导出按钮 */
+.btn-export {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-export:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 5px 15px var(--button-shadow) !important;
+}
+
+/* 提交按钮 */
+.btn-submit {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-submit:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 5px 15px var(--button-shadow) !important;
+}
+
+/* 导航按钮 */
+.btn-nav {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-nav:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 3px 8px var(--button-shadow) !important;
+}
+
+/* 今天按钮 */
+.btn-today {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-today:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 3px 8px var(--button-shadow) !important;
+}
+
+/* 按钮组 */
+.btn-group .btn {
+    background: var(--button-primary-color) !important;
+    color: var(--button-text-color) !important;
+    border-color: var(--button-primary-color) !important;
+}
+
+.btn-group .btn:hover {
+    background: var(--button-primary-hover) !important;
+    box-shadow: 0 3px 8px var(--button-shadow) !important;
+}
+
+/* 按钮内的图标颜色 */
+.btn i {
+    color: inherit !important;
+}
+
+/* 特殊按钮保持原有样式（如登出按钮） */
+.logout-btn {
+    background: rgba(255,255,255,0.2) !important;
+    color: white !important;
+    border: 2px solid white !important;
+}
+
+.logout-btn:hover {
+    background: white !important;
+    color: #667eea !important;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .btn {
+        padding: 10px 20px !important;
+        font-size: 0.9em !important;
+    }
+    
+    .btn-small {
+        padding: 8px 16px !important;
+        font-size: 0.8em !important;
+    }
+}
+
+/* 确保按钮文字可读性 */
+.btn {
+    font-weight: 600 !important;
+    text-shadow: none !important;
+}
+
+/* 移除可能存在的渐变背景 */
+.btn,
+.btn-primary,
+.btn-secondary,
+.btn-outline,
+.btn-success,
+.btn-warning,
+.btn-danger,
+.btn-small,
+.btn-custom,
+.btn-export,
+.btn-submit,
+.btn-nav,
+.btn-today {
+    background-image: none !important;
+}

@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>编辑个人资料 - 员工仪表板</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,7 +17,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -22,14 +25,15 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: white;
+            background: rgba(228, 246, 236, 0.3);
+            backdrop-filter: blur(10px);
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(228, 246, 236, 0.3);
             overflow: hidden;
         }
         
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -75,7 +79,7 @@
         .form-group textarea:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #20B2AA;
         }
         
         .form-group textarea {
@@ -103,25 +107,25 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
             color: white;
         }
         
         .btn-outline {
             background: transparent;
-            color: #667eea;
-            border: 2px solid #667eea;
+            color: #20B2AA;
+            border: 2px solid #20B2AA;
         }
         
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(32, 178, 170, 0.3);
         }
         
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
-            color: #667eea;
+            color: #20B2AA;
             text-decoration: none;
             font-weight: 600;
         }
@@ -293,5 +297,10 @@
             }
         });
     </script>
+    
+    <!-- 引入图标颜色随机分配器 -->
+    <script src="{{ url_for('static', filename='js/icon_color_randomizer.js') }}"></script>
+    <!-- 引入移动渐变色形状脚本 -->
+    <script src="{{ url_for('static', filename='js/moving_gradient_shapes.js') }}"></script>
 </body>
 </html>
