@@ -318,9 +318,14 @@
 </style>
 
 <div class="review-container">
-    <a href="{{ url_for('smartrecruit.hr.candidates.view_candidates', job_id=job.id) }}" class="back-link">
-        ← 返回候选人列表
-    </a>
+    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+        <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="back-link">
+            ← 返回仪表盘
+        </a>
+        <a href="{{ url_for('smartrecruit.hr.candidates.view_candidates', job_id=job.id) }}" class="back-link">
+            ← 返回候选人列表
+        </a>
+    </div>
 
     <div class="page-header">
         <h1 class="page-title">审核AI面试结果</h1>

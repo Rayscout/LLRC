@@ -156,7 +156,7 @@
             </div>
             <div class="modal-footer">
                 <button class="modal-btn secondary" onclick="closeJobModal()">关闭</button>
-                <button class="modal-btn primary" id="modalApplyBtn">立即申请</button>
+                <button class="modal-btn primary" id="modalApplyBtn" onclick="window.location.href='{{ url_for('smartrecruit.candidate.applications.pre_apply', job_id=0) }}'.replace('0', document.getElementById('jobModal').dataset.jobId)">立即申请</button>
             </div>
         </div>
     </div>
