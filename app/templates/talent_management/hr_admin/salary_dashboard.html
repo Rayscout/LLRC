@@ -9,7 +9,42 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">        
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            
+            // 添加样式
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+                ${type === 'success' ? 'background: #34C759;' : 
+                  type === 'error' ? 'background: #FF3B30;' : 
+                  'background: #007AFF;'}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
     <style>
         :root {
             --primary-color: #667eea;
@@ -847,7 +882,20 @@
         // 导出数据功能
         function exportData() {
             console.log('开始导出数据...');
-            alert('正在导出薪酬数据报表...');
+            
+            // 显示加载状态
+            const exportBtn = event.target.closest('button');
+            if (exportBtn) {
+                const originalText = exportBtn.innerHTML;
+                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 导出中...';
+                exportBtn.disabled = true;
+                
+                // 恢复按钮状态
+                setTimeout(() => {
+                    exportBtn.innerHTML = originalText;
+                    exportBtn.disabled = false;
+                }, 5000);
+            }
             
             // 使用fetch API发送POST请求
             fetch('{{ url_for("talent_management.hr_admin.salary_analysis.export_salary_data") }}', {
@@ -877,16 +925,33 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `薪酬分析报告_${new Date().toISOString().slice(0,10)}.xlsx`;
+                a.download = `salary_analysis_report_${new Date().toISOString().slice(0,10)}.xlsx`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
-                alert('导出成功！');
+                
+                // 显示成功通知
+                showNotification('薪酬数据导出成功！', 'success');
             })
             .catch(error => {
                 console.error('导出错误:', error);
-                alert('导出失败，请重试。错误信息: ' + error.message);
+                
+                // 显示详细错误信息
+                let errorMessage = '导出失败，请重试。';
+                if (error.message.includes('502')) {
+                    errorMessage = '服务器暂时不可用，请稍后重试。';
+                } else if (error.message.includes('500')) {
+                    errorMessage = '服务器内部错误，请联系管理员。';
+                } else if (error.message.includes('404')) {
+                    errorMessage = '导出接口不存在，请联系管理员。';
+                } else if (error.message.includes('403')) {
+                    errorMessage = '权限不足，请检查登录状态。';
+                } else if (error.message.includes('401')) {
+                    errorMessage = '请先登录系统。';
+                }
+                
+                showNotification(errorMessage, 'error');
             });
         }
 
@@ -899,6 +964,41 @@
         // 切换视图功能
         function toggleView() {
             alert('视图切换功能开发中...');
+        }
+            
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            
+            // 添加样式
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+                ${type === 'success' ? 'background: #34C759;' : 
+                  type === 'error' ? 'background: #FF3B30;' : 
+                  'background: #007AFF;'}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
     </script>
 </body>
