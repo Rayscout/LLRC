@@ -176,6 +176,12 @@ def create_goal():
             if not user:
                 return jsonify({'success': False, 'message': '用户信息获取失败'})
 
+            # 验证必填字段
+            required_fields = ['title', 'specific', 'measurable', 'achievable', 'relevant', 'time_bound', 'target_date']
+            for field in required_fields:
+                if not request.form.get(field):
+                    return jsonify({'success': False, 'message': f'请填写{field}字段'})
+
             # 创建新的SMART目标
             new_goal = SmartGoal(
                 user_id=user.id,
@@ -198,14 +204,28 @@ def create_goal():
             db.session.add(new_goal)
             db.session.commit()
 
+            # 验证数据是否成功保存
+            saved_goal = SmartGoal.query.filter_by(
+                user_id=user.id,
+                title=request.form.get('title')
+            ).first()
+
+            if not saved_goal:
+                db.session.rollback()
+                return jsonify({'success': False, 'message': '目标保存失败，请重试'})
+
             return jsonify({
                 'success': True,
                 'message': '目标创建成功',
                 'goal_id': new_goal.id
             })
 
+        except ValueError as ve:
+            db.session.rollback()
+            return jsonify({'success': False, 'message': f'数据格式错误: {str(ve)}'})
         except Exception as e:
             db.session.rollback()
+            print(f"创建目标失败: {e}")
             return jsonify({'success': False, 'message': f'创建目标失败: {str(e)}'})
 
     return render_template('talent_management/employee_management/create_goal.html')

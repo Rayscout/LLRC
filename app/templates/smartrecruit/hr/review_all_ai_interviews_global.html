@@ -244,6 +244,163 @@
             color: var(--ios-text-quaternary);
             margin-bottom: var(--ios-spacing-lg);
         }
+        
+        /* 模态框样式 */
+        .ios-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+        
+        .ios-modal {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .ios-modal-header {
+            padding: 24px 24px 16px 24px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 16px 16px 0 0;
+        }
+        
+        .ios-modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .ios-modal-close {
+            background: #e9ecef;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #6c757d;
+            padding: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        
+        .ios-modal-close:hover {
+            background: #dee2e6;
+            color: #495057;
+        }
+        
+        .ios-modal-body {
+            padding: 24px;
+            background: #ffffff;
+        }
+        
+        .ios-modal-footer {
+            padding: 16px 24px 24px 24px;
+            border-top: 1px solid #e1e5e9;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            background: #f8f9fa;
+            border-radius: 0 0 16px 16px;
+        }
+        
+        .ios-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .ios-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #1a1a1a;
+            font-size: 14px;
+        }
+        
+        .ios-form-group input,
+        .ios-form-group select,
+        .ios-form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #ffffff;
+            color: #1a1a1a;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .ios-form-group input:focus,
+        .ios-form-group select:focus,
+        .ios-form-group textarea:focus {
+            outline: none;
+            border-color: #007AFF;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+        
+        .ios-form-group textarea {
+            height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .ios-action-button.primary {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 100px;
+        }
+        
+        .ios-action-button.primary:hover {
+            background: #0056CC;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+        
+        .ios-action-button.neutral {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 100px;
+        }
+        
+        .ios-action-button.neutral:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -332,16 +489,10 @@
         <!-- 欢迎Section -->
         <section class="ios-section ios-ai-review-hero">
             <div class="ios-container">
-                <div style="display: flex; gap: 15px; margin-bottom: var(--ios-spacing-lg); flex-wrap: wrap;">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-back-button">
-                        <i class="uil uil-arrow-left"></i>
-                        返回仪表盘
-                    </a>
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-back-button">
-                        <i class="uil uil-arrow-left"></i>
-                        返回候选人管理
-                    </a>
-                </div>
+                <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-back-button">
+                    <i class="uil uil-arrow-left"></i>
+                    返回候选人管理
+                </a>
                 
                 <h1 class="ios-title ios-fade-in">AI面试结果审核</h1>
                 <p class="ios-subtitle ios-fade-in">查看和审核所有AI面试结果，快速筛选优秀候选人</p>
@@ -354,7 +505,7 @@
                     </div>
                     <div class="ios-stat-card">
                         <div class="ios-stat-number">{{ total_passed }}</div>
-                        <div class="ios-stat-label">通过AI面试</div>
+                        <div class="ios-stat-label">通过面试</div>
                     </div>
                     <div class="ios-stat-card">
                         <div class="ios-stat-number">{{ pass_rate }}%</div>
@@ -372,7 +523,9 @@
         <section class="ios-section ios-ai-review-content">
             <div class="ios-container">
                 <h2 class="ios-title ios-fade-in">AI面试结果</h2>
-                <p class="ios-subtitle ios-fade-in">查看所有通过AI面试的候选人详细信息</p>
+                <p class="ios-subtitle ios-fade-in">查看所有进行过AI面试的候选人详细信息</p>
+                
+
                 
                 {% if passed_candidates %}
                     {% for candidate in passed_candidates %}
@@ -427,7 +580,7 @@
                                 <i class="uil uil-times"></i>
                                 拒绝
                             </button>
-                            <a href="{{ url_for('smartrecruit.hr.candidates.review_ai_interview', application_id=candidate.application_id) }}" class="ios-action-button details">
+                            <a href="{{ url_for('smartrecruit.hr.dashboard.view_candidate', candidate_id=candidate.application_id) }}" class="ios-action-button details">
                                 <i class="uil uil-eye"></i>
                                 查看详情
                             </a>
@@ -440,7 +593,7 @@
                         <i class="uil uil-clipboard-notes"></i>
                     </div>
                     <h3>暂无AI面试结果</h3>
-                    <p>目前还没有候选人通过AI面试，请稍后再查看。</p>
+                    <p>目前还没有候选人进行AI面试，请稍后再查看。</p>
                 </div>
                 {% endif %}
             </div>
@@ -450,33 +603,126 @@
     <script>
         // 审核功能
         function approveCandidate(applicationId) {
-            if (confirm('确定要通过这个候选人的审核吗？')) {
-                fetch(`/candidates/approve_ai_interview/${applicationId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('审核通过成功！');
-                        // 刷新页面以更新状态
-                        location.reload();
-                    } else {
-                        alert('操作失败：' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('操作失败，请重试');
-                });
+            // 显示面试时间安排模态框
+            showInterviewScheduleModal(applicationId);
+        }
+        
+        function showInterviewScheduleModal(applicationId) {
+            // 创建模态框HTML
+            const modalHtml = `
+                <div id="interviewScheduleModal" class="ios-modal-overlay">
+                    <div class="ios-modal">
+                        <div class="ios-modal-header">
+                            <h3>安排面试时间</h3>
+                            <button class="ios-modal-close" onclick="closeInterviewScheduleModal()">×</button>
+                        </div>
+                        <div class="ios-modal-body">
+                            <form id="interviewScheduleForm">
+                                <div class="ios-form-group">
+                                    <label>面试日期</label>
+                                    <input type="date" id="interviewDate" required min="${new Date().toISOString().split('T')[0]}">
+                                </div>
+                                <div class="ios-form-group">
+                                    <label>开始时间</label>
+                                    <input type="time" id="startTime" required>
+                                </div>
+                                <div class="ios-form-group">
+                                    <label>结束时间</label>
+                                    <input type="time" id="endTime" required>
+                                </div>
+                                <div class="ios-form-group">
+                                    <label>面试方式</label>
+                                    <select id="interviewType" required>
+                                        <option value="online">在线面试</option>
+                                        <option value="onsite">现场面试</option>
+                                        <option value="phone">电话面试</option>
+                                    </select>
+                                </div>
+                                <div class="ios-form-group">
+                                    <label>面试地点/链接</label>
+                                    <input type="text" id="interviewLocation" placeholder="面试地点或在线会议链接">
+                                </div>
+                                <div class="ios-form-group">
+                                    <label>面试官姓名</label>
+                                    <input type="text" id="interviewerName" placeholder="面试官姓名">
+                                </div>
+                                <div class="ios-form-group">
+                                    <label>备注</label>
+                                    <textarea id="interviewNotes" placeholder="面试注意事项或特殊要求"></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="ios-modal-footer">
+                            <button class="ios-action-button neutral" onclick="closeInterviewScheduleModal()">取消</button>
+                            <button class="ios-action-button primary" onclick="submitInterviewSchedule(${applicationId})">确认安排</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // 添加到页面
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            // 设置默认时间（当前时间后1小时）
+            const now = new Date();
+            const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+            document.getElementById('startTime').value = oneHourLater.toTimeString().slice(0, 5);
+            document.getElementById('endTime').value = new Date(oneHourLater.getTime() + 60 * 60 * 1000).toTimeString().slice(0, 5);
+        }
+        
+        function closeInterviewScheduleModal() {
+            const modal = document.getElementById('interviewScheduleModal');
+            if (modal) {
+                modal.remove();
             }
+        }
+        
+        function submitInterviewSchedule(applicationId) {
+            const form = document.getElementById('interviewScheduleForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const formData = {
+                application_id: applicationId,
+                interview_date: document.getElementById('interviewDate').value,
+                start_time: document.getElementById('startTime').value,
+                end_time: document.getElementById('endTime').value,
+                interview_type: document.getElementById('interviewType').value,
+                location: document.getElementById('interviewLocation').value,
+                interviewer_name: document.getElementById('interviewerName').value,
+                notes: document.getElementById('interviewNotes').value
+            };
+            
+            // 提交面试安排
+            fetch(`/smartrecruit/hr/dashboard/candidates/schedule_interview/${applicationId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('面试安排成功！候选人将收到面试通知。');
+                    closeInterviewScheduleModal();
+                    // 刷新页面以更新状态
+                    location.reload();
+                } else {
+                    alert('操作失败：' + (data.message || '请重试'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('操作失败，请重试');
+            });
         }
         
         function rejectCandidate(applicationId) {
             if (confirm('确定要拒绝这个候选人吗？')) {
-                fetch(`/candidates/reject_ai_interview/${applicationId}`, {
+                fetch(`/smartrecruit/hr/dashboard/candidates/reject_ai_interview/${applicationId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -485,7 +731,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('拒绝成功！');
+                        alert('拒绝成功！候选人将收到未通过通知。');
                         // 刷新页面以更新状态
                         location.reload();
                     } else {
