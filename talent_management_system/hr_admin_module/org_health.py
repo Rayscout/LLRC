@@ -204,6 +204,29 @@ def org_health_dashboard():
         time_filter=time_filter
     )
 
+@org_health_bp.route('/api/refresh_data', methods=['POST'])
+def refresh_org_health_data():
+    """刷新组织健康度数据"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': '请先登录'}), 401
+        
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'executive':
+            return jsonify({'error': '权限不足'}), 403
+        
+        # 重新生成数据
+        org_health_data = generate_org_health_data()
+        
+        return jsonify({
+            'success': True,
+            'message': '数据刷新成功！',
+            'data': org_health_data
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'刷新数据失败: {str(e)}'}), 500
+
 @org_health_bp.route('/api/export_report', methods=['POST'])
 def export_org_health_report():
     """导出组织健康度对比报告"""
@@ -310,8 +333,8 @@ def export_org_health_report():
             return jsonify({'error': f'Excel文件生成失败: {str(excel_error)}'}), 500
         
     except Exception as e:
-        print(f"组织健康度报告导出错误: {e}")
-        return jsonify({'error': f'导出报告时发生错误: {str(e)}'}), 500
+        print(f"组织健康度数据导出错误: {e}")
+        return jsonify({'error': f'导出数据时发生错误: {str(e)}'}), 500
 
 @org_health_bp.route('/api/org_health_data', methods=['GET'])
 def get_org_health_data():

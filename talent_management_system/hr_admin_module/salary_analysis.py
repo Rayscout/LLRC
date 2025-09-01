@@ -9,6 +9,7 @@ except ImportError:
     pd = None
 import io
 import os
+import uuid
 
 salary_analysis_bp = Blueprint('salary_analysis', __name__, url_prefix='/salary_analysis')
 
@@ -119,6 +120,44 @@ def salary_dashboard():
         user=user,
         salary_data=salary_data
     )
+
+@salary_analysis_bp.route('/api/generate_report')
+def generate_salary_report():
+    """生成薪酬分析报告"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': '请先登录'}), 401
+        
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'executive':
+            return jsonify({'error': '权限不足'}), 403
+        
+        # 生成薪酬数据
+        salary_data = generate_salary_data()
+        
+        # 生成报告数据
+        report_data = {
+            'report_id': str(uuid.uuid4()),
+            'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'summary': salary_data['summary'],
+            'positions': salary_data['positions'],
+            'detailed_positions': salary_data['detailed_positions'],
+            'trends': {
+                'months': salary_data['months'],
+                'company_trends': salary_data['company_trends'],
+                'industry_trends': salary_data['industry_trends']
+            }
+        }
+        
+        return jsonify({
+            'success': True,
+            'message': '薪酬分析报告已生成！',
+            'report_id': report_data['report_id'],
+            'report': report_data
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'生成报告失败: {str(e)}'}), 500
 
 @salary_analysis_bp.route('/api/export_data', methods=['POST'])
 def export_salary_data():

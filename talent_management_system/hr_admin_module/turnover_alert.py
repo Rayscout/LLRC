@@ -5,12 +5,14 @@
 监控离职趋势，识别高风险岗位，生成预警报告
 """
 
-from flask import Blueprint, render_template, request, jsonify, session
+from flask import Blueprint, render_template, request, jsonify, session, send_file
 from app.models import User, db
 from datetime import datetime, timedelta
 import json
 import random
 import uuid
+import pandas as pd
+import io
 
 turnover_alert_bp = Blueprint('turnover_alert', __name__, url_prefix='/turnover_alert')
 
@@ -362,6 +364,13 @@ def api_employee_details(employee_id):
 def api_generate_report():
     """生成离职预警报告"""
     try:
+        if 'user_id' not in session:
+            return jsonify({'error': '请先登录'}), 401
+        
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'executive':
+            return jsonify({'error': '权限不足'}), 403
+        
         # 生成报告数据
         report_data = {
             'report_id': str(uuid.uuid4()),
@@ -380,11 +389,146 @@ def api_generate_report():
         
         return jsonify({
             'success': True,
+            'message': '预警报告已生成！',
+            'report_id': report_data['report_id'],
             'report': report_data
         })
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': f'生成报告失败: {str(e)}'}), 500
+
+@turnover_alert_bp.route('/api/export_data', methods=['POST'])
+def export_turnover_data():
+    """导出人才流失预警数据"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': '请先登录'}), 401
+        
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'executive':
+            return jsonify({'error': '权限不足'}), 403
+        
+        if pd is None:
+            return jsonify({'error': 'pandas库未安装，无法导出Excel文件'}), 500
+        
+        # 生成模拟数据
+        generate_mock_turnover_data()
+        
+        # 创建Excel文件
+        output = io.BytesIO()
+        
+        try:
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                # 部门统计表
+                dept_data = []
+                for dept_name, dept_info in DEPARTMENT_STATS.items():
+                    dept_data.append({
+                        '部门名称': dept_name,
+                        '员工总数': dept_info['total_employees'],
+                        '离职人数': dept_info['turnover_count'],
+                        '离职率': f"{dept_info['turnover_rate']*100:.1f}%",
+                        '平均薪资': dept_info['avg_salary'],
+                        '平均任职时间': f"{dept_info['avg_tenure']:.1f}年",
+                        '风险等级': dept_info['risk_level']
+                    })
+                
+                df_dept = pd.DataFrame(dept_data)
+                df_dept.to_excel(writer, sheet_name='部门统计', index=False)
+                
+                # 岗位分析表
+                position_data = []
+                for pos_name, pos_info in POSITION_ANALYSIS.items():
+                    position_data.append({
+                        '岗位名称': pos_name,
+                        '市场需求': f"{pos_info['market_demand']:.2f}",
+                        '技能差距': f"{pos_info['skill_gap']:.2f}",
+                        '薪资竞争力': f"{pos_info['salary_competitiveness']:.2f}",
+                        '离职风险': f"{pos_info['turnover_risk']*100:.1f}%",
+                        '主要离职原因': '; '.join(pos_info['main_reasons'])
+                    })
+                
+                df_position = pd.DataFrame(position_data)
+                df_position.to_excel(writer, sheet_name='岗位分析', index=False)
+                
+                # 高风险员工表
+                high_risk_employees = [emp for emp in EMPLOYEE_RISK_SCORES.values() if emp['risk_level'] == 'high']
+                if high_risk_employees:
+                    emp_data = []
+                    for emp in high_risk_employees[:20]:  # 只导出前20名
+                        emp_data.append({
+                            '员工姓名': emp['name'],
+                            '部门': emp['department'],
+                            '岗位': emp['position'],
+                            '风险评分': f"{emp['risk_score']*100:.1f}%",
+                            '任职时间': f"{emp['tenure']:.1f}年",
+                            '上次晋升': f"{emp['last_promotion']}个月前",
+                            '薪资增长率': f"{emp['salary_growth']*100:.1f}%",
+                            '绩效评分': f"{emp['performance_rating']:.1f}",
+                            '工作负荷': f"{emp['workload']:.1f}",
+                            '满意度评分': f"{emp['satisfaction_score']:.1f}"
+                        })
+                    
+                    df_emp = pd.DataFrame(emp_data)
+                    df_emp.to_excel(writer, sheet_name='高风险员工', index=False)
+                
+                # 离职记录表
+                turnover_data = []
+                for turnover in list(TURNOVER_DATA.values())[:20]:  # 只导出最近20条
+                    turnover_data.append({
+                        '员工姓名': turnover['employee_name'],
+                        '部门': turnover['department'],
+                        '岗位': turnover['position'],
+                        '离职日期': turnover['turnover_date'],
+                        '任职时间': f"{turnover['tenure']:.1f}年",
+                        '离职原因': turnover['reason'],
+                        '离职面谈': turnover['exit_interview'],
+                        '替代难度': turnover['replacement_difficulty'],
+                        '离职成本': turnover['cost_impact']
+                    })
+                
+                df_turnover = pd.DataFrame(turnover_data)
+                df_turnover.to_excel(writer, sheet_name='离职记录', index=False)
+                
+                # 汇总统计
+                summary_data = [
+                    ['总员工数', sum(dept['total_employees'] for dept in DEPARTMENT_STATS.values())],
+                    ['总离职人数', sum(dept['turnover_count'] for dept in DEPARTMENT_STATS.values())],
+                    ['平均离职率', f"{sum(dept['turnover_count'] for dept in DEPARTMENT_STATS.values()) / sum(dept['total_employees'] for dept in DEPARTMENT_STATS.values()) * 100:.1f}%"],
+                    ['高风险部门数', len([d for d in DEPARTMENT_STATS.values() if d['risk_level'] == 'high'])],
+                    ['高风险岗位数', len([p for p in POSITION_ANALYSIS.values() if p['turnover_risk'] > 0.6])],
+                    ['高风险员工数', len([e for e in EMPLOYEE_RISK_SCORES.values() if e['risk_level'] == 'high'])]
+                ]
+                
+                df_summary = pd.DataFrame(summary_data, columns=['指标', '数值'])
+                df_summary.to_excel(writer, sheet_name='汇总统计', index=False)
+            
+            output.seek(0)
+            
+            filename = f"人才流失预警报告_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            
+            # 设置响应头
+            response = send_file(
+                output,
+                as_attachment=True,
+                download_name=filename,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            
+            # 添加额外的响应头
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            return response
+            
+        except Exception as excel_error:
+            print(f"Excel生成错误: {excel_error}")
+            return jsonify({'error': f'Excel文件生成失败: {str(excel_error)}'}), 500
+        
+    except Exception as e:
+        print(f"人才流失数据导出错误: {e}")
+        return jsonify({'error': f'导出数据时发生错误: {str(e)}'}), 500
 
 # 初始化模拟数据
 generate_mock_turnover_data()
