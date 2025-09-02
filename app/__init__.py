@@ -31,10 +31,14 @@ mongo_client = None
 mongodb = None
 applications_collection = None
 try:
-    mongo_client = MongoClient('mongodb://localhost:27017/')
-    mongodb = mongo_client['applications']
-    applications_collection = mongodb['applications']
-    logger.info("MongoDB connected successfully.")
+    # 优先读取环境变量，保持向后兼容的本地默认
+    mongo_uri = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/')
+    mongo_db_name = os.getenv('MONGODB_DB', 'applications')
+    mongo_collection_name = os.getenv('MONGODB_COLLECTION', 'applications')
+    mongo_client = MongoClient(mongo_uri)
+    mongodb = mongo_client[mongo_db_name]
+    applications_collection = mongodb[mongo_collection_name]
+    logger.info(f"MongoDB connected successfully. uri={mongo_uri} db={mongo_db_name} col={mongo_collection_name}")
 except Exception as e:
     logger.warning(f"Could not connect to MongoDB: {e}. MongoDB features will be disabled.")
 
@@ -64,6 +68,19 @@ def create_app():
     except Exception as e:
         logger.warning(f"Failed to set custom Jinja loader: {e}")
     app.config.from_object(Config)
+
+    # 可选启用 CORS：仅当设置了前端来源时
+    try:
+        cors_origins = os.getenv('FRONTEND_ORIGIN') or os.getenv('CORS_ORIGINS')
+        if cors_origins:
+            try:
+                from flask_cors import CORS
+                CORS(app, resources={r"/*": {"origins": [o.strip() for o in cors_origins.split(',') if o.strip()]}}, supports_credentials=True)
+                logger.info(f"CORS enabled for origins: {cors_origins}")
+            except Exception as e:
+                logger.warning(f"Failed to enable CORS: {e}")
+    except Exception as e:
+        logger.warning(f"CORS env check failed: {e}")
 
     # 初始化扩展
     try:
@@ -100,6 +117,37 @@ def create_app():
         raise
 
     with app.app_context():
+        # 轻量自愈：自动为 SQLite 添加缺失的用户简历分析相关列，避免因未迁移导致报错
+        try:
+            from sqlalchemy import text as _text
+            try:
+                dialect_name = db.session.bind.dialect.name
+            except Exception:
+                dialect_name = 'sqlite'
+            if dialect_name == 'sqlite':
+                cols = []
+                try:
+                    res = db.session.execute(_text('PRAGMA table_info(user)'))
+                    cols = [row[1] for row in res.fetchall()]
+                except Exception:
+                    cols = []
+                alter_stmts = []
+                if 'resume_analysis' not in cols:
+                    alter_stmts.append('ALTER TABLE user ADD COLUMN resume_analysis TEXT')
+                if 'resume_last_analyzed_at' not in cols:
+                    alter_stmts.append('ALTER TABLE user ADD COLUMN resume_last_analyzed_at DATETIME')
+                if 'resume_signature' not in cols:
+                    alter_stmts.append('ALTER TABLE user ADD COLUMN resume_signature VARCHAR(64)')
+                for stmt in alter_stmts:
+                    try:
+                        db.session.execute(_text(stmt))
+                        db.session.commit()
+                        logger.info(f"Applied auto-migration: {stmt}")
+                    except Exception as _e:
+                        db.session.rollback()
+                        logger.warning(f"Auto-migration failed for '{stmt}': {_e}")
+        except Exception as e:
+            logger.warning(f"Auto-migration check failed: {e}")
         # 注册蓝图
         try:
             from .common import common_bp

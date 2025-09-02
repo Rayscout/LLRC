@@ -51,6 +51,12 @@
             <div class="card" style="margin: 0 0 16px; padding:16px; background:#f8fafc; border-left:4px solid #acd2b7;">
               <h3 style="margin:0 0 8px;">基于最新简历的AI分析</h3>
               <p style="margin:0 0 6px; color:#374151;">{{ resume_analysis.summary }}</p>
+              {% if resume_analysis.score is not none %}
+              <div style="margin:6px 0;">
+                <strong>简历评分：</strong>
+                <span class="tag" style="background:#eef2ff;color:#3730a3;padding:6px 10px;border-radius:12px;">{{ resume_analysis.score }}/100</span>
+              </div>
+              {% endif %}
               {% if resume_analysis.strengths %}
                 <div style="margin:6px 0;"><strong>优势：</strong>
                   <ul style="margin:6px 0 0 18px;">
