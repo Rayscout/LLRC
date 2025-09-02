@@ -257,6 +257,9 @@ def turnover_dashboard():
         high_risk_positions = sum(1 for pos in POSITION_ANALYSIS.values() if pos['turnover_risk'] > 0.6)
         high_risk_employees = sum(1 for emp in EMPLOYEE_RISK_SCORES.values() if emp['risk_level'] == 'high')
         
+        # 生成预防建议
+        recommendations = generate_prevention_recommendations()
+        
         # 准备数据
         dashboard_data = {
             'summary': {
@@ -268,7 +271,8 @@ def turnover_dashboard():
             'department_stats': DEPARTMENT_STATS,
             'position_analysis': POSITION_ANALYSIS,
             'employee_risks': list(EMPLOYEE_RISK_SCORES.values())[:20],  # 只显示前20个
-            'turnover_records': list(TURNOVER_DATA.values())[:10]  # 只显示前10个
+            'turnover_records': list(TURNOVER_DATA.values())[:10],  # 只显示前10个
+            'recommendations': recommendations
         }
         
         return render_template('talent_management/hr_admin/turnover_dashboard.html', data=dashboard_data)

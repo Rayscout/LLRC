@@ -746,7 +746,7 @@
                     <i class="fas fa-user-shield"></i> 高风险员工
                 </h3>
                 <div class="risk-list">
-                    {% for employee in dashboard_data.high_risk_employees[:5] %}
+                    {% for employee in dashboard_data.employee_risks[:5] %}
                         <div class="risk-item">
                             <div class="risk-header">
                                 <span class="risk-name">{{ employee.name }} ({{ employee.department }})</span>
@@ -768,7 +768,7 @@
             <h3 class="analysis-title">
                 <i class="fas fa-lightbulb"></i> 预防建议
             </h3>
-            {% for recommendation in prevention_recommendations %}
+            {% for recommendation in dashboard_data.recommendations %}
                 <div class="recommendation-item">
                     <div class="recommendation-header">
                         <div class="recommendation-issue">{{ recommendation.issue }}</div>
