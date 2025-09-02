@@ -11,29 +11,53 @@
     <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            --bg-secondary: rgba(228, 246, 236, 0.3);
-            --bg-card: rgba(228, 246, 236, 0.3);
-            --text-primary: #2F4F4F;
-            --text-secondary: #666;
-            --text-tertiary: #999;
-            --accent-blue: #20B2AA;
-            --accent-green: #34C759;
-            --accent-orange: #FF9500;
-            --accent-red: #FF3B30;
-            --accent-purple: #8A2BE2;
-            --accent-teal: #00CED1;
-            --accent-coral: #FF7F50;
-            --accent-gold: #FFD700;
-            --accent-pink: #FF69B4;
-            --accent-cyan: #00FFFF;
-            --accent-lime: #32CD32;
-            --accent-indigo: #4B0082;
-            --accent-violet: #EE82EE;
-            --accent-salmon: #FA8072;
-            --accent-turquoise: #40E0D0;
-            --shadow-light: 0 4px 20px rgba(228, 246, 236, 0.3);
-            --shadow-medium: 0 8px 30px rgba(228, 246, 236, 0.3);
+            /* 主色调 - 现代蓝绿色系 */
+            --primary-blue: #4A90E2;
+            --primary-teal: #50C878;
+            --primary-cyan: #00B4D8;
+            
+            /* 背景色系 - 优雅的渐变 */
+            --bg-primary: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            --bg-secondary: rgba(248, 250, 252, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.6);
+            --bg-hover: rgba(255, 255, 255, 0.8);
+            
+            /* 文字色系 - 现代深色 */
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-tertiary: #64748b;
+            --text-light: #94a3b8;
+            
+            /* 强调色系 - 现代多彩 */
+            --accent-blue: #3B82F6;
+            --accent-indigo: #6366F1;
+            --accent-purple: #8B5CF6;
+            --accent-pink: #EC4899;
+            --accent-rose: #F43F5E;
+            --accent-orange: #F97316;
+            --accent-amber: #F59E0B;
+            --accent-yellow: #EAB308;
+            --accent-lime: #84CC16;
+            --accent-green: #22C55E;
+            --accent-emerald: #10B981;
+            --accent-teal: #14B8A6;
+            --accent-cyan: #06B6D4;
+            --accent-sky: #0EA5E9;
+            
+            /* 状态色系 */
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            --info: #3B82F6;
+            
+            /* 阴影和边框 */
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-heavy: 0 16px 40px rgba(0, 0, 0, 0.16);
+            --border-light: rgba(255, 255, 255, 0.8);
+            --border-hover: rgba(255, 255, 255, 1);
+            
+            /* 圆角和过渡 */
             --border-radius: 16px;
             --border-radius-large: 24px;
             --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
@@ -41,29 +65,46 @@
         }
 
         [data-theme="dark"] {
-            --bg-primary: #000000;
-            --bg-secondary: rgba(44, 44, 46, 0.8);
-            --bg-card: rgba(44, 44, 46, 0.9);
-            --text-primary: #FFFFFF;
-            --text-secondary: #EBEBF5;
-            --text-tertiary: #8E8E93;
-            --accent-blue: #0A84FF;
-            --accent-green: #30D158;
-            --accent-orange: #FF9F0A;
-            --accent-red: #FF453A;
-            --accent-purple: #BF5AF2;
-            --accent-teal: #64D2FF;
-            --accent-coral: #FF6B6B;
-            --accent-gold: #FFD60A;
-            --accent-pink: #FF2D92;
-            --accent-cyan: #00E5FF;
-            --accent-lime: #30D158;
-            --accent-indigo: #5E5CE6;
-            --accent-violet: #DA70D6;
-            --accent-salmon: #FF6B6B;
-            --accent-turquoise: #40E0D0;
-            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
+            /* 暗色主题背景 */
+            --bg-primary: #0f172a;
+            --bg-secondary: rgba(30, 41, 59, 0.8);
+            --bg-card: rgba(51, 65, 85, 0.6);
+            --bg-hover: rgba(51, 65, 85, 0.8);
+            
+            /* 暗色主题文字 */
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-tertiary: #cbd5e1;
+            --text-light: #94a3b8;
+            
+            /* 暗色主题强调色 - 更亮更鲜艳 */
+            --accent-blue: #60A5FA;
+            --accent-indigo: #818CF8;
+            --accent-purple: #A78BFA;
+            --accent-pink: #F472B6;
+            --accent-rose: #FB7185;
+            --accent-orange: #FB923C;
+            --accent-amber: #FBBF24;
+            --accent-yellow: #FDE047;
+            --accent-lime: #A3E635;
+            --accent-green: #4ADE80;
+            --accent-emerald: #34D399;
+            --accent-teal: #5EEAD4;
+            --accent-cyan: #22D3EE;
+            --accent-sky: #38BDF8;
+            
+            /* 暗色主题状态色 */
+            --success: #34D399;
+            --warning: #FBBF24;
+            --error: #F87171;
+            --info: #60A5FA;
+            
+            /* 暗色主题阴影和边框 */
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --shadow-heavy: 0 16px 40px rgba(0, 0, 0, 0.6);
+            --border-light: rgba(148, 163, 184, 0.3);
+            --border-hover: rgba(148, 163, 184, 0.5);
         }
 
         * {
@@ -106,11 +147,11 @@
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(144, 238, 144, 0.12) 0%, transparent 70%), /* 左下角光晕 - 更绿更明显 */
-                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(152, 251, 152, 0.06) 0%, transparent 70%),
-                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(173, 255, 47, 0.04) 0%, transparent 70%),
-                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(50, 205, 50, 0.08) 0%, transparent 70%), /* 右下角光晕 - 更绿更明显 */
-                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(34, 139, 34, 0.03) 0%, transparent 70%);
+                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(74, 144, 226, 0.08) 0%, transparent 70%), /* 左下角蓝色光晕 */
+                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(80, 200, 120, 0.06) 0%, transparent 70%), /* 右上角绿色光晕 */
+                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(0, 180, 216, 0.04) 0%, transparent 70%), /* 中央青色光晕 */
+                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(139, 92, 246, 0.05) 0%, transparent 70%), /* 右下角紫色光晕 */
+                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(236, 72, 153, 0.03) 0%, transparent 70%); /* 左上角粉色光晕 */
             pointer-events: none;
             z-index: -1;
             animation: gentleDrift 60s ease-in-out infinite;
@@ -195,7 +236,7 @@
             align-items: center;
             gap: 10px;
             padding: 15px 20px;
-            background: linear-gradient(135deg, #7FB069, #9DC183);
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
             color: white;
             text-decoration: none;
             border-radius: 25px;
@@ -316,7 +357,7 @@
         
         /* 调整主容器位置，避免被导航栏遮挡 */
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 100px 20px 20px 20px; /* 顶部增加100px的padding */
             position: relative;
@@ -396,29 +437,29 @@
         }
 
         /* 第一个卡片 - 珊瑚色 */
-        .stat-card:nth-child(1) .stat-icon { background: var(--accent-coral); }
+                .stat-card:nth-child(1) .stat-icon { background: #1e40af; } /* 深蓝色 */
         .stat-card:nth-child(1) .stat-icon i { color: white; }
-        .stat-card:nth-child(1) .stat-value { color: var(--accent-coral); }
-
-        /* 第二个卡片 - 青色 */
-        .stat-card:nth-child(2) .stat-icon { background: var(--accent-teal); }
+        .stat-card:nth-child(1) .stat-value { color: #1e40af; }
+        
+        /* 第二个卡片 - 深翠绿色 */
+        .stat-card:nth-child(2) .stat-icon { background: #047857; }
         .stat-card:nth-child(2) .stat-icon i { color: white; }
-        .stat-card:nth-child(2) .stat-value { color: var(--accent-teal); }
-
-        /* 第三个卡片 - 蓝色 */
-        .stat-card:nth-child(3) .stat-icon { background: var(--accent-blue); }
+        .stat-card:nth-child(2) .stat-value { color: #047857; }
+        
+        /* 第三个卡片 - 深紫色 */
+        .stat-card:nth-child(3) .stat-icon { background: #6d28d9; }
         .stat-card:nth-child(3) .stat-icon i { color: white; }
-        .stat-card:nth-child(3) .stat-value { color: var(--accent-blue); }
-
-        /* 第四个卡片 - 绿色 */
-        .stat-card:nth-child(4) .stat-icon { background: var(--accent-green); }
+        .stat-card:nth-child(3) .stat-value { color: #6d28d9; }
+        
+        /* 第四个卡片 - 深琥珀色 */
+        .stat-card:nth-child(4) .stat-icon { background: #d97706; }
         .stat-card:nth-child(4) .stat-icon i { color: white; }
-        .stat-card:nth-child(4) .stat-value { color: var(--accent-green); }
-
-        /* 第五个卡片 - 紫色 */
-        .stat-card:nth-child(5) .stat-icon { background: var(--accent-purple); }
+        .stat-card:nth-child(4) .stat-value { color: #d97706; }
+        
+        /* 第五个卡片 - 深粉色 */
+        .stat-card:nth-child(5) .stat-icon { background: #be185d; }
         .stat-card:nth-child(5) .stat-icon i { color: white; }
-        .stat-card:nth-child(5) .stat-value { color: var(--accent-purple); }
+        .stat-card:nth-child(5) .stat-value { color: #be185d; }
 
         .stat-card:nth-child(1) { animation-delay: 0.1s; }
         .stat-card:nth-child(2) { animation-delay: 0.2s; }
@@ -553,7 +594,7 @@
         }
 
         .action-btn {
-            background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
             color: white;
             border: none;
             padding: 12px 24px;
@@ -568,7 +609,7 @@
             gap: 8px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
         }
 
         .action-btn::before {
@@ -587,9 +628,9 @@
         }
 
         .action-btn:hover {
-            background: linear-gradient(135deg, var(--accent-coral), var(--accent-orange));
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 149, 0, 0.5);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
             animation: borderGlow 2s ease-in-out infinite;
         }
 
@@ -599,16 +640,16 @@
         }
 
         .action-btn.secondary {
-            background: linear-gradient(135deg, var(--accent-teal), var(--accent-green));
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-teal));
             color: white;
-            border: 1px solid rgba(0, 206, 209, 0.3);
-            box-shadow: 0 4px 15px rgba(0, 206, 209, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
         .action-btn.secondary:hover {
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-emerald));
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 206, 209, 0.5);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
             animation: borderGlow 2s ease-in-out infinite;
         }
 
@@ -641,6 +682,26 @@
             height: 100%;
             background: rgba(255, 255, 255, 0.9);
             opacity: 1;
+        }
+
+        /* 卡片头部样式 */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card-header .section-title {
+            margin: 0;
+            flex: 1;
+        }
+
+        .card-header .special-action-btn {
+            margin-left: 15px;
+            flex-shrink: 0;
         }
 
         .content-card:nth-child(1) { animation-delay: 0.3s; }
@@ -792,19 +853,19 @@
         }
 
         .status-pending {
-            background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));
+            background: linear-gradient(135deg, var(--accent-amber), var(--accent-orange));
             color: white;
             font-weight: 600;
         }
 
         .status-read {
-            background: linear-gradient(135deg, var(--accent-teal), var(--accent-green));
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-cyan));
             color: white;
             font-weight: 600;
         }
 
         .status-completed {
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-green));
             color: white;
             font-weight: 600;
         }
@@ -849,45 +910,190 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
             color: white;
-            box-shadow: 0 2px 8px rgba(255, 149, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, var(--accent-coral), var(--accent-orange));
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 149, 0, 0.5);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, var(--accent-teal), var(--accent-green));
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-teal));
             color: white;
-            border: 1px solid rgba(0, 206, 209, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .btn-secondary:hover {
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-emerald));
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 206, 209, 0.5);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
         }
 
         .btn-success {
-            background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-green));
             color: white;
-            box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
 
         .btn-success:hover {
-            background: linear-gradient(135deg, var(--accent-teal), var(--accent-green));
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-emerald));
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.5);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
         }
 
         .btn-warning {
-            background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));
+            background: linear-gradient(135deg, var(--accent-amber), var(--accent-orange));
             color: white;
             box-shadow: 0 2px 8px rgba(255, 149, 0, 0.3);
+        }
+
+        /* 特殊功能按钮样式 */
+        .special-action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .special-action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .special-action-btn:hover::before {
+            left: 100%;
+        }
+
+        .special-action-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .special-action-btn:active {
+            transform: translateY(-2px) scale(1.02);
+            transition: transform 0.1s;
+        }
+
+                /* 生成总结按钮 - 智慧蓝主题 */
+        .btn-generate-summary {
+            background: linear-gradient(135deg, #3B82F6, #60A5FA, #93C5FD);
+            color: white;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-generate-summary:hover {
+            background: linear-gradient(135deg, #1D4ED8, #3B82F6, #60A5FA);
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+            animation: blueGlow 2s ease-in-out infinite;
+        }
+
+        /* 获取推荐按钮 - 智慧主题 */
+        .btn-get-recommendations {
+            background: linear-gradient(135deg, #10B981, #34D399, #6EE7B7);
+            color: white;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-get-recommendations:hover {
+            background: linear-gradient(135deg, #059669, #10B981, #34D399);
+            border-color: rgba(16, 185, 129, 0.6);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+            animation: wisdomGlow 2s ease-in-out infinite;
+        }
+
+        /* 蓝色光效动画 */
+        @keyframes blueGlow {
+            0%, 100% {
+                box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+            }
+            50% {
+                box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6), 0 0 15px rgba(59, 130, 246, 0.4);
+            }
+        }
+
+        /* 智慧光效动画 */
+        @keyframes wisdomGlow {
+            0%, 100% {
+                box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+            }
+            50% {
+                box-shadow: 0 12px 30px rgba(16, 185, 129, 0.6), 0 0 20px rgba(16, 185, 129, 0.4);
+            }
+        }
+
+        /* 图标动画效果 */
+        .btn-generate-summary:hover i {
+            animation: blueIconFloat 1s ease-in-out infinite;
+        }
+
+        .btn-get-recommendations:hover i {
+            animation: wisdomIconFloat 1s ease-in-out infinite;
+        }
+
+        @keyframes blueIconFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-3px) rotate(5deg);
+            }
+        }
+
+        @keyframes wisdomIconFloat {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-3px) scale(1.1);
+            }
+        }
+
+        /* 按钮点击波纹效果 */
+        .special-action-btn {
+            position: relative;
+        }
+
+        .special-action-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .special-action-btn:active::after {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-warning:hover {
@@ -1078,9 +1284,7 @@
             <a href="{{ url_for('talent_management.employee_manager.feedback.send_feedback') }}" class="action-btn">
                 <i class="fas fa-paper-plane"></i> 发送反馈
             </a>
-            <a href="{{ url_for('talent_management.employee_manager.feedback.sent_feedback') }}" class="action-btn secondary">
-                <i class="fas fa-list"></i> 查看已发送
-            </a>
+
             <button class="action-btn secondary" onclick="refreshNotifications()">
                 <i class="fas fa-sync-alt"></i> 刷新通知
             </button>
@@ -1296,38 +1500,41 @@
 
         <!-- 总结反馈模块 -->
         <div class="content-card">
-            <h2 class="section-title">
-                <i class="fas fa-brain" style="color: var(--accent-orange);"></i> 总结反馈
-                <button class="action-btn secondary" onclick="generateFeedbackSummary()" style="font-size: 0.8em; padding: 6px 12px; background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));">
-                    <i class="fas fa-magic" style="color: white;"></i> 生成总结
-                        </button>
-            </h2>
+            <div class="card-header">
+                <h2 class="section-title">
+                    <i class="fas fa-brain" style="color: var(--accent-orange);"></i> 总结反馈
+                </h2>
+                <button class="special-action-btn btn-generate-summary" onclick="generateFeedbackSummary()">
+                    <i class="fas fa-magic"></i> 生成总结
+                </button>
+            </div>
             <div id="feedback-summary-content">
                 <div class="empty-state">
                     <i class="fas fa-brain"></i>
                     <p>点击"生成总结"按钮，使用AI分析您的所有反馈</p>
                     <p class="text-muted">AI将为您提供个性化的反馈总结报告</p>
-                    </div>
                 </div>
             </div>
+        </div>
 
         <!-- 课程学习建议模块 -->
         <div class="content-card">
-            <h2 class="section-title">
-                <i class="fas fa-graduation-cap" style="color: var(--accent-teal);"></i> 课程学习建议
-                <button class="action-btn secondary" onclick="generateCourseRecommendations()" style="font-size: 0.8em; padding: 6px 12px; background: linear-gradient(135deg, var(--accent-teal), var(--accent-green));">
-                    <i class="fas fa-lightbulb" style="color: white;"></i> 获取推荐
-                    </button>
-            </h2>
+            <div class="card-header">
+                <h2 class="section-title">
+                    <i class="fas fa-graduation-cap" style="color: var(--accent-teal);"></i> 课程学习建议
+                </h2>
+                <button class="special-action-btn btn-get-recommendations" onclick="generateCourseRecommendations()">
+                    <i class="fas fa-lightbulb"></i> 获取推荐
+                </button>
+            </div>
             <div id="course-recommendations-content">
                 <div class="empty-state">
                     <i class="fas fa-graduation-cap"></i>
                     <p>点击"获取推荐"按钮，基于反馈分析为您推荐课程</p>
                     <p class="text-muted">AI将根据您的反馈为您推荐最适合的学习课程</p>
                 </div>
-                    </div>
-                        </div>
-                        </div>
+            </div>
+        </div>
 
     <script>
         // 页面加载完成后的动画效果

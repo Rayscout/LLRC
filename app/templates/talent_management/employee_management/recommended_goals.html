@@ -42,107 +42,11 @@
             font-size: 1.2rem;
         }
         
-        /* 导航栏样式 */
-        .top-navigation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(26, 77, 26, 0.1);
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-            z-index: 1000;
-            padding: 0;
-        }
-        
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 30px;
-        }
-        
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1a4d1a;
-        }
-        
-        .nav-brand i {
-            font-size: 1.8rem;
-            color: #2d5a2d;
-        }
-        
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            color: #2d5a2d;
-            text-decoration: none;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-        
-        .nav-item:hover {
-            background: rgba(26, 77, 26, 0.08);
-            color: #1a4d1a;
-            transform: translateY(-1px);
-        }
-        
-        .nav-item i {
-            font-size: 1rem;
-        }
-        
-        .nav-actions {
-            display: flex;
-            align-items: center;
-        }
-        
-        .nav-logout {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #2d5a2d, #1a4d1a);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(45, 90, 45, 0.3);
-        }
-        
-        .nav-logout:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(45, 90, 45, 0.4);
-            background: linear-gradient(135deg, #1a4d1a, #2d5a2d);
-        }
-        
-        .nav-logout i {
-            font-size: 1rem;
-        }
-        
         /* 调整主容器位置，避免被导航栏遮挡 */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 100px 20px 20px 20px;
+            padding: 20px 20px 20px 20px;
             position: relative;
             z-index: 1;
         }
@@ -417,53 +321,7 @@
         <i class="fas fa-arrow-left"></i> 返回目标管理
     </a>
     
-    <!-- 导航栏 -->
-    <nav class="top-navigation">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <i class="fas fa-user-tie"></i>
-                <span>员工平台</span>
-            </div>
-            
-            <div class="nav-menu">
-                <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="nav-item">
-                    <i class="fas fa-home"></i>
-                    <span>员工仪表盘</span>
-                </a>
-                <a href="{{ url_for('talent_management.employee_management.profile.profile_dashboard') }}" class="nav-item">
-                    <i class="fas fa-user"></i>
-                    <span>个人资料</span>
-                </a>
-                <a href="{{ url_for('talent_management.employee_management.performance.performance_dashboard') }}" class="nav-item">
-                    <i class="fas fa-chart-line"></i>
-                    <span>绩效分析</span>
-                </a>
-                <a href="{{ url_for('talent_management.employee_management.learning_recommendation.dashboard') }}" class="nav-item">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>学习中心</span>
-                </a>
-                <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="nav-item">
-                    <i class="fas fa-bullseye"></i>
-                    <span>目标设定</span>
-                </a>
-                <a href="{{ url_for('talent_management.employee_management.feedback.feedback_dashboard') }}" class="nav-item">
-                    <i class="fas fa-comments"></i>
-                    <span>反馈管理</span>
-                </a>
-                <a href="{{ url_for('talent_management.employee_management.projects.projects_dashboard') }}" class="nav-item">
-                    <i class="fas fa-project-diagram"></i>
-                    <span>项目经验</span>
-                </a>
-            </div>
-            
-            <div class="nav-actions">
-                <a href="{{ url_for('common.auth.logout') }}" class="nav-logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>退出登录</span>
-                </a>
-            </div>
-        </div>
-    </nav>
+
     
     <div class="container">
         <div class="header">

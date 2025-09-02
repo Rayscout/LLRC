@@ -272,18 +272,18 @@
         
         /* 调整主容器位置，避免被导航栏遮挡 */
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: transparent;
             border-radius: 15px;
             overflow: hidden;
-            padding-top: 100px; /* 顶部增加100px的padding */
+            padding-top: 80px; /* 顶部减少padding，缩小与导航栏的间距 */
         }
         
         .performance-container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 80px 20px 20px 20px; /* 顶部增加padding为返回按钮留空间 */
+            padding: 60px 20px 20px 20px; /* 顶部减少padding，缩小与导航栏的间距 */
             position: relative;
             z-index: 1;
         }
@@ -333,9 +333,9 @@
         }
 
         .page-title i {
-            color: #FF6B6B; /* 珊瑚红 - 活力色彩 */
+            color: #052505; /* 深绿色 */
             font-size: 1.2em;
-            background: rgba(255, 107, 107, 0.15);
+            background: rgba(5, 37, 5, 0.15);
             padding: 15px;
             border-radius: 50%;
             transition: all 0.3s ease;
@@ -343,7 +343,7 @@
 
         .page-header-card:hover .page-title i {
             transform: rotate(10deg) scale(1.1);
-            background: rgba(255, 107, 107, 0.25);
+            background: rgba(5, 37, 5, 0.25);
         }
 
         .page-subtitle {
@@ -465,28 +465,28 @@
         }
 
         .card-title i {
-            color: #4ECDC4; /* 青绿色 - 统一主题色 */
+            color: #2d5a2d; /* 深绿色 - 统一主题色 */
             font-size: 1.2em;
-            background: rgba(78, 205, 196, 0.15);
+            background: rgba(45, 90, 45, 0.1);
             padding: 12px;
             border-radius: 50%;
             transition: all 0.3s ease;
         }
 
-        /* 为不同类型的卡片图标添加不同的主题色 */
+        /* 为不同类型的卡片图标添加协调的主题色 */
         .performance-card:nth-child(3n+1) .card-title i {
-            color: #FF6B6B; /* 珊瑚红 */
-            background: rgba(255, 107, 107, 0.15);
+            color: #2d5a2d; /* 深绿色 */
+            background: rgba(45, 90, 45, 0.1);
         }
 
         .performance-card:nth-child(3n+2) .card-title i {
-            color: #4ECDC4; /* 青绿色 */
-            background: rgba(78, 205, 196, 0.15);
+            color: #2d5a2d; /* 深绿色 */
+            background: rgba(45, 90, 45, 0.1);
         }
 
         .performance-card:nth-child(3n+3) .card-title i {
-            color: #45B7D1; /* 天蓝色 */
-            background: rgba(69, 183, 209, 0.15);
+            color: #2d5a2d; /* 深绿色 */
+            background: rgba(45, 90, 45, 0.1);
         }
 
         .performance-card:hover .card-title i {
@@ -1212,14 +1212,14 @@
         }
 
         .action-btn.primary {
-            background: linear-gradient(135deg, #4ECDC4, #45B7D1); /* 青绿色渐变 */
-            color: white;
-            border: none;
+            background: rgba(45, 90, 45, 0.1);
+            color: #2d5a2d;
+            border: 1px solid rgba(45, 90, 45, 0.2);
         }
 
         .action-btn.primary:hover {
-            background: linear-gradient(135deg, #45B7D1, #4ECDC4);
-            color: white;
+            background: rgba(45, 90, 45, 0.15);
+            color: #1a4d1a;
         }
 
         .action-btn i {

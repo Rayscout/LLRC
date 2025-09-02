@@ -224,7 +224,7 @@
             z-index: 1;
         }
         
-        /* 页面标题卡片 */
+        /* 页面标题卡片样式 - 采用学习中心界面的设计 */
         .page-header-card {
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(15px);
@@ -232,14 +232,29 @@
             padding: 40px;
             box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            margin-bottom: 40px; /* 增加间距 */
             transition: all 0.3s ease;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
         
+        /* 为页面标题添加简洁的白色边框 */
+        .page-header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #ffffff;
+            border-radius: 25px 25px 0 0;
+        }
+
         .page-header-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.8);
         }
         
         .page-title {
@@ -249,44 +264,22 @@
             margin-bottom: 15px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 20px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: relative;
         }
-        
-        .page-title::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #FFE66D);
-            border-radius: 2px;
-            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .page-title:hover::after {
-            width: 120px;
-            background: linear-gradient(135deg, #4ECDC4, #FFE66D, #FF6B6B);
-            box-shadow: 0 3px 12px rgba(78, 205, 196, 0.4);
-        }
-        
+
         .page-title i {
-            color: white;
-            font-size: 1.5em;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            color: #052505; /* 深绿色 */
+            font-size: 1.2em;
+            background: rgba(5, 37, 5, 0.15);
             padding: 15px;
             border-radius: 50%;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
         }
-        
-        .page-title:hover i {
+
+        .page-header-card:hover .page-title i {
             transform: rotate(10deg) scale(1.1);
-            background: linear-gradient(135deg, #4ECDC4, #FF6B6B);
-            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+            background: rgba(5, 37, 5, 0.25);
         }
         
         .page-subtitle {
@@ -294,12 +287,17 @@
             font-size: 1.1em;
             font-weight: 500;
             margin-bottom: 25px;
+            background: linear-gradient(135deg, #2d5a2d, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .header-actions {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
+            justify-content: center; /* 居中对齐 */
         }
         
         .btn-header {
@@ -307,30 +305,41 @@
             align-items: center;
             gap: 8px;
             padding: 12px 24px;
-            background: linear-gradient(135deg, #4ECDC4, #44A08D);
-            color: white;
+            background: rgba(45, 90, 45, 0.1);
+            color: #2d5a2d;
             text-decoration: none;
             border-radius: 15px;
             font-weight: 600;
             transition: all 0.3s ease;
-            border: none;
-            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+            border: 1px solid rgba(45, 90, 45, 0.2);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .btn-header:hover {
-            background: linear-gradient(135deg, #44A08D, #4ECDC4);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
-            text-decoration: none;
-        }
-        
-        .btn-header i {
+
+        /* 为按钮添加彩色边框装饰 */
+        .btn-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            opacity: 0;
             transition: all 0.3s ease;
+            z-index: -1;
         }
-        
-        .btn-header:hover i {
-            transform: scale(1.2);
+
+        .btn-header:hover::before {
+            opacity: 0.1;
+        }
+
+        .btn-header:hover {
+            background: rgba(45, 90, 45, 0.15);
+            color: #1a4d1a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 90, 45, 0.2);
+            text-decoration: none;
         }
         
         /* 统计概览网格 */
@@ -352,32 +361,196 @@
             transition: all 0.3s ease;
             cursor: pointer;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
         
-        .stats-card:hover {
+        /* 第一个卡片 - 红色主题 */
+        .stats-card:nth-child(1) {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #F44336;
+            box-shadow: 0 15px 45px rgba(244, 67, 54, 0.15);
+        }
+        
+        .stats-card:nth-child(1)::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #F44336, #F44336);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:nth-child(1):hover {
             transform: translateY(-8px);
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
-            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 25px 70px rgba(244, 67, 54, 0.25);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .stats-card:nth-child(1):hover::before {
+            width: 8px;
+            box-shadow: 0 0 20px rgba(244, 67, 54, 0.6);
+        }
+        
+        /* 第二个卡片 - 紫色主题 */
+        .stats-card:nth-child(2) {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #9C27B0;
+            box-shadow: 0 15px 45px rgba(156, 39, 176, 0.15);
+        }
+        
+        .stats-card:nth-child(2)::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #9C27B0, #9C27B0);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:nth-child(2):hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 70px rgba(156, 39, 176, 0.25);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .stats-card:nth-child(2):hover::before {
+            width: 8px;
+            box-shadow: 0 0 20px rgba(156, 39, 176, 0.6);
+        }
+        
+        /* 第三个卡片 - 蓝色主题 */
+        .stats-card:nth-child(3) {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #2196F3;
+            box-shadow: 0 15px 45px rgba(33, 150, 243, 0.15);
+        }
+        
+        .stats-card:nth-child(3)::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #2196F3, #2196F3);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:nth-child(3):hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 70px rgba(33, 150, 243, 0.25);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .stats-card:nth-child(3):hover::before {
+            width: 8px;
+            box-shadow: 0 0 20px rgba(33, 150, 243, 0.6);
+        }
+        
+        /* 第四个卡片 - 绿色主题 */
+        .stats-card:nth-child(4) {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #4CAF50;
+            box-shadow: 0 15px 45px rgba(76, 175, 80, 0.15);
+        }
+        
+        .stats-card:nth-child(4)::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #4CAF50, #4CAF50);
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:nth-child(4):hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 70px rgba(76, 175, 80, 0.25);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .stats-card:nth-child(4):hover::before {
+            width: 8px;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
         }
         
         .stats-number {
             font-size: 2.5em;
             font-weight: 700;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
             margin-bottom: 15px;
             transition: all 0.3s ease;
             text-shadow: none;
+            position: relative;
+            z-index: 2;
         }
         
-        .stats-card:hover .stats-number {
-            transform: scale(1.1);
-            background: linear-gradient(135deg, #4ECDC4, #FF6B6B);
+        /* 五彩数字颜色 - 根据卡片主题调整 */
+        .stats-card:nth-child(1) .stats-number {
+            background: linear-gradient(135deg, #F44336, #F44336);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+        
+        .stats-card:nth-child(2) .stats-number {
+            background: linear-gradient(135deg, #9C27B0, #9C27B0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stats-card:nth-child(3) .stats-number {
+            background: linear-gradient(135deg, #2196F3, #2196F3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stats-card:nth-child(4) .stats-number {
+            background: linear-gradient(135deg, #4CAF50, #4CAF50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* 悬停时数字颜色反转 */
+        .stats-card:nth-child(1):hover .stats-number {
+            background: linear-gradient(135deg, #F44336, #F44336);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scale(1.1);
+        }
+        
+        .stats-card:nth-child(2):hover .stats-number {
+            background: linear-gradient(135deg, #9C27B0, #9C27B0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scale(1.1);
+        }
+        
+        .stats-card:nth-child(3):hover .stats-number {
+            background: linear-gradient(135deg, #2196F3, #2196F3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scale(1.1);
+        }
+        
+        .stats-card:nth-child(4):hover .stats-number {
+            background: linear-gradient(135deg, #4CAF50, #4CAF50);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scale(1.1);
         }
         
         .stats-label {
@@ -385,10 +558,45 @@
             font-weight: 600;
             font-size: 1em;
             transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
         }
         
-        .stats-card:hover .stats-label {
-            color: #1a4d1a;
+        /* 五彩标签颜色 - 根据卡片主题调整 */
+        .stats-card:nth-child(1) .stats-label {
+            color: #F44336;
+        }
+        
+        .stats-card:nth-child(2) .stats-label {
+            color: #9C27B0;
+        }
+        
+        .stats-card:nth-child(3) .stats-label {
+            color: #2196F3;
+        }
+        
+        .stats-card:nth-child(4) .stats-label {
+            color: #4CAF50;
+        }
+        
+        /* 悬停时标签颜色加深 */
+        .stats-card:nth-child(1):hover .stats-label {
+            color: #F44336;
+            transform: scale(1.05);
+        }
+        
+        .stats-card:nth-child(2):hover .stats-label {
+            color: #9C27B0;
+            transform: scale(1.05);
+        }
+        
+        .stats-card:nth-child(3):hover .stats-label {
+            color: #2196F3;
+            transform: scale(1.05);
+        }
+        
+        .stats-card:nth-child(4):hover .stats-label {
+            color: #4CAF50;
             transform: scale(1.05);
         }
         
@@ -426,17 +634,28 @@
         .card-title i {
             color: white;
             font-size: 1.2em;
-            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            background: linear-gradient(135deg, #FF6B6B, #EE5A52);
             padding: 12px;
             border-radius: 50%;
             transition: all 0.3s ease;
-            box-shadow: 0 3px 12px rgba(78, 205, 196, 0.3);
+            box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3);
         }
         
         .tech-overview-card:hover .card-title i {
             transform: rotate(5deg) scale(1.1);
-            background: linear-gradient(135deg, #44A08D, #4ECDC4);
-            box-shadow: 0 5px 18px rgba(78, 205, 196, 0.4);
+            background: linear-gradient(135deg, #EE5A52, #FF6B6B);
+            box-shadow: 0 5px 18px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* 项目详情卡片的图标使用不同的颜色 */
+        .projects-list-card .card-title i {
+            background: linear-gradient(135deg, #FFE66D, #FFD700);
+            box-shadow: 0 3px 12px rgba(255, 230, 109, 0.3);
+        }
+        
+        .projects-list-card:hover .card-title i {
+            background: linear-gradient(135deg, #FFD700, #FFE66D);
+            box-shadow: 0 5px 18px rgba(255, 230, 109, 0.4);
         }
         
         /* 技术标签容器 */
@@ -528,6 +747,83 @@
             background: rgba(255, 255, 255, 0.95);
         }
         
+        /* 五彩卡片设计 - 每个卡片使用单一主色调 */
+        .project-card:nth-child(1) {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(255, 107, 107, 0.05));
+            border: 2px solid #FF6B6B;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.15);
+        }
+        
+        .project-card:nth-child(1)::before {
+            background: linear-gradient(135deg, #FF6B6B, #FF6B6B);
+        }
+        
+        .project-card:nth-child(1):hover {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 107, 107, 0.08));
+            box-shadow: 0 15px 45px rgba(255, 107, 107, 0.25);
+        }
+        
+        .project-card:nth-child(2) {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(78, 205, 196, 0.05));
+            border: 2px solid #4ECDC4;
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.15);
+        }
+        
+        .project-card:nth-child(2)::before {
+            background: linear-gradient(135deg, #4ECDC4, #4ECDC4);
+        }
+        
+        .project-card:nth-child(2):hover {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.15), rgba(78, 205, 196, 0.08));
+            box-shadow: 0 15px 45px rgba(78, 205, 196, 0.25);
+        }
+        
+        .project-card:nth-child(3) {
+            background: linear-gradient(135deg, rgba(255, 230, 109, 0.1), rgba(255, 230, 109, 0.05));
+            border: 2px solid #FFE66D;
+            box-shadow: 0 8px 25px rgba(255, 230, 109, 0.15);
+        }
+        
+        .project-card:nth-child(3)::before {
+            background: linear-gradient(135deg, #FFE66D, #FFE66D);
+        }
+        
+        .project-card:nth-child(3):hover {
+            background: linear-gradient(135deg, rgba(255, 230, 109, 0.15), rgba(255, 230, 109, 0.08));
+            box-shadow: 0 15px 45px rgba(255, 230, 109, 0.25);
+        }
+        
+        .project-card:nth-child(4) {
+            background: linear-gradient(135deg, rgba(168, 230, 207, 0.1), rgba(168, 230, 207, 0.05));
+            border: 2px solid #A8E6CF;
+            box-shadow: 0 8px 25px rgba(168, 230, 207, 0.15);
+        }
+        
+        .project-card:nth-child(4)::before {
+            background: linear-gradient(135deg, #A8E6CF, #A8E6CF);
+        }
+        
+        .project-card:nth-child(4):hover {
+            background: linear-gradient(135deg, rgba(168, 230, 207, 0.15), rgba(168, 230, 207, 0.08));
+            box-shadow: 0 15px 45px rgba(168, 230, 207, 0.25);
+        }
+        
+        .project-card:nth-child(5) {
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.1), rgba(255, 182, 193, 0.05));
+            border: 2px solid #FFB6C1;
+            box-shadow: 0 8px 25px rgba(255, 182, 193, 0.15);
+        }
+        
+        .project-card:nth-child(5)::before {
+            background: linear-gradient(135deg, #FFB6C1, #FFB6C1);
+        }
+        
+        .project-card:nth-child(5):hover {
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.15), rgba(255, 182, 193, 0.08));
+            box-shadow: 0 15px 45px rgba(255, 182, 193, 0.25);
+        }
+        
+        /* 通用装饰条样式 */
         .project-card::before {
             content: '';
             position: absolute;
@@ -535,37 +831,32 @@
             left: 0;
             width: 4px;
             height: 100%;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
             transition: all 0.3s ease;
-        }
-        
-        .project-card:nth-child(2n)::before {
-            background: linear-gradient(135deg, #4ECDC4, #FFE66D);
-        }
-        
-        .project-card:nth-child(3n)::before {
-            background: linear-gradient(135deg, #FFE66D, #A8E6CF);
-        }
-        
-        .project-card:nth-child(4n)::before {
-            background: linear-gradient(135deg, #A8E6CF, #FF6B6B);
         }
         
         .project-card:hover::before {
             width: 8px;
-            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
         }
         
-        .project-card:nth-child(2n):hover::before {
-            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        /* 五彩悬停发光效果 */
+        .project-card:nth-child(1):hover::before {
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
         }
         
-        .project-card:nth-child(3n):hover::before {
-            box-shadow: 0 0 20px rgba(255, 230, 109, 0.3);
+        .project-card:nth-child(2):hover::before {
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.6);
         }
         
-        .project-card:nth-child(4n):hover::before {
-            box-shadow: 0 0 20px rgba(168, 230, 207, 0.3);
+        .project-card:nth-child(3):hover::before {
+            box-shadow: 0 0 20px rgba(255, 230, 109, 0.6);
+        }
+        
+        .project-card:nth-child(4):hover::before {
+            box-shadow: 0 0 20px rgba(168, 230, 207, 0.6);
+        }
+        
+        .project-card:nth-child(5):hover::before {
+            box-shadow: 0 0 20px rgba(255, 182, 193, 0.6);
         }
         
         /* 项目状态标签 */
@@ -614,6 +905,58 @@
             position: relative;
         }
         
+        /* 五彩标题装饰线 - 每个卡片使用对应单色 */
+        .project-card:nth-child(1) .project-title::after {
+            background: linear-gradient(135deg, #FF6B6B, #FF6B6B);
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+        }
+        
+        .project-card:nth-child(1) .project-title:hover::after {
+            background: linear-gradient(135deg, #FF6B6B, #FF6B6B);
+            box-shadow: 0 3px 12px rgba(255, 107, 107, 0.6);
+        }
+        
+        .project-card:nth-child(2) .project-title::after {
+            background: linear-gradient(135deg, #4ECDC4, #4ECDC4);
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.4);
+        }
+        
+        .project-card:nth-child(2) .project-title:hover::after {
+            background: linear-gradient(135deg, #4ECDC4, #4ECDC4);
+            box-shadow: 0 3px 12px rgba(78, 205, 196, 0.6);
+        }
+        
+        .project-card:nth-child(3) .project-title::after {
+            background: linear-gradient(135deg, #FFE66D, #FFE66D);
+            box-shadow: 0 2px 8px rgba(255, 230, 109, 0.4);
+        }
+        
+        .project-card:nth-child(3) .project-title:hover::after {
+            background: linear-gradient(135deg, #FFE66D, #FFE66D);
+            box-shadow: 0 3px 12px rgba(255, 230, 109, 0.6);
+        }
+        
+        .project-card:nth-child(4) .project-title::after {
+            background: linear-gradient(135deg, #A8E6CF, #A8E6CF);
+            box-shadow: 0 2px 8px rgba(168, 230, 207, 0.4);
+        }
+        
+        .project-card:nth-child(4) .project-title:hover::after {
+            background: linear-gradient(135deg, #A8E6CF, #A8E6CF);
+            box-shadow: 0 3px 12px rgba(168, 230, 207, 0.6);
+        }
+        
+        .project-card:nth-child(5) .project-title::after {
+            background: linear-gradient(135deg, #FFB6C1, #FFB6C1);
+            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.4);
+        }
+        
+        .project-card:nth-child(5) .project-title:hover::after {
+            background: linear-gradient(135deg, #FFB6C1, #FFB6C1);
+            box-shadow: 0 3px 12px rgba(255, 182, 193, 0.6);
+        }
+        
+        /* 通用装饰线样式 */
         .project-title::after {
             content: '';
             position: absolute;
@@ -621,16 +964,12 @@
             left: 0;
             width: 80px;
             height: 4px;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #FFE66D);
             border-radius: 2px;
-            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
             transition: all 0.3s ease;
         }
         
         .project-title:hover::after {
             width: 100px;
-            background: linear-gradient(135deg, #4ECDC4, #FFE66D, #FF6B6B);
-            box-shadow: 0 3px 12px rgba(78, 205, 196, 0.4);
         }
         
         /* 项目描述 */
@@ -683,6 +1022,87 @@
             border-top: 3px solid #A8E6CF;
         }
         
+        /* 五彩元信息边框 - 根据项目卡片颜色调整 */
+        .project-card:nth-child(1) .meta-item:nth-child(1) {
+            border-top-color: #FF6B6B;
+        }
+        
+        .project-card:nth-child(1) .meta-item:nth-child(2) {
+            border-top-color: #FF6B6B;
+        }
+        
+        .project-card:nth-child(1) .meta-item:nth-child(3) {
+            border-top-color: #FF6B6B;
+        }
+        
+        .project-card:nth-child(1) .meta-item:nth-child(4) {
+            border-top-color: #FF6B6B;
+        }
+        
+        .project-card:nth-child(2) .meta-item:nth-child(1) {
+            border-top-color: #4ECDC4;
+        }
+        
+        .project-card:nth-child(2) .meta-item:nth-child(2) {
+            border-top-color: #4ECDC4;
+        }
+        
+        .project-card:nth-child(2) .meta-item:nth-child(3) {
+            border-top-color: #4ECDC4;
+        }
+        
+        .project-card:nth-child(2) .meta-item:nth-child(4) {
+            border-top-color: #4ECDC4;
+        }
+        
+        .project-card:nth-child(3) .meta-item:nth-child(1) {
+            border-top-color: #FFE66D;
+        }
+        
+        .project-card:nth-child(3) .meta-item:nth-child(2) {
+            border-top-color: #FFE66D;
+        }
+        
+        .project-card:nth-child(3) .meta-item:nth-child(3) {
+            border-top-color: #FFE66D;
+        }
+        
+        .project-card:nth-child(3) .meta-item:nth-child(4) {
+            border-top-color: #FFE66D;
+        }
+        
+        .project-card:nth-child(4) .meta-item:nth-child(1) {
+            border-top-color: #A8E6CF;
+        }
+        
+        .project-card:nth-child(4) .meta-item:nth-child(2) {
+            border-top-color: #A8E6CF;
+        }
+        
+        .project-card:nth-child(4) .meta-item:nth-child(3) {
+            border-top-color: #A8E6CF;
+        }
+        
+        .project-card:nth-child(4) .meta-item:nth-child(4) {
+            border-top-color: #A8E6CF;
+        }
+        
+        .project-card:nth-child(5) .meta-item:nth-child(1) {
+            border-top-color: #FFB6C1;
+        }
+        
+        .project-card:nth-child(5) .meta-item:nth-child(2) {
+            border-top-color: #FFB6C1;
+        }
+        
+        .project-card:nth-child(5) .meta-item:nth-child(3) {
+            border-top-color: #FFB6C1;
+        }
+        
+        .project-card:nth-child(5) .meta-item:nth-child(4) {
+            border-top-color: #FFB6C1;
+        }
+        
         .meta-label {
             font-size: 0.85em;
             color: #6c757d;
@@ -717,6 +1137,32 @@
             text-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
         }
         
+        /* 五彩技术栈图标 - 根据项目卡片颜色调整 */
+        .project-card:nth-child(1) .tech-section h6 i {
+            color: #FF6B6B;
+            text-shadow: 0 2px 4px rgba(255, 107, 107, 0.4);
+        }
+        
+        .project-card:nth-child(2) .tech-section h6 i {
+            color: #4ECDC4;
+            text-shadow: 0 2px 4px rgba(78, 205, 196, 0.4);
+        }
+        
+        .project-card:nth-child(3) .tech-section h6 i {
+            color: #FFE66D;
+            text-shadow: 0 2px 4px rgba(255, 230, 109, 0.4);
+        }
+        
+        .project-card:nth-child(4) .tech-section h6 i {
+            color: #A8E6CF;
+            text-shadow: 0 2px 4px rgba(168, 230, 207, 0.4);
+        }
+        
+        .project-card:nth-child(5) .tech-section h6 i {
+            color: #FFB6C1;
+            text-shadow: 0 2px 4px rgba(255, 182, 193, 0.4);
+        }
+        
         /* 贡献和成就区域 */
         .contribution-section,
         .achievements-section {
@@ -739,10 +1185,62 @@
             text-shadow: 0 2px 4px rgba(78, 205, 196, 0.3);
         }
         
+        /* 五彩贡献图标 - 根据项目卡片颜色调整 */
+        .project-card:nth-child(1) .contribution-section h6 i {
+            color: #FF6B6B;
+            text-shadow: 0 2px 4px rgba(255, 107, 107, 0.4);
+        }
+        
+        .project-card:nth-child(2) .contribution-section h6 i {
+            color: #4ECDC4;
+            text-shadow: 0 2px 4px rgba(78, 205, 196, 0.4);
+        }
+        
+        .project-card:nth-child(3) .contribution-section h6 i {
+            color: #FFE66D;
+            text-shadow: 0 2px 4px rgba(255, 230, 109, 0.4);
+        }
+        
+        .project-card:nth-child(4) .contribution-section h6 i {
+            color: #A8E6CF;
+            text-shadow: 0 2px 4px rgba(168, 230, 207, 0.4);
+        }
+        
+        .project-card:nth-child(5) .contribution-section h6 i {
+            color: #FFB6C1;
+            text-shadow: 0 2px 4px rgba(255, 182, 193, 0.4);
+        }
+        
         .achievements-section h6 i {
             color: #FFE66D; /* 金黄色 */
             font-size: 1em;
             text-shadow: 0 2px 4px rgba(255, 230, 109, 0.3);
+        }
+        
+        /* 五彩成就图标 - 根据项目卡片颜色调整 */
+        .project-card:nth-child(1) .achievements-section h6 i {
+            color: #FF6B6B;
+            text-shadow: 0 2px 4px rgba(255, 107, 107, 0.4);
+        }
+        
+        .project-card:nth-child(2) .achievements-section h6 i {
+            color: #4ECDC4;
+            text-shadow: 0 2px 4px rgba(78, 205, 196, 0.4);
+        }
+        
+        .project-card:nth-child(3) .achievements-section h6 i {
+            color: #FFE66D;
+            text-shadow: 0 2px 4px rgba(255, 230, 109, 0.4);
+        }
+        
+        .project-card:nth-child(4) .achievements-section h6 i {
+            color: #A8E6CF;
+            text-shadow: 0 2px 4px rgba(168, 230, 207, 0.4);
+        }
+        
+        .project-card:nth-child(5) .achievements-section h6 i {
+            color: #FFB6C1;
+            text-shadow: 0 2px 4px rgba(255, 182, 193, 0.4);
         }
         
         .contribution-text {
@@ -753,6 +1251,32 @@
             border-radius: 10px;
             border-left: 4px solid #4ECDC4;
             box-shadow: 0 2px 8px rgba(78, 205, 196, 0.1);
+        }
+        
+        /* 五彩贡献文本边框 - 根据项目卡片颜色调整 */
+        .project-card:nth-child(1) .contribution-text {
+            border-left-color: #FF6B6B;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.15);
+        }
+        
+        .project-card:nth-child(2) .contribution-text {
+            border-left-color: #4ECDC4;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.15);
+        }
+        
+        .project-card:nth-child(3) .contribution-text {
+            border-left-color: #FFE66D;
+            box-shadow: 0 2px 8px rgba(255, 230, 109, 0.15);
+        }
+        
+        .project-card:nth-child(4) .contribution-text {
+            border-left-color: #A8E6CF;
+            box-shadow: 0 2px 8px rgba(168, 230, 207, 0.15);
+        }
+        
+        .project-card:nth-child(5) .contribution-text {
+            border-left-color: #FFB6C1;
+            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.15);
         }
         
         /* 成就项目 */
@@ -767,6 +1291,32 @@
             align-items: center;
             gap: 12px;
             box-shadow: 0 2px 8px rgba(255, 107, 107, 0.1);
+        }
+        
+        /* 五彩成就项目边框 - 根据项目卡片颜色调整 */
+        .project-card:nth-child(1) .achievement-item {
+            border-left-color: #FF6B6B;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.15);
+        }
+        
+        .project-card:nth-child(2) .achievement-item {
+            border-left-color: #4ECDC4;
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.15);
+        }
+        
+        .project-card:nth-child(3) .achievement-item {
+            border-left-color: #FFE66D;
+            box-shadow: 0 2px 8px rgba(255, 230, 109, 0.15);
+        }
+        
+        .project-card:nth-child(4) .achievement-item {
+            border-left-color: #A8E6CF;
+            box-shadow: 0 2px 8px rgba(168, 230, 207, 0.15);
+        }
+        
+        .project-card:nth-child(5) .achievement-item {
+            border-left-color: #FFB6C1;
+            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.15);
         }
         
         .achievement-item:nth-child(2n) {
@@ -794,6 +1344,27 @@
             color: #FF6B6B;
             font-size: 1.1em;
             transition: all 0.3s ease;
+        }
+        
+        /* 五彩成就项目图标 - 根据项目卡片颜色调整 */
+        .project-card:nth-child(1) .achievement-item i {
+            color: #FF6B6B;
+        }
+        
+        .project-card:nth-child(2) .achievement-item i {
+            color: #4ECDC4;
+        }
+        
+        .project-card:nth-child(3) .achievement-item i {
+            color: #FFE66D;
+        }
+        
+        .project-card:nth-child(4) .achievement-item i {
+            color: #A8E6CF;
+        }
+        
+        .project-card:nth-child(5) .achievement-item i {
+            color: #FFB6C1;
         }
         
         .achievement-item:nth-child(2n) i {
@@ -845,6 +1416,57 @@
             border-color: #FF6B6B;
         }
         
+        /* 五彩操作按钮 - 根据项目卡片颜色调整 */
+        .project-card:nth-child(1) .action-btn:first-child {
+            background: linear-gradient(135deg, #FF6B6B, #EE5A52);
+            border-color: #FF6B6B;
+        }
+        
+        .project-card:nth-child(1) .action-btn:last-child {
+            background: linear-gradient(135deg, #FF6B6B, #EE5A52);
+            border-color: #FF6B6B;
+        }
+        
+        .project-card:nth-child(2) .action-btn:first-child {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            border-color: #4ECDC4;
+        }
+        
+        .project-card:nth-child(2) .action-btn:last-child {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            border-color: #4ECDC4;
+        }
+        
+        .project-card:nth-child(3) .action-btn:first-child {
+            background: linear-gradient(135deg, #FFE66D, #FFD700);
+            border-color: #FFE66D;
+        }
+        
+        .project-card:nth-child(3) .action-btn:last-child {
+            background: linear-gradient(135deg, #FFE66D, #FFD700);
+            border-color: #FFE66D;
+        }
+        
+        .project-card:nth-child(4) .action-btn:first-child {
+            background: linear-gradient(135deg, #A8E6CF, #98FB98);
+            border-color: #A8E6CF;
+        }
+        
+        .project-card:nth-child(4) .action-btn:last-child {
+            background: linear-gradient(135deg, #A8E6CF, #98FB98);
+            border-color: #A8E6CF;
+        }
+        
+        .project-card:nth-child(5) .action-btn:first-child {
+            background: linear-gradient(135deg, #FFB6C1, #FFC0CB);
+            border-color: #FFB6C1;
+        }
+        
+        .project-card:nth-child(5) .action-btn:last-child {
+            background: linear-gradient(135deg, #FFB6C1, #FFC0CB);
+            border-color: #FFB6C1;
+        }
+        
         .action-btn:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
@@ -856,6 +1478,47 @@
         
         .action-btn:last-child:hover {
             background: linear-gradient(135deg, #EE5A52, #FF6B6B);
+        }
+        
+        /* 五彩操作按钮悬停效果 - 根据项目卡片颜色调整 */
+        .project-card:nth-child(1) .action-btn:first-child:hover {
+            background: linear-gradient(135deg, #EE5A52, #FF6B6B);
+        }
+        
+        .project-card:nth-child(1) .action-btn:last-child:hover {
+            background: linear-gradient(135deg, #EE5A52, #FF6B6B);
+        }
+        
+        .project-card:nth-child(2) .action-btn:first-child:hover {
+            background: linear-gradient(135deg, #44A08D, #4ECDC4);
+        }
+        
+        .project-card:nth-child(2) .action-btn:last-child:hover {
+            background: linear-gradient(135deg, #44A08D, #4ECDC4);
+        }
+        
+        .project-card:nth-child(3) .action-btn:first-child:hover {
+            background: linear-gradient(135deg, #FFD700, #FFE66D);
+        }
+        
+        .project-card:nth-child(3) .action-btn:last-child:hover {
+            background: linear-gradient(135deg, #FFD700, #FFE66D);
+        }
+        
+        .project-card:nth-child(4) .action-btn:first-child:hover {
+            background: linear-gradient(135deg, #98FB98, #A8E6CF);
+        }
+        
+        .project-card:nth-child(4) .action-btn:last-child:hover {
+            background: linear-gradient(135deg, #98FB98, #A8E6CF);
+        }
+        
+        .project-card:nth-child(5) .action-btn:first-child:hover {
+            background: linear-gradient(135deg, #FFC0CB, #FFB6C1);
+        }
+        
+        .project-card:nth-child(5) .action-btn:last-child:hover {
+            background: linear-gradient(135deg, #FFC0CB, #FFB6C1);
         }
         
         /* 快速操作区域 */
@@ -1204,10 +1867,10 @@
                 快速操作
             </div>
             <div class="actions-grid">
-                <a href="{{ url_for('talent_management.employee_manager.performance.performance_dashboard') }}" class="action-btn-main primary">
-                    <i class="fas fa-chart-line"></i>
-                    绩效记录
-                </a>
+                                 <a href="{{ url_for('talent_management.employee_manager.performance.performance_dashboard') }}" class="action-btn-main">
+                     <i class="fas fa-chart-line"></i>
+                     绩效记录
+                 </a>
                 <a href="{{ url_for('talent_management.employee_manager.learning_recommendation.dashboard') }}" class="action-btn-main">
                     <i class="fas fa-graduation-cap"></i>
                     学习推荐
