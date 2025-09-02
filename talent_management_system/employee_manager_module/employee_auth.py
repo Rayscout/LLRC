@@ -6,7 +6,7 @@ employee_auth_bp = Blueprint('employee_auth', __name__, url_prefix='/employee')
 
 @employee_auth_bp.route('/auth', methods=['GET', 'POST'])
 def employee_auth():
-    """员工登录和注册"""
+    """员工认证（注册/登录）"""
     if request.method == 'POST':
         action = request.form.get('action')
         
@@ -14,50 +14,50 @@ def employee_auth():
             # 员工注册
             first_name = request.form['first_name']
             last_name = request.form['last_name']
-            company_name = request.form['company_name']
-            department = request.form['department']
-            position = request.form['position']
-            employee_id = request.form['employee_id']
-            supervisor_email = request.form['supervisor_email']
-            hire_date = request.form['hire_date']
             email = request.form['email']
-            phone_number = request.form['phone_number']
-            birthday = request.form['birthday']
             password = request.form['password']
-            confirm_password = request.form['confirm_password']
+            phone_number = request.form.get('phone_number', '')
+            birthday_str = request.form.get('birthday', '')
+            hire_date = request.form.get('hire_date', '')
             
-            if password != confirm_password:
-                flash('两次输入的密码不一致。', 'danger')
+            # 验证必填字段
+            if not all([first_name, last_name, email, password]):
+                flash('请填写所有必填字段', 'danger')
+                return redirect(url_for('talent_management.employee_auth.employee_auth'))
+            
+            # 验证邮箱格式
+            if '@' not in email or '.' not in email:
+                flash('请输入有效的邮箱地址', 'danger')
                 return redirect(url_for('talent_management.employee_auth.employee_auth'))
             
             # 检查邮箱是否已存在
             existing_user = User.query.filter_by(email=email).first()
             if existing_user:
-                flash('该邮箱已被注册。', 'danger')
+                flash('该邮箱已被注册', 'danger')
                 return redirect(url_for('talent_management.employee_auth.employee_auth'))
             
-            # 检查员工编号是否已存在
-            existing_employee = User.query.filter_by(employee_id=employee_id).first()
-            if existing_employee:
-                flash('该员工编号已被使用。', 'danger')
-                return redirect(url_for('talent_management.employee_auth.employee_auth'))
+            # 处理日期字段
+            birthday = None
+            if birthday_str:
+                try:
+                    birthday = datetime.strptime(birthday_str, '%Y-%m-%d').date()
+                except ValueError:
+                    flash('生日日期格式错误', 'danger')
+                    return redirect(url_for('talent_management.employee_auth.employee_auth'))
             
-            # 查找高管
-            supervisor = User.query.filter_by(email=supervisor_email, user_type='executive').first()
-            if not supervisor:
-                flash('未找到指定的高管，请检查高管邮箱是否正确。', 'danger')
-                return redirect(url_for('talent_management.employee_auth.employee_auth'))
+            hire_date_obj = None
+            if hire_date:
+                try:
+                    hire_date_obj = datetime.strptime(hire_date, '%Y-%m-%d').date()
+                except ValueError:
+                    flash('入职日期格式错误', 'danger')
+                    return redirect(url_for('talent_management.employee_auth.employee_auth'))
             
-            # 创建新员工用户
+            # 创建新用户
             user = User(
                 first_name=first_name,
                 last_name=last_name,
-                company_name=company_name,
-                department=department,
-                position=position,
-                employee_id=employee_id,
-                supervisor_id=supervisor.id,
-                hire_date=datetime.strptime(hire_date, '%Y-%m-%d').date(),
+                hire_date=hire_date_obj,
                 email=email,
                 phone_number=phone_number,
                 birthday=birthday,
@@ -69,27 +69,49 @@ def employee_auth():
             try:
                 db.session.add(user)
                 db.session.commit()
+                
+                # 验证用户是否成功创建
+                saved_user = User.query.filter_by(email=email).first()
+                if not saved_user:
+                    db.session.rollback()
+                    flash('注册失败，请稍后重试', 'danger')
+                    return redirect(url_for('talent_management.employee_auth.employee_auth'))
+                
                 flash('员工注册成功！现在可以登录。', 'success')
                 return redirect(url_for('talent_management.employee_auth.employee_auth'))
+                
             except Exception as e:
                 db.session.rollback()
+                print(f"员工注册失败: {e}")
                 flash('注册失败，请稍后重试。', 'danger')
                 return redirect(url_for('talent_management.employee_auth.employee_auth'))
                 
         elif action == 'signin':
             # 员工登录
-            email = request.form['email']
-            password = request.form['password']
+            email = request.form.get('email', '')
+            password = request.form.get('password', '')
             
-            user = User.query.filter_by(email=email, password=password, user_type='employee').first()
-            if user:
-                session['user_id'] = user.id
-                session['user_type'] = 'employee'
-                flash('员工登录成功！', 'success')
-                # 重定向到员工仪表盘
-                return redirect(url_for('talent_management.employee_management.employee_dashboard'))
-            else:
-                flash('邮箱或密码错误，或该账号不是员工账号。', 'danger')
+            if not email or not password:
+                flash('请输入邮箱和密码', 'danger')
+                return redirect(url_for('talent_management.employee_auth.employee_auth'))
+            
+            try:
+                user = User.query.filter_by(email=email, password=password, user_type='employee').first()
+                if user:
+                    # 设置会话
+                    session['user_id'] = user.id
+                    session['user_type'] = 'employee'
+                    session['user_email'] = user.email
+                    
+                    flash('员工登录成功！', 'success')
+                    # 重定向到员工仪表盘
+                    return redirect(url_for('talent_management.employee_management.employee_dashboard'))
+                else:
+                    flash('邮箱或密码错误，或该账号不是员工账号。', 'danger')
+                    return redirect(url_for('talent_management.employee_auth.employee_auth'))
+            except Exception as e:
+                print(f"员工登录失败: {e}")
+                flash('登录失败，请稍后重试', 'danger')
                 return redirect(url_for('talent_management.employee_auth.employee_auth'))
     
     # GET请求显示登录页面

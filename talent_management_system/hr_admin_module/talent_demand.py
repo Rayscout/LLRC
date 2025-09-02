@@ -28,36 +28,67 @@ def notify_all_hr_for_demand(demand: TalentDemand, executive: User) -> int:
 @talent_demand_bp.route('/publish', methods=['GET', 'POST'])
 def publish():
     """高管发布人才需求（输入关键词，可选描述）"""
-    if 'user_id' not in session or session.get('user_type') != 'executive':
-        flash('请先使用高管账户登录', 'danger')
+    try:
+        if 'user_id' not in session or session.get('user_type') != 'executive':
+            flash('请先使用高管账户登录', 'danger')
+            return redirect(url_for('talent_management.executive_auth.executive_auth'))
+
+        executive = User.query.get(session['user_id'])
+        if not executive or executive.user_type != 'executive':
+            flash('权限不足', 'danger')
+            return redirect(url_for('talent_management.executive_auth.executive_auth'))
+
+        if request.method == 'POST':
+            keyword = request.form.get('keyword', '').strip()
+            description = request.form.get('description', '').strip()
+            
+            if not keyword:
+                flash('请输入人才需求关键词', 'warning')
+                return redirect(url_for('talent_management.hr_admin.talent_demand.publish'))
+
+            try:
+                # 创建人才需求
+                demand = TalentDemand(
+                    executive_id=executive.id,
+                    keyword=keyword,
+                    description=description or None
+                )
+                db.session.add(demand)
+                db.session.commit()
+
+                # 验证数据是否成功保存
+                saved_demand = TalentDemand.query.filter_by(
+                    executive_id=executive.id,
+                    keyword=keyword
+                ).first()
+
+                if not saved_demand:
+                    db.session.rollback()
+                    flash('人才需求保存失败，请重试', 'danger')
+                    return redirect(url_for('talent_management.hr_admin.talent_demand.publish'))
+
+                # 通知所有 HR
+                try:
+                    count = notify_all_hr_for_demand(demand, executive)
+                    flash(f'人才需求已发布，并通知 {count} 位HR', 'success')
+                except Exception as notify_error:
+                    print(f"通知HR失败: {notify_error}")
+                    flash('人才需求已发布，但通知HR时出现问题', 'warning')
+
+                return redirect(url_for('talent_management.hr_admin.executive_dashboard'))
+
+            except Exception as db_error:
+                db.session.rollback()
+                print(f"发布人才需求失败: {db_error}")
+                flash('发布失败，请重试', 'danger')
+                return redirect(url_for('talent_management.hr_admin.talent_demand.publish'))
+
+        return render_template('talent_management/hr_admin/talent_demand_publish.html', user=executive)
+        
+    except Exception as e:
+        print(f"发布人才需求页面错误: {e}")
+        flash('页面加载失败，请重试', 'danger')
         return redirect(url_for('talent_management.executive_auth.executive_auth'))
-
-    executive = User.query.get(session['user_id'])
-    if not executive or executive.user_type != 'executive':
-        flash('权限不足', 'danger')
-        return redirect(url_for('talent_management.executive_auth.executive_auth'))
-
-    if request.method == 'POST':
-        keyword = request.form.get('keyword', '').strip()
-        description = request.form.get('description', '').strip()
-        if not keyword:
-            flash('请输入人才需求关键词', 'warning')
-            return redirect(url_for('talent_management.hr_admin.talent_demand.publish'))
-
-        demand = TalentDemand(
-            executive_id=executive.id,
-            keyword=keyword,
-            description=description or None
-        )
-        db.session.add(demand)
-        db.session.commit()
-
-        # 通知所有 HR
-        count = notify_all_hr_for_demand(demand, executive)
-        flash(f'人才需求已发布，并通知 {count} 位HR', 'success')
-        return redirect(url_for('talent_management.hr_admin.executive_dashboard'))
-
-    return render_template('talent_management/hr_admin/talent_demand_publish.html', user=executive)
 
 
 @talent_demand_bp.route('/hr_inbox')
