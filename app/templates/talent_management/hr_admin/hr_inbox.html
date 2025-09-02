@@ -19,7 +19,7 @@
             <form method="post" action="{{ url_for('talent_management.hr_admin.talent_demand.clear_read') }}">
                 <button type="submit" style="padding:8px 12px; border:1px solid #e3e3e3; color:#333; border-radius:8px; background:#fff; cursor:pointer;">清除已读消息</button>
             </form>
-            <a href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}" style="padding:8px 12px; border:1px solid #e3e3e3; color:#333; border-radius:8px; background:#fff; text-decoration:none;">返回仪表盘</a>
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" style="padding:8px 12px; border:1px solid #e3e3e3; color:#333; border-radius:8px; background:#fff; text-decoration:none;">返回仪表盘</a>
         </div>
 
         {% if notifications %}
