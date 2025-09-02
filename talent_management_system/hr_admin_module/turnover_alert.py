@@ -258,7 +258,7 @@ def turnover_dashboard():
         # 生成预防建议
         prevention_recommendations = generate_prevention_recommendations()
         
-        return render_template('talent_management/hr_admin/turnover_dashboard.html',
+        return render_template('hr_admin/turnover_dashboard.html',
                              user=user,
                              dashboard_data=dashboard_data,
                              causes_analysis=causes_analysis,
