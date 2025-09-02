@@ -297,43 +297,11 @@
             --dash-accent-3:#a7d3e7; /* 天蓝 */
             --dash-accent-4:#c9b8e8; /* 淡紫 */
         }
-        /* 标题与数字的渐变点缀，让首页更有层次 */
-        .ios-title.hello{ 
-            background: linear-gradient(90deg, #8fc8a7, #7cc3e2 35%, #b59be2 70%, #8fc8a7);
-            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .ios-metric-value{ 
-            background: linear-gradient(90deg, #6fb994, #6bb6d6, #a48bdc);
-            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-            font-weight: 800;
-        }
-
-        /* 指标图标容器加柔光与细描边 */
-        .ios-metric-icon{
-            position: relative;
-        }
-        .ios-metric-icon:after{ content:""; position:absolute; inset:-4px; border-radius:50%; 
-            background: radial-gradient(circle at 50% 40%, rgba(196,223,204,.35), rgba(167,211,231,.22), rgba(201,184,232,.18) 70%, transparent 75%);
-            pointer-events:none; filter: blur(1px); }
-
-        /* 快速操作卡片：按顺序使用不同配色，更加活泼 */
-        .ios-quick-actions .ios-quick-action:nth-of-type(1){ background: linear-gradient(135deg, #e8f5ee, #ffffff); }
-        .ios-quick-actions .ios-quick-action:nth-of-type(2){ background: linear-gradient(135deg, #ecf7fc, #ffffff); }
-        .ios-quick-actions .ios-quick-action:nth-of-type(3){ background: linear-gradient(135deg, #f3f0fb, #ffffff); }
-        .ios-quick-actions .ios-quick-action:nth-of-type(4){ background: linear-gradient(135deg, #fff7e8, #ffffff); }
-
-        /* 快速操作图标轻微彩色光晕 */
-        .ios-quick-action i{ position:relative }
-        .ios-quick-action i:after{ content:""; position:absolute; inset:-6px; border-radius:50%; 
-            background: radial-gradient(circle, rgba(196,223,204,.25), rgba(167,211,231,.18), rgba(201,184,232,.15)); opacity:.65; filter:blur(6px); z-index:-1 }
-
-        /* 顶部胶囊高亮标签更清晰 */
-        .ios-hero-pills .pill{ border:1px solid rgba(140, 198, 168, .35); }
-        .ios-hero-pills .pill .v{ color:#6fb994; }
-
-        /* 图表占位/容器的彩色描边，提升整体活力 */
-        .ios-chart-container{ border:1px solid rgba(140,198,168,.25); }
-        .ios-chart-placeholder{ background: linear-gradient(180deg, #dbece0, #cfe5d6 60%, #eef7fb); color:#6a7a73 }
+        /* 快速操作卡片：柔和渐变与清晰描边 */
+        .ios-quick-action{ background:linear-gradient(135deg,#ffffff,rgba(255,255,255,.95)); border:1px solid rgba(0,0,0,.06) }
+        .ios-quick-action.primary{ background:linear-gradient(135deg,var(--dash-accent-1),var(--dash-accent-2)); color: var(--ios-blue) }
+        .ios-quick-action .uil{ color: var(--ios-blue) }
+        .ios-quick-action:hover{ box-shadow:0 14px 36px rgba(0,0,0,.14) }
 
         /* 指标卡片：细腻渐变描边与更柔光影 */
         .ios-metric-card{ border:1px solid transparent; background-clip:padding-box,border-box; background-image:linear-gradient(#ffffff,#ffffff),linear-gradient(135deg,rgba(196,223,204,.35),rgba(167,211,231,.25),rgba(201,184,232,.25)); box-shadow:0 6px 20px rgba(0,0,0,.08) }

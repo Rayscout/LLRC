@@ -387,12 +387,12 @@ html { overflow: auto; }
 .ios-nav-brand-icon {
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
-    border-radius: var(--ios-radius-medium);
+    background: #c4dfcc; /* 50%绿色作为底色 */
+    border-radius: 10px; /* 圆角方块，贴合示例 */
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #ffffff; /* 图标白色 */
     font-size: 1.1rem;
 }
 
@@ -1497,6 +1497,9 @@ textarea.ios-input:focus { box-shadow: 0 0 0 3px rgba(196,223,204,.25); border-c
 .ios-title::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,.7) 14%, transparent 22%) no-repeat; background-size: 18% 100%; background-position: -25% 0; mix-blend-mode: screen; opacity: .0; transition: opacity .4s ease, background-position 1.2s ease; pointer-events: none; }
 .ios-title:hover { transform: translateY(-1px); }
 .ios-title:hover::after { opacity: .9; background-position: 120% 0; }
+
+/* 大标题居中（HR iOS 全局） */
+.ios-title{ text-align:center; display:block; margin-left:auto; margin-right:auto; }
 
 /* 徽章/状态脉动 */
 .badge, .ios-status { position: relative; }
