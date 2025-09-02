@@ -96,14 +96,14 @@ body {
     left: 0;
     right: 0;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--ios-border-secondary);
     transition: all var(--ios-transition-medium);
 }
 
 body.dark .executive-nav {
-    background: rgba(28, 28, 30, 0.8);
+    background: rgba(28, 28, 30, 0.7);
     border-bottom-color: var(--ios-dark-border-primary);
 }
 
@@ -523,7 +523,7 @@ body.dark .executive-card p {
 
 /* Cards */
 .executive-card {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     border-radius: var(--ios-radius-large);
@@ -558,7 +558,7 @@ body.dark .executive-card p {
 
 /* Dark mode cards */
 body.dark .executive-card {
-    background: rgba(44, 44, 46, 0.25);
+    background: rgba(44, 44, 46, 0.6);
     border: 1px solid rgba(72, 72, 74, 0.3);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
@@ -594,7 +594,7 @@ body.dark .executive-card:hover {
 .executive-metric {
     text-align: center;
     padding: var(--ios-spacing-lg);
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-radius: var(--ios-radius-large);
@@ -610,7 +610,7 @@ body.dark .executive-card:hover {
 }
 
 body.dark .executive-metric {
-    background: rgba(44, 44, 46, 0.2);
+    background: rgba(44, 44, 46, 0.6);
     border: 1px solid rgba(72, 72, 74, 0.3);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
@@ -808,7 +808,7 @@ body.dark .executive-button.secondary:hover {
         top: 100%;
         left: 0;
         right: 0;
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.7);
         backdrop-filter: blur(20px);
         flex-direction: column;
         padding: var(--ios-spacing-lg);
@@ -820,7 +820,7 @@ body.dark .executive-button.secondary:hover {
     }
     
     body.dark .executive-nav-menu {
-        background: rgba(28, 28, 30, 0.95);
+        background: rgba(28, 28, 30, 0.7);
         border-top-color: var(--ios-dark-border-primary);
     }
     
@@ -867,10 +867,46 @@ body.dark .executive-button.secondary:hover {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(-45deg, #87CEEB, #B0E0E6, #ADD8E6, #E0F6FF, #F0F8FF);
+    background: linear-gradient(135deg, #E6F3FF, #F0F8FF, #E8F4FD, #F5F9FF, #E0F0FF);
     background-size: 400% 400%;
     animation: gradientShift 15s ease infinite;
     z-index: -1;
+}
+
+/* 动态蓝色区域 */
+.executive-parallax-bg::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(135, 206, 235, 0.4) 0%, rgba(135, 206, 235, 0.2) 30%, transparent 70%),
+        radial-gradient(circle at 80% 70%, rgba(173, 216, 230, 0.5) 0%, rgba(173, 216, 230, 0.25) 35%, transparent 75%),
+        radial-gradient(circle at 40% 80%, rgba(176, 224, 230, 0.4) 0%, rgba(176, 224, 230, 0.2) 30%, transparent 70%),
+        radial-gradient(circle at 90% 20%, rgba(135, 206, 235, 0.35) 0%, rgba(135, 206, 235, 0.15) 25%, transparent 65%);
+    animation: bluePulse 8s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes bluePulse {
+    0%, 100% {
+        opacity: 0.2;
+        transform: scale(1);
+    }
+    25% {
+        opacity: 0.5;
+        transform: scale(1.05);
+    }
+    50% {
+        opacity: 0.4;
+        transform: scale(1.02);
+    }
+    75% {
+        opacity: 0.7;
+        transform: scale(1.08);
+    }
 }
 
 @keyframes gradientShift {
@@ -886,27 +922,57 @@ body.dark .executive-button.secondary:hover {
 }
 
 /* Floating Background Elements */
-.executive-parallax-bg::before,
-.executive-parallax-bg::after {
+.executive-parallax-bg::before {
     content: '';
     position: absolute;
     width: 300px;
     height: 300px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
+    background: radial-gradient(circle, rgba(135, 206, 235, 0.2) 0%, rgba(173, 216, 230, 0.1) 50%, transparent 100%);
     animation: float 20s ease-in-out infinite;
-}
-
-.executive-parallax-bg::before {
     top: 10%;
     left: 10%;
     animation-delay: 0s;
 }
 
-.executive-parallax-bg::after {
-    bottom: 10%;
-    right: 10%;
-    animation-delay: 10s;
+/* 额外的动态蓝色元素 */
+.executive-parallax-bg .blue-orb-1 {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(100, 149, 237, 0.3) 0%, rgba(70, 130, 180, 0.1) 50%, transparent 100%);
+    animation: float 15s ease-in-out infinite;
+    top: 60%;
+    right: 15%;
+    animation-delay: 5s;
+    z-index: -1;
+}
+
+.executive-parallax-bg .blue-orb-2 {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(30, 144, 255, 0.25) 0%, rgba(0, 191, 255, 0.1) 50%, transparent 100%);
+    animation: float 18s ease-in-out infinite;
+    top: 20%;
+    right: 60%;
+    animation-delay: 8s;
+    z-index: -1;
+}
+
+.executive-parallax-bg .blue-orb-3 {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(135, 206, 250, 0.2) 0%, rgba(173, 216, 230, 0.1) 50%, transparent 100%);
+    animation: float 22s ease-in-out infinite;
+    bottom: 20%;
+    left: 30%;
+    animation-delay: 12s;
+    z-index: -1;
 }
 
 @keyframes float {
@@ -925,6 +991,42 @@ body.dark .executive-button.secondary:hover {
     75% {
         transform: translateY(-50px) rotate(270deg);
         opacity: 0.6;
+    }
+}
+
+/* 动态蓝色波浪效果 */
+.executive-parallax-bg .blue-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(45deg, 
+        rgba(135, 206, 235, 0.2) 0%, 
+        rgba(173, 216, 230, 0.3) 25%, 
+        rgba(100, 149, 237, 0.2) 50%, 
+        rgba(30, 144, 255, 0.3) 75%, 
+        rgba(135, 206, 235, 0.2) 100%);
+    animation: waveMove 10s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes waveMove {
+    0%, 100% {
+        transform: translateX(0) scaleY(1);
+        opacity: 0.4;
+    }
+    25% {
+        transform: translateX(-20px) scaleY(1.1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translateX(20px) scaleY(0.9);
+        opacity: 0.5;
+    }
+    75% {
+        transform: translateX(-10px) scaleY(1.05);
+        opacity: 0.7;
     }
 }
 

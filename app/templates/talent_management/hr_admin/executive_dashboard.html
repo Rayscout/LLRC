@@ -86,7 +86,12 @@
     </nav>
 
     <!-- 视差背景 -->
-    <div class="executive-parallax-bg" id="parallaxBg"></div>
+    <div class="executive-parallax-bg" id="parallaxBg">
+        <div class="blue-orb-1"></div>
+        <div class="blue-orb-2"></div>
+        <div class="blue-orb-3"></div>
+        <div class="blue-wave"></div>
+    </div>
     
     <!-- 滚动容器 -->
     <div class="executive-scroll-container">
@@ -489,12 +494,12 @@
             window.addEventListener('scroll', function() {
                 if (window.scrollY > 50) {
                     nav.style.background = body.classList.contains('dark') 
-                        ? 'rgba(28, 28, 30, 0.95)' 
-                        : 'rgba(255, 255, 255, 0.95)';
+                        ? 'rgba(28, 28, 30, 0.7)' 
+                        : 'rgba(255, 255, 255, 0.7)';
                 } else {
                     nav.style.background = body.classList.contains('dark') 
-                        ? 'rgba(28, 28, 30, 0.8)' 
-                        : 'rgba(255, 255, 255, 0.8)';
+                        ? 'rgba(28, 28, 30, 0.7)' 
+                        : 'rgba(255, 255, 255, 0.7)';
                 }
             });
             
