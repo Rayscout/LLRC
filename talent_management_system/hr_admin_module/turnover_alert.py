@@ -39,30 +39,30 @@ def generate_mock_turnover_data():
         DEPARTMENT_STATS[dept] = {
             'total_employees': total_employees,
             'turnover_count': turnover_count,
-            'turnover_rate': turnover_rate,
+            'turnover_rate': round(turnover_rate, 4),  # 确保是基本类型
             'avg_salary': random.randint(8000, 25000),
-            'avg_tenure': random.uniform(1.5, 4.0),
+            'avg_tenure': round(random.uniform(1.5, 4.0), 2),  # 确保是基本类型
             'risk_level': 'high' if turnover_rate > 0.15 else 'medium' if turnover_rate > 0.10 else 'low'
         }
     
     # 生成岗位分析数据
     for pos in positions:
-        market_demand = random.uniform(0.7, 1.3)  # 市场需求系数
-        skill_gap = random.uniform(0.1, 0.4)  # 技能差距
-        salary_competitiveness = random.uniform(0.6, 1.2)  # 薪资竞争力
+        market_demand = round(random.uniform(0.7, 1.3), 4)  # 市场需求系数
+        skill_gap = round(random.uniform(0.1, 0.4), 4)  # 技能差距
+        salary_competitiveness = round(random.uniform(0.6, 1.2), 4)  # 薪资竞争力
         
         POSITION_ANALYSIS[pos] = {
             'market_demand': market_demand,
             'skill_gap': skill_gap,
             'salary_competitiveness': salary_competitiveness,
-            'turnover_risk': calculate_position_risk(market_demand, skill_gap, salary_competitiveness),
+            'turnover_risk': round(calculate_position_risk(market_demand, skill_gap, salary_competitiveness), 4),
             'main_reasons': generate_turnover_reasons(market_demand, skill_gap, salary_competitiveness)
         }
     
     # 生成员工风险评分
     for i in range(50):
         employee_id = str(uuid.uuid4())
-        risk_score = random.uniform(0.1, 0.9)
+        risk_score = round(random.uniform(0.1, 0.9), 4)
         
         EMPLOYEE_RISK_SCORES[employee_id] = {
             'id': employee_id,
@@ -71,12 +71,12 @@ def generate_mock_turnover_data():
             'position': random.choice(positions),
             'risk_score': risk_score,
             'risk_level': 'high' if risk_score > 0.7 else 'medium' if risk_score > 0.4 else 'low',
-            'tenure': random.uniform(0.5, 5.0),
+            'tenure': round(random.uniform(0.5, 5.0), 2),
             'last_promotion': random.randint(0, 24),  # 月数
-            'salary_growth': random.uniform(-0.1, 0.3),  # 薪资增长率
-            'performance_rating': random.uniform(2.5, 5.0),
-            'workload': random.uniform(0.6, 1.4),  # 工作负荷
-            'satisfaction_score': random.uniform(3.0, 5.0)
+            'salary_growth': round(random.uniform(-0.1, 0.3), 4),  # 薪资增长率
+            'performance_rating': round(random.uniform(2.5, 5.0), 2),
+            'workload': round(random.uniform(0.6, 1.4), 4),  # 工作负荷
+            'satisfaction_score': round(random.uniform(3.0, 5.0), 2)
         }
     
     # 生成离职记录
@@ -91,7 +91,7 @@ def generate_mock_turnover_data():
             'department': dept,
             'position': pos,
             'turnover_date': (datetime.now() - timedelta(days=random.randint(1, 365))).strftime('%Y-%m-%d'),
-            'tenure': random.uniform(0.5, 4.0),
+            'tenure': round(random.uniform(0.5, 4.0), 2),
             'reason': random.choice(['薪资不足', '技能发展瓶颈', '企业要求过高', '工作压力大', '个人发展', '家庭原因']),
             'exit_interview': generate_exit_interview(),
             'replacement_difficulty': random.choice(['easy', 'medium', 'hard']),
@@ -251,6 +251,10 @@ def turnover_dashboard():
         if not user:
             return jsonify({'error': '用户不存在'}), 404
         
+        # 验证用户类型
+        if not hasattr(user, 'user_type') or user.user_type != 'executive':
+            return jsonify({'error': '权限不足，需要高管权限'}), 403
+        
         # 计算统计数据
         total_employees = sum(dept['total_employees'] for dept in DEPARTMENT_STATS.values())
         high_risk_departments = sum(1 for dept in DEPARTMENT_STATS.values() if dept['risk_level'] == 'high')
@@ -260,7 +264,19 @@ def turnover_dashboard():
         # 生成预防建议
         recommendations = generate_prevention_recommendations()
         
-        # 准备数据
+        # 确保所有数据都是可序列化的
+        def ensure_serializable(obj):
+            """确保对象可以被JSON序列化"""
+            if isinstance(obj, dict):
+                return {k: ensure_serializable(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [ensure_serializable(item) for item in obj]
+            elif isinstance(obj, (str, int, float, bool, type(None))):
+                return obj
+            else:
+                return str(obj)
+        
+        # 准备数据并确保可序列化
         dashboard_data = {
             'summary': {
                 'total_employees': total_employees,
@@ -268,15 +284,169 @@ def turnover_dashboard():
                 'high_risk_positions': high_risk_positions,
                 'high_risk_employees': high_risk_employees
             },
-            'department_stats': DEPARTMENT_STATS,
-            'position_analysis': POSITION_ANALYSIS,
-            'employee_risks': list(EMPLOYEE_RISK_SCORES.values())[:20],  # 只显示前20个
-            'turnover_records': list(TURNOVER_DATA.values())[:10],  # 只显示前10个
-            'recommendations': recommendations
+            'department_stats': ensure_serializable(DEPARTMENT_STATS),
+            'position_analysis': ensure_serializable(POSITION_ANALYSIS),
+            'employee_risks': ensure_serializable(list(EMPLOYEE_RISK_SCORES.values())[:20]),  # 只显示前20个
+            'turnover_records': ensure_serializable(list(TURNOVER_DATA.values())[:10]),  # 只显示前10个
+            'recommendations': ensure_serializable(recommendations)
         }
         
+<<<<<<< HEAD
         return render_template('talent_management/hr_admin/turnover_dashboard.html', dashboard_data=dashboard_data)
+=======
+        # 验证数据完整性
+        try:
+            import json
+            json.dumps(dashboard_data)  # 测试JSON序列化
+        except (TypeError, ValueError) as json_error:
+            print(f"JSON序列化测试失败: {json_error}")
+            # 如果序列化失败，返回简化版本
+            dashboard_data = {
+                'summary': {
+                    'total_employees': total_employees,
+                    'high_risk_departments': high_risk_departments,
+                    'high_risk_positions': high_risk_positions,
+                    'high_risk_employees': high_risk_employees
+                },
+                'error': '部分数据无法显示，请联系管理员'
+            }
+        
+        return render_template('talent_management/hr_admin/turnover_dashboard.html', data=dashboard_data)
+>>>>>>> 41ff5e41368fa5f008c944a568b340c0b0753359
         
     except Exception as e:
         print(f"离职预警仪表板错误: {e}")
+        import traceback
+        traceback.print_exc()  # 打印详细错误信息
         return jsonify({'error': f'服务器内部错误: {str(e)}'}), 500
+
+# 添加缺失的API路由
+@turnover_alert_bp.route('/api/department_trends')
+def department_trends():
+    """获取部门趋势数据"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': '未登录'}), 401
+        
+        # 生成模拟数据
+        generate_mock_turnover_data()
+        
+        # 返回部门趋势数据
+        trends_data = {
+            'departments': list(DEPARTMENT_STATS.keys()),
+            'turnover_rates': [dept['turnover_rate'] for dept in DEPARTMENT_STATS.values()],
+            'employee_counts': [dept['total_employees'] for dept in DEPARTMENT_STATS.values()],
+            'risk_levels': [dept['risk_level'] for dept in DEPARTMENT_STATS.values()]
+        }
+        
+        return jsonify(trends_data)
+        
+    except Exception as e:
+        print(f"部门趋势API错误: {e}")
+        return jsonify({'error': f'获取部门趋势数据失败: {str(e)}'}), 500
+
+@turnover_alert_bp.route('/api/risk_analysis')
+def risk_analysis():
+    """获取风险分析数据"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': '未登录'}), 401
+        
+        # 生成模拟数据
+        generate_mock_turnover_data()
+        
+        # 返回风险分析数据
+        risk_data = {
+            'high_risk_employees': [
+                {
+                    'id': emp['id'],
+                    'name': emp['name'],
+                    'department': emp['department'],
+                    'position': emp['position'],
+                    'risk_score': emp['risk_score'],
+                    'risk_level': emp['risk_level']
+                }
+                for emp in EMPLOYEE_RISK_SCORES.values() if emp['risk_level'] == 'high'
+            ][:10],
+            'high_risk_positions': [
+                {
+                    'position': pos,
+                    'risk_score': analysis['turnover_risk'],
+                    'reasons': analysis['main_reasons']
+                }
+                for pos, analysis in POSITION_ANALYSIS.items() if analysis['turnover_risk'] > 0.6
+            ]
+        }
+        
+        return jsonify(risk_data)
+        
+    except Exception as e:
+        print(f"风险分析API错误: {e}")
+        return jsonify({'error': f'获取风险分析数据失败: {str(e)}'}), 500
+
+@turnover_alert_bp.route('/api/employee_details/<employee_id>')
+def employee_details(employee_id):
+    """获取员工详细信息"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': '未登录'}), 401
+        
+        # 生成模拟数据
+        generate_mock_turnover_data()
+        
+        # 查找员工
+        employee = EMPLOYEE_RISK_SCORES.get(employee_id)
+        if not employee:
+            return jsonify({'error': '员工不存在'}), 404
+        
+        return jsonify(employee)
+        
+    except Exception as e:
+        print(f"员工详情API错误: {e}")
+        return jsonify({'error': f'获取员工详情失败: {str(e)}'}), 500
+
+@turnover_alert_bp.route('/api/generate_report')
+def generate_report():
+    """生成报告"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': '未登录'}), 401
+        
+        # 生成模拟数据
+        generate_mock_turnover_data()
+        
+        # 生成报告数据
+        report_data = {
+            'summary': {
+                'total_employees': sum(dept['total_employees'] for dept in DEPARTMENT_STATS.values()),
+                'total_turnover': sum(dept['turnover_count'] for dept in DEPARTMENT_STATS.values()),
+                'overall_turnover_rate': sum(dept['turnover_count'] for dept in DEPARTMENT_STATS.values()) / sum(dept['total_employees'] for dept in DEPARTMENT_STATS.values()) if sum(dept['total_employees'] for dept in DEPARTMENT_STATS.values()) > 0 else 0
+            },
+            'department_analysis': DEPARTMENT_STATS,
+            'position_analysis': POSITION_ANALYSIS,
+            'recommendations': generate_prevention_recommendations()
+        }
+        
+        return jsonify(report_data)
+        
+    except Exception as e:
+        print(f"生成报告API错误: {e}")
+        return jsonify({'error': f'生成报告失败: {str(e)}'}), 500
+
+@turnover_alert_bp.route('/api/export_data', methods=['POST'])
+def export_data():
+    """导出数据"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': '未登录'}), 401
+        
+        # 生成模拟数据
+        generate_mock_turnover_data()
+        
+        # 这里可以添加Excel导出逻辑
+        # 暂时返回成功消息
+        return jsonify({'message': '数据导出功能正在开发中'})
+        
+    except Exception as e:
+        print(f"导出数据API错误: {e}")
+        return jsonify({'error': f'导出数据失败: {str(e)}'}), 500
