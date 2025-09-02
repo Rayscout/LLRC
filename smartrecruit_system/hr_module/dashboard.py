@@ -20,9 +20,9 @@ def index():
         return redirect(url_for('common.auth.sign'))
     # Prefer iOS-styled dashboard if present
     try:
-        return render_template('smartrecruit/hr/hr_dashboard_ios.html')
+        return render_template('smartrecruit/hr/hr_dashboard_ios.html', user=g.user)
     except Exception:
-        return render_template('smartrecruit/hr/hr_dashboard.html')
+        return render_template('smartrecruit/hr/hr_dashboard.html', user=g.user)
 
 
 @dashboard_bp.route('/insights', endpoint='insights')
