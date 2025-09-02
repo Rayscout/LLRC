@@ -377,11 +377,12 @@ def export_career_report():
         
         output.seek(0)
         
-        filename = f"职业发展追踪报告_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        # 使用英文文件名避免编码问题
+        safe_filename = f"career_tracking_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
         return send_file(
             output,
             as_attachment=True,
-            download_name=filename,
+            download_name=safe_filename,
             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
         
