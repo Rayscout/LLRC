@@ -275,7 +275,7 @@ def turnover_dashboard():
             'recommendations': recommendations
         }
         
-        return render_template('talent_management/hr_admin/turnover_dashboard.html', data=dashboard_data)
+        return render_template('talent_management/hr_admin/turnover_dashboard.html', dashboard_data=dashboard_data)
         
     except Exception as e:
         print(f"离职预警仪表板错误: {e}")
