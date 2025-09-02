@@ -410,16 +410,17 @@ def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict
             'Content-Type': 'application/json'
         }
         
-        # 构建请求体，包含音频数据
+        # 构建请求体，包含音频数据（按Gemini最新字段：role、inlineData、mimeType）
         payload = {
             "contents": [{
+                "role": "user",
                 "parts": [
                     {
                         "text": "请将这段音频转换为文字。请只返回转写的文字内容，不要添加任何解释或标点符号。"
                     },
                     {
-                        "inline_data": {
-                            "mime_type": _get_mime_type(filename),
+                        "inlineData": {
+                            "mimeType": _get_mime_type(filename),
                             "data": audio_base64
                         }
                     }
@@ -442,7 +443,12 @@ def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict
         
         if response.status_code != 200:
             logger.error(f"Gemini API请求失败: {response.status_code} - {response.text}")
-            return {"error": f"语音识别API请求失败: {response.status_code}"}
+            # 将部分错误信息返回给前端，便于定位（隐藏密钥）
+            try:
+                err_js = response.json()
+            except Exception:
+                err_js = {"message": response.text[:300]}
+            return {"error": f"语音识别API请求失败: {response.status_code}", "detail": err_js}
         
         # 解析响应
         data = response.json()
