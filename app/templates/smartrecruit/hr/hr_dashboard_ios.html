@@ -141,20 +141,6 @@
             margin-bottom: var(--ios-spacing-md);
         }
         
-        /* 快速操作卡片图标颜色映射 - 使用甜甜圈图表的颜色（避免黄红绿蓝顺序） */
-        .ios-quick-action:nth-of-type(1) i {
-            color: #60C7B8 !important; /* 青绿色 */
-        }
-        .ios-quick-action:nth-of-type(2) i {
-            color: #82C7A7 !important; /* 薄荷绿 */
-        }
-        .ios-quick-action:nth-of-type(3) i {
-            color: #F87979 !important; /* 珊瑚粉 */
-        }
-        .ios-quick-action:nth-of-type(4) i {
-            color: #FDF0B2 !important; /* 浅黄色 */
-        }
-        
         .ios-quick-action h4 {
             font-size: 1.125rem;
             margin-bottom: var(--ios-spacing-sm);
@@ -330,6 +316,57 @@
         /* 顶部胶囊条轻渐变描边 */
         .ios-hero-pills .pill{ background:linear-gradient(#ffffff,#ffffff); border:1px solid rgba(0,0,0,.08); position:relative }
         .ios-hero-pills .pill:after{ content:""; position:absolute; inset:0; border-radius:999px; pointer-events:none; background:linear-gradient(135deg, rgba(196,223,204,.28), rgba(167,211,231,.2), rgba(201,184,232,.2)); mix-blend-mode:multiply; opacity:.55 }
+
+        /* 快速操作卡片图标颜色定制 */
+        .ios-grid .ios-quick-action:nth-of-type(1) i{ color: #20B2AA !important; } /* 青/浅蓝色 - 发布职位 */
+        .ios-grid .ios-quick-action:nth-of-type(2) i{ color: #FF6B6B !important; } /* 红/橙色 - HR消息通知 */
+        .ios-grid .ios-quick-action:nth-of-type(3) i{ color: #98FB98 !important; } /* 浅绿/薄荷绿色 - 候选人管理 */
+        .ios-grid .ios-quick-action:nth-of-type(4) i{ color: #4169E1 !important; } /* 中蓝色 - 面试安排 */
+
+        /* 步骤卡片圆形图标颜色定制 */
+        .ios-step-guide .ios-step:nth-of-type(1) .ios-step-number {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E8E) !important; /* 红/橙色 - 查看申请 */
+            box-shadow: 0 6px 14px rgba(255, 107, 107, 0.25) !important;
+        }
+        .ios-step-guide .ios-step:nth-of-type(2) .ios-step-number {
+            background: linear-gradient(135deg, #20B2AA, #40E0D0) !important; /* 青/浅蓝色 - 评估候选人 */
+            box-shadow: 0 6px 14px rgba(32, 178, 170, 0.25) !important;
+        }
+        .ios-step-guide .ios-step:nth-of-type(3) .ios-step-number {
+            background: linear-gradient(135deg, #4169E1, #6495ED) !important; /* 中蓝色 - 安排面试 */
+            box-shadow: 0 6px 14px rgba(65, 105, 225, 0.25) !important;
+        }
+
+        /* 帮助中心链接颜色定制 */
+        .ios-help-center .ios-help-item:nth-of-type(1) .ios-link {
+            color: #FF6B6B !important; /* 红/橙色 - 查看指南 */
+        }
+        .ios-help-center .ios-help-item:nth-of-type(1) .ios-link:hover {
+            color: #FF8E8E !important;
+        }
+        .ios-help-center .ios-help-item:nth-of-type(2) .ios-link {
+            color: #20B2AA !important; /* 青/浅蓝色 - 查看FAQ */
+        }
+        .ios-help-center .ios-help-item:nth-of-type(2) .ios-link:hover {
+            color: #40E0D0 !important;
+        }
+        .ios-help-center .ios-help-item:nth-of-type(3) .ios-link {
+            color: #4169E1 !important; /* 中蓝色 - 联系支持 */
+        }
+        .ios-help-center .ios-help-item:nth-of-type(3) .ios-link:hover {
+            color: #6495ED !important;
+        }
+
+        /* 底部导航管理卡片标题颜色定制 */
+        .ios-footer-section .ios-card:nth-of-type(1) h3 {
+            color: #FF6B6B !important; /* 红/橙色 - 招聘管理 */
+        }
+        .ios-footer-section .ios-card:nth-of-type(2) h3 {
+            color: #20B2AA !important; /* 青/浅蓝色 - 候选人管理 */
+        }
+        .ios-footer-section .ios-card:nth-of-type(3) h3 {
+            color: #4169E1 !important; /* 中蓝色 - 数据分析 */
+        }
     </style>
 </head>
 <body>
@@ -602,7 +639,8 @@
                             <span class="ios-tooltip-text">为合适的候选人安排面试时间，记录面试反馈和结果</span>
                         </div>
                     </a>
-                </div>
+                    
+
                 </div>
             </div>
         </section>
@@ -726,44 +764,7 @@
             </div>
         </section>
 
-        <!-- 数据洞察Section -->
-        <section class="ios-section ios-insights-section">
-            <div class="ios-container compact">
-                <h2 class="ios-title ios-fade-in">数据洞察</h2>
-                <p class="ios-subtitle ios-fade-in">深度分析招聘效果和趋势</p>
-                
-                <div class="ios-grid ios-grid-2">
-                    <div class="ios-chart-container ios-fade-in-up">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
-                            <i class="uil uil-chart-line"></i>
-                            申请趋势
-                        </h3>
-                        <div class="ios-chart-placeholder">
-                            <i class="uil uil-chart-line" style="font-size: 3rem; margin-right: var(--ios-spacing-md);"></i>
-                            申请趋势图表
-                        </div>
-                    </div>
-                    
-                    <div class="ios-chart-container ios-fade-in-up">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
-                            <i class="uil uil-chart-pie"></i>
-                            职位分布
-                        </h3>
-                        <div class="ios-chart-placeholder">
-                            <i class="uil uil-chart-pie" style="font-size: 3rem; margin-right: var(--ios-spacing-md);"></i>
-                            职位分布图表
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="text-align: center; margin-top: var(--ios-spacing-xl);">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-button large">
-                        <i class="uil uil-chart-bar"></i>
-                        查看详细报表
-                    </a>
-                </div>
-            </div>
-        </section>
+
 
         <!-- 底部导航Section -->
         <section class="ios-section ios-footer-section">
@@ -841,11 +842,7 @@
                             数据分析
                         </h3>
                         <ul style="list-style: none; padding: 0;">
-                            <li style="margin-bottom: var(--ios-spacing-sm);">
-                                <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" style="color: var(--ios-text-secondary); text-decoration: none;">
-                                    <i class="uil uil-chart-bar"></i> 数据报表
-                                </a>
-                            </li>
+
                             <li style="margin-bottom: var(--ios-spacing-sm);">
                                 <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" style="color: var(--ios-text-secondary); text-decoration: none;">
                                     <i class="uil uil-lightbulb"></i> 智能洞察
