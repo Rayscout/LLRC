@@ -291,9 +291,6 @@ def turnover_dashboard():
             'recommendations': ensure_serializable(recommendations)
         }
         
-<<<<<<< HEAD
-        return render_template('talent_management/hr_admin/turnover_dashboard.html', dashboard_data=dashboard_data)
-=======
         # 验证数据完整性
         try:
             import json
@@ -312,7 +309,6 @@ def turnover_dashboard():
             }
         
         return render_template('talent_management/hr_admin/turnover_dashboard.html', data=dashboard_data)
->>>>>>> 41ff5e41368fa5f008c944a568b340c0b0753359
         
     except Exception as e:
         print(f"离职预警仪表板错误: {e}")
