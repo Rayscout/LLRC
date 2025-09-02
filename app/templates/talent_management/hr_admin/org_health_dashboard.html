@@ -6,13 +6,48 @@
     <title>组织健康度评估 - 人才管理系统</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">        
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            
+            // 添加样式
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+                ${type === 'success' ? 'background: #34C759;' : 
+                  type === 'error' ? 'background: #FF3B30;' : 
+                  'background: #007AFF;'}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    </script>
     <style>
         /* 人才流失预警系统配色方案 - 完全对齐 */
         :root {
             --bg-primary: #F2F2F7;
-            --bg-secondary: rgba(255, 255, 255, 0.8);
-            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-secondary: rgba(255, 255, 255, 0.6);
+            --bg-card: rgba(255, 255, 255, 0.6);
             --text-primary: #1D1D1F;
             --text-secondary: #86868B;
             --text-tertiary: #C7C7CC;
@@ -31,8 +66,8 @@
 
         [data-theme="dark"] {
             --bg-primary: #000000;
-            --bg-secondary: rgba(44, 44, 46, 0.8);
-            --bg-card: rgba(44, 44, 46, 0.9);
+            --bg-secondary: rgba(44, 44, 46, 0.6);
+            --bg-card: rgba(44, 44, 46, 0.6);
             --text-primary: #FFFFFF;
             --text-secondary: #EBEBF5;
             --text-tertiary: #8E8E93;
@@ -62,47 +97,131 @@
             overflow-x: hidden;
         }
 
-        /* Animated Light Blue Background */
+        /* Animated Light Blue Background - 与高管仪表盘一致 */
         .executive-parallax-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(-45deg, #87CEEB, #B0E0E6, #ADD8E6, #E0F6FF, #F0F8FF);
+            background: linear-gradient(135deg, #E6F3FF, #F0F8FF, #E8F4FD, #F5F9FF, #E0F0FF);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
+            z-index: -2;
+        }
+
+        /* 透明度为40%的图层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* 动态蓝色区域 */
+        .executive-parallax-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(135, 206, 235, 0.4) 0%, rgba(135, 206, 235, 0.2) 30%, transparent 70%),
+                radial-gradient(circle at 80% 70%, rgba(173, 216, 230, 0.5) 0%, rgba(173, 216, 230, 0.25) 35%, transparent 75%),
+                radial-gradient(circle at 40% 80%, rgba(176, 224, 230, 0.4) 0%, rgba(176, 224, 230, 0.2) 30%, transparent 70%),
+                radial-gradient(circle at 90% 20%, rgba(135, 206, 235, 0.35) 0%, rgba(135, 206, 235, 0.15) 25%, transparent 65%);
+            animation: bluePulse 8s ease-in-out infinite;
             z-index: -1;
         }
 
+        @keyframes bluePulse {
+            0%, 100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            25% {
+                opacity: 0.5;
+                transform: scale(1.05);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(1.02);
+            }
+            75% {
+                opacity: 0.7;
+                transform: scale(1.08);
+            }
+        }
+
         @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         /* Floating Background Elements */
-        .executive-parallax-bg::before,
-        .executive-parallax-bg::after {
+        .executive-parallax-bg::before {
             content: '';
             position: absolute;
             width: 300px;
             height: 300px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.2) 0%, rgba(173, 216, 230, 0.1) 50%, transparent 100%);
             animation: float 20s ease-in-out infinite;
-        }
-
-        .executive-parallax-bg::before {
             top: 10%;
             left: 10%;
             animation-delay: 0s;
         }
 
-        .executive-parallax-bg::after {
-            bottom: 10%;
-            right: 10%;
-            animation-delay: 10s;
+        /* 额外的动态蓝色元素 */
+        .executive-parallax-bg .blue-orb-1 {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(100, 149, 237, 0.3) 0%, rgba(70, 130, 180, 0.1) 50%, transparent 100%);
+            animation: float 15s ease-in-out infinite;
+            top: 60%;
+            right: 15%;
+            animation-delay: 5s;
+            z-index: -1;
+        }
+
+        .executive-parallax-bg .blue-orb-2 {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(30, 144, 255, 0.25) 0%, rgba(0, 191, 255, 0.1) 50%, transparent 100%);
+            animation: float 18s ease-in-out infinite;
+            top: 20%;
+            right: 60%;
+            animation-delay: 8s;
+            z-index: -1;
+        }
+
+        .executive-parallax-bg .blue-orb-3 {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(135, 206, 250, 0.2) 0%, rgba(173, 216, 230, 0.1) 50%, transparent 100%);
+            animation: float 22s ease-in-out infinite;
+            bottom: 20%;
+            left: 30%;
+            animation-delay: 12s;
+            z-index: -1;
         }
 
         @keyframes float {
@@ -121,6 +240,42 @@
             75% {
                 transform: translateY(-50px) rotate(270deg);
                 opacity: 0.6;
+            }
+        }
+
+        /* 动态蓝色波浪效果 */
+        .executive-parallax-bg .blue-wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, 
+                rgba(135, 206, 235, 0.2) 0%, 
+                rgba(173, 216, 230, 0.3) 25%, 
+                rgba(100, 149, 237, 0.2) 50%, 
+                rgba(30, 144, 255, 0.3) 75%, 
+                rgba(135, 206, 235, 0.2) 100%);
+            animation: waveMove 10s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes waveMove {
+            0%, 100% {
+                transform: translateX(0) scaleY(1);
+                opacity: 0.4;
+            }
+            25% {
+                transform: translateX(-20px) scaleY(1.1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateX(10px) scaleY(0.9);
+                opacity: 0.5;
+            }
+            75% {
+                transform: translateX(-15px) scaleY(1.05);
+                opacity: 0.7;
             }
         }
 
@@ -352,7 +507,7 @@
         }
 
         .risk-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-card);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--border-radius);
             padding: 15px;
@@ -419,7 +574,7 @@
         }
 
         .recommendation-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-card);
             border-left: 4px solid var(--accent-orange);
             border-radius: var(--border-radius);
             padding: 20px;
@@ -516,6 +671,16 @@
         }
         .chart-container { height: 400px; position: relative; }
         .sidebar { display: flex; flex-direction: column; gap: 20px; }
+        .info-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 25px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition-fast);
+        }
         .info-card h3 { 
             margin: 0 0 15px 0; 
             font-size: 1.3em; 
@@ -637,7 +802,7 @@
         
         /* 综合评分样式 - 使用人才流失预警系统配色 */
         .comprehensive-score {
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.6), rgba(175, 82, 222, 0.6));
             color: white;
             padding: 20px;
             border-radius: var(--border-radius);
@@ -719,13 +884,13 @@
             color: var(--text-secondary);
         }
         
-        /* 按钮样式 - 使用人才流失预警系统配色 */
+        /* 按钮样式 - 与人才流失预警系统一致 */
         .btn-primary {
             background: var(--accent-blue);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: var(--border-radius-large);
+            border-radius: var(--border-radius);
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
@@ -737,16 +902,17 @@
         }
         
         .btn-primary:hover {
-            background: #0056CC;
-            transform: translateY(-1px);
+            background: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
         }
         
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--bg-secondary);
             color: var(--text-primary);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 12px 24px;
-            border-radius: var(--border-radius-large);
+            border-radius: var(--border-radius);
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
@@ -758,8 +924,8 @@
         }
         
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-1px);
+            background: var(--bg-card);
+            transform: translateY(-2px);
         }
         
         /* 页面头部样式 - 使用人才流失预警系统配色 */
@@ -896,8 +1062,16 @@
     </style>
 </head>
 <body>
-    <!-- 背景动画 - 与人才流失预警系统一致 -->
-    <div class="executive-parallax-bg"></div>
+    <!-- 背景动画 - 与高管仪表盘一致 -->
+    <div class="executive-parallax-bg">
+        <div class="blue-orb-1"></div>
+        <div class="blue-orb-2"></div>
+        <div class="blue-orb-3"></div>
+        <div class="blue-wave"></div>
+    </div>
+    
+    <!-- 透明度为40%的图层 -->
+    <div class="overlay-layer"></div>
     
     <div class="container">
         <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="back-btn">←</a>
@@ -1098,7 +1272,21 @@
         }
 
         function exportReport() {
-            alert('正在导出组织健康度对比报告...');
+            console.log('开始导出组织健康度报告...');
+            
+            // 显示加载状态
+            const exportBtn = event.target.closest('button');
+            if (exportBtn) {
+                const originalText = exportBtn.innerHTML;
+                exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 导出中...';
+                exportBtn.disabled = true;
+                
+                // 恢复按钮状态
+                setTimeout(() => {
+                    exportBtn.innerHTML = originalText;
+                    exportBtn.disabled = false;
+                }, 5000);
+            }
             
             // 使用fetch API发送POST请求
             fetch('{{ url_for("talent_management.hr_admin.org_health.export_org_health_report") }}', {
@@ -1109,10 +1297,15 @@
                 }
             })
             .then(response => {
+                console.log('响应状态:', response.status);
+                
                 if (response.ok) {
                     return response.blob();
                 } else {
-                    throw new Error('导出失败');
+                    return response.text().then(text => {
+                        console.error('错误响应:', text);
+                        throw new Error(`导出失败: ${response.status} ${response.statusText}`);
+                    });
                 }
             })
             .then(blob => {
@@ -1120,16 +1313,35 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `组织健康度评估报告_${new Date().toISOString().slice(0,10)}.xlsx`;
+                a.download = `org_health_report_${new Date().toISOString().slice(0,10)}.xlsx`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
-                alert('导出成功！');
+                
+                // 显示成功通知
+                showNotification('组织健康度报告导出成功！', 'success');
             })
             .catch(error => {
                 console.error('导出错误:', error);
-                alert('导出失败，请重试');
+                
+                // 显示详细错误信息
+                let errorMessage = '导出失败，请重试。';
+                if (error.message.includes('502')) {
+                    errorMessage = '服务器暂时不可用，请稍后重试。错误信息: ' + error.message;
+                } else if (error.message.includes('500')) {
+                    errorMessage = '服务器内部错误，请联系管理员。错误信息: ' + error.message;
+                } else if (error.message.includes('404')) {
+                    errorMessage = '导出接口不存在，请联系管理员。错误信息: ' + error.message;
+                } else if (error.message.includes('403')) {
+                    errorMessage = '权限不足，请检查登录状态。错误信息: ' + error.message;
+                } else if (error.message.includes('401')) {
+                    errorMessage = '请先登录系统。错误信息: ' + error.message;
+                } else {
+                    errorMessage = '导出失败，请重试。错误信息: ' + error.message;
+                }
+                
+                showNotification(errorMessage, 'error');
             });
         }
 
@@ -1140,6 +1352,41 @@
 
         function toggleView() {
             alert('视图切换功能开发中...');
+        }
+            
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.textContent = message;
+            
+            // 添加样式
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+                ${type === 'success' ? 'background: #34C759;' : 
+                  type === 'error' ? 'background: #FF3B30;' : 
+                  'background: #007AFF;'}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后自动消失
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
         }
     </script>
 </body>
