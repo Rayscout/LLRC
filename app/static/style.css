@@ -215,8 +215,6 @@ body.dark .switch:before{
     width: calc(100% - 250px);
     padding: 10px 14px;
     transition: var(--tran-05);
-    max-width: 1400px;
-    margin: 0 auto;
 }
 nav.close ~ .dashboard{
     left: 73px;
@@ -1141,52 +1139,3 @@ body.dark .activity-icon { background:#444; color:#fff; }
 @media (max-width: 680px) {
   .metrics-grid, .quick-actions { grid-template-columns: 1fr; }
 }
-
-/* HR 标准界面通用悬停动效 */
-.app .card,
-.app .dashboard-section,
-.app .action-card,
-.app .metric-card,
-.app .btn,
-.app .nav-item {
-  transition: transform .25s ease, box-shadow .25s ease, color .25s ease, background-color .25s ease, border-color .25s ease;
-}
-.app .card:hover,
-.app .dashboard-section:hover,
-.app .action-card:hover,
-.app .metric-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.18); }
-.app .btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 24px rgba(0,0,0,.12); }
-.app .btn:active { transform: translateY(0) scale(.98); }
-.app .nav-item:hover { filter: saturate(1.05); transform: translateY(-1px); }
-
-/* 标题扫光与轻微悬停下沉 */
-.app h1,.app h2,.app h3,.app .section-title{position:relative;display:inline-block;transition:transform .25s ease}
-.app h1::after,.app h2::after,.app h3::after,.app .section-title::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 0%,rgba(255,255,255,.7) 14%,transparent 22%) no-repeat;background-size:18% 100%;background-position:-25% 0;mix-blend-mode:screen;opacity:.0;transition:opacity .4s ease,background-position 1.2s ease;pointer-events:none}
-.app h1:hover,.app h2:hover,.app h3:hover,.app .section-title:hover{transform:translateY(-1px)}
-.app h1:hover::after,.app h2:hover::after,.app h3:hover::after,.app .section-title:hover::after{opacity:.9;background-position:120% 0}
-
-/* 按钮点击波纹 */
-.app .btn{position:relative;overflow:hidden}
-.app .btn::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at var(--rx,50%) var(--ry,50%),rgba(255,255,255,.35),rgba(255,255,255,0) 45%);opacity:0;transform:scale(.2);transition:opacity .45s ease,transform .45s ease;pointer-events:none}
-.app .btn:active::after{opacity:1;transform:scale(1)}
-
-/* 链接下划线滑入 */
-.app a.underline-hover{position:relative}
-.app a.underline-hover::after{content:"";position:absolute;left:0;right:100%;bottom:-2px;height:2px;background:currentColor;transition:right .25s ease;opacity:.6}
-.app a.underline-hover:hover::after{right:0}
-
-/* 标准HR按钮透明度与对比度调整 */
-.app .btn {
-  opacity: .9;
-  filter: contrast(1.25) saturate(1.10);
-}
-.app .btn:hover {
-  opacity: 1;
-  filter: contrast(1.35) saturate(1.15);
-}
-.app .btn:disabled { opacity:.5; filter: none; }
-
-/* 标准HR按钮文字颜色为黑色 */
-.app .btn { color: #000 !important; }
-.app .btn:hover { color: #000 !important; }
-.app .btn:disabled { color: #000 !important; }

@@ -1,6 +1,6 @@
 from flask import current_app
 from app.models import db
-from app.utils import extract_text_from_resume, ai_extract_skills_from_text, ai_analyze_resume_text
+from app.utils import extract_text_from_resume, ai_extract_skills_from_text
 from .emotion_recognition import get_emotion_recognition_ai
 import logging
 
@@ -18,30 +18,13 @@ def update_user_skills_from_resume(user, file_bytes: bytes, filename: str) -> li
     except Exception:
         resume_text = ''
 
-    # 若无法提取到简历文本，则回退到用户资料拼接文本
-    if not resume_text:
-        resume_text = f"姓名:{getattr(user,'first_name','')} {getattr(user,'last_name','')}. 公司:{getattr(user,'company_name','')}. 职位:{getattr(user,'position','')}. 简介:{getattr(user,'bio','')}. 经验:{getattr(user,'experience','')}. 教育:{getattr(user,'education','')}. 技能:{getattr(user,'skills','')}"
-
     skills = ai_extract_skills_from_text(resume_text or (getattr(user, 'position', '') or '') )
     try:
-        import json, hashlib
-        # 保存技能
+        import json
         user.skills = json.dumps(skills, ensure_ascii=False)
-        # 生成签名并存储简历分析结果
-        signature = hashlib.sha1((resume_text or '').encode('utf-8')).hexdigest() if resume_text else None
-        analysis = None
-        try:
-            analysis = ai_analyze_resume_text(resume_text)
-        except Exception:
-            analysis = None
-        if analysis:
-            user.resume_analysis = json.dumps(analysis, ensure_ascii=False)
-            from datetime import datetime as _dt
-            user.resume_last_analyzed_at = _dt.utcnow()
-        user.resume_signature = signature
         db.session.commit()
     except Exception as e:
-        current_app.logger.warning(f'Failed to save AI skills/analysis: {e}')
+        current_app.logger.warning(f'Failed to save AI skills: {e}')
     return skills
 
 
@@ -427,17 +410,16 @@ def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict
             'Content-Type': 'application/json'
         }
         
-        # 构建请求体，包含音频数据（按Gemini最新字段：role、inlineData、mimeType）
+        # 构建请求体，包含音频数据
         payload = {
             "contents": [{
-                "role": "user",
                 "parts": [
                     {
                         "text": "请将这段音频转换为文字。请只返回转写的文字内容，不要添加任何解释或标点符号。"
                     },
                     {
-                        "inlineData": {
-                            "mimeType": _get_mime_type(filename),
+                        "inline_data": {
+                            "mime_type": _get_mime_type(filename),
                             "data": audio_base64
                         }
                     }
@@ -460,12 +442,7 @@ def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict
         
         if response.status_code != 200:
             logger.error(f"Gemini API请求失败: {response.status_code} - {response.text}")
-            # 将部分错误信息返回给前端，便于定位（隐藏密钥）
-            try:
-                err_js = response.json()
-            except Exception:
-                err_js = {"message": response.text[:300]}
-            return {"error": f"语音识别API请求失败: {response.status_code}", "detail": err_js}
+            return {"error": f"语音识别API请求失败: {response.status_code}"}
         
         # 解析响应
         data = response.json()
