@@ -1,6 +1,6 @@
 from flask import current_app
 from app.models import db
-from app.utils import extract_text_from_resume, ai_extract_skills_from_text
+from app.utils import extract_text_from_resume, ai_extract_skills_from_text, ai_analyze_resume_text
 from .emotion_recognition import get_emotion_recognition_ai
 import logging
 
@@ -18,13 +18,30 @@ def update_user_skills_from_resume(user, file_bytes: bytes, filename: str) -> li
     except Exception:
         resume_text = ''
 
+    # 若无法提取到简历文本，则回退到用户资料拼接文本
+    if not resume_text:
+        resume_text = f"姓名:{getattr(user,'first_name','')} {getattr(user,'last_name','')}. 公司:{getattr(user,'company_name','')}. 职位:{getattr(user,'position','')}. 简介:{getattr(user,'bio','')}. 经验:{getattr(user,'experience','')}. 教育:{getattr(user,'education','')}. 技能:{getattr(user,'skills','')}"
+
     skills = ai_extract_skills_from_text(resume_text or (getattr(user, 'position', '') or '') )
     try:
-        import json
+        import json, hashlib
+        # 保存技能
         user.skills = json.dumps(skills, ensure_ascii=False)
+        # 生成签名并存储简历分析结果
+        signature = hashlib.sha1((resume_text or '').encode('utf-8')).hexdigest() if resume_text else None
+        analysis = None
+        try:
+            analysis = ai_analyze_resume_text(resume_text)
+        except Exception:
+            analysis = None
+        if analysis:
+            user.resume_analysis = json.dumps(analysis, ensure_ascii=False)
+            from datetime import datetime as _dt
+            user.resume_last_analyzed_at = _dt.utcnow()
+        user.resume_signature = signature
         db.session.commit()
     except Exception as e:
-        current_app.logger.warning(f'Failed to save AI skills: {e}')
+        current_app.logger.warning(f'Failed to save AI skills/analysis: {e}')
     return skills
 
 
