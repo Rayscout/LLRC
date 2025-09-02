@@ -1,8 +1,0 @@
-# FER2013表情识别数据集配置
-path: ../dataset  # 数据集根目录
-train: train      # 训练集目录
-val: val          # 验证集目录
-
-# 类别数量和名称
-nc: 7  # 类别数量
-names: ['angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral']
