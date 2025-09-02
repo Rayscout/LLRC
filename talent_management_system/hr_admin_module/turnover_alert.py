@@ -276,6 +276,9 @@ def turnover_dashboard():
             else:
                 return str(obj)
         
+        # 计算并清洗 causes 分析，保证可序列化
+        causes_analysis = ensure_serializable(analyze_turnover_causes())
+        
         # 准备数据并确保可序列化
         dashboard_data = {
             'summary': {
@@ -290,7 +293,7 @@ def turnover_dashboard():
             'turnover_records': ensure_serializable(list(TURNOVER_DATA.values())[:10]),  # 只显示前10个
             'recommendations': ensure_serializable(recommendations)
         }
-        
+
         # 验证数据完整性
         try:
             import json
@@ -307,8 +310,8 @@ def turnover_dashboard():
                 },
                 'error': '部分数据无法显示，请联系管理员'
             }
-        
-        return render_template('talent_management/hr_admin/turnover_dashboard.html', data=dashboard_data)
+
+        return render_template('talent_management/hr_admin/turnover_dashboard.html', data=dashboard_data, dashboard_data=dashboard_data, causes_analysis=causes_analysis)
         
     except Exception as e:
         print(f"离职预警仪表板错误: {e}")
