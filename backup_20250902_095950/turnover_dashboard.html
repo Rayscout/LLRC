@@ -937,7 +937,6 @@
 
         // 生成预警报告
         // 生成预警报告
-        // 生成预警报告
         function generateReport() {
             const btn = event.target.closest("button");
             if (btn) {
@@ -945,64 +944,6 @@
                 setTimeout(() => {
                     btn.style.transform = "scale(1)";
                 }, 150);
-            }
-            
-            // 显示加载状态
-            const originalText = btn.innerHTML;
-            btn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> 生成中...";
-            btn.disabled = true;
-            
-            fetch("/talent/hr_admin/turnover_alert/api/generate_report")
-                .then(response => {
-                    if (response.ok) {
-                        return response.blob();
-                    } else {
-                        return response.text().then(text => {
-                            throw new Error(`生成失败: ${response.status} ${response.statusText}`);
-                        });
-                    }
-                })
-                .then(blob => {
-                    // 创建下载链接
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `turnover_alert_report_${new Date().toISOString().slice(0,10)}.pdf`;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                    
-                    // 显示成功通知
-                    showNotification("预警报告生成成功！", "success");
-                })
-                .catch(error => {
-                    console.error("生成报告失败:", error);
-                    
-                    // 显示详细错误信息
-                    let errorMessage = "生成报告失败，请重试。";
-                    if (error.message.includes("502")) {
-                        errorMessage = "服务器暂时不可用，请稍后重试。错误信息: " + error.message;
-                    } else if (error.message.includes("500")) {
-                        errorMessage = "服务器内部错误，请联系管理员。错误信息: " + error.message;
-                    } else if (error.message.includes("404")) {
-                        errorMessage = "生成接口不存在，请联系管理员。错误信息: " + error.message;
-                    } else if (error.message.includes("403")) {
-                        errorMessage = "权限不足，请检查登录状态。错误信息: " + error.message;
-                    } else if (error.message.includes("401")) {
-                        errorMessage = "请先登录系统。错误信息: " + error.message;
-                    } else {
-                        errorMessage = "生成报告失败，请重试。错误信息: " + error.message;
-                    }
-                    
-                    showNotification(errorMessage, "error");
-                })
-                .finally(() => {
-                    // 恢复按钮状态
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                });
-        }
             }
             
             // 显示加载状态
