@@ -24,6 +24,8 @@ function initializeApp() {
     initializeAnimations();
     initializeLoadingStates();
     initializeNotifications();
+    applySoftPalette();
+    applyRainbowIcons();
 }
 
 /**
@@ -585,3 +587,81 @@ function escapeHtml(str) {
 }
 
 window.toggleNotificationDropdown = toggleNotificationDropdown;
+
+/**
+ * 将柔和配色随机分配给按钮和小标题图标
+ * 调色板：#FFE4B5、#FAEBD7、#FFE4B5、#F0F8FF、#E6E6FA、#ADD8E6
+ */
+function applySoftPalette() {
+    const palette = ['#FFE4B5', '#FAEBD7', '#FFE4B5', '#F0F8FF', '#E6E6FA', '#ADD8E6'];
+
+    // 按钮（含主要与次要）
+    const buttons = document.querySelectorAll('.btn, .btn-primary, .btn-secondary, .ios-button');
+    let idx = 0;
+    buttons.forEach(btn => {
+        const color = palette[idx % palette.length];
+        idx++;
+        btn.style.backgroundColor = color;
+        btn.style.borderColor = color;
+        btn.style.color = '#101010';
+        btn.addEventListener('mouseenter', () => { btn.style.filter = 'brightness(0.97)'; });
+        btn.addEventListener('mouseleave', () => { btn.style.filter = ''; });
+    });
+
+    // 小标题图标
+    const titleIcons = document.querySelectorAll('h2 i, h3 i, h4 i, .section-title i, .section-subtitle i, .card-title i, .ios-recent-title i, .ios-metric-icon i');
+    titleIcons.forEach((icon, i) => {
+        icon.style.color = palette[i % palette.length];
+    });
+}
+
+/**
+ * 为标题与卡片添加简洁图标（柔和彩虹色系，适配浅背景）
+ */
+function applyRainbowIcons() {
+    // 图标前景色使用图中配色（不含背景黄）
+    const colors = ['#FF6B6B', '#3DD5C9', '#4DB7E5', '#A9D6C6'];
+    // 图标背景统一使用图中的柔和黄色
+    const bgYellow = '#FDE7A1';
+    const icons  = ['fa-star', 'fa-heart', 'fa-seedling', 'fa-bolt', 'fa-gem'];
+
+    // 注入一次性样式，保证间距美观
+    (function ensureIconStyles(){
+        if (document.getElementById('candidate-inline-icon-style')) return;
+        const style = document.createElement('style');
+        style.id = 'candidate-inline-icon-style';
+        style.textContent = `
+            .inline-title-icon{margin-right:8px;vertical-align:middle;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+        `;
+        document.head.appendChild(style);
+    })();
+
+    // 将 HEX 增加透明度
+    function hexToRgba(hex, a){
+        const h = hex.replace('#','');
+        const r = parseInt(h.substring(0,2),16);
+        const g = parseInt(h.substring(2,4),16);
+        const b = parseInt(h.substring(4,6),16);
+        return `rgba(${r}, ${g}, ${b}, ${a})`;
+    }
+
+    // 给标题添加图标
+    const titles = document.querySelectorAll('.section-title, h2, h3, h4, .card-title');
+    titles.forEach((title, i) => {
+        // 避免重复添加
+        if (title.querySelector('.inline-title-icon')) return;
+        const icon = document.createElement('i');
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const fs = window.getComputedStyle(title).fontSize || '20px';
+        icon.className = `fas ${icons[i % icons.length]} inline-title-icon`;
+        icon.style.color = '#101010';
+        icon.style.width = fs;
+        icon.style.height = fs;
+        icon.style.fontSize = fs; // 与文字同大小
+        icon.style.backgroundColor = hexToRgba(bgYellow, 0.36);
+        title.prepend(icon);
+    });
+
+    // 移除曾添加的卡片角标
+    document.querySelectorAll('.card-badge').forEach(el => el.remove());
+}

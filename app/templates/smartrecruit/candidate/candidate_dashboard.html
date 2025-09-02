@@ -443,7 +443,7 @@ body {
 }
 
 .nav-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 20px;
     height: 60px;
@@ -510,7 +510,7 @@ body {
 }
 
 .section-content {
-    max-width: 1200px;
+    max-width: 1400px;
     width: 100%;
     margin: 0 auto;
 }
@@ -1240,7 +1240,7 @@ function displayRecommendedJobs(jobs) {
                 ${job.location} · ${job.job_type}
             </div>
             <div class="job-actions">
-                <a href="/smartrecruit/candidate/applications/apply/${job.id}" class="ios-button ios-button-primary">立即申请</a>
+                <a href="/smartrecruit/candidate/applications/pre_apply/${job.id}" class="ios-button ios-button-primary">立即申请</a>
                 <button class="ios-button ios-button-outline" onclick="saveJob(${job.id})">收藏</button>
             </div>
         </div>

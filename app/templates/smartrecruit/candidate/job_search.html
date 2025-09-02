@@ -4,9 +4,9 @@
 
 {% block content %}
 <section class="section" id="job-search">
-    <div style="width: 100%; max-width: 1200px;">
+    <div style="width: 100%; max-width: 1400px;">
         <div class="card animate-fade-in-up">
-            <div class="search-header" style="text-align: center; margin-bottom: 30px;">
+            <div class="search-header" style="text-align: center; margin-bottom: 30px; background:#ffffff; padding:16px; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,.08);">
                 <h1 style="font-size: 2.5rem; margin-bottom: 15px; color: var(--text-primary);">
                     🔍 智能岗位搜索
                 </h1>
@@ -19,12 +19,12 @@
                     <div class="filter-group">
                         <label for="searchQuery" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">关键词搜索</label>
                         <input type="text" id="searchQuery" placeholder="职位名称、技能、公司名称..." 
-                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: #ffffff; color: var(--text-primary);">
                     </div>
                     <div class="filter-group">
                         <label for="locationFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">工作地点</label>
                         <input type="text" id="locationFilter" placeholder="城市、地区..." 
-                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: #ffffff; color: var(--text-primary);">
                     </div>
                 </div>
                 
@@ -32,17 +32,17 @@
                     <div class="filter-group">
                         <label for="salaryMin" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">最低薪资</label>
                         <input type="number" id="salaryMin" placeholder="最低薪资" 
-                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: #ffffff; color: var(--text-primary);">
                     </div>
                     <div class="filter-group">
                         <label for="salaryMax" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">最高薪资</label>
                         <input type="number" id="salaryMax" placeholder="最高薪资" 
-                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: #ffffff; color: var(--text-primary);">
                     </div>
                     <div class="filter-group">
                         <label for="jobTypeFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">工作类型</label>
                         <select id="jobTypeFilter" 
-                                style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                                style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: #ffffff; color: var(--text-primary);">
                             <option value="">全部类型</option>
                             <option value="全职">全职</option>
                             <option value="兼职">兼职</option>
@@ -53,7 +53,7 @@
                     <div class="filter-group">
                         <label for="experienceFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">经验要求</label>
                         <select id="experienceFilter" 
-                                style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                                style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: #ffffff; color: var(--text-primary);">
                             <option value="">全部级别</option>
                             <option value="初级">初级</option>
                             <option value="中级">中级</option>
@@ -127,12 +127,12 @@
 <style>
 .job-search-container {
     padding: 20px;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
 .search-filters {
-    background: var(--bg-card);
+    background: #ffffff;
     padding: 25px;
     border-radius: var(--card-radius);
     box-shadow: var(--card-shadow);
@@ -156,16 +156,16 @@
     padding: 12px;
     border: 1px solid var(--border-color);
     border-radius: var(--button-radius);
-    background: var(--bg-card);
+    background: #ffffff;
     color: var(--text-primary);
     transition: border-color 0.3s ease;
 }
 
 .filter-group input:focus,
 .filter-group select:focus {
-    outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.1);
+  outline: none;
+  border-color: #A8DDA8;
+  box-shadow: 0 0 0 2px rgba(168, 221, 168, 0.1);
 }
 
 .filter-actions {
@@ -174,15 +174,33 @@
 }
 
 .filter-actions .btn {
-    margin: 0 10px;
-    padding: 12px 24px;
-    border-radius: var(--button-radius);
-    font-weight: 600;
-    transition: all 0.3s ease;
+  margin: 0 10px;
+  padding: 12px 24px;
+  border-radius: var(--button-radius);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: #A8DDA8;
+  color: white;
+  border: none;
+}
+
+.filter-actions .btn:hover {
+  background: #4FC3F7;
+  transform: translateY(-1px);
+}
+
+.filter-actions .btn-secondary {
+  background: #FDFD96;
+  color: #2d3748;
+}
+
+.filter-actions .btn-secondary:hover {
+  background: #F7797D;
+  color: white;
 }
 
 .user-skills {
-    background: var(--bg-card);
+    background: #ffffff;
     padding: 20px;
     border-radius: var(--card-radius);
     box-shadow: var(--card-shadow);
@@ -196,16 +214,16 @@
 }
 
 .skill-tag {
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
+  background: #F7797D;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .search-results {
-    background: var(--bg-card);
+    background: #ffffff;
     padding: 25px;
     border-radius: var(--card-radius);
     box-shadow: var(--card-shadow);
@@ -227,7 +245,7 @@
 }
 
 .job-card {
-    background: var(--bg-card);
+    background: #ffffff;
     border: 1px solid var(--border-color);
     border-radius: var(--card-radius);
     padding: 20px;
@@ -236,9 +254,9 @@
 }
 
 .job-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--card-shadow);
-    border-color: var(--accent-color);
+  transform: translateY(-2px);
+  box-shadow: var(--card-shadow);
+  border-color: #FDFD96;
 }
 
 .job-header {
@@ -261,12 +279,12 @@
 }
 
 .job-badge {
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-    color: white;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
+  background: #4ECDC4;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .job-meta {
@@ -292,7 +310,7 @@
 }
 
 .tag {
-    background: var(--bg-secondary);
+    background: #ffffff;
     color: var(--text-primary);
     padding: 4px 12px;
     border-radius: 12px;
@@ -301,8 +319,8 @@
 }
 
 .tag:hover {
-    background: var(--accent-color);
-    color: white;
+  background: #4FC3F7;
+  color: white;
 }
 
 .related-section {
@@ -317,10 +335,42 @@
 }
 
 .related-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.related-actions .btn-secondary {
+  background: #4ECDC4;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.related-actions .btn-secondary:hover {
+  background: #F7797D;
+  transform: translateY(-1px);
+}
+
+.related-section .btn {
+  background: #A8DDA8;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.related-section .btn:hover {
+  background: #4FC3F7;
+  transform: translateY(-1px);
 }
 
 .loading {
@@ -377,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 显示用户技能
 function displayUserSkills() {
-    const skills = {{ user_skills | tojson }};
+    const skills = JSON.parse('{{ user_skills | tojson | safe }}');
     const skillsSection = document.getElementById('userSkillsSection');
     const skillsTags = document.getElementById('skillsTags');
     
