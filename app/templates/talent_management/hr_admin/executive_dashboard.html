@@ -217,7 +217,10 @@
                              </svg>
                              年度人才变化趋势
                          </h3>
-                        <div style="height: 400px;">
+                        <div style="height: 400px; position: relative;">
+                            <div id="talentTrendEmpty" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ios-text-secondary);">
+                                暂无数据，加载中...
+                            </div>
                             <canvas id="talentTrendChart"></canvas>
             </div>
         </div>
@@ -266,7 +269,10 @@
                              </svg>
                              公司与行业薪酬对比
                          </h3>
-                        <div style="height: 300px;">
+                        <div style="height: 300px; position: relative;">
+                            <div id="salaryComparisonEmpty" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ios-text-secondary);">
+                                暂无数据，加载中...
+                            </div>
                             <canvas id="salaryComparisonChart"></canvas>
                         </div>
                     </div>
@@ -278,7 +284,10 @@
                              </svg>
                              未来6个月供需趋势
                          </h3>
-                        <div style="height: 300px;">
+                        <div style="height: 300px; position: relative;">
+                            <div id="supplyDemandEmpty" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--ios-text-secondary);">
+                                暂无数据，加载中...
+                            </div>
                             <canvas id="supplyDemandChart"></canvas>
                         </div>
                     </div>
@@ -518,6 +527,14 @@
                 navToggle.classList.toggle('active');
             });
             
+            // 工具函数：隐藏空状态
+            function hideEmptyState(elementId) {
+                const el = document.getElementById(elementId);
+                if (el) {
+                    el.style.display = 'none';
+                }
+            }
+
             // 人才发展趋势图表
             const ctx = document.getElementById('talentTrendChart').getContext('2d');
             const talentTrendChart = new Chart(ctx, {
@@ -579,6 +596,7 @@
                     }
                 }
             });
+            hideEmptyState('talentTrendEmpty');
 
             // 薪酬对比图表
             const salaryCtx = document.getElementById('salaryComparisonChart').getContext('2d');
@@ -628,6 +646,7 @@
                     }
                 }
             });
+            hideEmptyState('salaryComparisonEmpty');
 
             // 供需趋势图表
             const supplyCtx = document.getElementById('supplyDemandChart').getContext('2d');
@@ -683,6 +702,7 @@
                     }
                 }
             });
+            hideEmptyState('supplyDemandEmpty');
 
             // 页面加载动画
             const observerOptions = {
