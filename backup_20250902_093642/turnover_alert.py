@@ -239,6 +239,138 @@ def generate_prevention_recommendations():
 def turnover_dashboard():
     """离职预警仪表板"""
     try:
+        if 'user_id' not in session:
+            return jsonify({'error': '请先登录'}), 401
+        
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'executive':
+            return jsonify({'error': '权限不足'}), 403
+        
+        # 生成模拟数据（实际应用中从数据库获取）
+        generate_mock_turnover_data()
+        
+        # 获取仪表板数据
+        dashboard_data = get_turnover_dashboard_data()
+        
+        # 分析离职原因
+        causes_analysis = analyze_turnover_causes()
+        
+        # 生成预防建议
+        prevention_recommendations = generate_prevention_recommendations()
+        
+        return render_template('talent_management/hr_admin/turnover_dashboard.html',
+                             user=user,
+                             dashboard_data=dashboard_data,
+                             causes_analysis=causes_analysis,
+                             prevention_recommendations=prevention_recommendations)
+                             
+    except Exception as e:
+        return jsonify({'error': f'加载页面时发生错误: {str(e)}'}), 500
+
+@turnover_alert_bp.route('/api/department_trends')
+def api_department_trends():
+    """获取部门离职趋势数据"""
+    try:
+        # 生成月度趋势数据
+        months = []
+        trends = {}
+        
+        for i in range(12):
+            month = (datetime.now() - timedelta(days=30*i)).strftime('%Y-%m')
+            months.append(month)
+            
+            for dept in DEPARTMENT_STATS.keys():
+                if dept not in trends:
+                    trends[dept] = []
+                
+                # 模拟月度波动
+                base_rate = DEPARTMENT_STATS[dept]['turnover_rate']
+                monthly_rate = base_rate * random.uniform(0.5, 1.5)
+                trends[dept].append(round(monthly_rate * 100, 2))
+        
+        return jsonify({
+            'success': True,
+            'months': months,
+            'trends': trends
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@turnover_alert_bp.route('/api/risk_analysis')
+def api_risk_analysis():
+    """获取风险分析数据"""
+    try:
+        # 岗位风险分布
+        position_risks = []
+        for pos, analysis in POSITION_ANALYSIS.items():
+            position_risks.append({
+                'position': pos,
+                'risk_score': round(analysis['turnover_risk'] * 100, 1),
+                'market_demand': round(analysis['market_demand'], 2),
+                'skill_gap': round(analysis['skill_gap'], 2),
+                'salary_competitiveness': round(analysis['salary_competitiveness'], 2)
+            })
+        
+        # 员工风险分布
+        risk_distribution = {'low': 0, 'medium': 0, 'high': 0}
+        for emp in EMPLOYEE_RISK_SCORES.values():
+            risk_distribution[emp['risk_level']] += 1
+        
+        return jsonify({
+            'success': True,
+            'position_risks': position_risks,
+            'risk_distribution': risk_distribution
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@turnover_alert_bp.route('/api/employee_details/<employee_id>')
+def api_employee_details(employee_id):
+    """获取员工详细信息"""
+    try:
+        if employee_id in EMPLOYEE_RISK_SCORES:
+            employee = EMPLOYEE_RISK_SCORES[employee_id]
+            
+            # 生成详细的风险分析
+            risk_factors = []
+            if employee['tenure'] < 2.0:
+                risk_factors.append('任职时间短，忠诚度待观察')
+            if employee['last_promotion'] > 18:
+                risk_factors.append('长期未晋升，发展受限')
+            if employee['salary_growth'] < 0.05:
+                risk_factors.append('薪资增长缓慢，激励不足')
+            if employee['performance_rating'] < 3.5:
+                risk_factors.append('绩效评分偏低，工作积极性不高')
+            if employee['workload'] > 1.2:
+                risk_factors.append('工作负荷过重，压力较大')
+            if employee['satisfaction_score'] < 4.0:
+                risk_factors.append('工作满意度偏低')
+            
+            employee['risk_factors'] = risk_factors
+            
+            return jsonify({
+                'success': True,
+                'employee': employee
+            })
+        else:
+            return jsonify({'error': '员工不存在'}), 404
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@turnover_alert_bp.route('/api/generate_report')
+def api_generate_report():
+    """生成离职预警报告PDF"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': '请先登录'}), 401
+        
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'executive':
+            return jsonify({'error': '权限不足'}), 403
+        
         # 检查reportlab是否可用
         try:
             from reportlab.lib.pagesizes import letter, A4
@@ -249,6 +381,27 @@ def turnover_dashboard():
             from reportlab.pdfgen import canvas
         except ImportError as e:
             print(f"缺少reportlab依赖: {e}")
+            return jsonify({'error': '服务器缺少PDF生成库，请联系管理员安装'}), 500
+        
+        # 生成模拟数据
+        generate_mock_turnover_data()
+        
+        # 生成报告数据
+        report_id = str(uuid.uuid4())
+        report_data = {
+            'report_id': report_id,
+            'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'summary': {
+                'total_employees': sum(dept['total_employees'] for dept in DEPARTMENT_STATS.values()),
+                'high_risk_departments': len([d for d in DEPARTMENT_STATS.values() if d['risk_level'] == 'high']),
+                'high_risk_positions': len([p for p in POSITION_ANALYSIS.values() if p['turnover_risk'] > 0.6]),
+                'high_risk_employees': len([e for e in EMPLOYEE_RISK_SCORES.values() if e['risk_level'] == 'high'])
+            },
+            'department_analysis': DEPARTMENT_STATS,
+            'position_analysis': POSITION_ANALYSIS,
+            'causes_analysis': analyze_turnover_causes(),
+            'recommendations': generate_prevention_recommendations()
+        }
         
         # 创建PDF文件
         output = io.BytesIO()
@@ -275,133 +428,7 @@ def turnover_dashboard():
             fontSize=12,
             spaceAfter=20
         )
-        story.append(Paragraph(f"报告ID: {report_data['report_id']}", info_style))
-        story.append(Paragraph(f"生成时间: {report_data['generated_at']}", info_style))
-        story.append(Paragraph(f"生成人员: {user.first_name} {user.last_name}", info_style))
-        story.append(Spacer(1, 20))
-        
-        # 总体概览
-        story.append(Paragraph("总体概览", styles['Heading2']))
-        story.append(Spacer(1, 12))
-        
-        summary_data = [
-            ['指标', '数值'],
-            ['总员工数', str(report_data['summary']['total_employees'])],
-            ['高风险部门数', str(report_data['summary']['high_risk_departments'])],
-            ['高风险岗位数', str(report_data['summary']['high_risk_positions'])],
-            ['高风险员工数', str(report_data['summary']['high_risk_employees'])]
-        ]
-        
-        # 部门分
-        story.append(Paragraph("部门分析", styles['Heading2']))
-        story.append(Spacer(1, 12))
-        
-        dept_data = [['部门名称', '员工总数', '离职人数', '离职率', '风险等级']]
-        for dept_name, dept_info in report_data['department_analysis'].items():
-            dept_data.append([
-                dept_name,
-                str(dept_info['total_employees']),
-                str(dept_info['turnover_count']),
-                f"{dept_info['turnover_rate']*100:.1f}%",
-                dept_info['risk_level']
-            ])
-        
-        dept_table = Table(dept_data, colWidths=[1.2*inch, 1*inch, 1*inch, 1*inch, 1*inch])
-        dept_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ]))
-        story.append(dept_table)
-        story.append(Spacer(1, 20))
-        
-        # 高风险岗位
-        story.append(Paragraph("高风险岗位分析", styles['Heading2']))
-        story.append(Spacer(1, 12))
-        
-        pos_data = [['岗位名称', '离职风险', '市场需求', '技能差距']]
-        high_risk_positions = [(name, info) for name, info in report_data['position_analysis'].items() 
-                              if info['turnover_risk'] > 0.6]
-        high_risk_positions.sort(key=lambda x: x[1]['turnover_risk'], reverse=True)
-        
-        for pos_name, pos_info in high_risk_positions[:10]:  # 只显示前10个
-            pos_data.append([
-                pos_name,
-                f"{pos_info['turnover_risk']*100:.1f}%",
-                f"{pos_info['market_demand']:.2f}",
-                f"{pos_info['skill_gap']:.2f}"
-            ])
-        
-        pos_table = Table(pos_data, colWidths=[1.5*inch, 1*inch, 1*inch, 1*inch])
-        pos_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ]))
-        story.append(pos_table)
-        story.append(Spacer(1, 20))
-        
-        # 预防建议
-        story.append(Paragraph("预防建议", styles['Heading2']))
-        story.append(Spacer(1, 12))
-        
-        for i, recommendation in enumerate(report_data['recommendations'], 1):
-            story.append(Paragraph(f"{i}. {recommendation}", styles['Normal']))
-            story.append(Spacer(1, 6))
-        
-        # 生成PDF
-        doc.build(story)
-        output.seek(0)
-        
-        # 使用英文文件名避免编码问题
-        safe_filename = f"turnover_alert_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
-        
-        return send_file(
-            output,
-            as_attachment=True,
-            download_name=safe_filename,
-            mimetype='application/pdf'
-        )
-        
-    except Exception as e:
-        print(f"生成报告错误: {e}")
-        
-        # 创建PDF文件
-        output = io.BytesIO()
-        doc = SimpleDocTemplate(output, pagesize=A4)
-        styles = getSampleStyleSheet()
-        story = []
-        
-        # 标题
-        title_style = ParagraphStyle(
-            'CustomTitle',
-            parent=styles['Heading1'],
-            fontSize=24,
-            spaceAfter=30,
-            alignment=1,
-            textColor=colors.darkblue
-        )
-        story.append(Paragraph("人才流失预警报告", title_style))
-        story.append(Spacer(1, 20))
-        
-        # 报告信息
-        info_style = ParagraphStyle(
-            'Info',
-            parent=styles['Normal'],
-            fontSize=12,
-            spaceAfter=20
-        )
-        story.append(Paragraph(f"报告ID: {report_data['report_id']}", info_style))
+        story.append(Paragraph(f"报告ID: {report_id}", info_style))
         story.append(Paragraph(f"生成时间: {report_data['generated_at']}", info_style))
         story.append(Paragraph(f"生成人员: {user.first_name} {user.last_name}", info_style))
         story.append(Spacer(1, 20))
@@ -516,3 +543,147 @@ def turnover_dashboard():
     except Exception as e:
         print(f"生成报告错误: {e}")
         return jsonify({'error': f'生成报告失败: {str(e)}'}), 500
+
+@turnover_alert_bp.route('/api/export_data', methods=['POST'])
+def export_turnover_data():
+    """导出人才流失预警数据"""
+    try:
+        if 'user_id' not in session:
+            return jsonify({'error': '请先登录'}), 401
+        
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'executive':
+            return jsonify({'error': '权限不足'}), 403
+        
+        # 检查pandas和openpyxl是否可用
+        try:
+            import pandas as pd
+            import openpyxl
+        except ImportError as e:
+            print(f"缺少必要依赖: {e}")
+            return jsonify({'error': '服务器缺少必要的数据处理库，请联系管理员安装'}), 500
+        
+        # 生成模拟数据
+        generate_mock_turnover_data()
+        
+        # 创建Excel文件
+        output = io.BytesIO()
+        
+        try:
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                # 部门统计表
+                dept_data = []
+                for dept_name, dept_info in DEPARTMENT_STATS.items():
+                    dept_data.append({
+                        '部门名称': dept_name,
+                        '员工总数': dept_info['total_employees'],
+                        '离职人数': dept_info['turnover_count'],
+                        '离职率': f"{dept_info['turnover_rate']*100:.1f}%",
+                        '平均薪资': dept_info['avg_salary'],
+                        '平均任职时间': f"{dept_info['avg_tenure']:.1f}年",
+                        '风险等级': dept_info['risk_level']
+                    })
+                
+                df_dept = pd.DataFrame(dept_data)
+                df_dept.to_excel(writer, sheet_name='部门统计', index=False)
+                
+                # 岗位分析表
+                position_data = []
+                for pos_name, pos_info in POSITION_ANALYSIS.items():
+                    position_data.append({
+                        '岗位名称': pos_name,
+                        '市场需求': f"{pos_info['market_demand']:.2f}",
+                        '技能差距': f"{pos_info['skill_gap']:.2f}",
+                        '薪资竞争力': f"{pos_info['salary_competitiveness']:.2f}",
+                        '离职风险': f"{pos_info['turnover_risk']*100:.1f}%",
+                        '主要离职原因': '; '.join(pos_info['main_reasons'])
+                    })
+                
+                df_position = pd.DataFrame(position_data)
+                df_position.to_excel(writer, sheet_name='岗位分析', index=False)
+                
+                # 高风险员工表
+                high_risk_employees = [emp for emp in EMPLOYEE_RISK_SCORES.values() if emp['risk_level'] == 'high']
+                if high_risk_employees:
+                    emp_data = []
+                    for emp in high_risk_employees[:20]:  # 只导出前20名
+                        emp_data.append({
+                            '员工姓名': emp['name'],
+                            '部门': emp['department'],
+                            '岗位': emp['position'],
+                            '风险评分': f"{emp['risk_score']*100:.1f}%",
+                            '任职时间': f"{emp['tenure']:.1f}年",
+                            '上次晋升': f"{emp['last_promotion']}个月前",
+                            '薪资增长率': f"{emp['salary_growth']*100:.1f}%",
+                            '绩效评分': f"{emp['performance_rating']:.1f}",
+                            '工作负荷': f"{emp['workload']:.1f}",
+                            '满意度评分': f"{emp['satisfaction_score']:.1f}"
+                        })
+                    
+                    df_emp = pd.DataFrame(emp_data)
+                    df_emp.to_excel(writer, sheet_name='高风险员工', index=False)
+                
+                # 离职记录表
+                turnover_data = []
+                for turnover in list(TURNOVER_DATA.values())[:20]:  # 只导出最近20条
+                    turnover_data.append({
+                        '员工姓名': turnover['employee_name'],
+                        '部门': turnover['department'],
+                        '岗位': turnover['position'],
+                        '离职日期': turnover['turnover_date'],
+                        '任职时间': f"{turnover['tenure']:.1f}年",
+                        '离职原因': turnover['reason'],
+                        '离职面谈': turnover['exit_interview'],
+                        '替代难度': turnover['replacement_difficulty'],
+                        '离职成本': turnover['cost_impact']
+                    })
+                
+                df_turnover = pd.DataFrame(turnover_data)
+                df_turnover.to_excel(writer, sheet_name='离职记录', index=False)
+                
+                # 汇总统计
+                summary_data = [
+                    ['总员工数', sum(dept['total_employees'] for dept in DEPARTMENT_STATS.values())],
+                    ['总离职人数', sum(dept['turnover_count'] for dept in DEPARTMENT_STATS.values())],
+                    ['平均离职率', f"{sum(dept['turnover_count'] for dept in DEPARTMENT_STATS.values()) / sum(dept['total_employees'] for dept in DEPARTMENT_STATS.values()) * 100:.1f}%"],
+                    ['高风险部门数', len([d for d in DEPARTMENT_STATS.values() if d['risk_level'] == 'high'])],
+                    ['高风险岗位数', len([p for p in POSITION_ANALYSIS.values() if p['turnover_risk'] > 0.6])],
+                    ['高风险员工数', len([e for e in EMPLOYEE_RISK_SCORES.values() if e['risk_level'] == 'high'])]
+                ]
+                
+                df_summary = pd.DataFrame(summary_data, columns=['指标', '数值'])
+                df_summary.to_excel(writer, sheet_name='汇总统计', index=False)
+            
+            output.seek(0)
+            
+            filename = f"人才流失预警报告_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            
+            # 设置响应头 - 修复编码问题
+            # 使用英文文件名避免编码问题
+            safe_filename = f"turnover_alert_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            
+            response = send_file(
+                output,
+                as_attachment=True,
+                download_name=safe_filename,
+                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            
+            # 添加额外的响应头 - 避免中文字符
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            response.headers['Content-Disposition'] = f'attachment; filename="{safe_filename}"'
+            
+            return response
+            
+        except Exception as excel_error:
+            print(f"Excel生成错误: {excel_error}")
+            return jsonify({'error': f'Excel文件生成失败: {str(excel_error)}'}), 500
+        
+    except Exception as e:
+        print(f"人才流失数据导出错误: {e}")
+        return jsonify({'error': f'导出数据时发生错误: {str(e)}'}), 500
+
+# 初始化模拟数据
+generate_mock_turnover_data()
