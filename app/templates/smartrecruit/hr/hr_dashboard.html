@@ -26,11 +26,11 @@
     .icon-btn{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:#F2F2F7;color:#1D1D1F;text-decoration:none}
     .main{grid-area:main;padding:1px}
     .card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
-    .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;margin-bottom:1px}
+    .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:28px;margin-bottom:16px}
     .metric-card{padding:18px 20px;border-radius:14px}
     .metric-card.card{will-change:transform,box-shadow;transition:all .2s ease}
     .metric-card.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
-    .dashboard-section.card{padding:1px;margin-bottom:1px}
+    .dashboard-section.card{padding:16px;margin-bottom:16px}
     .quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px}
     .action-card{padding:18px;border-radius:14px;text-decoration:none;color:inherit;display:block;transition:transform .2s ease}
     .action-card:hover{transform:translateY(-4px)}
@@ -51,17 +51,17 @@
     /* 团队目标区（参照图示） */
     .goals{margin-top:6px}
     .goals .title{display:flex;align-items:center;gap:10px;font-weight:700;color:#0d355d;margin-bottom:12px}
-    .goal-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;margin-bottom:1px}
+    .goal-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px}
     .goal-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 4px 14px rgba(51,86,255,.06);padding:14px 16px}
     .goal-card h4{margin:0 0 8px 0;font-size:14px;color:#4b5b76;display:flex;align-items:center;gap:6px}
     .goal-card .v{font-size:24px;font-weight:800;color:#acd2b7}
     .goal-card .sub{font-size:12px;color:#94a3b8}
-    .goal-chip{position:absolute;right:-10px;top:-14px;background:#b8d8c1;color:#fff;border-radius:12px;padding:6px 10px;box-shadow:0 10px 24px rgba(184,216,193,.35)}
+    .goal-chip{position:static;float:right;margin-top:8px;background:#b8d8c1;color:#fff;border-radius:12px;padding:6px 10px;box-shadow:0 10px 24px rgba(184,216,193,.35)}
     .goal-table{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);overflow:hidden}
     .goal-table .bar{background:#f7b500;color:#fff;font-weight:700;padding:12px 16px;display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr .8fr}
     .goal-table .row{display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr .8fr;align-items:center;padding:14px 16px;border-top:1px solid #eef2f7}
     .goal-table .row:hover{background:#f9fbff}
-    .goal-float{position:relative;margin-top:-32px}
+    .goal-float{position:relative;margin-top:12px}
     .goal-float .float{background:#fff;border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.12);display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr .8fr;align-items:center;padding:16px}
     .mini-avatar{width:28px;height:28px;border-radius:50%;overflow:hidden;margin-right:10px;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 </style>
@@ -79,7 +79,7 @@
             <a class="nav-item" href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}"><i class="uil uil-briefcase"></i><span>职位</span></a>
             <a class="nav-item" href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}"><i class="uil uil-users-alt"></i><span>候选人</span></a>
             <a class="nav-item" href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}"><i class="uil uil-calendar-alt"></i><span>面试</span></a>
-            <a class="nav-item" href="{{ url_for('smartrecruit.hr.dashboard.reports') }}"><i class="uil uil-chart-line"></i><span>报表</span></a>
+
         </div>
     </aside>
     <header class="topbar">
