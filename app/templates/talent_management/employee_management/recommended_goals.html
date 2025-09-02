@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推荐目标 - 员工仪表板</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
+    <style>
+        /* 返回按钮样式 */
+        .back-link {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #7FB069, #9DC183);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(127, 176, 105, 0.4);
+            border: none;
+        }
+        
+        .back-link:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(127, 176, 105, 0.6);
+            background: linear-gradient(135deg, #9DC183, #7FB069);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .back-link i {
+            font-size: 1.2rem;
+        }
+        
+        /* 导航栏样式 */
+        .top-navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(26, 77, 26, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            padding: 0;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a4d1a;
+        }
+        
+        .nav-brand i {
+            font-size: 1.8rem;
+            color: #2d5a2d;
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            color: #2d5a2d;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .nav-item:hover {
+            background: rgba(26, 77, 26, 0.08);
+            color: #1a4d1a;
+            transform: translateY(-1px);
+        }
+        
+        .nav-item i {
+            font-size: 1rem;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2d5a2d, #1a4d1a);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 90, 45, 0.3);
+        }
+        
+        .nav-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 90, 45, 0.4);
+            background: linear-gradient(135deg, #1a4d1a, #2d5a2d);
+        }
+        
+        .nav-logout i {
+            font-size: 1rem;
+        }
+        
+        /* 调整主容器位置，避免被导航栏遮挡 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 20px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 动态背景 - 采用HR界面的优雅渐变晕染设计 */
+        .employee-parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        /* 微妙的渐变晕染背景装饰 */
+        .employee-parallax-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(144, 238, 144, 0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(152, 251, 152, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(173, 255, 47, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(50, 205, 50, 0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(34, 139, 34, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 60s ease-in-out infinite;
+        }
+        
+        /* 半透明遮罩层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            z-index: -1;
+        }
+        
+        /* 微妙的渐变晕染动画 */
+        @keyframes gentleDrift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: translate(30px, -20px) scale(1.01);
+                opacity: 0.98;
+            }
+            50% {
+                transform: translate(-25px, 35px) scale(0.99);
+                opacity: 1.02;
+            }
+            75% {
+                transform: translate(20px, 25px) scale(1.005);
+                opacity: 0.99;
+            }
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            color: #1a4d1a;
+            padding: 30px;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #1a4d1a;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            color: #2d5a2d;
+            font-weight: 500;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        .main-content {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .section-title {
+            color: #1a4d1a;
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(26, 77, 26, 0.2);
+        }
+        
+        .section-title i {
+            color: #2d5a2d;
+            font-size: 1.5em;
+            background: rgba(45, 90, 45, 0.1);
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: none;
+        }
+        
+        .recommended-goal {
+            background: rgba(45, 90, 45, 0.05);
+            border: 1px solid rgba(45, 90, 45, 0.2);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .recommended-goal:hover {
+            background: rgba(45, 90, 45, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .recommended-goal h4 {
+            color: #2d5a2d;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .recommended-goal p {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .goal-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .goal-priority {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        
+        .priority-high {
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+        }
+        
+        .priority-medium {
+            background: rgba(255, 149, 0, 0.1);
+            color: #FF9500;
+        }
+        
+        .priority-low {
+            background: rgba(52, 199, 89, 0.1);
+            color: #34C759;
+        }
+        
+        .goal-hours {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .create-goal-btn {
+            background: linear-gradient(135deg, #34C759 0%, #30D158 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .create-goal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 199, 89, 0.3);
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .sidebar-card {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .sidebar-card h3 {
+            color: #1a4d1a;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+        
+        .skill-gap-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(45, 90, 45, 0.1);
+        }
+        
+        .skill-gap-item:last-child {
+            border-bottom: none;
+        }
+        
+        .skill-name {
+            font-weight: 500;
+            color: #1a4d1a;
+        }
+        
+        .skill-hours {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 动态背景 -->
+    <div class="employee-parallax-bg"></div>
+    <div class="overlay-layer"></div>
+    
+    <!-- 返回按钮 -->
+    <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="back-link">
+        <i class="fas fa-arrow-left"></i> 返回目标管理
+    </a>
+    
+    <!-- 导航栏 -->
+    <nav class="top-navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-user-tie"></i>
+                <span>员工平台</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>员工仪表盘</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.profile.profile_dashboard') }}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>个人资料</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.performance.performance_dashboard') }}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>绩效分析</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.learning_recommendation.dashboard') }}" class="nav-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>学习中心</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="nav-item">
+                    <i class="fas fa-bullseye"></i>
+                    <span>目标设定</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.feedback.feedback_dashboard') }}" class="nav-item">
+                    <i class="fas fa-comments"></i>
+                    <span>反馈管理</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.projects.projects_dashboard') }}" class="nav-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>项目经验</span>
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <a href="{{ url_for('common.auth.logout') }}" class="nav-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出登录</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-lightbulb"></i> 推荐目标</h1>
+            <p>基于您的技能差距和职业发展需求，我们为您推荐以下学习目标</p>
+        </div>
+
+        <div class="content-grid">
+            <!-- 主要内容 -->
+            <div class="main-content">
+                <h2 class="section-title">
+                    <i class="fas fa-star"></i> 个性化推荐
+                </h2>
+
+                {% if recommended_goals %}
+                    {% for goal in recommended_goals %}
+                        <div class="recommended-goal">
+                            <h4>{{ goal.title }}</h4>
+                            <p><strong>具体目标：</strong>{{ goal.specific }}</p>
+                            <p><strong>可衡量：</strong>{{ goal.measurable }}</p>
+                            <p><strong>可实现：</strong>{{ goal.achievable }}</p>
+                            <p><strong>相关性：</strong>{{ goal.relevant }}</p>
+                            <p><strong>时间限制：</strong>{{ goal.time_bound }}</p>
+                            
+                            <div class="goal-meta">
+                                <span class="goal-priority priority-{{ goal.priority }}">
+                                    {{ goal.priority|title }} 优先级
+                                </span>
+                                <span class="goal-hours">预计学习时间: {{ goal.estimated_hours }} 小时</span>
+                            </div>
+                            
+                            <div style="margin-top: 15px;">
+                                <a href="{{ url_for('talent_management.employee_management.smart_goals.create_goal') }}" class="create-goal-btn">
+                                    <i class="fas fa-plus"></i> 创建此目标
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="recommended-goal">
+                        <h4>暂无推荐目标</h4>
+                        <p>我们正在分析您的技能档案，请稍后再来查看推荐目标。</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <div class="sidebar-card">
+                    <h3><i class="fas fa-chart-line"></i> 技能差距概览</h3>
+                    {% if skill_gaps %}
+                        {% for gap in skill_gaps %}
+                            <div class="skill-gap-item">
+                                <span class="skill-name">{{ gap.skill }}</span>
+                                <span class="skill-hours">{{ gap.estimated_learning_hours }} 小时</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>暂无技能差距分析</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

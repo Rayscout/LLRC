@@ -4,349 +4,1549 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>绩效记录 - 员工仪表板</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* 动态背景 - 采用HR界面的优雅渐变晕染设计 */
+        .performance-parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        /* 微妙的渐变晕染背景装饰 */
+        .performance-parallax-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(144, 238, 144, 0.12) 0%, transparent 70%), /* 左下角光晕 - 淡绿色 */
+                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(152, 251, 152, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(173, 255, 47, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(50, 205, 50, 0.08) 0%, transparent 70%), /* 右下角光晕 - 淡绿色 */
+                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(34, 139, 34, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 60s ease-in-out infinite;
+        }
+        
+        /* 添加彩色光晕装饰 */
+        .performance-parallax-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 400px 300px at 15% 85%, rgba(255, 107, 107, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 300px 400px at 85% 15%, rgba(78, 205, 196, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 500px 250px at 45% 45%, rgba(69, 183, 209, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 350px 450px at 88% 65%, rgba(150, 206, 180, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse 250px 350px at 12% 25%, rgba(255, 234, 167, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 80s ease-in-out infinite reverse;
+        }
+        
+        /* 半透明遮罩层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            z-index: -1;
+        }
+        
+        /* 微妙的渐变晕染动画 */
+        @keyframes gentleDrift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: translate(30px, -20px) scale(1.01);
+                opacity: 0.98;
+            }
+            50% {
+                transform: translate(-25px, 35px) scale(0.99);
+                opacity: 1.02;
+            }
+            75% {
+                transform: translate(20px, 25px) scale(1.005);
+                opacity: 0.99;
+            }
+        }
+        
+        /* 添加卡片入场动画 */
+        @keyframes cardEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .performance-card {
+            animation: cardEntrance 0.6s ease-out;
+        }
+        
+        .performance-card:nth-child(1) { animation-delay: 0.1s; }
+        .performance-card:nth-child(2) { animation-delay: 0.2s; }
+        .performance-card:nth-child(3) { animation-delay: 0.3s; }
+        .performance-card:nth-child(4) { animation-delay: 0.4s; }
+        .performance-card:nth-child(5) { animation-delay: 0.5s; }
+        
+        /* 添加图标呼吸动画 */
+        @keyframes iconBreath {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .card-title i {
+            animation: iconBreath 3s ease-in-out infinite;
+        }
+        
+        /* 返回按钮 - 固定在左上角 */
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #7FB069, #9DC183); /* 柔和的薄荷绿渐变 */
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(127, 176, 105, 0.4);
+            border: none;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(127, 176, 105, 0.6);
+            background: linear-gradient(135deg, #9DC183, #7FB069);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .back-button i {
+            font-size: 1.2rem;
+        }
+        
+        /* 导航栏样式 */
+        .top-navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(26, 77, 26, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            padding: 0;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a4d1a;
+        }
+        
+        .nav-brand i {
+            font-size: 1.8rem;
+            color: #2d5a2d;
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            color: #2d5a2d;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .nav-item:hover {
+            background: rgba(26, 77, 26, 0.08);
+            color: #1a4d1a;
+            transform: translateY(-1px);
+        }
+        
+        .nav-item i {
+            font-size: 1rem;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2d5a2d, #1a4d1a);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 90, 45, 0.3);
+        }
+        
+        .nav-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 90, 45, 0.4);
+            background: linear-gradient(135deg, #1a4d1a, #2d5a2d);
+        }
+        
+        .nav-logout i {
+            font-size: 1rem;
+        }
+        
+        /* 调整主容器位置，避免被导航栏遮挡 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: transparent;
+            border-radius: 15px;
+            overflow: hidden;
+            padding-top: 100px; /* 顶部增加100px的padding */
         }
         
         .performance-container {
-            padding: 2rem 0;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 20px 20px 20px; /* 顶部增加padding为返回按钮留空间 */
+            position: relative;
+            z-index: 1;
         }
         
-        .card {
-            background: rgba(228, 246, 236, 0.3);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(228, 246, 236, 0.3);
-            margin-bottom: 2rem;
+        /* 页面标题卡片 */
+        .page-header-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
         
-        .card-header {
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
-            color: white;
-            border-radius: 15px 15px 0 0 !important;
-            padding: 1.5rem;
+        /* 为页面标题添加简洁的白色边框 */
+        .page-header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #ffffff;
+            border-radius: 25px 25px 0 0;
         }
-        
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: conic-gradient(#20B2AA 0deg, #20B2AA var(--score), #e9ecef var(--score), #e9ecef 360deg);
+
+        .page-header-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .page-title {
+            color: #1a4d1a;
+            font-size: 2.2em;
+            font-weight: 700;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto;
-            position: relative;
+            gap: 20px;
         }
-        
+
+        .page-title i {
+            color: #FF6B6B; /* 珊瑚红 - 活力色彩 */
+            font-size: 1.2em;
+            background: rgba(255, 107, 107, 0.15);
+            padding: 15px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .page-header-card:hover .page-title i {
+            transform: rotate(10deg) scale(1.1);
+            background: rgba(255, 107, 107, 0.25);
+        }
+
+        .page-subtitle {
+            color: #2d5a2d;
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #2d5a2d, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(45, 90, 45, 0.1);
+            color: #2d5a2d;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(45, 90, 45, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 为按钮添加彩色边框装饰 */
+        .btn-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn-header:hover::before {
+            opacity: 0.1;
+        }
+
+        .btn-header:hover {
+            background: rgba(45, 90, 45, 0.15);
+            color: #1a4d1a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 90, 45, 0.2);
+            text-decoration: none;
+        }
+
+        /* 内容卡片网格 */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px; /* 增加间距 */
+            margin-bottom: 40px; /* 增加间距 */
+        }
+
+        /* 卡片基础样式 */
+        .performance-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 40px; /* 增加内边距 */
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer; /* 添加指针样式 */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 为卡片添加简洁的白色边框 */
+        .performance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #ffffff;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .performance-card:hover::before {
+            opacity: 0;
+        }
+
+        .performance-card:hover {
+            transform: translateY(-8px); /* 增加悬停效果 */
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .card-title {
+            color: #1a4d1a;
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 30px; /* 增加间距 */
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(26, 77, 26, 0.2);
+        }
+
+        .card-title i {
+            color: #4ECDC4; /* 青绿色 - 统一主题色 */
+            font-size: 1.2em;
+            background: rgba(78, 205, 196, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        /* 为不同类型的卡片图标添加不同的主题色 */
+        .performance-card:nth-child(3n+1) .card-title i {
+            color: #FF6B6B; /* 珊瑚红 */
+            background: rgba(255, 107, 107, 0.15);
+        }
+
+        .performance-card:nth-child(3n+2) .card-title i {
+            color: #4ECDC4; /* 青绿色 */
+            background: rgba(78, 205, 196, 0.15);
+        }
+
+        .performance-card:nth-child(3n+3) .card-title i {
+            color: #45B7D1; /* 天蓝色 */
+            background: rgba(69, 183, 209, 0.15);
+        }
+
+        .performance-card:hover .card-title i {
+            transform: rotate(5deg) scale(1.1);
+            background: rgba(78, 205, 196, 0.25);
+        }
+
+        /* 为不同卡片标题添加协调的彩色边框 */
+        .performance-card:nth-child(3n+1) .card-title {
+            border-bottom: 2px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .performance-card:nth-child(3n+2) .card-title {
+            border-bottom: 2px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .performance-card:nth-child(3n+3) .card-title {
+            border-bottom: 2px solid rgba(69, 183, 209, 0.3);
+        }
+
+        /* 评分圆圈 - 使用丰富的渐变色彩 */
+        .score-circle {
+            width: 160px; /* 增大尺寸 */
+            height: 160px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #FF6B6B 0deg, 
+                #FF6B6B calc(var(--score) * 0.2), 
+                #4ECDC4 calc(var(--score) * 0.2), 
+                #4ECDC4 calc(var(--score) * 0.4), 
+                #45B7D1 calc(var(--score) * 0.4), 
+                #45B7D1 calc(var(--score) * 0.6), 
+                #96CEB4 calc(var(--score) * 0.6), 
+                #96CEB4 calc(var(--score) * 0.8), 
+                #FFEAA7 calc(var(--score) * 0.8), 
+                #FFEAA7 var(--score), 
+                #e9ecef var(--score), 
+                #e9ecef 360deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            position: relative;
+            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .score-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 45px rgba(255, 107, 107, 0.4);
+        }
+
+        /* 为评分圆圈添加丰富的彩色光晕效果 */
+        .score-circle::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: conic-gradient(
+                rgba(255, 107, 107, 0.1) 0deg, 
+                rgba(78, 205, 196, 0.1) 90deg, 
+                rgba(69, 183, 209, 0.1) 180deg, 
+                rgba(150, 206, 180, 0.1) 270deg, 
+                rgba(255, 234, 167, 0.1) 360deg
+            );
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .score-circle:hover::after {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
         .score-circle::before {
             content: '';
             position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             background: white;
             border-radius: 50%;
         }
-        
+
         .score-text {
             position: relative;
             z-index: 1;
-            font-size: 1.5rem;
+            font-size: 2.2rem;
             font-weight: bold;
-            color: #20B2AA;
-        }
-        
-        .progress-bar {
-            height: 10px;
-            border-radius: 5px;
-            background: #e9ecef;
-            overflow: hidden;
-            margin: 0.5rem 0;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
-            transition: width 0.3s ease;
-        }
-        
-        .metric-card {
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid #20B2AA;
-        }
-        
-        .goal-status {
-            padding: 0.25rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .status-completed { background: #d4edda; color: #155724; }
-        .status-ongoing { background: #fff3cd; color: #856404; }
-        .status-pending { background: #f8d7da; color: #721c24; }
-        
-        .btn-custom {
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
-            border: none;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #45B7D1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             transition: all 0.3s ease;
         }
-        
-        .btn-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(32, 178, 170, 0.4);
-            color: white;
+
+        .score-circle:hover .score-text {
+            transform: scale(1.1);
         }
-        
-        .skill-score {
+
+        .score-label {
+            color: #2d5a2d;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #2d5a2d, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+
+        .score-circle:hover + .score-label {
+            transform: scale(1.05);
+        }
+
+        .score-badges {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .score-badge {
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #A8D5BA, #B8E6B8); /* 柔和的薄荷绿渐变 */
+            color: #2d5a2d;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 为徽章添加丰富的彩色装饰 */
+        .score-badge:nth-child(2n+1) {
+            background: linear-gradient(135deg, #FFEAA7, #FFF0C7);
+            color: #B45309;
+        }
+
+        .score-badge:nth-child(2n+2) {
+            background: linear-gradient(135deg, #A8D5BA, #B8E6B8);
+            color: #2d5a2d;
+        }
+
+        .score-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: all 0.5s ease;
+        }
+
+        .score-badge:hover::before {
+            left: 100%;
+        }
+
+        .score-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(168, 213, 186, 0.4);
+        }
+
+        /* 目标完成情况 */
+        .goal-item {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 25px; /* 增加内边距 */
+            margin-bottom: 20px; /* 增加间距 */
+            border: 1px solid rgba(45, 90, 45, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .goal-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* 为目标项添加悬停时的丰富彩色边框 */
+        .goal-item:nth-child(3n+1):hover {
+            border: 1px solid rgba(255, 234, 167, 0.4);
+            box-shadow: 0 10px 30px rgba(255, 234, 167, 0.15);
+        }
+
+        .goal-item:nth-child(3n+2):hover {
+            border: 1px solid rgba(255, 107, 107, 0.4);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.15);
+        }
+
+        .goal-item:nth-child(3n+3):hover {
+            border: 1px solid rgba(78, 205, 196, 0.4);
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.15);
+        }
+
+        .goal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 20px;
         }
-        
+
+        .goal-name {
+            color: #1a4d1a;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .goal-status {
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .status-completed { 
+            background: linear-gradient(135deg, #96CEB4, #A8D5BA); /* 薄荷绿 */
+            color: #1a4d1a; 
+            border: none;
+        }
+        .status-ongoing { 
+            background: linear-gradient(135deg, #FFEAA7, #FFF0C7); /* 金黄色 */
+            color: #B45309; 
+            border: none;
+        }
+        .status-pending { 
+            background: linear-gradient(135deg, #FFB6C1, #FFC0CB); /* 柔和的粉红色 */
+            color: #721c24; 
+            border: none;
+        }
+
+        .goal-status:hover {
+            transform: scale(1.05);
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            height: 15px; /* 增加高度 */
+            border-radius: 8px;
+            background: rgba(45, 90, 45, 0.1);
+            overflow: hidden;
+            margin: 20px 0; /* 增加间距 */
+            border: 1px solid rgba(45, 90, 45, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4ECDC4, #45B7D1); /* 青绿色渐变 */
+            transition: width 0.5s ease;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 为进度条添加光泽效果 */
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* 为不同位置的进度条添加丰富的彩色填充 */
+        .skill-item:nth-child(5n+1) .progress-fill {
+            background: linear-gradient(135deg, #F59E0B, #FCD34D); /* 金黄色渐变 */
+        }
+
+        .skill-item:nth-child(5n+2) .progress-fill {
+            background: linear-gradient(135deg, #EC4899, #F472B6); /* 珊瑚红渐变 */
+        }
+
+        .skill-item:nth-child(5n+3) .progress-fill {
+            background: linear-gradient(135deg, #10B981, #34D399); /* 青绿色渐变 */
+        }
+
+        .skill-item:nth-child(5n+4) .progress-fill {
+            background: linear-gradient(135deg, #3B82F6, #60A5FA); /* 天蓝色渐变 */
+        }
+
+        .skill-item:nth-child(5n+5) .progress-fill {
+            background: linear-gradient(135deg, #059669, #10B981); /* 深绿色渐变 */
+        }
+
+        /* 目标进度条丰富彩色填充 */
+        .goal-item:nth-child(3n+1) .progress-fill {
+            background: linear-gradient(135deg, #F59E0B, #FCD34D); /* 金黄色渐变 */
+        }
+
+        .goal-item:nth-child(3n+2) .progress-fill {
+            background: linear-gradient(135deg, #EC4899, #F472B6); /* 珊瑚红渐变 */
+        }
+
+        .goal-item:nth-child(3n+3) .progress-fill {
+            background: linear-gradient(135deg, #10B981, #34D399); /* 青绿色渐变 */
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            color: #2d5a2d;
+            margin-top: 10px;
+        }
+
+        /* 技能评估 */
+        .skill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px; /* 增加间距 */
+            padding: 20px; /* 增加内边距 */
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 18px;
+            border: 1px solid rgba(45, 90, 45, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* 为技能评估项添加丰富的彩色背景 */
+        .skill-item:nth-child(5n+1) {
+            background: linear-gradient(135deg, rgba(255, 234, 167, 0.2), rgba(255, 234, 167, 0.1));
+            border: 1px solid rgba(255, 234, 167, 0.3);
+        }
+
+        .skill-item:nth-child(5n+2) {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 107, 107, 0.1));
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+
+        .skill-item:nth-child(5n+3) {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 193, 7, 0.1));
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .skill-item:nth-child(5n+4) {
+            background: linear-gradient(135deg, rgba(69, 183, 209, 0.2), rgba(69, 183, 209, 0.1));
+            border: 1px solid rgba(69, 183, 209, 0.3);
+        }
+
+        .skill-item:nth-child(5n+5) {
+            background: linear-gradient(135deg, rgba(150, 206, 180, 0.2), rgba(150, 206, 180, 0.1));
+            border: 1px solid rgba(150, 206, 180, 0.3);
+        }
+
+        .skill-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 为技能评估项添加悬停时的丰富彩色边框 */
+        .skill-item:nth-child(5n+1):hover {
+            border: 1px solid rgba(255, 234, 167, 0.6);
+            box-shadow: 0 8px 25px rgba(255, 234, 167, 0.2);
+        }
+
+        .skill-item:nth-child(5n+2):hover {
+            border: 1px solid rgba(255, 107, 107, 0.6);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.2);
+        }
+
+        .skill-item:nth-child(5n+3):hover {
+            border: 1px solid rgba(255, 193, 7, 0.6);
+            box-shadow: 0 8px 25px rgba(255, 193, 7, 0.2);
+        }
+
+        .skill-item:nth-child(5n+4):hover {
+            border: 1px solid rgba(69, 183, 209, 0.6);
+            box-shadow: 0 8px 25px rgba(69, 183, 209, 0.2);
+        }
+
+        .skill-item:nth-child(5n+5):hover {
+            border: 1px solid rgba(150, 206, 180, 0.6);
+            box-shadow: 0 8px 25px rgba(150, 206, 180, 0.2);
+        }
+
         .skill-name {
             font-weight: 600;
-            color: #2F4F4F;
+            color: #1a4d1a;
+            font-size: 1em;
         }
-        
+
+        /* 技能区域布局 */
+        .skill-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .skill-section {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(78, 205, 196, 0.2);
+        }
+
+        .section-title {
+            color: #1a4d1a;
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(78, 205, 196, 0.3);
+        }
+
         .skill-value {
             font-weight: bold;
-            color: #20B2AA;
+            color: #4ECDC4; /* 青绿色 - 统一主题色 */
+            font-size: 1.1em;
+        }
+
+        /* 为技能值添加丰富的彩色文字 */
+        .skill-item:nth-child(5n+1) .skill-value {
+            color: #D4A017; /* 金黄色 */
+        }
+
+        .skill-item:nth-child(5n+2) .skill-value {
+            color: #D63384; /* 珊瑚红 */
+        }
+
+        .skill-item:nth-child(5n+3) .skill-value {
+            color: #D4A017; /* 金黄色 */
+        }
+
+        .skill-item:nth-child(5n+4) .skill-value {
+            color: #0EA5E9; /* 天蓝色 */
+        }
+
+        .skill-item:nth-child(5n+5) .skill-value {
+            color: #059669; /* 深绿色 */
+        }
+
+        /* 绩效趋势 */
+        .trend-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px; /* 增加间距 */
+            margin-bottom: 35px; /* 增加间距 */
+        }
+
+        .trend-item {
+            text-align: center;
+            padding: 25px; /* 增加内边距 */
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            border: 1px solid rgba(45, 90, 45, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 为趋势项添加丰富的彩色背景 */
+        .trend-item:nth-child(4n+1) {
+            background: linear-gradient(135deg, rgba(255, 234, 167, 0.3), rgba(255, 234, 167, 0.1));
+            border: 1px solid rgba(255, 234, 167, 0.4);
+        }
+
+        .trend-item:nth-child(4n+2) {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(255, 107, 107, 0.1));
+            border: 1px solid rgba(255, 107, 107, 0.4);
+        }
+
+        .trend-item:nth-child(4n+3) {
+            background: linear-gradient(135deg, rgba(78, 205, 196, 0.3), rgba(78, 205, 196, 0.1));
+            border: 1px solid rgba(78, 205, 196, 0.4);
+        }
+
+        .trend-item:nth-child(4n+4) {
+            background: linear-gradient(135deg, rgba(69, 183, 209, 0.3), rgba(69, 183, 209, 0.1));
+            border: 1px solid rgba(69, 183, 209, 0.4);
+        }
+
+        .trend-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 为趋势项添加悬停时的丰富彩色边框 */
+        .trend-item:nth-child(4n+1):hover {
+            border: 1px solid rgba(255, 234, 167, 0.8);
+            box-shadow: 0 12px 35px rgba(255, 234, 167, 0.3);
+        }
+
+        .trend-item:nth-child(4n+2):hover {
+            border: 1px solid rgba(255, 107, 107, 0.8);
+            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.3);
+        }
+
+        .trend-item:nth-child(4n+3):hover {
+            border: 1px solid rgba(78, 205, 196, 0.8);
+            box-shadow: 0 12px 35px rgba(78, 205, 196, 0.3);
+        }
+
+        .trend-item:nth-child(4n+4):hover {
+            border: 1px solid rgba(69, 183, 209, 0.8);
+            box-shadow: 0 12px 35px rgba(69, 183, 209, 0.3);
+        }
+
+        .trend-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #4ECDC4; /* 青绿色 - 统一主题色 */
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        /* 为趋势值添加丰富的彩色文字 */
+        .trend-item:nth-child(4n+1) .trend-value {
+            color: #D4A017; /* 金黄色 */
+        }
+
+        .trend-item:nth-child(4n+2) .trend-value {
+            color: #D63384; /* 珊瑚红 */
+        }
+
+        .trend-item:nth-child(4n+3) .trend-value {
+            color: #0CA678; /* 青绿色 */
+        }
+
+        .trend-item:nth-child(4n+4) .trend-value {
+            color: #0EA5E9; /* 天蓝色 */
+        }
+
+        .trend-item:hover .trend-value {
+            transform: scale(1.1);
+        }
+
+        .trend-label {
+            color: #2d5a2d;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        /* 为趋势标签添加丰富的彩色文字 */
+        .trend-item:nth-child(4n+1) .trend-label {
+            color: #B45309; /* 深金黄色 */
+        }
+
+        .trend-item:nth-child(4n+2) .trend-label {
+            color: #BE185D; /* 深珊瑚红 */
+        }
+
+        .trend-item:nth-child(4n+3) .trend-label {
+            color: #047857; /* 深青绿色 */
+        }
+
+        .trend-item:nth-child(4n+4) .trend-label {
+            color: #0369A1; /* 深天蓝色 */
+        }
+
+        /* 建议卡片 */
+        .suggestion-card {
+            background: linear-gradient(135deg, rgba(168, 213, 186, 0.2), rgba(184, 230, 184, 0.2)); /* 柔和的薄荷绿渐变 */
+            border: 1px solid rgba(168, 213, 186, 0.4);
+            border-radius: 20px;
+            padding: 25px; /* 增加内边距 */
+            margin-top: 25px; /* 增加间距 */
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 为建议卡片添加简洁的白色边框 */
+        .suggestion-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #ffffff;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .suggestion-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(168, 213, 186, 0.3);
+        }
+
+        .suggestion-title {
+            color: #1a4d1a;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .suggestion-title i {
+            color: #D4A5A5; /* 柔和的玫瑰粉 */
+            font-size: 1.1em;
+            background: rgba(212, 165, 165, 0.15);
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-card:hover .suggestion-title i {
+            transform: rotate(5deg) scale(1.1);
+            background: rgba(212, 165, 165, 0.25);
+        }
+
+        .suggestion-content {
+            color: #2d5a2d;
+            line-height: 1.7;
+        }
+
+        /* 快速操作 */
+        .quick-actions {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 40px; /* 增加内边距 */
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 40px; /* 增加顶部间距 */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 为快速操作区域添加简洁的白色边框 */
+        .quick-actions::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #ffffff;
+            border-radius: 25px 25px 0 0;
+        }
+
+        .quick-actions:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .quick-actions .card-title {
+            color: #1a4d1a;
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(26, 77, 26, 0.2);
+        }
+
+        .quick-actions .card-title i {
+            color: #FF6B6B; /* 珊瑚红 */
+            font-size: 1.2em;
+            background: rgba(255, 107, 107, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .quick-actions:hover .card-title i {
+            transform: rotate(5deg) scale(1.1);
+            background: rgba(255, 107, 107, 0.25);
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* 增加最小宽度 */
+            gap: 25px; /* 增加间距 */
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 22px 28px; /* 增加内边距 */
+            background: rgba(45, 90, 45, 0.1);
+            color: #2d5a2d;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(45, 90, 45, 0.2);
+            min-height: 70px; /* 增加高度 */
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: rgba(45, 90, 45, 0.15);
+            color: #1a4d1a;
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(45, 90, 45, 0.2);
+            text-decoration: none;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #4ECDC4, #45B7D1); /* 青绿色渐变 */
+            color: white;
+            border: none;
+        }
+
+        .action-btn.primary:hover {
+            background: linear-gradient(135deg, #45B7D1, #4ECDC4);
+            color: white;
+        }
+
+        .action-btn i {
+            font-size: 1.3em;
+            transition: all 0.3s ease;
+        }
+
+        /* 为快速操作按钮添加丰富的彩色图标 */
+        .action-btn:nth-child(3n+1) i {
+            color: #F59E0B; /* 金黄色 */
+        }
+
+        .action-btn:nth-child(3n+2) i {
+            color: #EC4899; /* 珊瑚红 */
+        }
+
+        .action-btn:nth-child(3n+3) i {
+            color: #10B981; /* 青绿色 */
+        }
+
+        .action-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* 为快速操作按钮添加丰富的彩色悬停效果 */
+        .action-btn:nth-child(3n+1):hover {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .action-btn:nth-child(3n+2):hover {
+            background: rgba(236, 72, 153, 0.1);
+            border-color: rgba(236, 72, 153, 0.3);
+        }
+
+        .action-btn:nth-child(3n+3):hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .trend-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .performance-container {
+                padding: 70px 15px 15px 15px;
+            }
+            
+            .page-header-card,
+            .performance-card,
+            .quick-actions {
+                padding: 30px;
+            }
+            
+            .trend-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+            }
+            
+            .btn-header {
+                text-align: center;
+                justify-content: center;
+            }
+            
+            .score-circle {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .score-circle::before {
+                width: 85px;
+                height: 85px;
+            }
+            
+            /* 移动端导航栏适配 */
+            .nav-container {
+                padding: 10px 20px;
+            }
+            
+            .nav-menu {
+                display: none; /* 移动端隐藏导航菜单 */
+            }
+            
+            .container {
+                padding-top: 120px; /* 移动端增加更多顶部间距 */
+            }
         }
     </style>
 </head>
 <body>
-    <div class="performance-container">
-        <div class="container">
+    <!-- 动态背景 -->
+    <div class="performance-parallax-bg"></div>
+    <div class="overlay-layer"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="top-navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-user-tie"></i>
+                <span>员工平台</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>员工仪表盘</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.profile.profile_dashboard') }}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>个人资料</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.performance.performance_dashboard') }}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>绩效分析</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.learning_recommendation.dashboard') }}" class="nav-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>学习中心</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="nav-item">
+                    <i class="fas fa-bullseye"></i>
+                    <span>目标设定</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.feedback.feedback_dashboard') }}" class="nav-item">
+                    <i class="fas fa-comments"></i>
+                    <span>反馈管理</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.projects.projects_dashboard') }}" class="nav-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>项目经验</span>
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <a href="{{ url_for('common.auth.logout') }}" class="nav-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出登录</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 调整主容器位置，避免被导航栏遮挡 -->
+    <div class="container">
+        <div class="performance-container">
             <!-- 页面标题 -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h2 class="mb-0">
-                                        <i class="fas fa-chart-line me-2"></i>
-                                        绩效记录
-                                    </h2>
-                                    <p class="mb-0 mt-2">查看您的绩效表现和成长轨迹</p>
-                                </div>
-                                <div class="text-end">
-                                    <a href="{{ url_for('talent_management.employee_manager.performance.performance_history') }}" class="btn btn-light">
-                                        <i class="fas fa-history me-2"></i>历史记录
-                                    </a>
-                                    <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="btn btn-outline-light ms-2">
-                                        <i class="fas fa-arrow-left me-2"></i>返回仪表板
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="page-header-card">
+                <div class="page-title">
+                    <i class="fas fa-chart-line"></i>
+                    绩效记录
+                </div>
+                <div class="page-subtitle">查看您的绩效表现和成长轨迹</div>
+                <div class="header-actions">
+                    <a href="{{ url_for('talent_management.employee_manager.performance.performance_history') }}" class="btn-header">
+                        <i class="fas fa-history"></i>历史记录
+                    </a>
                 </div>
             </div>
 
-            <!-- 综合评分 -->
-            <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h4 class="mb-3">综合评分</h4>
-                            <div class="score-circle" style="--score: {{ performance_data.overall_score * 3.6 }}deg">
-                                <div class="score-text">{{ performance_data.overall_score }}</div>
-                            </div>
-                            <p class="text-muted mt-3">满分 100 分</p>
-                            <div class="mt-3">
-                                <span class="badge bg-primary">{{ performance_data.current_month }}月</span>
-                                <span class="badge bg-success">{{ performance_data.current_year }}年</span>
-                            </div>
-                        </div>
+            <!-- 综合评分和目标完成情况 -->
+            <div class="content-grid">
+                <!-- 综合评分 -->
+                <div class="performance-card">
+                    <div class="card-title">
+                        <i class="fas fa-star"></i>
+                        综合评分
+                    </div>
+                    <div class="score-circle" style="--score: {{ performance_data.overall_score * 3.6 }}deg">
+                        <div class="score-text">{{ performance_data.overall_score }}</div>
+                    </div>
+                    <div class="score-label">满分 100 分</div>
+                    <div class="score-badges">
+                        <span class="score-badge">{{ performance_data.current_month }}月</span>
+                        <span class="score-badge">{{ performance_data.current_year }}年</span>
                     </div>
                 </div>
                 
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="mb-0">
-                                <i class="fas fa-tasks me-2"></i>
-                                月度目标完成情况
-                            </h4>
+                <!-- 月度目标完成情况 -->
+                <div class="performance-card">
+                    <div class="card-title">
+                        <i class="fas fa-tasks"></i>
+                        月度目标完成情况
+                    </div>
+                    {% for goal in performance_data.monthly_goals %}
+                        <div class="goal-item">
+                            <div class="goal-header">
+                                <div class="goal-name">{{ goal.name }}</div>
+                                <span class="goal-status status-{{ goal.status }}">
+                                    {{ goal.status }}
+                                </span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ goal.progress }}%"></div>
+                            </div>
+                            <div class="progress-info">
+                                <small>完成进度: {{ goal.progress }}%</small>
+                                <small>截止日期: {{ goal.deadline }}</small>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            {% for goal in performance_data.monthly_goals %}
-                                <div class="metric-card">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h6 class="mb-0">{{ goal.name }}</h6>
-                                        <span class="goal-status status-{{ goal.status }}">
-                                            {{ goal.status }}
-                                        </span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: {{ goal.progress }}%"></div>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small class="text-muted">完成进度: {{ goal.progress }}%</small>
-                                        <small class="text-muted">截止日期: {{ goal.deadline }}</small>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 绩效指标详情 -->
+            <div class="performance-card">
+                <div class="card-title">
+                    <i class="fas fa-chart-bar"></i>
+                    绩效指标详情
+                </div>
+                <div class="skill-sections">
+                    <div class="skill-section">
+                        <h6 class="section-title">基础绩效指标</h6>
+                        {% for metric, score in performance_data.base_performance.items() %}
+                            <div class="skill-item">
+                                <span class="skill-name">
+                                    {% if metric == 'work_quality' %}工作质量
+                                    {% elif metric == 'work_efficiency' %}工作效率
+                                    {% elif metric == 'teamwork' %}团队协作
+                                    {% elif metric == 'initiative' %}主动性
+                                    {% elif metric == 'learning_ability' %}学习能力
+                                    {% else %}{{ metric }}{% endif %}
+                                </span>
+                                <span class="skill-value">{{ score }}分</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ score }}%"></div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="skill-section">
+                        <h6 class="section-title">技能评估</h6>
+                        {% for skill, score in performance_data.skill_assessment.items() %}
+                            <div class="skill-item">
+                                <span class="skill-name">
+                                    {% if skill == 'technical_skills' %}技术技能
+                                    {% elif skill == 'communication' %}沟通能力
+                                    {% elif skill == 'leadership' %}领导力
+                                    {% elif skill == 'problem_solving' %}问题解决
+                                    {% elif skill == 'adaptability' %}适应能力
+                                    {% else %}{{ skill }}{% endif %}
+                                </span>
+                                <span class="skill-value">{{ score }}分</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ score }}%"></div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
 
-            <!-- 绩效指标 -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="mb-0">
-                                <i class="fas fa-chart-bar me-2"></i>
-                                绩效指标详情
-                            </h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6 class="mb-3">基础绩效指标</h6>
-                                    {% for metric, score in performance_data.base_performance.items() %}
-                                        <div class="skill-score">
-                                            <span class="skill-name">
-                                                {% if metric == 'work_quality' %}工作质量
-                                                {% elif metric == 'work_efficiency' %}工作效率
-                                                {% elif metric == 'teamwork' %}团队协作
-                                                {% elif metric == 'initiative' %}主动性
-                                                {% elif metric == 'learning_ability' %}学习能力
-                                                {% else %}{{ metric }}{% endif %}
-                                            </span>
-                                            <span class="skill-value">{{ score }}分</span>
-                                        </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: {{ score }}%"></div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                
-                                <div class="col-md-6">
-                                    <h6 class="mb-3">技能评估</h6>
-                                    {% for skill, score in performance_data.skill_assessment.items() %}
-                                        <div class="skill-score">
-                                            <span class="skill-name">
-                                                {% if skill == 'technical_skills' %}技术技能
-                                                {% elif skill == 'communication' %}沟通能力
-                                                {% elif skill == 'leadership' %}领导力
-                                                {% elif skill == 'problem_solving' %}问题解决
-                                                {% elif skill == 'adaptability' %}适应能力
-                                                {% else %}{{ skill }}{% endif %}
-                                            </span>
-                                            <span class="skill-value">{{ score }}分</span>
-                                        </div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: {{ score }}%"></div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
+            <!-- 绩效趋势分析 -->
+            <div class="performance-card">
+                <div class="card-title">
+                    <i class="fas fa-trending-up"></i>
+                    绩效趋势分析
+                </div>
+                <div class="trend-grid">
+                    <div class="trend-item">
+                        <div class="trend-value">{{ performance_data.base_performance.work_quality }}</div>
+                        <div class="trend-label">工作质量</div>
+                    </div>
+                    <div class="trend-item">
+                        <div class="trend-value">{{ performance_data.base_performance.teamwork }}</div>
+                        <div class="trend-label">团队协作</div>
+                    </div>
+                    <div class="trend-item">
+                        <div class="trend-value">{{ performance_data.base_performance.initiative }}</div>
+                        <div class="trend-label">主动性</div>
+                    </div>
+                    <div class="trend-item">
+                        <div class="trend-value">{{ performance_data.base_performance.learning_ability }}</div>
+                        <div class="trend-label">学习能力</div>
+                    </div>
+                </div>
+                
+                <div class="suggestion-card">
+                    <div class="suggestion-title">
+                        <i class="fas fa-lightbulb"></i>
+                        绩效建议
+                    </div>
+                    <div class="suggestion-content">
+                        基于您的绩效表现，建议重点关注工作效率的提升，可以通过参加相关培训课程来增强技能。
                     </div>
                 </div>
             </div>
-
-            <!-- 绩效趋势 -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="mb-0">
-                                <i class="fas fa-trending-up me-2"></i>
-                                绩效趋势分析
-                            </h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="text-center">
-                                        <h5 class="text-primary">{{ performance_data.base_performance.work_quality }}</h5>
-                                        <p class="text-muted">工作质量</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="text-center">
-                                        <h5 class="text-success">{{ performance_data.base_performance.teamwork }}</h5>
-                                        <p class="text-muted">团队协作</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="text-center">
-                                        <h5 class="text-warning">{{ performance_data.base_performance.initiative }}</h5>
-                                        <p class="text-muted">主动性</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="text-center">
-                                        <h5 class="text-info">{{ performance_data.base_performance.learning_ability }}</h5>
-                                        <p class="text-muted">学习能力</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-4">
-                                <h6>绩效建议：</h6>
-                                <div class="alert alert-info">
-                                    <i class="fas fa-lightbulb me-2"></i>
-                                    基于您的绩效表现，建议重点关注工作效率的提升，可以通过参加相关培训课程来增强技能。
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            
 
             <!-- 快速操作 -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="mb-0">
-                                <i class="fas fa-rocket me-2"></i>
-                                快速操作
-                            </h4>
-                        </div>
-                        <div class="card-body text-center">
-                            <a href="{{ url_for('talent_management.employee_manager.learning_recommendation.dashboard') }}" class="btn btn-custom me-3">
-                                <i class="fas fa-graduation-cap me-2"></i>查看学习推荐
-                            </a>
-                            <a href="{{ url_for('talent_management.employee_manager.projects.projects_dashboard') }}" class="btn btn-outline-primary me-3">
-                                <i class="fas fa-project-diagram me-2"></i>项目经验
-                            </a>
-                            <a href="{{ url_for('talent_management.employee_manager.profile.profile_dashboard') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-user me-2"></i>个人资料
-                            </a>
-                        </div>
-                    </div>
+            <div class="quick-actions">
+                <div class="card-title">
+                    <i class="fas fa-rocket"></i>
+                    快速操作
+                </div>
+                <div class="actions-grid">
+                    <a href="{{ url_for('talent_management.employee_manager.learning_recommendation.dashboard') }}" class="action-btn primary">
+                        <i class="fas fa-graduation-cap"></i>
+                        查看学习推荐
+                    </a>
+                    <a href="{{ url_for('talent_management.employee_manager.projects.projects_dashboard') }}" class="action-btn">
+                        <i class="fas fa-project-diagram"></i>
+                        项目经验
+                    </a>
+                    <a href="{{ url_for('talent_management.employee_manager.profile.profile_dashboard') }}" class="action-btn">
+                        <i class="fas fa-user"></i>
+                        个人资料
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js">    </script>
     
     <!-- 引入图标颜色随机分配器 -->
     <script src="{{ url_for('static', filename='js/icon_color_randomizer.js') }}"></script>

@@ -11,19 +11,29 @@
     <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #F2F2F7;
-            --bg-secondary: rgba(255, 255, 255, 0.8);
-            --bg-card: rgba(255, 255, 255, 0.9);
-            --text-primary: #1D1D1F;
-            --text-secondary: #86868B;
-            --text-tertiary: #C7C7CC;
-            --accent-blue: #007AFF;
+            --bg-primary: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
+            --bg-secondary: rgba(228, 246, 236, 0.3);
+            --bg-card: rgba(228, 246, 236, 0.3);
+            --text-primary: #2F4F4F;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --accent-blue: #20B2AA;
             --accent-green: #34C759;
             --accent-orange: #FF9500;
             --accent-red: #FF3B30;
-            --accent-purple: #AF52DE;
-            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --accent-purple: #8A2BE2;
+            --accent-teal: #00CED1;
+            --accent-coral: #FF7F50;
+            --accent-gold: #FFD700;
+            --accent-pink: #FF69B4;
+            --accent-cyan: #00FFFF;
+            --accent-lime: #32CD32;
+            --accent-indigo: #4B0082;
+            --accent-violet: #EE82EE;
+            --accent-salmon: #FA8072;
+            --accent-turquoise: #40E0D0;
+            --shadow-light: 0 4px 20px rgba(228, 246, 236, 0.3);
+            --shadow-medium: 0 8px 30px rgba(228, 246, 236, 0.3);
             --border-radius: 16px;
             --border-radius-large: 24px;
             --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
@@ -42,6 +52,16 @@
             --accent-orange: #FF9F0A;
             --accent-red: #FF453A;
             --accent-purple: #BF5AF2;
+            --accent-teal: #64D2FF;
+            --accent-coral: #FF6B6B;
+            --accent-gold: #FFD60A;
+            --accent-pink: #FF2D92;
+            --accent-cyan: #00E5FF;
+            --accent-lime: #30D158;
+            --accent-indigo: #5E5CE6;
+            --accent-violet: #DA70D6;
+            --accent-salmon: #FF6B6B;
+            --accent-turquoise: #40E0D0;
             --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
             --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
@@ -53,14 +73,78 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
             color: var(--text-primary);
             line-height: 1.6;
             transition: var(--transition);
             animation: fadeIn 0.6s ease-out;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 动态背景 - 采用HR界面的优雅渐变晕染设计 */
+        .feedback-parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        /* 微妙的渐变晕染背景装饰 */
+        .feedback-parallax-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(144, 238, 144, 0.12) 0%, transparent 70%), /* 左下角光晕 - 更绿更明显 */
+                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(152, 251, 152, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(173, 255, 47, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(50, 205, 50, 0.08) 0%, transparent 70%), /* 右下角光晕 - 更绿更明显 */
+                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(34, 139, 34, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 60s ease-in-out infinite;
+        }
+
+        /* 半透明遮罩层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            z-index: -1;
+        }
+
+        /* 微妙的渐变晕染动画 */
+        @keyframes gentleDrift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: translate(30px, -20px) scale(1.01);
+                opacity: 0.98;
+            }
+            50% {
+                transform: translate(-25px, 35px) scale(0.99);
+                opacity: 1.02;
+            }
+            75% {
+                transform: translate(20px, 25px) scale(1.005);
+                opacity: 0.99;
+            }
         }
 
         @keyframes fadeIn {
@@ -74,33 +158,208 @@
             }
         }
 
+        @keyframes colorPulse {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes borderGlow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(78, 205, 196, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(78, 205, 196, 0.6);
+            }
+        }
+
+        @keyframes iconFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        /* 返回按钮样式 */
+        .back-link {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #7FB069, #9DC183);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(127, 176, 105, 0.4);
+            border: none;
+        }
+        
+        .back-link:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(127, 176, 105, 0.6);
+            background: linear-gradient(135deg, #9DC183, #7FB069);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .back-link i {
+            font-size: 1.2rem;
+        }
+        
+        /* 导航栏样式 */
+        .top-navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(26, 77, 26, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            padding: 0;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a4d1a;
+        }
+        
+        .nav-brand i {
+            font-size: 1.8rem;
+            color: #2d5a2d;
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            color: #2d5a2d;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .nav-item:hover {
+            background: rgba(26, 77, 26, 0.08);
+            color: #1a4d1a;
+            transform: translateY(-1px);
+        }
+        
+        .nav-item i {
+            font-size: 1rem;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2d5a2d, #1a4d1a);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 90, 45, 0.3);
+        }
+        
+        .nav-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 90, 45, 0.4);
+            background: linear-gradient(135deg, #1a4d1a, #2d5a2d);
+        }
+        
+        .nav-logout i {
+            font-size: 1rem;
+        }
+        
+        /* 调整主容器位置，避免被导航栏遮挡 */
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-            padding: 20px;
+            padding: 100px 20px 20px 20px; /* 顶部增加100px的padding */
+            position: relative;
+            z-index: 1;
         }
 
         .header {
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            color: #2F4F4F;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            color: var(--text-primary);
             padding: 30px;
             text-align: center;
             margin-bottom: 30px;
             animation: slideInDown 0.8s ease-out;
+            border-radius: 20px;
+            box-shadow: var(--shadow-light);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            opacity: 1;
         }
 
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
+            color: #1a4d1a;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .header p {
             font-size: 1.2em;
-            opacity: 0.9;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .stats-grid {
@@ -111,7 +370,8 @@
         }
 
         .stat-card {
-            background: rgba(248, 249, 250, 0.6);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
             border-radius: var(--border-radius);
             padding: 25px;
             box-shadow: var(--shadow-light);
@@ -119,7 +379,46 @@
             text-align: center;
             animation: slideInUp 0.6s ease-out;
             animation-fill-mode: both;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
         }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.9);
+            opacity: 1;
+        }
+
+        /* 第一个卡片 - 珊瑚色 */
+        .stat-card:nth-child(1) .stat-icon { background: var(--accent-coral); }
+        .stat-card:nth-child(1) .stat-icon i { color: white; }
+        .stat-card:nth-child(1) .stat-value { color: var(--accent-coral); }
+
+        /* 第二个卡片 - 青色 */
+        .stat-card:nth-child(2) .stat-icon { background: var(--accent-teal); }
+        .stat-card:nth-child(2) .stat-icon i { color: white; }
+        .stat-card:nth-child(2) .stat-value { color: var(--accent-teal); }
+
+        /* 第三个卡片 - 蓝色 */
+        .stat-card:nth-child(3) .stat-icon { background: var(--accent-blue); }
+        .stat-card:nth-child(3) .stat-icon i { color: white; }
+        .stat-card:nth-child(3) .stat-value { color: var(--accent-blue); }
+
+        /* 第四个卡片 - 绿色 */
+        .stat-card:nth-child(4) .stat-icon { background: var(--accent-green); }
+        .stat-card:nth-child(4) .stat-icon i { color: white; }
+        .stat-card:nth-child(4) .stat-value { color: var(--accent-green); }
+
+        /* 第五个卡片 - 紫色 */
+        .stat-card:nth-child(5) .stat-icon { background: var(--accent-purple); }
+        .stat-card:nth-child(5) .stat-icon i { color: white; }
+        .stat-card:nth-child(5) .stat-value { color: var(--accent-purple); }
 
         .stat-card:nth-child(1) { animation-delay: 0.1s; }
         .stat-card:nth-child(2) { animation-delay: 0.2s; }
@@ -128,8 +427,10 @@
         .stat-card:nth-child(5) { animation-delay: 0.5s; }
 
         .stat-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             box-shadow: var(--shadow-medium);
+            background: rgba(255, 255, 255, 0.8);
+            border: 3px solid rgba(255, 255, 255, 1);
         }
 
         @keyframes slideInUp {
@@ -162,25 +463,69 @@
             align-items: center;
             justify-content: center;
             font-size: 1.8em;
-            color: white;
             margin: 0 auto 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+            border-radius: 50%;
+        }
+
+        .stat-icon i {
+            position: relative;
+            z-index: 2;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        .stat-icon i:hover {
+            animation: iconFloat 1s ease-in-out infinite;
+        }
+
+        /* 统计图标基础样式 */
+        .stat-icon {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
         }
 
         .stat-value {
             font-size: 2.5em;
             font-weight: 700;
-            color: var(--text-primary);
             margin-bottom: 5px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            color: var(--text-primary);
         }
 
         .stat-label {
             font-size: 1em;
             color: var(--text-secondary);
             font-weight: 500;
+            position: relative;
+            padding: 8px 0;
+        }
+
+        .stat-label::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.8);
+            opacity: 1;
+            border-radius: 2px;
         }
 
         .action-bar {
             background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
             border-radius: var(--border-radius);
             padding: 20px;
             margin-bottom: 30px;
@@ -191,10 +536,24 @@
             animation: slideInUp 0.8s ease-out;
             animation-delay: 0.6s;
             animation-fill-mode: both;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.9);
+            opacity: 1;
         }
 
         .action-btn {
-            background: var(--accent-blue);
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));
             color: white;
             border: none;
             padding: 12px 24px;
@@ -209,6 +568,7 @@
             gap: 8px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(255, 149, 0, 0.3);
         }
 
         .action-btn::before {
@@ -218,7 +578,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
             transition: left 0.5s;
         }
 
@@ -227,9 +587,10 @@
         }
 
         .action-btn:hover {
-            background: var(--accent-purple);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+            background: linear-gradient(135deg, var(--accent-coral), var(--accent-orange));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 149, 0, 0.5);
+            animation: borderGlow 2s ease-in-out infinite;
         }
 
         .action-btn:active {
@@ -238,13 +599,17 @@
         }
 
         .action-btn.secondary {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-green));
+            color: white;
+            border: 1px solid rgba(0, 206, 209, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 206, 209, 0.3);
         }
 
         .action-btn.secondary:hover {
-            background: var(--bg-card);
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 206, 209, 0.5);
+            animation: borderGlow 2s ease-in-out infinite;
         }
 
         .content-grid {
@@ -256,15 +621,37 @@
 
         .content-card {
             background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
             border-radius: var(--border-radius-large);
             padding: 30px;
             box-shadow: var(--shadow-light);
             animation: slideInRight 0.8s ease-out;
             animation-fill-mode: both;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            opacity: 1;
         }
 
         .content-card:nth-child(1) { animation-delay: 0.3s; }
         .content-card:nth-child(2) { animation-delay: 0.4s; }
+
+        .content-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-medium);
+            background: rgba(255, 255, 255, 0.8);
+            border: 3px solid rgba(255, 255, 255, 1);
+        }
 
         @keyframes slideInRight {
             from {
@@ -285,6 +672,21 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title i {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .section-title:hover i {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
         .feedback-list {
@@ -293,14 +695,31 @@
         }
 
         .feedback-item {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.8);
             border-radius: var(--border-radius);
             padding: 20px;
             margin-bottom: 15px;
             transition: var(--transition-fast);
             position: relative;
             overflow: hidden;
+        }
+
+        .feedback-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 25px 25px 0;
+            border-color: transparent rgba(255, 255, 255, 0.6) transparent transparent;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-item:hover::after {
+            border-color: transparent rgba(255, 255, 255, 0.9) transparent transparent;
         }
 
         .feedback-item::before {
@@ -310,7 +729,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, transparent, rgba(0, 122, 255, 0.05), transparent);
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.1), transparent);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -320,10 +739,10 @@
         }
 
         .feedback-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent-blue);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            border-color: rgba(255, 255, 255, 1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         .feedback-header {
@@ -340,9 +759,29 @@
             margin-bottom: 5px;
         }
 
+        .feedback-info h4 .category-emoji {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
+
         .feedback-meta {
             font-size: 0.9em;
             color: var(--text-secondary);
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .feedback-meta::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            opacity: 1;
         }
 
         .feedback-status {
@@ -353,29 +792,46 @@
         }
 
         .status-pending {
-            background: rgba(255, 149, 0, 0.1);
-            color: var(--accent-orange);
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));
+            color: white;
+            font-weight: 600;
         }
 
         .status-read {
-            background: rgba(52, 199, 89, 0.1);
-            color: var(--accent-green);
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-green));
+            color: white;
+            font-weight: 600;
         }
 
         .status-completed {
-            background: rgba(52, 199, 89, 0.1);
-            color: var(--accent-green);
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
+            color: white;
+            font-weight: 600;
         }
 
         .status-archived {
-            background: rgba(142, 142, 147, 0.1);
-            color: var(--text-tertiary);
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-indigo));
+            color: white;
+            font-weight: 600;
         }
 
         .feedback-message {
             color: var(--text-primary);
             margin-bottom: 15px;
             line-height: 1.5;
+            position: relative;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid rgba(255, 255, 255, 0.8);
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-message:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-width: 6px;
+            transform: translateX(5px);
         }
 
         .feedback-actions {
@@ -393,69 +849,85 @@
         }
 
         .btn-primary {
-            background: var(--accent-blue);
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));
             color: white;
+            box-shadow: 0 2px 8px rgba(255, 149, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--accent-coral), var(--accent-orange));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 149, 0, 0.5);
         }
 
         .btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-green));
+            color: white;
+            border: 1px solid rgba(0, 206, 209, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 206, 209, 0.5);
         }
 
         .btn-success {
-            background: var(--accent-green);
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
             color: white;
+            box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-green));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.5);
         }
 
         .btn-warning {
-            background: var(--accent-orange);
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));
             color: white;
+            box-shadow: 0 2px 8px rgba(255, 149, 0, 0.3);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, var(--accent-coral), var(--accent-orange));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 149, 0, 0.5);
         }
 
         .btn-danger {
-            background: var(--accent-red);
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-indigo));
             color: white;
+            box-shadow: 0 2px 8px rgba(138, 43, 226, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(138, 43, 226, 0.5);
         }
 
         .priority-badge {
-            padding: 2px 8px;
+            padding: 4px 10px;
             border-radius: 12px;
-            font-size: 0.7em;
-            font-weight: 500;
+            font-size: 0.75em;
+            font-weight: 600;
             margin-left: 10px;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
         .priority-high {
-            background: rgba(255, 59, 48, 0.1);
-            color: var(--accent-red);
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-indigo));
         }
 
         .priority-medium {
-            background: rgba(255, 149, 0, 0.1);
-            color: var(--accent-orange);
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));
         }
 
         .priority-low {
-            background: rgba(52, 199, 89, 0.1);
-            color: var(--accent-green);
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition-fast);
-        }
-
-        .back-link:hover {
-            transform: translateX(-5px);
-        }
-
-        .back-link i {
-            margin-right: 8px;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-teal));
         }
 
         .empty-state {
@@ -467,7 +939,8 @@
         .empty-state i {
             font-size: 3em;
             margin-bottom: 20px;
-            opacity: 0.5;
+            opacity: 0.6;
+            color: var(--text-secondary);
         }
 
         @media (max-width: 768px) {
@@ -482,60 +955,121 @@
             .action-bar {
                 flex-direction: column;
             }
+            
+            .back-link {
+                top: 15px;
+                left: 15px;
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+            
+            .container {
+                margin-top: 70px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="back-link">
-            <i class="fas fa-arrow-left"></i> 返回仪表板
-        </a>
+    <!-- 动态背景 -->
+    <div class="feedback-parallax-bg"></div>
+    
+    <!-- 半透明遮罩层 -->
+    <div class="overlay-layer"></div>
 
+    <!-- 导航栏 -->
+    <nav class="top-navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-user-tie"></i>
+                <span>员工平台</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>员工仪表盘</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.profile.profile_dashboard') }}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>个人资料</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.performance.performance_dashboard') }}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>绩效分析</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.learning_recommendation.dashboard') }}" class="nav-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>学习中心</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="nav-item">
+                    <i class="fas fa-bullseye"></i>
+                    <span>目标设定</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.feedback.feedback_dashboard') }}" class="nav-item">
+                    <i class="fas fa-comments"></i>
+                    <span>反馈管理</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.projects.projects_dashboard') }}" class="nav-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>项目经验</span>
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <a href="{{ url_for('common.auth.logout') }}" class="nav-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出登录</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
         <div class="header">
-            <h1><i class="fas fa-comments"></i> 反馈管理</h1>
+            <h1><i class="fas fa-comments" style="color: var(--accent-orange); margin-right: 15px;"></i> 反馈管理</h1>
             <p>主动请求同事或主管的反馈，促进团队协作和个人成长</p>
         </div>
 
         <!-- 统计卡片 -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon" style="background: var(--accent-blue);">
-                    <i class="fas fa-paper-plane"></i>
+                <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
                 </div>
-                <div class="stat-value">{{ feedback_stats.total_sent }}</div>
-                <div class="stat-label">已发送请求</div>
+                <div class="stat-value">暂无</div>
+                <div class="stat-label">绩效评分</div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon" style="background: var(--accent-green);">
-                    <i class="fas fa-inbox"></i>
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
                 </div>
-                <div class="stat-value">{{ feedback_stats.total_received }}</div>
-                <div class="stat-label">收到的请求</div>
+                <div class="stat-value">0%</div>
+                <div class="stat-label">学习进度</div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon" style="background: var(--accent-orange);">
-                    <i class="fas fa-clock"></i>
+                <div class="stat-icon">
+                    <i class="fas fa-tasks"></i>
                 </div>
-                <div class="stat-value">{{ feedback_stats.pending_responses }}</div>
-                <div class="stat-label">待回复</div>
+                <div class="stat-value">0/15</div>
+                <div class="stat-label">任务完成</div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon" style="background: var(--accent-purple);">
-                    <i class="fas fa-check-circle"></i>
+                <div class="stat-icon">
+                    <i class="fas fa-star"></i>
                 </div>
-                <div class="stat-value">{{ feedback_stats.completed }}</div>
-                <div class="stat-label">已完成</div>
+                <div class="stat-value">暂无</div>
+                <div class="stat-label">综合评分</div>
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon" style="background: var(--text-tertiary);">
-                    <i class="fas fa-archive"></i>
+                <div class="stat-icon">
+                    <i class="fas fa-project-diagram"></i>
                 </div>
-                <div class="stat-value">{{ feedback_stats.archived }}</div>
-                <div class="stat-label">已归档</div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">项目经验</div>
             </div>
         </div>
 
@@ -561,23 +1095,23 @@
                 <h2 class="section-title">
                     <i class="fas fa-inbox"></i> 收到的反馈
                 </h2>
-                <div class="feedback-list">
+            <div class="feedback-list">
                     {% if received_feedback %}
                         {% for feedback in received_feedback %}
                             <div class="feedback-item" data-feedback-id="{{ feedback.id }}">
-                                <div class="feedback-header">
+                    <div class="feedback-header">
                                     <div class="feedback-info">
                                         <h4>
                                             {% if feedback.category == 'skill' %}
-                                                🚀 技能发展
+                                                <span style="color: var(--primary-orange);">🚀</span> 技能发展
                                             {% elif feedback.category == 'communication' %}
-                                                💬 沟通协作
+                                                <span style="color: var(--primary-teal);">💬</span> 沟通协作
                                             {% elif feedback.category == 'performance' %}
-                                                📈 绩效表现
+                                                <span style="color: var(--primary-blue);">📈</span> 绩效表现
                                             {% elif feedback.category == 'general' %}
-                                                📝 一般反馈
+                                                <span style="color: var(--primary-green);">📝</span> 一般反馈
                                             {% else %}
-                                                📝 {{ feedback.category }}
+                                                <span style="color: var(--primary-purple);">📝</span> {{ feedback.category }}
                                             {% endif %}
                                             <span class="priority-badge priority-{{ feedback.priority }}">
                                                 {% if feedback.priority == 'high' %}
@@ -593,8 +1127,8 @@
                                             来自: {{ feedback.sender.first_name }} {{ feedback.sender.last_name }} ({{ feedback.sender.position or '未知职位' }})
                                             <br>
                                             {{ feedback.created_at.strftime('%Y年%m月%d日 %H:%M') }}
-                                        </div>
-                                    </div>
+                            </div>
+                        </div>
                                     <span class="feedback-status status-{{ feedback.status }}">
                                         {% if feedback.status == 'sent' %}
                                             未读
@@ -606,10 +1140,10 @@
                                             已归档
                                         {% endif %}
                                     </span>
-                                </div>
+                    </div>
                                 <div class="feedback-message">
                                     {{ feedback.content[:100] }}{% if feedback.content|length > 100 %}...{% endif %}
-                                </div>
+                    </div>
                                 <!-- 删除操作按钮，只保留状态显示 -->
                             </div>
                         {% endfor %}
@@ -620,8 +1154,8 @@
                             <p class="text-muted">当管理层发送反馈时，您会在这里看到</p>
                         </div>
                     {% endif %}
+                    </div>
                 </div>
-            </div>
 
             <!-- 已发送的反馈 -->
             <div class="content-card">
@@ -632,19 +1166,19 @@
                     {% if sent_feedback %}
                         {% for feedback in sent_feedback %}
                             <div class="feedback-item" data-feedback-id="{{ feedback.id }}">
-                                <div class="feedback-header">
+                    <div class="feedback-header">
                                     <div class="feedback-info">
                                         <h4>
                                             {% if feedback.category == 'skill' %}
-                                                🚀 技能发展
+                                                <span style="color: var(--primary-orange);">🚀</span> 技能发展
                                             {% elif feedback.category == 'communication' %}
-                                                💬 沟通协作
+                                                <span style="color: var(--primary-teal);">💬</span> 沟通协作
                                             {% elif feedback.category == 'performance' %}
-                                                📈 绩效表现
+                                                <span style="color: var(--primary-blue);">📈</span> 绩效表现
                                             {% elif feedback.category == 'general' %}
-                                                📝 一般反馈
+                                                <span style="color: var(--primary-green);">📝</span> 一般反馈
                                             {% else %}
-                                                📝 {{ feedback.category }}
+                                                <span style="color: var(--primary-purple);">��</span> {{ feedback.category }}
                                             {% endif %}
                                             <span class="priority-badge priority-{{ feedback.priority }}">
                                                 {% if feedback.priority == 'high' %}
@@ -660,8 +1194,8 @@
                                             发送给: {{ feedback.recipient.first_name }} {{ feedback.recipient.last_name }} ({{ feedback.recipient.position or '未知职位' }})
                                             <br>
                                             {{ feedback.created_at.strftime('%Y年%m月%d日 %H:%M') }}
-                                        </div>
-                                    </div>
+                            </div>
+                        </div>
                                     <span class="feedback-status status-{{ feedback.status }}">
                                         {% if feedback.status == 'sent' %}
                                             待回复
@@ -673,10 +1207,10 @@
                                             已归档
                                         {% endif %}
                                     </span>
-                                </div>
+                    </div>
                                 <div class="feedback-message">
                                     {{ feedback.content[:100] }}{% if feedback.content|length > 100 %}...{% endif %}
-                                </div>
+                    </div>
                                 <!-- 删除操作按钮，只保留状态显示 -->
                             </div>
                         {% endfor %}
@@ -688,8 +1222,8 @@
                         </div>
                     {% endif %}
                 </div>
-            </div>
-        </div>
+                    </div>
+                </div>
 
         <!-- 待处理的反馈 -->
         {% if unread_feedback %}
@@ -703,17 +1237,17 @@
             <div class="feedback-list">
                 {% for feedback in unread_feedback %}
                     <div class="feedback-item" data-feedback-id="{{ feedback.id }}">
-                        <div class="feedback-header">
+                    <div class="feedback-header">
                             <div class="feedback-info">
                                 <h4>
                                     {% if feedback.category == 'skill' %}
-                                        🚀 技能发展
+                                        <span style="color: var(--primary-orange);">🚀</span> 技能发展
                                     {% elif feedback.category == 'communication' %}
-                                        💬 沟通协作
+                                        <span style="color: var(--primary-teal);">💬</span> 沟通协作
                                     {% elif feedback.category == 'performance' %}
-                                        📈 绩效表现
+                                        <span style="color: var(--primary-blue);">📈</span> 绩效表现
                                     {% else %}
-                                        📝 {{ feedback.category }}
+                                        <span style="color: var(--primary-purple);">📝</span> {{ feedback.category }}
                                     {% endif %}
                                     <span class="priority-badge priority-{{ feedback.priority }}">
                                         {% if feedback.priority == 'high' %}
@@ -729,20 +1263,20 @@
                                     来自: {{ feedback.sender.first_name }} {{ feedback.sender.last_name }} ({{ feedback.sender.position or '未知职位' }})
                                     <br>
                                     {{ feedback.created_at.strftime('%Y年%m月%d日 %H:%M') }}
-                                </div>
                             </div>
+                        </div>
                             <span class="feedback-status status-pending">
                                 未读
                             </span>
-                        </div>
+                    </div>
                         <div class="feedback-message">
                             {{ feedback.content[:100] }}{% if feedback.content|length > 100 %}...{% endif %}
-                        </div>
+                    </div>
                         <!-- 删除操作按钮，只保留状态显示 -->
                     </div>
                 {% endfor %}
-            </div>
-        </div>
+                </div>
+                            </div>
         {% else %}
         <!-- 当没有未读反馈时显示空状态 -->
         <div class="content-card">
@@ -756,34 +1290,34 @@
                 <i class="fas fa-check-circle"></i>
                 <p>所有反馈都已处理完毕</p>
                 <p class="text-muted">没有待处理的反馈项目</p>
-            </div>
-        </div>
+                        </div>
+                    </div>
         {% endif %}
 
         <!-- 总结反馈模块 -->
         <div class="content-card">
             <h2 class="section-title">
-                <i class="fas fa-brain"></i> 总结反馈
-                <button class="action-btn secondary" onclick="generateFeedbackSummary()" style="font-size: 0.8em; padding: 6px 12px;">
-                    <i class="fas fa-magic"></i> 生成总结
-                </button>
+                <i class="fas fa-brain" style="color: var(--accent-orange);"></i> 总结反馈
+                <button class="action-btn secondary" onclick="generateFeedbackSummary()" style="font-size: 0.8em; padding: 6px 12px; background: linear-gradient(135deg, var(--accent-orange), var(--accent-coral));">
+                    <i class="fas fa-magic" style="color: white;"></i> 生成总结
+                        </button>
             </h2>
             <div id="feedback-summary-content">
                 <div class="empty-state">
                     <i class="fas fa-brain"></i>
                     <p>点击"生成总结"按钮，使用AI分析您的所有反馈</p>
                     <p class="text-muted">AI将为您提供个性化的反馈总结报告</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
         <!-- 课程学习建议模块 -->
         <div class="content-card">
             <h2 class="section-title">
-                <i class="fas fa-graduation-cap"></i> 课程学习建议
-                <button class="action-btn secondary" onclick="generateCourseRecommendations()" style="font-size: 0.8em; padding: 6px 12px;">
-                    <i class="fas fa-lightbulb"></i> 获取推荐
-                </button>
+                <i class="fas fa-graduation-cap" style="color: var(--accent-teal);"></i> 课程学习建议
+                <button class="action-btn secondary" onclick="generateCourseRecommendations()" style="font-size: 0.8em; padding: 6px 12px; background: linear-gradient(135deg, var(--accent-teal), var(--accent-green));">
+                    <i class="fas fa-lightbulb" style="color: white;"></i> 获取推荐
+                    </button>
             </h2>
             <div id="course-recommendations-content">
                 <div class="empty-state">
@@ -791,9 +1325,9 @@
                     <p>点击"获取推荐"按钮，基于反馈分析为您推荐课程</p>
                     <p class="text-muted">AI将根据您的反馈为您推荐最适合的学习课程</p>
                 </div>
-            </div>
-        </div>
-    </div>
+                    </div>
+                        </div>
+                        </div>
 
     <script>
         // 页面加载完成后的动画效果
@@ -937,7 +1471,7 @@
                                     <i class="fas fa-check-circle"></i>
                                     <p>所有反馈都已处理完毕</p>
                                     <p class="text-muted">没有待处理的反馈项目</p>
-                                </div>
+                    </div>
                             `;
                         }
                     }, 600);
@@ -959,6 +1493,14 @@
             const notification = document.createElement('div');
             notification.className = `notification notification-${type}`;
             notification.textContent = message;
+            
+            // 使用CSS变量定义颜色
+            const colors = {
+                success: 'var(--accent-green)',
+                error: 'var(--accent-purple)',
+                info: 'var(--accent-blue)'
+            };
+            
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
@@ -969,7 +1511,7 @@
                 font-weight: 500;
                 z-index: 1000;
                 animation: slideInRight 0.3s ease-out;
-                background: ${type === 'success' ? '#34C759' : type === 'error' ? '#FF3B30' : '#007AFF'};
+                background: ${colors[type] || colors.info};
             `;
             
             document.body.appendChild(notification);
@@ -1041,10 +1583,10 @@
             const contentDiv = document.getElementById('feedback-summary-content');
 
             let html = `
-                <div class="summary-overview" style="margin-bottom: 20px; padding: 20px; background: rgba(0, 122, 255, 0.05); border-radius: 12px; border-left: 4px solid var(--accent-blue);">
+                <div class="summary-overview" style="margin-bottom: 20px; padding: 20px; background: rgba(32, 178, 170, 0.05); border-radius: 12px; border-left: 4px solid var(--accent-blue);">
                     <h4 style="color: var(--accent-blue); margin-bottom: 10px;"><i class="fas fa-file-alt"></i> 反馈总结概述</h4>
                     <p style="color: var(--text-primary); line-height: 1.6;">${summaryData.summary}</p>
-                </div>
+                        </div>
 
                 <div class="summary-details" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="summary-section">
@@ -1077,7 +1619,7 @@
 
             html += `
                         </ul>
-                    </div>
+                        </div>
 
                     <div class="summary-section">
                         <h4 style="color: var(--text-primary); margin-bottom: 15px;"><i class="fas fa-chart-line"></i> 改进领域</h4>
@@ -1109,8 +1651,8 @@
 
             html += `
                         </ul>
-                    </div>
-                </div>
+                        </div>
+                        </div>
             `;
 
             contentDiv.innerHTML = html;
@@ -1185,8 +1727,8 @@
             }
 
             let html = `
-                <div class="recommendations-overview" style="margin-bottom: 20px; padding: 20px; background: rgba(52, 199, 89, 0.05); border-radius: 12px; border-left: 4px solid var(--accent-green);">
-                    <h4 style="color: var(--accent-green); margin-bottom: 10px;"><i class="fas fa-info-circle"></i> 推荐说明</h4>
+                <div class="recommendations-overview" style="margin-bottom: 20px; padding: 20px; background: rgba(52, 199, 89, 0.05); border-radius: 12px; border-left: 4px solid var(--primary-green);">
+                    <h4 style="color: var(--primary-green); margin-bottom: 10px;"><i class="fas fa-info-circle"></i> 推荐说明</h4>
                     <p style="color: var(--text-primary); line-height: 1.6;">${recommendationsData.reasoning || '基于您的反馈分析，为您推荐以下课程'}</p>
                     <p style="color: var(--text-secondary); font-size: 0.9em;">共推荐 ${recommendationsData.total_recommended || recommendationsData.recommendations.length} 门课程</p>
                 </div>
@@ -1202,7 +1744,7 @@
                         <div class="course-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
                             <div class="course-title" style="flex: 1;">
                                 <h4 style="color: var(--text-primary); margin: 0 0 5px 0; font-size: 1.1em;">
-                                    <a href="${course.url}" target="_blank" style="color: var(--accent-blue); text-decoration: none; hover: {text-decoration: underline;}">
+                                    <a href="${course.url}" target="_blank" style="color: var(--primary-blue); text-decoration: none; hover: {text-decoration: underline;}">
                                         ${course.title} <i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i>
                                     </a>
                                 </h4>
@@ -1211,22 +1753,22 @@
                                     <i class="fas fa-clock"></i> ${course.duration} •
                                     <i class="fas fa-signal"></i> ${course.difficulty}
                                 </p>
-                            </div>
+            </div>
                             <div class="relevance-score" style="text-align: center;">
-                                <div style="font-size: 1.5em; font-weight: bold; color: var(--accent-green);">${relevancePercent}%</div>
+                                <div style="font-size: 1.5em; font-weight: bold; color: var(--primary-green);">${relevancePercent}%</div>
                                 <div style="font-size: 0.8em; color: var(--text-secondary);">相关度</div>
-                            </div>
-                        </div>
+        </div>
+    </div>
 
                         <div class="course-description" style="margin-bottom: 15px;">
                             <p style="color: var(--text-primary); margin: 0; line-height: 1.5;">${course.description}</p>
                         </div>
 
                         <div class="course-tags" style="margin-bottom: 15px;">
-                            ${course.tags.map(tag => `<span class="tag" style="display: inline-block; padding: 3px 8px; margin: 2px; background: var(--accent-purple); color: white; border-radius: 10px; font-size: 0.75em;">${tag}</span>`).join('')}
+                            ${course.tags.map(tag => `<span class="tag" style="display: inline-block; padding: 3px 8px; margin: 2px; background: var(--primary-purple); color: white; border-radius: 10px; font-size: 0.75em;">${tag}</span>`).join('')}
                         </div>
 
-                        <div class="course-reason" style="background: rgba(0, 122, 255, 0.05); padding: 10px; border-radius: 8px; border-left: 3px solid var(--accent-blue);">
+                        <div class="course-reason" style="background: rgba(0, 122, 255, 0.05); padding: 10px; border-radius: 8px; border-left: 3px solid var(--primary-blue);">
                             <p style="color: var(--text-primary); margin: 0; font-size: 0.9em;">
                                 <i class="fas fa-lightbulb"></i> <strong>推荐理由：</strong>${rec.reason}
                             </p>
@@ -1248,7 +1790,7 @@
                     this.style.transform = 'translateY(-2px)';
                     this.style.boxShadow = '0 8px 25px rgba(0, 122, 255, 0.15)';
                 });
-
+                
                 card.addEventListener('mouseleave', function() {
                     this.style.transform = 'translateY(0)';
                     this.style.boxShadow = 'none';

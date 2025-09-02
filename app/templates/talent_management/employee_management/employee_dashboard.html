@@ -17,193 +17,638 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
+            background: #ffffff;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        /* 动态背景 - 采用HR界面的优雅渐变晕染设计 */
+        .employee-parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: -2;
             overflow: hidden;
         }
         
+        /* 微妙的渐变晕染背景装饰 */
+        .employee-parallax-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(144, 238, 144, 0.12) 0%, transparent 70%), /* 左下角光晕 - 更绿更明显 */
+                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(152, 251, 152, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(173, 255, 47, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(50, 205, 50, 0.08) 0%, transparent 70%), /* 右下角光晕 - 更绿更明显 */
+                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(34, 139, 34, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 60s ease-in-out infinite;
+        }
+        
+        /* 半透明遮罩层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            z-index: -1;
+        }
+        
+        /* 微妙的渐变晕染动画 */
+        @keyframes gentleDrift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: translate(30px, -20px) scale(1.01);
+                opacity: 0.98;
+            }
+            50% {
+                transform: translate(-25px, 35px) scale(0.99);
+                opacity: 1.02;
+            }
+            75% {
+                transform: translate(20px, 25px) scale(1.005);
+                opacity: 0.99;
+            }
+        }
+        
+        /* 导航栏样式 */
+        .top-navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(26, 77, 26, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            padding: 0;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a4d1a;
+        }
+        
+        .nav-brand i {
+            font-size: 1.8rem;
+            color: #2d5a2d;
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            color: #2d5a2d;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .nav-item:hover {
+            background: rgba(26, 77, 26, 0.08);
+            color: #1a4d1a;
+            transform: translateY(-1px);
+        }
+        
+        .nav-item i {
+            font-size: 1rem;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2d5a2d, #1a4d1a); /* 改为深绿色渐变 */
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 90, 45, 0.3); /* 改为绿色阴影 */
+        }
+        
+        .nav-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 90, 45, 0.4); /* 改为绿色阴影 */
+            background: linear-gradient(135deg, #1a4d1a, #2d5a2d); /* 悬停时颜色反转 */
+        }
+        
+        .nav-logout i {
+            font-size: 1rem;
+        }
+        
+        /* 调整主容器位置，避免被导航栏遮挡 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 20px 20px 20px; /* 顶部增加100px的padding */
+            position: relative;
+            z-index: 1;
+        }
+        
         .header {
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            color: #2F4F4F;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            color: #1a4d1a;
             padding: 30px;
             text-align: center;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
+            color: #1a4d1a;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .header p {
             font-size: 1.2em;
-            opacity: 0.9;
+            color: #2d5a2d;
+            font-weight: 500;
         }
         
         .content {
-            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
         }
         
+        /* 区域包装器样式 - 大的圆角磨砂质感透明卡片 */
+        .dashboard-section-wrapper {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-section-wrapper:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.4);
+        }
+        
+        /* 区域标题样式 */
+        .dashboard-section {
+            margin-bottom: 0;
+        }
+        
+        .section-title {
+            color: #1a4d1a;
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(26, 77, 26, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .section-title:hover {
+            color: #2E7D32;
+            border-bottom-color: rgba(46, 125, 50, 0.4);
+        }
+        
+        /* 统计概览标题图标 - 白色主题 */
+        .dashboard-section:nth-child(1) .section-title i {
+            color: #1a4d1a;
+            font-size: 1.5em;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .dashboard-section:nth-child(1) .section-title:hover i {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* 工作进度与活动标题图标 - 白色主题 */
+        .dashboard-section:nth-child(2) .section-title i {
+            color: #1a4d1a;
+            font-size: 1.5em;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .dashboard-section:nth-child(2) .section-title:hover i {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* 技能与发展标题图标 - 白色主题 */
+        .dashboard-section:nth-child(3) .section-title i {
+            color: #1a4d1a;
+            font-size: 1.5em;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .dashboard-section:nth-child(3) .section-title:hover i {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* 标题图标的微妙光效 */
+        .dashboard-section:nth-child(1) .section-title i {
+            animation: subtleGlow1 4s ease-in-out infinite;
+        }
+        
+        .dashboard-section:nth-child(2) .section-title i {
+            animation: subtleGlow2 4s ease-in-out infinite;
+        }
+        
+        .dashboard-section:nth-child(3) .section-title i {
+            animation: subtleGlow3 4s ease-in-out infinite;
+        }
+        
+        @keyframes subtleGlow1 {
+            0%, 100% { 
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+            50% { 
+                box-shadow: 0 5px 18px rgba(0, 0, 0, 0.15);
+            }
+        }
+        
+        @keyframes subtleGlow2 {
+            0%, 100% { 
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+            50% { 
+                box-shadow: 0 5px 18px rgba(0, 0, 0, 0.15);
+            }
+        }
+        
+        @keyframes subtleGlow3 {
+            0%, 100% { 
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+            50% { 
+                box-shadow: 0 5px 18px rgba(0, 0, 0, 0.15);
+            }
+        }
+        
+        /* 悬停时暂停光效动画 */
+        .dashboard-section:nth-child(1) .section-title:hover i,
+        .dashboard-section:nth-child(2) .section-title:hover i,
+        .dashboard-section:nth-child(3) .section-title:hover i {
+            animation: none;
+        }
+        
+        /* 统计卡片网格 */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 20px;
+            grid-template-columns: repeat(5, 1fr); /* 改为5列，每列等宽 */
+            gap: 20px; /* 减小间距 */
             margin-bottom: 30px;
-        }
-
-        /* 响应式设计 - 小屏幕时调整为2行 */
-        @media (max-width: 1200px) {
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-        }
-
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
         }
         
         .stat-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 25px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 20px; /* 减小内边距 */
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
-            transition: transform 0.3s ease;
+            min-height: 120px; /* 减小最小高度 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4CAF50, #45a049, #2E7D32);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .stat-card:hover::before {
+            opacity: 1;
         }
         
         .stat-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* 为不同类型的统计卡片设置不同的图标颜色 */
+        .stat-card:nth-child(1) i {
+            color: white; /* 绩效评分 - 白色图标 */
+            background: #FF6B35;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-card:nth-child(2) i {
+            color: white; /* 学习进度 - 白色图标 */
+            background: #00B4D8;
+            box-shadow: 0 4px 15px rgba(0, 180, 216, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-card:nth-child(3) i {
+            color: white; /* 任务完成 - 白色图标 */
+            background: #1E3A8A;
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-card:nth-child(4) i {
+            color: white; /* 综合评分 - 白色图标 */
+            background: #228B22;
+            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-card:nth-child(5) i {
+            color: white; /* 项目经验 - 白色图标 */
+            background: #7209B7;
+            box-shadow: 0 4px 15px rgba(114, 9, 183, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
         
         .stat-card i {
-            font-size: 3em;
-            color: #20B2AA;
-            margin-bottom: 15px;
+            font-size: 1.8rem; /* 减小图标大小 */
+            margin-bottom: 12px;
+            padding: 12px; /* 减小图标内边距 */
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .stat-card:hover i {
+            transform: scale(1.15) rotate(5deg);
+        }
+        
+        /* 图标悬停时的光晕效果 */
+        .stat-card:nth-child(1):hover i {
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.6);
+            background: #FF6B35;
+            border-color: rgba(255, 255, 255, 0.4);
+            animation: iconGlow1 0.6s ease-in-out;
+        }
+        
+        .stat-card:nth-child(2):hover i {
+            box-shadow: 0 8px 25px rgba(0, 180, 216, 0.6);
+            background: #00B4D8;
+            border-color: rgba(255, 255, 255, 0.4);
+            animation: iconGlow1 0.6s ease-in-out;
+        }
+        
+        .stat-card:nth-child(3):hover i {
+            box-shadow: 0 8px 25px rgba(30, 58, 138, 0.6);
+            background: #1E3A8A;
+            border-color: rgba(255, 255, 255, 0.4);
+            animation: iconGlow1 0.6s ease-in-out;
+        }
+        
+        .stat-card:nth-child(4):hover i {
+            box-shadow: 0 8px 25px rgba(34, 139, 34, 0.6);
+            background: #228B22;
+            border-color: rgba(255, 255, 255, 0.4);
+            animation: iconGlow1 0.6s ease-in-out;
+        }
+        
+        .stat-card:nth-child(5):hover i {
+            box-shadow: 0 8px 25px rgba(114, 9, 183, 0.6);
+            background: #7209B7;
+            border-color: rgba(255, 255, 255, 0.4);
+            animation: iconGlow1 0.6s ease-in-out;
+        }
+        
+        /* 图标光晕动画 */
+        @keyframes iconGlow1 {
+            0%, 100% { box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6); }
+        }
+        
+        @keyframes iconGlow2 {
+            0%, 100% { box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4); }
+            50% { box-shadow: 0 8px 25px rgba(255, 107, 107, 0.6); }
+        }
+        
+        @keyframes iconGlow3 {
+            0%, 100% { box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4); }
+            50% { box-shadow: 0 8px 25px rgba(78, 205, 196, 0.6); }
+        }
+        
+        @keyframes iconGlow4 {
+            0%, 100% { box-shadow: 0 6px 20px rgba(168, 230, 207, 0.4); }
+            50% { box-shadow: 0 8px 25px rgba(168, 230, 207, 0.6); }
+        }
+        
+        @keyframes iconGlow5 {
+            0%, 100% { box-shadow: 0 6px 20px rgba(255, 179, 71, 0.4); }
+            50% { box-shadow: 0 8px 25px rgba(255, 179, 71, 0.6); }
         }
         
         .stat-value {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 1.6rem; /* 减小数值字体大小 */
+            font-weight: 700;
+            color: #1a4d1a;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: color 0.3s ease;
+        }
+        
+        .stat-card:hover .stat-value {
+            color: #2E7D32;
         }
         
         .stat-label {
-            color: #666;
-            font-size: 1.1em;
+            font-size: 0.9rem; /* 减小标签字体大小 */
+            color: #2d5a2d;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: color 0.3s ease;
         }
         
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+        .stat-card:hover .stat-label {
+            color: #388E3C;
         }
         
-        .action-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+        /* 统计卡片响应式设计 */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr); /* 中等屏幕显示3列 */
+                gap: 15px;
+            }
         }
         
-        .action-card:hover {
-            transform: translateY(-5px);
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr); /* 小屏幕显示2列 */
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 15px;
+                min-height: 100px;
+            }
+            
+            .stat-card i {
+                font-size: 1.5rem;
+                padding: 10px;
+            }
+            
+            .stat-value {
+                font-size: 1.4rem;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
+            }
         }
         
-        .action-card h3 {
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr; /* 超小屏幕显示1列 */
+                gap: 10px;
+            }
         }
         
-        .action-card h3 i {
-            color: #20B2AA;
-        }
-        
-        .action-card p {
-            color: #666;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-        
-        .logout-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
-            color: white;
-            border: 2px solid #20B2AA;
-            font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-            box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3);
-        }
-        
-        .logout-btn:hover {
-            background: linear-gradient(135deg, #2F4F4F 0%, #20B2AA 100%);
-            color: white;
-            border-color: #2F4F4F;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(32, 178, 170, 0.4);
-        }
-        
+        /* 最近活动卡片 */
         .recent-activity {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            min-height: 300px; /* 设置最小高度，确保卡片大小一致 */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .recent-activity:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.7);
         }
         
         .recent-activity h3 {
-            color: #2F4F4F;
-            margin-bottom: 20px;
+            color: #1a4d1a;
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+        
+        .recent-activity h3 i {
+            color: #4ECDC4; /* 青绿色图标 */
+            background: rgba(78, 205, 196, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .recent-activity:hover h3 i {
+            transform: scale(1.1);
+            background: rgba(78, 205, 196, 0.25);
         }
         
         .activity-item {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(45, 90, 45, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 0 -20px;
         }
         
         .activity-item:last-child {
@@ -211,54 +656,761 @@
         }
         
         .activity-icon {
-            width: 40px;
-            height: 40px;
-            background: #f8f9fa;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #20B2AA;
+            color: white;
+            font-size: 1.2em;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover .activity-icon {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        /* 针对不同类型活动的图标颜色 */
+        .activity-icon.goal-icon {
+            background: linear-gradient(135deg, #87CEEB, #B0E0E6) !important; /* 目标进度更新 - 淡蓝色渐变 */
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.3) !important;
+        }
+        
+        .activity-icon.project-icon {
+            background: linear-gradient(135deg, #FF6B35, #FF8E53) !important; /* 项目更新 - 橙色渐变 */
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3) !important;
+        }
+        
+        .activity-icon.feedback-icon {
+            background: linear-gradient(135deg, #4361EE, #3A0CA3) !important; /* 收到反馈 - 蓝色渐变 */
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3) !important;
+        }
+        
+        .activity-icon.evaluation-icon {
+            background: linear-gradient(135deg, #06FFA5, #00B894) !important; /* 绩效评估 - 绿色渐变 */
+            box-shadow: 0 4px 15px rgba(6, 255, 165, 0.3) !important;
         }
         
         .activity-content h4 {
-            color: #333;
-            margin-bottom: 5px;
+            color: #1a4d1a;
+            margin-bottom: 8px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .activity-item:hover .activity-content h4 {
+            color: #2E7D32;
         }
         
         .activity-content p {
-            color: #666;
-            font-size: 0.9em;
+            color: #2d5a2d;
+            font-size: 1em;
+            transition: color 0.3s ease;
+        }
+        
+        .activity-item:hover .activity-content p {
+            color: #388E3C;
         }
         
         .activity-time {
-            color: #999;
+            color: #4a7c4a;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-left: auto;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover .activity-time {
+            background: rgba(76, 175, 80, 0.2);
+            color: #2E7D32;
+        }
+
+        /* 工作进度模块 */
+        .work-progress-module {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            min-height: 300px; /* 设置最小高度，确保卡片大小一致 */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .work-progress-module:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.7);
+        }
+        
+        .work-progress-module h3 {
+            color: #1a4d1a;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+        
+        .work-progress-module h3 i {
+            color: #FF6B35; /* 橙色图标 */
+            background: rgba(255, 107, 53, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .work-progress-module:hover h3 i {
+            transform: scale(1.1);
+            background: rgba(255, 107, 53, 0.25);
+        }
+        
+        .progress-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            flex: 1; /* 让进度网格填充剩余空间 */
+        }
+        
+        .progress-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #FF6B35, #E55A2B);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3em;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .progress-item:hover .progress-icon {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+        
+        .progress-content h4 {
+            color: #1a4d1a;
+            margin-bottom: 8px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .progress-item:hover .progress-content h4 {
+            color: #2E7D32;
+        }
+        
+        .progress-content p {
+            color: #2d5a2d;
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
+        }
+        
+        .progress-item:hover .progress-content p {
+            color: #388E3C;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049, #2E7D32);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+        }
+
+        /* 技能评估模块 */
+        .skills-assessment-module {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .skills-assessment-module:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.7);
+        }
+        
+        .skills-assessment-module h3 {
+            color: #1a4d1a;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+        
+        .skills-assessment-module h3 i {
+            color: #9C27B0; /* 紫色图标 */
+            background: rgba(156, 39, 176, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .skills-assessment-module:hover h3 i {
+            transform: scale(1.1);
+            background: rgba(156, 39, 176, 0.25);
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .skill-item {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skill-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #9C27B0, #7B1FA2, #4A148C);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .skill-item:hover::before {
+            opacity: 1;
+        }
+        
+        .skill-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .skill-name {
+            color: #1a4d1a;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            transition: color 0.3s ease;
+        }
+        
+        .skill-item:hover .skill-name {
+            color: #2E7D32;
+        }
+        
+        .skill-score {
+            color: #2d5a2d;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+        
+        .skill-item:hover .skill-score {
+            color: #9C27B0;
+        }
+        
+        .skill-level {
+            color: #4a7c4a;
+            font-size: 0.9em;
+            padding: 5px 12px;
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+            color: white;
+            border-radius: 15px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .skill-item:hover .skill-level {
+            background: linear-gradient(135deg, #7B1FA2, #4A148C);
+            transform: scale(1.05);
+        }
+
+        /* 职业发展模块 */
+        .career-development-module {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .career-development-module:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.7);
+        }
+        
+        .career-development-module h3 {
+            color: #1a4d1a;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+        
+        .career-development-module h3 i {
+            color: #FF9800; /* 橙色图标 */
+            background: rgba(255, 152, 0, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .career-development-module:hover h3 i {
+            transform: scale(1.1);
+            background: rgba(255, 152, 0, 0.25);
+        }
+        
+        .career-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 35px; /* 从20px增加到35px */
+        }
+        
+        .career-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .career-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #FF9800, #F57C00, #E65100);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .career-item:hover::before {
+            opacity: 1;
+        }
+        
+        .career-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .career-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3em;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .career-item:hover .career-icon {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+        }
+        
+        .career-content h4 {
+            color: #1a4d1a;
+            margin-bottom: 8px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .career-item:hover .career-content h4 {
+            color: #2E7D32;
+        }
+        
+        .career-content p {
+            color: #2d5a2d;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+        
+        .career-item:hover .career-content p {
+            color: #388E3C;
+        }
+        
+        .career-badge {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
             font-size: 0.8em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .career-item:hover .career-badge {
+            background: linear-gradient(135deg, #F57C00, #E65100);
+            transform: scale(1.05);
+        }
+
+        /* 团队协作模块 */
+        .team-collaboration-module {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .team-collaboration-module:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.7);
+        }
+        
+        .team-collaboration-module h3 {
+            color: #1a4d1a;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+        
+        .team-collaboration-module h3 i {
+            color: #2196F3; /* 蓝色图标 */
+            background: rgba(33, 150, 243, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .team-collaboration-module:hover h3 i {
+            transform: scale(1.1);
+            background: rgba(33, 150, 243, 0.25);
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 35px; /* 从20px增加到35px */
+        }
+        
+        .team-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .team-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #2196F3, #1976D2, #0D47A1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .team-item:hover::before {
+            opacity: 1;
+        }
+        
+        .team-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .team-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3em;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .team-item:hover .team-icon {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+        
+        .team-content h4 {
+            color: #1a4d1a;
+            margin-bottom: 8px;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .team-item:hover .team-content h4 {
+            color: #2E7D32;
+        }
+        
+        .team-content p {
+            color: #2d5a2d;
+            margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+        
+        .team-item:hover .team-content p {
+            color: #388E3C;
+        }
+        
+        .team-stats {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .team-stats .stat {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .team-item:hover .team-stats .stat {
+            background: linear-gradient(135deg, #1976D2, #0D47A1);
+            transform: scale(1.05);
+        }
+
+        /* 悬停效果 */
+        .work-progress-module:hover,
+        .skills-assessment-module:hover,
+        .career-development-module:hover,
+        .team-collaboration-module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .progress-item:hover,
+        .skill-item:hover,
+        .career-item:hover,
+        .team-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .work-progress-module,
+        .skills-assessment-module,
+        .career-development-module,
+        .team-collaboration-module {
+            transition: all 0.3s ease;
+        }
+        
+        .progress-item,
+        .skill-item,
+        .career-item,
+        .team-item {
+            transition: all 0.3s ease;
+        }
+        
+        /* 全局动画效果 */
+        .dashboard-section-wrapper {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .dashboard-section-wrapper:nth-child(1) { animation-delay: 0.1s; }
+        .dashboard-section-wrapper:nth-child(2) { animation-delay: 0.2s; }
+        .dashboard-section-wrapper:nth-child(3) { animation-delay: 0.3s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 卡片内容的光晕效果 */
+        .stat-card,
+        .activity-item,
+        .progress-item,
+        .skill-item,
+        .career-item,
+        .team-item {
+            position: relative;
+        }
+        
+        .stat-card::after,
+        .activity-item::after,
+        .progress-item::after,
+        .skill-item::after,
+        .career-item::after,
+        .team-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .stat-card:hover::after,
+        .activity-item:hover::after,
+        .progress-item:hover::after,
+        .skill-item:hover::after,
+        .career-item:hover::after,
+        .team-item:hover::after {
+            opacity: 1;
         }
 
         /* 账号状态样式 */
         .account-status {
-            background-color: #f0f0f0;
-            border-radius: 8px;
-            padding: 10px 20px;
-            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.9em;
-            color: #333;
+            gap: 15px;
+            font-size: 1em;
+            color: #1a4d1a;
             opacity: 1;
-            transition: opacity 0.5s ease-in-out;
+            transition: all 0.5s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .account-status::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4CAF50, #45a049, #2E7D32);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .account-status:hover::before {
+            opacity: 1;
         }
 
         .account-status.active {
-            background-color: #e8f5e9; /* Light green background */
-            color: #2e7d32; /* Dark green text */
+            background: linear-gradient(135deg, rgba(144, 238, 144, 0.9), rgba(76, 175, 80, 0.8));
+            color: #1a4d1a;
+            border-color: rgba(76, 175, 80, 0.3);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
+        }
+        
+        .account-status.active i {
+            color: #2E7D32;
+            animation: pulse 2s infinite;
         }
 
         .account-status.deactivated {
-            background-color: #ffebee; /* Light red background */
-            color: #c62828; /* Dark red text */
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.9), rgba(220, 20, 60, 0.8));
+            color: #8b0000;
+            border-color: rgba(220, 20, 60, 0.3);
+            box-shadow: 0 6px 20px rgba(220, 20, 60, 0.2);
+        }
+        
+        .account-status.deactivated i {
+            color: #8b0000;
+            animation: shake 0.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
         }
 
         .account-status.fade-out {
@@ -266,19 +1418,128 @@
         }
 
         .status-message {
+            font-size: 0.9em;
+            color: #2d5a2d;
+            margin-top: 8px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1600px) {
+            .container {
+                max-width: 95%;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .container {
+                max-width: 95%;
+                padding: 100px 15px 15px 15px;
+            }
+            
+            .nav-container {
+                padding: 15px 20px;
+            }
+            
+            .nav-menu {
+                gap: 4px;
+            }
+            
+            .nav-item {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .logout-btn {
+                position: fixed;
+                top: 15px;
+                right: 15px;
+                padding: 8px 16px;
             font-size: 0.8em;
-            color: #666;
-            margin-top: 5px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 动态背景 -->
+    <div class="employee-parallax-bg"></div>
+    
+    <!-- 半透明遮罩层 -->
+    <div class="overlay-layer"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="top-navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-user-tie"></i>
+                <span>员工平台</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>员工仪表盘</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.profile.profile_dashboard') }}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>个人资料</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.performance.performance_dashboard') }}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>绩效分析</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.learning_recommendation.dashboard') }}" class="nav-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>学习中心</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="nav-item">
+                    <i class="fas fa-bullseye"></i>
+                    <span>目标设定</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.feedback.feedback_dashboard') }}" class="nav-item">
+                    <i class="fas fa-comments"></i>
+                    <span>反馈管理</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.projects.projects_dashboard') }}" class="nav-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>项目经验</span>
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <a href="{{ url_for('common.auth.logout') }}" class="nav-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出登录</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
     <div class="container">
         <div class="header">
-            <a href="{{ url_for('common.auth.logout') }}" class="btn logout-btn">
-                <i class="fas fa-sign-out-alt"></i> 退出登录
-            </a>
-            
             <!-- 账号状态通知 -->
             {% if user and user.is_active is defined %}
                 {% if user.is_active %}
@@ -298,6 +1559,12 @@
         </div>
         
         <div class="content">
+            <!-- 区域1：统计概览 -->
+            <div class="dashboard-section-wrapper">
+                <div class="dashboard-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-chart-pie"></i>统计概览
+                    </h2>
                         <!-- 统计卡片 -->
             <div class="stats-grid">
                 <div class="stat-card">
@@ -330,57 +1597,15 @@
                     <div class="stat-label">项目经验</div>
                 </div>
             </div>
-            
-            <!-- 快速操作 -->
-            <div class="actions-grid">
-                <div class="action-card">
-                    <h3><i class="fas fa-user"></i> 个人资料</h3>
-                    <p>查看和管理您的个人信息、技能和经验记录。</p>
-                    <a href="{{ url_for('talent_management.employee_management.profile.profile_dashboard') }}" class="btn">
-                        查看资料
-                    </a>
-                </div>
-                
-                <div class="action-card">
-                    <h3><i class="fas fa-chart-line"></i> 绩效分析</h3>
-                    <p>查看详细的绩效报告和分析，了解工作表现和改进方向。</p>
-                    <a href="{{ url_for('talent_management.employee_management.performance.performance_dashboard') }}" class="btn">
-                        查看报告
-                    </a>
-                </div>
-                
-                <div class="action-card">
-                    <h3><i class="fas fa-graduation-cap"></i> 学习中心</h3>
-                    <p>制定个性化学习计划，提升技能水平，实现职业发展目标。</p>
-                    <a href="{{ url_for('talent_management.employee_management.learning_recommendation.dashboard') }}" class="btn">
-                        开始学习
-                    </a>
-                </div>
-                
-                <div class="action-card">
-                    <h3><i class="fas fa-bullseye"></i> 目标设定</h3>
-                    <p>设定SMART目标，跟踪进度，实现个人和职业发展。</p>
-                    <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="btn">
-                        设定目标
-                    </a>
-                </div>
-                
-                <div class="action-card">
-                    <h3><i class="fas fa-comments"></i> 反馈管理</h3>
-                    <p>查看和管理来自管理层和同事的反馈，进行回复和归档。</p>
-                    <a href="{{ url_for('talent_management.employee_management.feedback.feedback_dashboard') }}" class="btn">
-                        查看反馈
-                    </a>
-                </div>
-                
-                <div class="action-card">
-                    <h3><i class="fas fa-project-diagram"></i> 项目经验</h3>
-                    <p>记录和管理您的项目经验，展示专业能力和成就。</p>
-                    <a href="{{ url_for('talent_management.employee_management.projects.projects_dashboard') }}" class="btn">
-                        查看项目
-                    </a>
                 </div>
             </div>
+            
+            <!-- 区域3：工作进度和最近活动 -->
+            <div class="dashboard-section-wrapper">
+                <div class="dashboard-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>工作进度与活动
+                    </h2>
             
             <!-- 最近活动 -->
             <div class="recent-activity">
@@ -388,8 +1613,8 @@
 
                 {% if recent_activities %}
                     {% for activity in recent_activities %}
-                    <div class="activity-item">
-                        <div class="activity-icon">
+                    <div class="activity-item" data-activity-type="{{ activity.type }}">
+                        <div class="activity-icon {{ activity.type }}-icon">
                             <i class="{{ activity.icon }}"></i>
                         </div>
                         <div class="activity-content">
@@ -411,6 +1636,152 @@
                         <div class="activity-time">刚刚</div>
                     </div>
                 {% endif %}
+                    </div>
+                    
+                    <!-- 工作进度模块 -->
+                    <div class="work-progress-module">
+                        <h3><i class="fas fa-tasks"></i> 工作进度</h3>
+                        <div class="progress-grid">
+                            <div class="progress-item">
+                                <div class="progress-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="progress-content">
+                                    <h4>本周任务</h4>
+                                    <p>已完成 {{ task_completion.completed }} 项任务</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ (task_completion.completed / task_completion.total * 100) if task_completion.total > 0 else 0 }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="progress-item">
+                                <div class="progress-icon">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="progress-content">
+                                    <h4>学习计划</h4>
+                                    <p>学习进度 {{ learning_progress }}%</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ learning_progress }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 区域4：技能评估、职业发展和团队协作 -->
+            <div class="dashboard-section-wrapper">
+                <div class="dashboard-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-star"></i>技能与发展
+                    </h2>
+                    
+                    <!-- 技能评估模块 -->
+                    <div class="skills-assessment-module">
+                        <h3><i class="fas fa-chart-bar"></i> 技能评估</h3>
+                        <div class="skills-grid">
+                            <div class="skill-item">
+                                <div class="skill-name">专业技能</div>
+                                <div class="skill-score">{{ "%.1f"|format(performance_score) if performance_score > 0 else "暂无" }}</div>
+                                <div class="skill-level">优秀</div>
+                            </div>
+                            
+                            <div class="skill-item">
+                                <div class="skill-name">沟通能力</div>
+                                <div class="skill-score">8.5</div>
+                                <div class="skill-level">良好</div>
+                            </div>
+                            
+                            <div class="skill-item">
+                                <div class="skill-name">团队协作</div>
+                                <div class="skill-score">9.0</div>
+                                <div class="skill-level">优秀</div>
+                            </div>
+                            
+                            <div class="skill-item">
+                                <div class="skill-name">创新能力</div>
+                                <div class="skill-score">7.8</div>
+                                <div class="skill-level">良好</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 职业发展模块 -->
+                    <div class="career-development-module">
+                        <h3><i class="fas fa-rocket"></i> 职业发展</h3>
+                        <div class="career-grid">
+                            <div class="career-item">
+                                <div class="career-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="career-content">
+                                    <h4>培训课程</h4>
+                                    <p>本月已完成 3 门课程</p>
+                                    <span class="career-badge">进行中</span>
+                                </div>
+                            </div>
+                            
+                            <div class="career-item">
+                                <div class="career-icon">
+                                    <i class="fas fa-certificate"></i>
+                                </div>
+                                <div class="career-content">
+                                    <h4>认证考试</h4>
+                                    <p>准备参加高级认证</p>
+                                    <span class="career-badge">计划中</span>
+                                </div>
+                            </div>
+                            
+                            <div class="career-item">
+                                <div class="career-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="career-content">
+                                    <h4>导师指导</h4>
+                                    <p>与导师定期会面</p>
+                                    <span class="career-badge">进行中</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 团队协作模块 -->
+                    <div class="team-collaboration-module">
+                        <h3><i class="fas fa-handshake"></i> 团队协作</h3>
+                        <div class="team-grid">
+                            <div class="team-item">
+                                <div class="team-icon">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div class="team-content">
+                                    <h4>项目协作</h4>
+                                    <p>参与 {{ stats_data.project_count }} 个项目</p>
+                                    <div class="team-stats">
+                                        <span class="stat">团队规模: 8人</span>
+                                        <span class="stat">完成度: 75%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="team-item">
+                                <div class="team-icon">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <div class="team-content">
+                                    <h4>沟通反馈</h4>
+                                    <p>本月收到 5 条反馈</p>
+                                    <div class="team-stats">
+                                        <span class="stat">正面: 4条</span>
+                                        <span class="stat">建议: 1条</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -438,7 +1809,80 @@
                     }, 500); // 500ms是CSS过渡时间
                 }, 3000); // 3秒后开始淡出
             }
+            
+            // 为统计卡片添加数字动画效果
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                const text = stat.textContent;
+                if (text !== '暂无' && text.includes('%')) {
+                    const percentage = parseInt(text);
+                    animateNumber(stat, 0, percentage, 2000);
+                } else if (text !== '暂无' && text.includes('/')) {
+                    const parts = text.split('/');
+                    const completed = parseInt(parts[0]);
+                    const total = parseInt(parts[1]);
+                    animateFraction(stat, 0, completed, total, 2000);
+                }
+            });
+            
+            // 为进度条添加动画效果
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                if (width) {
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 500);
+                }
+            });
+            
+            // 添加卡片悬停时的微交互
+            const cards = document.querySelectorAll('.stat-card, .activity-item, .progress-item, .skill-item, .career-item, .team-item');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
         });
+        
+        // 数字动画函数
+        function animateNumber(element, start, end, duration) {
+            const startTime = performance.now();
+            const animate = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.floor(start + (end - start) * progress);
+                
+                element.textContent = current + '%';
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            };
+            requestAnimationFrame(animate);
+        }
+        
+        // 分数动画函数
+        function animateFraction(element, start, end, total, duration) {
+            const startTime = performance.now();
+            const animate = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.floor(start + (end - start) * progress);
+                
+                element.textContent = current + '/' + total;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            };
+            requestAnimationFrame(animate);
+        }
     </script>
 </body>
 </html>
