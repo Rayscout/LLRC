@@ -141,6 +141,20 @@
             margin-bottom: var(--ios-spacing-md);
         }
         
+        /* 快速操作卡片图标颜色映射 - 使用甜甜圈图表的颜色（避免黄红绿蓝顺序） */
+        .ios-quick-action:nth-of-type(1) i {
+            color: #60C7B8 !important; /* 青绿色 */
+        }
+        .ios-quick-action:nth-of-type(2) i {
+            color: #82C7A7 !important; /* 薄荷绿 */
+        }
+        .ios-quick-action:nth-of-type(3) i {
+            color: #F87979 !important; /* 珊瑚粉 */
+        }
+        .ios-quick-action:nth-of-type(4) i {
+            color: #FDF0B2 !important; /* 浅黄色 */
+        }
+        
         .ios-quick-action h4 {
             font-size: 1.125rem;
             margin-bottom: var(--ios-spacing-sm);
@@ -588,16 +602,7 @@
                             <span class="ios-tooltip-text">为合适的候选人安排面试时间，记录面试反馈和结果</span>
                         </div>
                     </a>
-                    
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-quick-action ios-fade-in-up">
-                        <i class="uil uil-chart-line"></i>
-                        <h4>数据报表</h4>
-                        <p>招聘数据分析</p>
-                        <div class="ios-feature-tooltip">
-                            <i class="uil uil-info-circle"></i>
-                            <span class="ios-tooltip-text">查看招聘效果分析，了解申请趋势和成功率数据</span>
-                        </div>
-                    </a>
+                </div>
                 </div>
             </div>
         </section>
