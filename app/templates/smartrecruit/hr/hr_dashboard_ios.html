@@ -24,10 +24,6 @@
              --fx-bg-3:#c4dfcc;
          }
         /* 页面特定样式 */
-        /* 间距精确缩小：去除每个Section的最小高度并压缩上下内边距，重点缩小英雄区与关键指标区间隔 */
-        .ios-section{ min-height:auto !important; padding-top:16px !important; padding-bottom:16px !important; }
-        .ios-hero-section{ padding-bottom:8px !important; }
-        .ios-stats-section{ padding-top:8px !important; }
                  .ios-hero-section { background: radial-gradient(1200px 420px at 20% -10%, #dbece0 0%, #cfe5d6 40%, #ffffff 100%); position:relative; overflow:hidden }
                  .ios-hero-section:before{content:""; position:absolute; inset:-20% -10% auto -10%; height:320px; background:conic-gradient(from 180deg, rgba(196,223,204,.18), rgba(207,229,214,.14), rgba(184,216,193,.12), rgba(196,223,204,.18)); filter:blur(40px); animation:spinSlow 22s linear infinite; pointer-events:none}
                  .ios-hero-section:after{content:""; position:absolute; right:-160px; top:-120px; width:520px; height:520px; background:radial-gradient(closest-side, rgba(196,223,204,.25), rgba(196,223,204,0)); filter:blur(10px); transform:rotate(15deg); animation:floatY 12s ease-in-out infinite; pointer-events:none}
@@ -210,19 +206,6 @@
 
         /* 头部 tabs 的视觉（明细/分析）可通过链接样式体现）*/
         .ios-title{ display:flex; align-items:center; gap:10px; }
-        
-        /* 统一重要文本字体为SF Pro Display */
-        h1, h2, h3, h4, h5, h6,
-        .ios-title, .ios-subtitle,
-        .ios-recent-title, .ios-metric-label,
-        .ios-quick-action h4, .ios-step-content h4,
-        .ios-guide-header h3, .ios-help-header h3,
-        .overlay-card h4, .ios-feature-card h4,
-        .ios-help-item h4, .ios-chart-container h3,
-        .ios-nav-brand, .ios-nav-text,
-        .ios-button, .ios-metric-value {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-        }
 
         /* 滑动时卡片渐显（不改结构，仅加类名控制） */
         .fade-card{ opacity:0; transform: translateY(12px); transition: opacity .5s ease, transform .6s cubic-bezier(.22,1,.36,1); will-change: transform, opacity; }
@@ -257,8 +240,8 @@
         /* 紧凑模式：缩小一切卡片尺寸、间距、字体 */
         .compact .ios-container{ --ios-spacing-xl:24px; --ios-spacing-lg:16px; --ios-spacing-md:10px; --ios-spacing-sm:6px }
         .compact .ios-title.hello{ font-size:1.8rem }
-        .compact .ios-title{ font-size:2rem }
-        .compact .ios-subtitle{ font-size:1.125rem }
+        .compact .ios-title{ font-size:1rem }
+        .compact .ios-subtitle{ font-size:.85rem }
         .compact .ios-metric-card{ padding: var(--ios-spacing-md); border-radius:12px }
         .compact .ios-metric-value{ font-size:22px }
         .compact .ios-quick-action{ padding: var(--ios-spacing-md); border-radius:12px }
@@ -533,7 +516,7 @@
 
         <!-- 快速操作Section -->
         <section class="ios-section ios-actions-section">
-            <div class="ios-container compact">
+            <div class="ios-container">
                 <h2 class="ios-title ios-fade-in">快速操作</h2>
                 <p class="ios-subtitle ios-fade-in">高效管理招聘流程的常用功能</p>
                 
@@ -593,7 +576,7 @@
 
         <!-- 最近活动Section -->
         <section class="ios-section ios-recent-section">
-            <div class="ios-container compact">
+            <div class="ios-container">
                 <h2 class="ios-title ios-fade-in">最近活动</h2>
                 <p class="ios-subtitle ios-fade-in">跟踪最新的招聘动态和申请情况</p>
                 
@@ -712,7 +695,7 @@
 
         <!-- 数据洞察Section -->
         <section class="ios-section ios-insights-section">
-            <div class="ios-container compact">
+            <div class="ios-container">
                 <h2 class="ios-title ios-fade-in">数据洞察</h2>
                 <p class="ios-subtitle ios-fade-in">深度分析招聘效果和趋势</p>
                 
@@ -751,7 +734,7 @@
 
         <!-- 底部导航Section -->
         <section class="ios-section ios-footer-section">
-            <div class="ios-container compact">
+            <div class="ios-container">
                 <h2 class="ios-title ios-fade-in">系统导航</h2>
                 <p class="ios-subtitle ios-fade-in">快速访问所有HR功能模块</p>
                 

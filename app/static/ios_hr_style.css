@@ -375,12 +375,12 @@ html { overflow: auto; }
 .ios-nav-brand-icon {
     width: 32px;
     height: 32px;
-    background: #c4dfcc; /* 50%绿色作为底色 */
-    border-radius: 10px; /* 圆角方块，贴合示例 */
+    background: linear-gradient(135deg, var(--ios-blue), var(--ios-purple));
+    border-radius: var(--ios-radius-medium);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff; /* 图标白色 */
+    color: white;
     font-size: 1.1rem;
 }
 
