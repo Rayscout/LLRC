@@ -145,20 +145,31 @@ def get_learning_progress(user_id):
         return 0
 
 def get_task_completion(user_id):
-    """获取任务完成情况"""
+    """获取任务完成情况 - 基于SMART目标数量"""
     try:
-        # 这里可以根据实际的任务系统来获取数据
-        # 暂时使用模拟数据，可以根据实际需求修改
-        evaluations = TaskEvaluation.query.filter_by(employee_id=user_id).all()
-        completed_tasks = len([e for e in evaluations if e.total_score >= 12])  # 假设12分以上算完成
-        total_tasks = len(evaluations)
+        # 从SMART目标中获取任务总数和完成情况
+        smart_goals = SmartGoal.query.filter_by(user_id=user_id).all()
+
+        # 计算总任务数（SMART目标总数）
+        total_tasks = len(smart_goals)
+
+        # 计算已完成的任务数（状态为completed的目标）
+        completed_tasks = len([goal for goal in smart_goals if goal.status == 'completed'])
+
+        # 如果没有SMART目标，则显示0/0
+        if total_tasks == 0:
+            return {
+                'completed': 0,
+                'total': 0  # 显示0/0
+            }
 
         return {
             'completed': completed_tasks,
-            'total': total_tasks if total_tasks > 0 else 15  # 默认15个任务
+            'total': total_tasks  # 基于SMART目标的动态总数
         }
-    except:
-        return {'completed': 0, 'total': 15}
+    except Exception as e:
+        print(f"获取任务完成情况失败: {e}")
+        return {'completed': 0, 'total': 0}
 
 def get_overall_score(user_id):
     """获取综合评分"""
