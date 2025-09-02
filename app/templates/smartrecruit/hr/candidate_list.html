@@ -123,23 +123,6 @@
             color: var(--ios-blue);
             margin-bottom: var(--ios-spacing-xs);
         }
-
-        /* 统计数字颜色定制 */
-        .ios-stat-card:nth-of-type(1) .ios-stat-number {
-            color: #FF6B6B !important; /* 红/珊瑚色 - 总申请数 */
-        }
-        .ios-stat-card:nth-of-type(2) .ios-stat-number {
-            color: #20B2AA !important; /* 青/浅蓝色 - 待处理 */
-        }
-        .ios-stat-card:nth-of-type(3) .ios-stat-number {
-            color: #87CEEB !important; /* 浅蓝/天蓝色 - 面试中 */
-        }
-        .ios-stat-card:nth-of-type(4) .ios-stat-number {
-            color: #98FB98 !important; /* 浅绿/薄荷绿色 - 已通过 */
-        }
-        .ios-stat-card:nth-of-type(5) .ios-stat-number {
-            color: #FFE4B5 !important; /* 浅黄/奶油色 - 已撤销 */
-        }
         
         .ios-stat-label {
             font-size: 0.875rem;
@@ -229,7 +212,18 @@
                         <span class="ios-nav-text">面试</span>
                     </a>
                 </li>
-
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-chart-pie"></i>
+                        <span class="ios-nav-text">报表</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link">
+                        <i class="uil uil-lightbulb"></i>
+                        <span class="ios-nav-text">AI洞察</span>
+                    </a>
+                </li>
             </ul>
             
             <div class="ios-nav-actions">

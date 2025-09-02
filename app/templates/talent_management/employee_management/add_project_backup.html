@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加项目经验 - 人才管理系统</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .skills-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .skill-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .skill-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: #4facfe;
+        }
+
+        .skill-item.selected {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-color: white;
+        }
+
+        .skill-item i {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .timeline-section {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: #43e97b;
+            border-radius: 50%;
+            transform: translateY(-50%);
+        }
+
+        .achievements-section {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .achievement-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            border-left: 4px solid #fa709a;
+        }
+
+        .achievement-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 15px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(240, 147, 251, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(67, 233, 123, 0.4);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(67, 233, 123, 0.6);
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .shape:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            border-radius: 20px;
+            animation-delay: 2s;
+        }
+
+        .shape:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            border-radius: 50%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            animation: progress-animation 2s ease-in-out infinite;
+        }
+
+        @keyframes progress-animation {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(0%); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .btn {
+                display: block;
+                margin: 15px auto;
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-project-diagram"></i> 添加项目经验</h1>
+            <p>记录您的专业项目成就，展示您的技能与价值</p>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <form method="POST" action="{{ url_for('talent_management.employee_manager.projects.add_project') }}">
+                <!-- 基本信息 -->
+                <div class="form-section">
+                    <h2 class="section-title"><i class="fas fa-info-circle"></i> 项目基本信息</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="project_name"><i class="fas fa-tag"></i> 项目名称</label>
+                            <input type="text" id="project_name" name="project_name" required placeholder="请输入项目名称">
+                        </div>
+                        <div class="form-group">
+                            <label for="project_role"><i class="fas fa-user-tie"></i> 担任角色</label>
+                            <select id="project_role" name="project_role" required>
+                                <option value="">请选择角色</option>
+                                <option value="项目经理">项目经理</option>
+                                <option value="技术负责人">技术负责人</option>
+                                <option value="开发工程师">开发工程师</option>
+                                <option value="测试工程师">测试工程师</option>
+                                <option value="产品经理">产品经理</option>
+                                <option value="UI/UX设计师">UI/UX设计师</option>
+                                <option value="数据分析师">数据分析师</option>
+                                <option value="运维工程师">运维工程师</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="company_name"><i class="fas fa-building"></i> 公司/组织</label>
+                            <input type="text" id="company_name" name="company_name" required placeholder="请输入公司或组织名称">
+                        </div>
+                        <div class="form-group">
+                            <label for="project_type"><i class="fas fa-layer-group"></i> 项目类型</label>
+                            <select id="project_type" name="project_type" required>
+                                <option value="">请选择项目类型</option>
+                                <option value="Web应用开发">Web应用开发</option>
+                                <option value="移动应用开发">移动应用开发</option>
+                                <option value="企业管理系统">企业管理系统</option>
+                                <option value="数据分析项目">数据分析项目</option>
+                                <option value="人工智能项目">人工智能项目</option>
+                                <option value="基础设施项目">基础设施项目</option>
+                                <option value="产品设计项目">产品设计项目</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 项目时间 -->
+                <div class="timeline-section">
+                    <h2 class="section-title"><i class="fas fa-calendar-alt"></i> 项目时间线</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="start_date"><i class="fas fa-play"></i> 开始时间</label>
+                            <input type="date" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_date"><i class="fas fa-stop"></i> 结束时间</label>
+                            <input type="date" id="end_date" name="end_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="duration"><i class="fas fa-clock"></i> 项目周期</label>
+                            <input type="text" id="duration" name="duration" placeholder="例如：6个月" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="current_status"><i class="fas fa-toggle-on"></i> 项目状态</label>
+                            <select id="current_status" name="current_status" required>
+                                <option value="">请选择状态</option>
+                                <option value="进行中">进行中</option>
+                                <option value="已完成">已完成</option>
+                                <option value="已暂停">已暂停</option>
+                                <option value="已取消">已取消</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 技术技能 -->
+                <div class="skills-section">
+                    <h2 class="section-title"><i class="fas fa-code"></i> 技术技能应用</h2>
+                    <div class="skills-grid">
+                        <div class="skill-item" data-skill="Python">
+                            <i class="fab fa-python"></i>
+                            <span>Python</span>
+                        </div>
+                        <div class="skill-item" data-skill="JavaScript">
+                            <i class="fab fa-js-square"></i>
+                            <span>JavaScript</span>
+                        </div>
+                        <div class="skill-item" data-skill="Java">
+                            <i class="fab fa-java"></i>
+                            <span>Java</span>
+                        </div>
+                        <div class="skill-item" data-skill="React">
+                            <i class="fab fa-react"></i>
+                            <span>React</span>
+                        </div>
+                        <div class="skill-item" data-skill="Vue.js">
+                            <i class="fab fa-vuejs"></i>
+                            <span>Vue.js</span>
+                        </div>
+                        <div class="skill-item" data-skill="Node.js">
+                            <i class="fab fa-node-js"></i>
+                            <span>Node.js</span>
+                        </div>
+                        <div class="skill-item" data-skill="Docker">
+                            <i class="fab fa-docker"></i>
+                            <span>Docker</span>
+                        </div>
+                        <div class="skill-item" data-skill="AWS">
+                            <i class="fab fa-aws"></i>
+                            <span>AWS</span>
+                        </div>
+                        <div class="skill-item" data-skill="Git">
+                            <i class="fab fa-git-alt"></i>
+                            <span>Git</span>
+                        </div>
+                        <div class="skill-item" data-skill="MySQL">
+                            <i class="fas fa-database"></i>
+                            <span>MySQL</span>
+                        </div>
+                        <div class="skill-item" data-skill="MongoDB">
+                            <i class="fas fa-leaf"></i>
+                            <span>MongoDB</span>
+                        </div>
+                        <div class="skill-item" data-skill="其他">
+                            <i class="fas fa-plus"></i>
+                            <span>其他技能</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selected_skills" name="selected_skills">
+                </div>
+
+                <!-- 项目描述 -->
+                <div class="form-section">
+                    <h2 class="section-title"><i class="fas fa-align-left"></i> 项目描述</h2>
+                    <div class="form-group">
+                        <label for="project_description"><i class="fas fa-file-alt"></i> 项目概述</label>
+                        <textarea id="project_description" name="project_description" required placeholder="请详细描述项目背景、目标、规模等信息..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="responsibilities"><i class="fas fa-tasks"></i> 主要职责</label>
+                        <textarea id="responsibilities" name="responsibilities" required placeholder="请描述您在项目中的主要职责和贡献..."></textarea>
+                    </div>
+                </div>
+
+                <!-- 项目成就 -->
+                <div class="achievements-section">
+                    <h2 class="section-title"><i class="fas fa-trophy"></i> 项目成就与影响</h2>
+                    <div class="form-group">
+                        <label for="achievements"><i class="fas fa-star"></i> 主要成就</label>
+                        <textarea id="achievements" name="achievements" required placeholder="请描述项目的主要成果、解决的问题、带来的价值等..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="metrics"><i class="fas fa-chart-line"></i> 量化指标</label>
+                        <textarea id="metrics" name="metrics" placeholder="请描述项目的关键绩效指标、数据表现等（如：提升效率30%、降低成本20%等）..."></textarea>
+                    </div>
+                </div>
+
+                <!-- 挑战与学习 -->
+                <div class="form-section">
+                    <h2 class="section-title"><i class="fas fa-lightbulb"></i> 挑战与学习</h2>
+                    <div class="form-group">
+                        <label for="challenges"><i class="fas fa-exclamation-triangle"></i> 主要挑战</label>
+                        <textarea id="challenges" name="challenges" placeholder="请描述项目过程中遇到的主要挑战和困难..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="learnings"><i class="fas fa-graduation-cap"></i> 学习收获</label>
+                        <textarea id="learnings" name="learnings" placeholder="请描述通过项目获得的学习收获、技能提升等..."></textarea>
+                    </div>
+                </div>
+
+                <!-- 按钮区域 -->
+                <div class="btn-container">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> 保存项目经验
+                    </button>
+                    <a href="{{ url_for('talent_management.employee_manager.projects.projects_dashboard') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> 返回项目列表
+                    </a>
+                    <button type="reset" class="btn btn-primary">
+                        <i class="fas fa-redo"></i> 重置表单
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // 技能选择功能
+        document.querySelectorAll('.skill-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.classList.toggle('selected');
+                updateSelectedSkills();
+            });
+        });
+
+        function updateSelectedSkills() {
+            const selectedSkills = Array.from(document.querySelectorAll('.skill-item.selected'))
+                .map(item => item.querySelector('span').textContent);
+            document.getElementById('selected_skills').value = selectedSkills.join(',');
+        }
+
+        // 时间计算功能
+        document.getElementById('start_date').addEventListener('change', calculateDuration);
+        document.getElementById('end_date').addEventListener('change', calculateDuration);
+
+        function calculateDuration() {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const diffTime = Math.abs(end - start);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const months = Math.floor(diffDays / 30);
+                const days = diffDays % 30;
+                
+                let duration = '';
+                if (months > 0) {
+                    duration = `${months}个月`;
+                    if (days > 0) duration += `${days}天`;
+                } else {
+                    duration = `${days}天`;
+                }
+                
+                document.getElementById('duration').value = duration;
+            }
+        }
+
+        // 表单验证
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const requiredFields = this.querySelectorAll('[required]');
+            let isValid = true;
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#ff6b6b';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '';
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('请填写所有必填字段！');
+            }
+        });
+
+        // 输入框焦点效果
+        document.querySelectorAll('input, select, textarea').forEach(field => {
+            field.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            field.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // 页面加载动画
+        window.addEventListener('load', function() {
+            document.querySelector('.container').style.opacity = '0';
+            document.querySelector('.container').style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                document.querySelector('.container').style.transition = 'all 0.8s ease';
+                document.querySelector('.container').style.opacity = '1';
+                document.querySelector('.container').style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

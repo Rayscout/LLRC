@@ -43,15 +43,7 @@ function createMovingGradientBackground() {
         // 设置动画延迟
         gradientShape.style.animationDelay = shape.delay + 's';
         
-        // 添加随机颜色变化
-        const colorVariations = [
-            'linear-gradient(45deg, #e4f6ec, #e0f5e9, #ddf4e7)',
-            'linear-gradient(135deg, #e0f5e9, #e4f6ec, #ddf4e7)',
-            'linear-gradient(225deg, #ddf4e7, #e0f5e9, #e4f6ec)',
-            'linear-gradient(315deg, #e4f6ec, #ddf4e7, #e0f5e9)'
-        ];
-        
-        gradientShape.style.background = colorVariations[index % colorVariations.length];
+        // 移除颜色设置，现在使用CSS中的径向渐变光晕效果
         
         backgroundContainer.appendChild(gradientShape);
     });
