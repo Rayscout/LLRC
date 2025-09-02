@@ -272,6 +272,36 @@
         .overlay-bar:nth-child(3){ height:35%; animation-delay:.1s }
         .overlay-bar:nth-child(4){ height:70%; animation-delay:.15s }
         @keyframes barUp{from{transform:translateY(12px); opacity:0}to{transform:none; opacity:1}}
+<<<<<<< HEAD
+=======
+
+        /* 仪表盘首页色彩点缀（仅本页生效） */
+        :root{
+            --dash-accent-1:#c4dfcc; /* 绿 */
+            --dash-accent-2:#b8d8c1; /* 深绿 */
+            --dash-accent-3:#a7d3e7; /* 天蓝 */
+            --dash-accent-4:#c9b8e8; /* 淡紫 */
+        }
+        /* 快速操作卡片：柔和渐变与清晰描边 */
+        .ios-quick-action{ background:linear-gradient(135deg,#ffffff,rgba(255,255,255,.95)); border:1px solid rgba(0,0,0,.06) }
+        .ios-quick-action.primary{ background:linear-gradient(135deg,var(--dash-accent-1),var(--dash-accent-2)); color: var(--ios-blue) }
+        .ios-quick-action .uil{ color: var(--ios-blue) }
+        .ios-quick-action:hover{ box-shadow:0 14px 36px rgba(0,0,0,.14) }
+
+        /* 指标卡片：细腻渐变描边与更柔光影 */
+        .ios-metric-card{ border:1px solid transparent; background-clip:padding-box,border-box; background-image:linear-gradient(#ffffff,#ffffff),linear-gradient(135deg,rgba(196,223,204,.35),rgba(167,211,231,.25),rgba(201,184,232,.25)); box-shadow:0 6px 20px rgba(0,0,0,.08) }
+        .ios-metric-card:hover{ box-shadow:0 14px 36px rgba(0,0,0,.14); background-image:linear-gradient(#ffffff,#ffffff),linear-gradient(135deg,rgba(196,223,204,.5),rgba(167,211,231,.35),rgba(201,184,232,.35)) }
+
+        /* 指标图标多色映射（前四张卡） */
+        .ios-grid .ios-metric-card:nth-of-type(1) .ios-metric-icon i{ color:var(--dash-accent-2) }
+        .ios-grid .ios-metric-card:nth-of-type(2) .ios-metric-icon i{ color:var(--dash-accent-3) }
+        .ios-grid .ios-metric-card:nth-of-type(3) .ios-metric-icon i{ color:var(--dash-accent-4) }
+        .ios-grid .ios-metric-card:nth-of-type(4) .ios-metric-icon i{ color:var(--dash-accent-1) }
+
+        /* 顶部胶囊条轻渐变描边 */
+        .ios-hero-pills .pill{ background:linear-gradient(#ffffff,#ffffff); border:1px solid rgba(0,0,0,.08); position:relative }
+        .ios-hero-pills .pill:after{ content:""; position:absolute; inset:0; border-radius:999px; pointer-events:none; background:linear-gradient(135deg, rgba(196,223,204,.28), rgba(167,211,231,.2), rgba(201,184,232,.2)); mix-blend-mode:multiply; opacity:.55 }
+>>>>>>> RayScout
     </style>
 </head>
 <body>
