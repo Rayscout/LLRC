@@ -44,6 +44,20 @@
             color: var(--ios-blue);
             margin-bottom: var(--ios-spacing-xs);
         }
+
+        /* 统计数字颜色定制 */
+        .ios-stats-grid .ios-stat-card:nth-of-type(1) .ios-stat-number {
+            color: #FFE4B5 !important; /* 浅黄色 - 总候选人 */
+        }
+        .ios-stats-grid .ios-stat-card:nth-of-type(2) .ios-stat-number {
+            color: #FF6B6B !important; /* 红/珊瑚色 - 通过面试 */
+        }
+        .ios-stats-grid .ios-stat-card:nth-of-type(3) .ios-stat-number {
+            color: #20B2AA !important; /* 青/浅蓝色 - 通过率 */
+        }
+        .ios-stats-grid .ios-stat-card:nth-of-type(4) .ios-stat-number {
+            color: #87CEEB !important; /* 中蓝/天蓝色 - 平均分数 */
+        }
         
         .ios-stat-label {
             font-size: 0.875rem;
