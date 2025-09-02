@@ -113,10 +113,21 @@ nav {
     display: none !important;
 }
 
-/* 调整主内容区域，移除左侧边距 */
+/* 调整主内容区域，移除左侧边距并确保居中 */
 .dashboard {
     margin-left: 0 !important;
     width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+}
+
+.dash-content {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    max-width: 1400px !important;
 }
 
 .top {
@@ -142,13 +153,21 @@ html, body {
 .hr-settings-page {
     padding: 20px;
     max-width: 1400px;
-    margin: 0 auto;
+    margin: 0 auto !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
 }
 
 .page-header {
     text-align: center;
     margin-bottom: 30px;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
 }
 
 .page-header h1 {
@@ -166,6 +185,9 @@ html, body {
     border-radius: 12px;
     padding: 40px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 .settings-section {
