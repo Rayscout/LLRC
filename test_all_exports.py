@@ -16,17 +16,17 @@ def test_all_exports():
     endpoints = [
         {
             "name": "薪酬分析导出",
-            "url": "http://localhost:5000/talent/hr_admin/salary_analysis/export_salary_data",
+            "url": "http://localhost:5000/talent/hr_admin/salary_analysis/api/export_data",
             "method": "POST"
         },
         {
             "name": "组织健康度导出",
-            "url": "http://localhost:5000/talent/hr_admin/org_health/export_org_health_report",
+            "url": "http://localhost:5000/talent/hr_admin/org_health/api/export_report",
             "method": "POST"
         },
         {
             "name": "职业发展追踪导出",
-            "url": "http://localhost:5000/talent/hr_admin/career_tracking/export_career_report",
+            "url": "http://localhost:5000/talent/hr_admin/career_tracking/api/export_report",
             "method": "POST"
         },
         {
@@ -37,49 +37,37 @@ def test_all_exports():
     ]
     
     for endpoint in endpoints:
-        print(f"\n🔍 测试 {endpoint['name']}...")
-        test_endpoint(endpoint)
-
-def test_endpoint(endpoint):
-    """测试单个端点"""
-    try:
-        response = requests.request(
-            endpoint['method'], 
-            endpoint['url'], 
-            timeout=30,
-            headers={'Content-Type': 'application/json'}
-        )
+        print(f"\n📋 测试 {endpoint['name']}...")
         
-        print(f"  状态码: {response.status_code}")
-        print(f"  响应头: {dict(response.headers)}")
-        
-        if response.status_code == 200:
-            print(f"  ✅ {endpoint['name']}成功！")
-            print(f"  文件大小: {len(response.content)} bytes")
+        try:
+            response = requests.post(endpoint['url'], timeout=30)
             
-            # 保存文件
-            filename = f"{endpoint['name'].replace('导出', '')}_test_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
-            with open(filename, 'wb') as f:
-                f.write(response.content)
-            print(f"  ✅ 文件已保存为: {filename}")
+            print(f"状态码: {response.status_code}")
+            print(f"响应头: {dict(response.headers)}")
             
-        elif response.status_code == 401:
-            print(f"  ⚠️ {endpoint['name']}需要登录")
-        elif response.status_code == 403:
-            print(f"  ⚠️ {endpoint['name']}权限不足")
-        elif response.status_code == 404:
-            print(f"  ❌ {endpoint['name']}接口不存在")
-        elif response.status_code == 500:
-            print(f"  ❌ {endpoint['name']}服务器内部错误")
-        elif response.status_code == 502:
-            print(f"  ❌ {endpoint['name']}网关错误")
-        else:
-            print(f"  ❌ {endpoint['name']}失败: {response.text}")
-            
-    except requests.exceptions.RequestException as e:
-        print(f"  ❌ {endpoint['name']}请求失败: {e}")
-    except Exception as e:
-        print(f"  ❌ {endpoint['name']}测试失败: {e}")
+            if response.status_code == 200:
+                print("✅ 导出成功！")
+                print(f"文件大小: {len(response.content)} bytes")
+                
+                # 保存文件
+                filename = f"{endpoint['name'].replace('导出', '')}_test_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+                with open(filename, 'wb') as f:
+                    f.write(response.content)
+                print(f"✅ 文件已保存为: {filename}")
+                
+            elif response.status_code == 401:
+                print("⚠️ 需要登录")
+            elif response.status_code == 403:
+                print("⚠️ 权限不足")
+            else:
+                print(f"❌ 导出失败: {response.text}")
+                
+        except requests.exceptions.RequestException as e:
+            print(f"❌ 请求失败: {e}")
+        except Exception as e:
+            print(f"❌ 测试失败: {e}")
+    
+    print("\n🎉 所有模块导出功能测试完成！")
 
 if __name__ == "__main__":
     test_all_exports()
