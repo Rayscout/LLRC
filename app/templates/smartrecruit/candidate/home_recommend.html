@@ -9,53 +9,6 @@
   <div class="section-content">
     <h1 class="section-title">智能职位推荐</h1>
 
-    {% if resume_analysis %}
-    <div class="card" style="margin-top: 12px;">
-      <div class="card-header">
-        <div class="card-title">基于最新简历的AI分析</div>
-        <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="btn btn-outline">更新简历</a>
-      </div>
-      <div class="text-secondary" style="margin:6px 0;">{{ resume_analysis.summary }}</div>
-      {% if resume_analysis.score is not none %}
-      <div style="margin:6px 0;">
-        <strong>简历评分：</strong>
-        <span class="tag" style="background:rgba(0,122,255,.12);color:var(--accent-primary);padding:6px 10px;border-radius:12px;">{{ resume_analysis.score }}/100</span>
-      </div>
-      {% endif %}
-      {% if resume_analysis.strengths %}
-      <div style="margin:6px 0;">
-        <strong>优势：</strong>
-        <ul style="margin:6px 0 0 18px;">
-          {% for s in resume_analysis.strengths %}<li>{{ s }}</li>{% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-      {% if resume_analysis.weaknesses %}
-      <div style="margin:6px 0;">
-        <strong>可改进：</strong>
-        <ul style="margin:6px 0 0 18px;">
-          {% for s in resume_analysis.weaknesses %}<li>{{ s }}</li>{% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-      {% if resume_analysis.suggestions %}
-      <div style="margin:6px 0;">
-        <strong>建议：</strong>
-        <ul style="margin:6px 0 0 18px;">
-          {% for s in resume_analysis.suggestions %}<li>{{ s }}</li>{% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-      {% if resume_analysis.recommended_roles %}
-      <div style="margin:6px 0;">
-        <strong>推荐岗位：</strong>
-        <span>{{ ', '.join(resume_analysis.recommended_roles) }}</span>
-      </div>
-      {% endif %}
-      <div class="text-tertiary" style="margin-top:8px; font-size:12px;">每次更新简历后，此分析将自动刷新。</div>
-    </div>
-    {% endif %}
-
     {% if user_skills %}
     <div class="card" style="margin-top: 12px;">
       <div class="card-header">

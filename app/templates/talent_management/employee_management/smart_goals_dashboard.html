@@ -7,7 +7,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
         :root {
@@ -21,6 +20,10 @@
             --accent-green: #34C759;
             --accent-orange: #FF9500;
             --accent-red: #FF3B30;
+            --accent-purple: #8A2BE2;
+            --accent-teal: #00CED1;
+            --accent-coral: #FF7F50;
+            --accent-gold: #FFD700;
             --shadow-light: 0 4px 20px rgba(228, 246, 236, 0.3);
             --shadow-medium: 0 8px 30px rgba(228, 246, 236, 0.3);
             --border-radius: 16px;
@@ -40,6 +43,10 @@
             --accent-green: #30D158;
             --accent-orange: #FF9F0A;
             --accent-red: #FF453A;
+            --accent-purple: #BF5AF2;
+            --accent-teal: #64D2FF;
+            --accent-coral: #FF6B6B;
+            --accent-gold: #FFD60A;
             --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
             --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
@@ -51,81 +58,427 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            color: var(--text-primary);
-            line-height: 1.6;
-            transition: var(--transition);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
             min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* 动态背景 - 采用HR界面的优雅渐变晕染设计 */
+        .employee-parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        /* 微妙的渐变晕染背景装饰 */
+        .employee-parallax-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(144, 238, 144, 0.12) 0%, transparent 70%), /* 左下角光晕 - 更绿更明显 */
+                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(152, 251, 152, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(173, 255, 47, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(50, 205, 50, 0.08) 0%, transparent 70%), /* 右下角光晕 - 更绿更明显 */
+                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(34, 139, 34, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 60s ease-in-out infinite;
+        }
+        
+        /* 半透明遮罩层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            z-index: -1;
+        }
+        
+        /* 微妙的渐变晕染动画 */
+        @keyframes gentleDrift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: translate(30px, -20px) scale(1.01);
+                opacity: 0.98;
+            }
+            50% {
+                transform: translate(-25px, 35px) scale(0.99);
+                opacity: 1.02;
+            }
+            75% {
+                transform: translate(20px, 25px) scale(1.005);
+                opacity: 0.99;
+            }
         }
 
-        .container {
-            max-width: 1200px;
+        /* 返回按钮样式 */
+        .back-link {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #7FB069, #9DC183);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(127, 176, 105, 0.4);
+            border: none;
+        }
+        
+        .back-link:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(127, 176, 105, 0.6);
+            background: linear-gradient(135deg, #9DC183, #7FB069);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .back-link i {
+            font-size: 1.2rem;
+        }
+        
+        /* 导航栏样式 */
+        .top-navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(26, 77, 26, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            padding: 0;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a4d1a;
+        }
+        
+        .nav-brand i {
+            font-size: 1.8rem;
+            color: #2d5a2d;
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            color: #2d5a2d;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .nav-item:hover {
+            background: rgba(26, 77, 26, 0.08);
+            color: #1a4d1a;
+            transform: translateY(-1px);
+        }
+        
+        .nav-item i {
+            font-size: 1rem;
+        }
+        
+        .nav-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2d5a2d, #1a4d1a);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 90, 45, 0.3);
+        }
+        
+        .nav-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 90, 45, 0.4);
+            background: linear-gradient(135deg, #1a4d1a, #2d5a2d);
+        }
+        
+        .nav-logout i {
+            font-size: 1rem;
+        }
+        
+        /* 调整主容器位置，避免被导航栏遮挡 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 20px 20px 20px; /* 顶部增加100px的padding */
+            position: relative;
+            z-index: 1;
         }
 
         .header {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--border-radius-large);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            color: #1a4d1a;
             padding: 30px;
+            text-align: center;
+            border-radius: 20px;
             margin-bottom: 30px;
-            box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .header h1 {
             font-size: 2.5em;
-            font-weight: 700;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #1a4d1a;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .header p {
             font-size: 1.2em;
-            color: var(--text-secondary);
+            color: #2d5a2d;
+            font-weight: 500;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 30px;
         }
 
         .stat-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--border-radius);
-            padding: 25px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
-            box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: var(--transition-fast);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.8);
+            opacity: 0.8;
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: var(--shadow-medium);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .stat-card:hover::before {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            color: var(--accent-blue);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            color: var(--accent-green);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            color: var(--accent-orange);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            color: var(--accent-purple);
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
         }
 
         .stat-value {
-            font-size: 2.5em;
+            font-size: 1.6rem;
             font-weight: 700;
-            color: #20B2AA;
-            margin-bottom: 10px;
+            color: #1a4d1a;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-value {
+            color: var(--accent-purple);
+            transform: scale(1.05);
         }
 
         .stat-label {
-            font-size: 1em;
-            color: var(--text-secondary);
+            font-size: 0.9rem;
+            color: #2d5a2d;
             font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-label {
+            color: var(--accent-teal);
+        }
+
+        /* 目标管理导航样式 */
+        .goals-navigation {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .goal-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 25px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            color: #1a4d1a;
+            text-decoration: none;
+            border-radius: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            min-width: 140px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 120px;
+        }
+
+        .goal-nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .goal-nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .goal-nav-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a4d1a;
+            text-decoration: none;
+            border-color: rgba(45, 90, 45, 0.2);
+        }
+
+        .goal-nav-btn i {
+            font-size: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .goal-nav-btn:nth-child(1) i {
+            color: var(--accent-green);
+        }
+
+        .goal-nav-btn:nth-child(2) i {
+            color: var(--accent-blue);
+        }
+
+        .goal-nav-btn:nth-child(3) i {
+            color: var(--accent-orange);
+        }
+
+        .goal-nav-btn:nth-child(4) i {
+            color: var(--accent-purple);
+        }
+
+        .goal-nav-btn:hover i {
+            transform: scale(1.1) rotate(5deg);
+            color: var(--accent-coral);
+        }
+
+        .goal-nav-btn span {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1a4d1a;
+            transition: all 0.3s ease;
+        }
+
+        .goal-nav-btn:hover span {
+            color: var(--accent-purple);
+            transform: scale(1.05);
         }
 
         .content-grid {
@@ -135,37 +488,81 @@
         }
 
         .main-content {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--border-radius-large);
-            padding: 30px;
-            box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
         }
 
         .section-title {
-            font-size: 1.5em;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--text-primary);
+            color: #1a4d1a;
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 30px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(26, 77, 26, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .section-title i {
+            color: var(--accent-blue);
+            font-size: 1.5em;
+            background: rgba(32, 178, 170, 0.1);
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: none;
+            transition: all 0.3s ease;
+        }
+
+        .section-title:hover {
+            color: var(--accent-purple);
+            border-bottom-color: rgba(138, 43, 226, 0.3);
+        }
+
+        .section-title:hover i {
+            color: var(--accent-coral);
+            background: rgba(255, 127, 80, 0.15);
+            transform: rotate(10deg) scale(1.05);
         }
 
         .goal-item {
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 18px;
             padding: 20px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: var(--transition-fast);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .goal-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            transition: all 0.3s ease;
         }
 
         .goal-item:hover {
             transform: translateX(5px);
-            box-shadow: var(--shadow-light);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .goal-item:hover::before {
+            width: 6px;
+            background: rgba(255, 255, 255, 0.8);
         }
 
         .goal-header {
@@ -179,6 +576,12 @@
             font-size: 1.2em;
             font-weight: 600;
             color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .goal-item:hover .goal-title {
+            color: var(--accent-purple);
+            transform: translateX(5px);
         }
 
         .goal-priority {
@@ -186,21 +589,40 @@
             border-radius: 20px;
             font-size: 0.8em;
             font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         .priority-high {
             background: rgba(255, 59, 48, 0.1);
-            color: var(--accent-red);
+            color: #FF3B30;
+            border: 1px solid rgba(255, 59, 48, 0.3);
+        }
+
+        .priority-high:hover {
+            background: rgba(255, 59, 48, 0.2);
+            transform: scale(1.05);
         }
 
         .priority-medium {
             background: rgba(255, 149, 0, 0.1);
             color: var(--accent-orange);
+            border: 1px solid rgba(255, 149, 0, 0.3);
+        }
+
+        .priority-medium:hover {
+            background: rgba(255, 149, 0, 0.2);
+            transform: scale(1.05);
         }
 
         .priority-low {
             background: rgba(52, 199, 89, 0.1);
-            color: var(--accent-green);
+            color: #34C759;
+            border: 1px solid rgba(52, 199, 89, 0.3);
+        }
+
+        .priority-low:hover {
+            background: rgba(52, 199, 89, 0.2);
+            transform: scale(1.05);
         }
 
         .goal-progress {
@@ -215,21 +637,23 @@
         .progress-bar {
             width: 100%;
             height: 12px;
-            background: rgba(32, 178, 170, 0.1);
+            background: rgba(45, 90, 45, 0.1);
             border-radius: 6px;
             overflow: visible;
             position: relative;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #20B2AA 0%, #2F4F4F 100%);
+            background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
             border-radius: 6px;
             transition: width 0.3s ease;
             position: absolute;
             top: 0;
             left: 0;
+            box-shadow: 0 0 10px rgba(32, 178, 170, 0.3);
         }
 
         .progress-handle {
@@ -239,17 +663,19 @@
             width: 20px;
             height: 20px;
             background: white;
-            border: 2px solid #20B2AA;
+            border: 2px solid var(--accent-blue);
             border-radius: 50%;
             cursor: grab;
-            box-shadow: 0 2px 6px rgba(32, 178, 170, 0.3);
+            box-shadow: 0 2px 6px rgba(45, 90, 45, 0.3);
             z-index: 10;
             transition: all 0.2s ease;
         }
 
         .progress-handle:hover {
             transform: translate(-50%, -50%) scale(1.1);
-            box-shadow: 0 4px 12px rgba(32, 178, 170, 0.4);
+            box-shadow: 0 4px 12px rgba(45, 90, 45, 0.4);
+            border-color: var(--accent-teal);
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
         }
 
         .progress-handle:active {
@@ -273,17 +699,31 @@
             color: var(--text-primary);
             font-size: 0.9em;
             text-align: center;
+            transition: all 0.3s ease;
         }
 
         .hours-input:focus {
             outline: none;
-            border-color: #20B2AA;
+            border-color: var(--accent-blue);
             box-shadow: 0 0 0 2px rgba(32, 178, 170, 0.1);
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .hours-input:hover {
+            border-color: var(--accent-teal);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .hours-label {
             font-size: 0.85em;
             color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .progress-input-group:hover .hours-label {
+            color: var(--accent-coral);
+            font-weight: 600;
         }
 
         .progress-text {
@@ -291,6 +731,29 @@
             color: var(--text-secondary);
             display: flex;
             justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .progress-text span {
+            transition: all 0.3s ease;
+        }
+
+        .progress-text span:first-child {
+            color: var(--accent-blue);
+        }
+
+        .progress-text span:last-child {
+            color: var(--accent-orange);
+        }
+
+        .progress-text:hover span:first-child {
+            color: var(--accent-teal);
+            font-weight: 600;
+        }
+
+        .progress-text:hover span:last-child {
+            color: var(--accent-gold);
+            font-weight: 600;
         }
 
         .goal-details {
@@ -304,53 +767,179 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(3px);
+        }
+
+        .detail-item:hover::before {
+            width: 5px;
+            background: rgba(255, 255, 255, 0.6);
         }
 
         .detail-label {
             font-size: 0.8em;
             color: var(--text-tertiary);
             font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover .detail-label {
+            color: var(--accent-teal);
+            font-weight: 600;
         }
 
         .detail-value {
             font-size: 0.9em;
             color: var(--text-primary);
             font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover .detail-value {
+            color: var(--accent-purple);
+            transform: translateX(2px);
         }
 
         .goal-actions {
             display: flex;
             gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .btn {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
+        .goal-actions .btn {
+            flex: 1;
+            justify-content: center;
+            min-height: 44px;
             font-size: 0.9em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
         }
 
-        .btn-primary {
-            background: #20B2AA;
+        .goal-actions .btn i {
+            transition: all 0.3s ease;
+            font-size: 1em;
             color: white;
         }
 
+        .goal-actions .btn:hover i {
+            transform: scale(1.1);
+        }
+
+        .goal-actions .btn:nth-child(1) i {
+            color: white;
+        }
+
+        .goal-actions .btn:nth-child(2) i {
+            color: var(--accent-blue);
+        }
+
+        .goal-actions .btn:nth-child(3) i {
+            color: var(--accent-blue);
+        }
+
+        .goal-actions .btn:nth-child(2):hover i {
+            color: var(--accent-blue);
+        }
+
+        .goal-actions .btn:nth-child(3):hover i {
+            color: var(--accent-blue);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: none;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            min-height: 44px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            color: white;
+            box-shadow: 0 6px 20px rgba(32, 178, 170, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-blue));
+            box-shadow: 0 8px 25px rgba(32, 178, 170, 0.5);
+            transform: translateY(-2px);
+        }
+
         .btn-secondary {
-            background: var(--bg-secondary);
+            background: rgba(255, 255, 255, 0.9);
             color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(45, 90, 45, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            box-shadow: 0 6px 20px rgba(32, 178, 170, 0.2);
+            transform: translateY(-2px);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-light);
+        }
+
+        .save-progress-btn {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+            color: white;
+            box-shadow: 0 6px 20px rgba(32, 178, 170, 0.4);
+        }
+
+        .save-progress-btn:hover {
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-blue));
+            box-shadow: 0 8px 25px rgba(32, 178, 170, 0.5);
+            transform: translateY(-2px);
         }
 
         .sidebar {
@@ -360,13 +949,59 @@
         }
 
         .sidebar-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
             padding: 25px;
-            box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.6);
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-card:hover::before {
+            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .sidebar-card .section-title {
+            color: #1a4d1a;
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(26, 77, 26, 0.2);
+        }
+
+        .sidebar-card .section-title i {
+            color: var(--accent-coral);
+            font-size: 1.3em;
+            background: rgba(255, 127, 80, 0.1);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-card:hover .section-title i {
+            transform: rotate(15deg) scale(1.1);
+            background: rgba(255, 127, 80, 0.2);
         }
 
         .skill-gap-item {
@@ -375,6 +1010,15 @@
             align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .skill-gap-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding-left: 10px;
+            padding-right: 10px;
+            transform: translateX(5px);
         }
 
         .skill-gap-item:last-child {
@@ -384,74 +1028,137 @@
         .skill-name {
             font-weight: 500;
             color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .skill-gap-item:hover .skill-name {
+            color: var(--accent-teal);
         }
 
         .skill-hours {
             font-size: 0.9em;
             color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .skill-gap-item:hover .skill-hours {
+            color: var(--accent-coral);
+            font-weight: 600;
         }
 
         .recommended-goal {
-            background: rgba(32, 178, 170, 0.05);
-            border: 1px solid rgba(32, 178, 170, 0.2);
-            border-radius: var(--border-radius);
+            background: rgba(45, 90, 45, 0.05);
+            border: 1px solid rgba(45, 90, 45, 0.2);
+            border-radius: 18px;
             padding: 15px;
             margin-bottom: 15px;
-            transition: var(--transition-fast);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recommended-goal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.6);
+            transition: all 0.3s ease;
         }
 
         .recommended-goal:hover {
             background: rgba(32, 178, 170, 0.1);
             transform: translateY(-2px);
+            border-color: var(--accent-teal);
+        }
+
+        .recommended-goal:hover::before {
+            width: 5px;
+            background: rgba(255, 255, 255, 0.8);
         }
 
         .recommended-goal h4 {
-            color: #20B2AA;
+            color: var(--accent-blue);
             margin-bottom: 8px;
             font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .recommended-goal:hover h4 {
+            color: var(--accent-teal);
+            transform: translateX(3px);
         }
 
         .recommended-goal p {
             font-size: 0.9em;
             color: var(--text-secondary);
             margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .recommended-goal:hover p {
+            color: var(--text-primary);
         }
 
         .create-goal-btn {
-            background: linear-gradient(135deg, var(--accent-green) 0%, #30D158 100%);
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%);
             color: white;
-            padding: 15px 25px;
-            border-radius: var(--border-radius);
+            padding: 18px 30px;
+            border-radius: 16px;
             text-decoration: none;
             font-weight: 600;
             text-align: center;
             display: block;
-            transition: var(--transition-fast);
+            transition: all 0.3s ease;
             margin-top: 20px;
+            box-shadow: 0 8px 25px rgba(32, 178, 170, 0.4);
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1em;
+            min-height: 50px;
+        }
+
+        .create-goal-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .create-goal-btn:hover::before {
+            left: 100%;
         }
 
         .create-goal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-medium);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(32, 178, 170, 0.5);
+            background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-blue) 100%);
         }
 
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #20B2AA;
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition-fast);
+        .create-goal-btn i {
+            transition: all 0.3s ease;
+            font-size: 1.2em;
+            color: white;
         }
 
-        .back-link:hover {
-            transform: translateX(-5px);
+        .create-goal-btn:hover i {
+            transform: rotate(90deg) scale(1.1);
         }
 
-        .back-link i {
-            margin-right: 8px;
+        /* 统计卡片响应式设计 */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
         }
-
+        
         @media (max-width: 768px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -459,19 +1166,301 @@
             
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
             }
             
             .goal-details {
                 grid-template-columns: 1fr;
             }
+            
+            .stat-card {
+                padding: 15px;
+                min-height: 100px;
+            }
+            
+            .stat-value {
+                font-size: 1.4rem;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
+            }
+            
+            .goals-navigation {
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+            
+            .goal-nav-btn {
+                padding: 15px 20px;
+                min-width: 120px;
+            }
+            
+            .goal-nav-btn i {
+                font-size: 1.5rem;
+            }
+            
+            .goal-nav-btn span {
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .back-link {
+                top: 15px;
+                left: 15px;
+                padding: 10px 16px;
+                font-size: 0.9em;
+            }
+            
+            .goals-navigation {
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+            
+            .goal-nav-btn {
+                padding: 12px 16px;
+                min-width: 100px;
+            }
+            
+            .goal-nav-btn i {
+                font-size: 1.3rem;
+            }
+            
+            .goal-nav-btn span {
+                font-size: 0.75rem;
+            }
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .empty-state:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent-teal);
+            transform: translateY(-3px);
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.6;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+
+        .empty-state:hover i {
+            opacity: 1;
+            transform: scale(1.1) rotate(5deg);
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-coral));
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            transition: all 0.3s ease;
+        }
+
+        .empty-state:hover h3 {
+            color: var(--accent-purple);
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .empty-state:hover p {
+            color: var(--accent-teal);
+        }
+        .sidebar-empty-state {
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-empty-state:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-teal);
+            transform: translateY(-2px);
+        }
+
+        .sidebar-empty-state i {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+            color: var(--accent-blue);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-empty-state:hover i {
+            opacity: 1;
+            color: var(--accent-coral);
+            transform: scale(1.1);
+        }
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200px 0;
+            }
+            100% {
+                background-position: calc(200px + 100%) 0;
+            }
+        }
+
+        /* 应用动画到卡片 */
+        .stat-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .goal-nav-btn {
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        .goal-nav-btn:nth-child(1) { animation-delay: 0.1s; }
+        .goal-nav-btn:nth-child(2) { animation-delay: 0.2s; }
+        .goal-nav-btn:nth-child(3) { animation-delay: 0.3s; }
+        .goal-nav-btn:nth-child(4) { animation-delay: 0.4s; }
+
+        .goal-item {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .sidebar-card {
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        /* 悬停时的脉冲效果 */
+        .stat-card:hover,
+        .goal-nav-btn:hover,
+        .goal-item:hover,
+        .sidebar-card:hover {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        /* 进度条加载动画 */
+        .progress-fill {
+            animation: shimmer 2s ease-in-out infinite;
+            background-size: 200px 100%;
+        }
+
+        .sidebar-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.4);
         }
     </style>
 </head>
 <body>
+    <!-- 动态背景 -->
+    <div class="employee-parallax-bg"></div>
+    <div class="overlay-layer"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="top-navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-user-tie"></i>
+                <span>员工平台</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>员工仪表盘</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.profile.profile_dashboard') }}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>个人资料</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.performance.performance_dashboard') }}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>绩效分析</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.learning_recommendation.dashboard') }}" class="nav-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>学习中心</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="nav-item">
+                    <i class="fas fa-bullseye"></i>
+                    <span>目标设定</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.feedback.feedback_dashboard') }}" class="nav-item">
+                    <i class="fas fa-comments"></i>
+                    <span>反馈管理</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.projects.projects_dashboard') }}" class="nav-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>项目经验</span>
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <a href="{{ url_for('common.auth.logout') }}" class="nav-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出登录</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
     <div class="container">
-        <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="back-link">
-            <i class="fas fa-arrow-left"></i> 返回仪表板
-        </a>
 
         <div class="header">
             <h1><i class="fas fa-bullseye"></i> SMART目标管理</h1>
@@ -481,21 +1470,45 @@
         <!-- 统计卡片 -->
         <div class="stats-grid">
             <div class="stat-card">
+                <i class="fas fa-bullseye stat-icon"></i>
                 <div class="stat-value">{{ goal_stats.total_goals }}</div>
                 <div class="stat-label">总目标数</div>
             </div>
             <div class="stat-card">
+                <i class="fas fa-check-circle stat-icon"></i>
                 <div class="stat-value">{{ goal_stats.active_goals }}</div>
                 <div class="stat-label">进行中</div>
             </div>
             <div class="stat-card">
+                <i class="fas fa-chart-bar stat-icon"></i>
                 <div class="stat-value">{{ goal_stats.avg_progress }}%</div>
                 <div class="stat-label">平均进度</div>
             </div>
             <div class="stat-card">
+                <i class="fas fa-percent stat-icon"></i>
                 <div class="stat-value">{{ goal_stats.completion_rate }}%</div>
                 <div class="stat-label">完成率</div>
             </div>
+        </div>
+
+        <!-- 目标管理导航 -->
+        <div class="goals-navigation">
+            <a href="{{ url_for('talent_management.employee_management.smart_goals.create_goal') }}" class="goal-nav-btn">
+                <i class="fas fa-plus"></i>
+                <span>创建目标</span>
+            </a>
+            <a href="{{ url_for('talent_management.employee_management.smart_goals.my_goals') }}" class="goal-nav-btn">
+                <i class="fas fa-list-check"></i>
+                <span>我的目标</span>
+            </a>
+            <a href="{{ url_for('talent_management.employee_management.smart_goals.recommended_goals') }}" class="goal-nav-btn">
+                <i class="fas fa-lightbulb"></i>
+                <span>推荐目标</span>
+            </a>
+            <a href="{{ url_for('talent_management.employee_management.smart_goals.skill_gaps') }}" class="goal-nav-btn">
+                <i class="fas fa-chart-line"></i>
+                <span>技能差距</span>
+            </a>
         </div>
 
         <div class="content-grid">
@@ -579,8 +1592,8 @@
                         </div>
                     {% endfor %}
                 {% else %}
-                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                        <i class="fas fa-bullseye" style="font-size: 3em; margin-bottom: 20px; opacity: 0.5;"></i>
+                    <div class="empty-state">
+                        <i class="fas fa-bullseye"></i>
                         <h3>暂无目标</h3>
                         <p>开始创建您的第一个SMART目标吧！</p>
                     </div>
@@ -602,9 +1615,10 @@
                             </div>
                         {% endfor %}
                     {% else %}
-                        <p style="color: var(--text-secondary); text-align: center; padding: 20px;">
-                            暂无技能差距
-                        </p>
+                        <div class="sidebar-empty-state">
+                            <i class="fas fa-chart-line"></i>
+                            <p>暂无技能差距</p>
+                        </div>
                     {% endif %}
                 </div>
 
@@ -622,16 +1636,17 @@
                                     <span style="font-size: 0.8em; color: var(--text-tertiary);">
                                         {{ goal.estimated_hours }}h
                                     </span>
-                                    <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.8em;">
+                                    <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85em; min-height: 36px;">
                                         采用目标
                                     </button>
                                 </div>
                             </div>
                         {% endfor %}
                     {% else %}
-                        <p style="color: var(--text-secondary); text-align: center; padding: 20px;">
-                            暂无推荐目标
-                        </p>
+                        <div class="sidebar-empty-state">
+                            <i class="fas fa-lightbulb"></i>
+                            <p>暂无推荐目标</p>
+                        </div>
                     {% endif %}
                 </div>
 
@@ -692,7 +1707,7 @@
                     // 强制更新特定按钮状态
                     const saveButton = document.querySelector(`[data-goal-id="${goalId}"].save-progress-btn`);
                     if (saveButton) {
-                        saveButton.style.background = 'linear-gradient(135deg, #FF9500 0%, #FF6B35 100%)';
+                        saveButton.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%)';
                         saveButton.innerHTML = '<i class="fas fa-save"></i> 保存更改';
                         saveButton.disabled = false;
                     }
@@ -716,7 +1731,7 @@
                     // 强制更新特定按钮状态
                     const saveButton = document.querySelector(`[data-goal-id="${goalId}"].save-progress-btn`);
                     if (saveButton) {
-                        saveButton.style.background = 'linear-gradient(135deg, #FF9500 0%, #FF6B35 100%)';
+                        saveButton.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%)';
                         saveButton.innerHTML = '<i class="fas fa-save"></i> 保存更改';
                         saveButton.disabled = false;
                     }
@@ -755,7 +1770,7 @@
                 // 强制更新特定按钮状态
                 const saveButton = document.querySelector(`[data-goal-id="${goalId}"].save-progress-btn`);
                 if (saveButton) {
-                    saveButton.style.background = 'linear-gradient(135deg, #FF9500 0%, #FF6B35 100%)';
+                    saveButton.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%)';
                     saveButton.innerHTML = '<i class="fas fa-save"></i> 保存更改';
                     saveButton.disabled = false;
                 }
@@ -789,12 +1804,12 @@
 
                 if (hasChanges) {
                     // 有待保存更改时的状态
-                    button.style.background = 'linear-gradient(135deg, #FF9500 0%, #FF6B35 100%)';
+                    button.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%)';
                     button.innerHTML = '<i class="fas fa-save"></i> 保存更改';
                     button.disabled = false;
                 } else {
                     // 无待保存更改时的状态 - 可点击但样式不同
-                    button.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, #5856D6 100%)';
+                    button.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%)';
                     button.innerHTML = '<i class="fas fa-save"></i> 保存';
                     button.disabled = false;
                 }
@@ -937,7 +1952,7 @@
             if (button) {
                 const originalHTML = button.innerHTML;
                 button.innerHTML = '<i class="fas fa-check"></i> 已保存';
-                button.style.background = 'linear-gradient(135deg, #34C759 0%, #30D158 100%)';
+                button.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%)';
 
                 setTimeout(() => {
                     button.innerHTML = originalHTML;
@@ -954,7 +1969,7 @@
                 const originalBackground = button.style.background;
 
                 button.innerHTML = '<i class="fas fa-info-circle"></i> 无更改';
-                button.style.background = 'linear-gradient(135deg, #8E8E93 0%, #636366 100%)';
+                button.style.background = 'linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-teal) 100%)';
 
                 setTimeout(() => {
                     button.innerHTML = originalHTML;

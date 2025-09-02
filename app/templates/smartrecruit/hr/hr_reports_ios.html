@@ -7,186 +7,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
-        /* 与HR仪表盘保持一致的背景样式 */
-        .ios-reports-hero { 
-            background: radial-gradient(1200px 420px at 20% -10%, #dbece0 0%, #cfe5d6 40%, #ffffff 100%); 
-            position: relative; 
-            overflow: hidden;
-        }
-        .ios-reports-hero:before {
-            content: "";
-            position: absolute;
-            inset: -20% -10% auto -10%;
-            height: 320px;
-            background: conic-gradient(from 180deg, rgba(196,223,204,.18), rgba(207,229,214,.14), rgba(184,216,193,.12), rgba(196,223,204,.18));
-            filter: blur(40px);
-            animation: spinSlow 22s linear infinite;
-            pointer-events: none;
-        }
-        .ios-reports-hero:after {
-            content: "";
-            position: absolute;
-            right: -160px;
-            top: -120px;
-            width: 520px;
-            height: 520px;
-            background: radial-gradient(closest-side, rgba(196,223,204,.25), rgba(196,223,204,0));
-            filter: blur(10px);
-            transform: rotate(15deg);
-            animation: floatY 12s ease-in-out infinite;
-            pointer-events: none;
-        }
-        
-        .ios-overview-section { 
-            background: var(--ios-bg-secondary); 
-            position: relative; 
-            overflow: hidden;
-        }
-        .ios-overview-section:before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, rgba(196,223,204,.06), rgba(207,229,214,.06));
-            opacity: .6;
-            mix-blend-mode: multiply;
-            pointer-events: none;
-        }
-        
-        .ios-charts-section { 
-            background: var(--ios-bg-tertiary); 
-            position: relative;
-        }
-        .ios-charts-section:before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(1000px 380px at 85% -20%, rgba(196,223,204,.10), transparent 60%), 
-                        radial-gradient(800px 320px at 10% 120%, rgba(184,216,193,.10), transparent 55%);
-        }
-        
-        .ios-insights-section { 
-            background: var(--ios-bg-secondary); 
-            position: relative; 
-            overflow: hidden;
-        }
-        .ios-insights-section:before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, rgba(196,223,204,.06), rgba(207,229,214,.06));
-            opacity: .6;
-            mix-blend-mode: multiply;
-            pointer-events: none;
-        }
-        
-        /* 与HR仪表盘相同的动画关键帧 */
-        @keyframes spinSlow {
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes floatY {
-            0%, 100% { transform: translateY(0) rotate(15deg); }
-            50% { transform: translateY(16px) rotate(15deg); }
-        }
-        
-        /* 大幅减少section之间的间距 */
-        .ios-section {
-            padding-top: var(--ios-spacing-md) !important;
-            padding-bottom: var(--ios-spacing-md) !important;
-            min-height: auto !important;
-        }
-        
-        /* 进一步减少特定section的间距 */
-        .ios-reports-hero {
-            padding-bottom: var(--ios-spacing-sm) !important;
-        }
-        
-        .ios-overview-section {
-            padding-top: var(--ios-spacing-sm) !important;
-            padding-bottom: var(--ios-spacing-sm) !important;
-        }
-        
-        .ios-charts-section {
-            padding-top: var(--ios-spacing-sm) !important;
-            padding-bottom: var(--ios-spacing-sm) !important;
-        }
-        
-        .ios-insights-section {
-            padding-top: var(--ios-spacing-sm) !important;
-            padding-bottom: var(--ios-spacing-sm) !important;
-        }
-        
-        /* 减少容器内部的间距 */
-        .ios-container {
-            padding-top: var(--ios-spacing-sm) !important;
-            padding-bottom: var(--ios-spacing-sm) !important;
-        }
-        
-        /* 减少标题和副标题的间距 */
-        .ios-title {
-            margin-bottom: var(--ios-spacing-sm) !important;
-        }
-        
-        .ios-subtitle {
-            margin-bottom: var(--ios-spacing-md) !important;
-        }
-        
-        /* 减少功能按钮区域的间距 */
-        .ios-quick-actions {
-            margin: var(--ios-spacing-md) 0 !important;
-        }
-        
-        /* 减少报表概览网格的间距 */
-        .ios-report-overview {
-            gap: var(--ios-spacing-md) !important;
-            margin-bottom: var(--ios-spacing-md) !important;
-        }
-        
-        /* 减少报表卡片的间距 */
-        .ios-report-card {
-            margin-bottom: var(--ios-spacing-md) !important;
-        }
-        
-        /* 减少报表图标的间距 */
-        .ios-report-icon {
-            margin: 0 auto var(--ios-spacing-md) !important;
-        }
-        
-        /* 减少报表数值的间距 */
-        .ios-report-value {
-            margin: var(--ios-spacing-sm) 0 !important;
-        }
-        
-        /* 减少报表标签的间距 */
-        .ios-report-label {
-            margin-bottom: var(--ios-spacing-xs) !important;
-        }
-        
-        /* 减少图表容器的间距 */
-        .ios-chart-container {
-            margin-bottom: var(--ios-spacing-md) !important;
-        }
-        
-        /* 减少图表头部的间距 */
-        .ios-chart-header {
-            margin-bottom: var(--ios-spacing-md) !important;
-            padding-bottom: var(--ios-spacing-sm) !important;
-        }
-        
-        /* 减少洞察卡片的间距 */
-        .ios-insight-card {
-            margin-bottom: var(--ios-spacing-md) !important;
-        }
-        
-        /* 减少洞察头部的间距 */
-        .ios-insight-header {
-            margin-bottom: var(--ios-spacing-sm) !important;
-        }
-        
-        /* 减少漏斗容器的间距 */
-        .ios-funnel-container {
-            padding: var(--ios-spacing-md) 0 !important;
-        }
+        .ios-reports-hero { background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%); }
+        .ios-overview-section { background: var(--ios-bg-secondary); }
+        .ios-charts-section { background: var(--ios-bg-tertiary); }
+        .ios-insights-section { background: var(--ios-bg-secondary); }
         
         .ios-report-overview {
             display: grid;
@@ -476,13 +300,19 @@
                         <span class="ios-nav-text">我的职位</span>
                     </a>
                 </li>
+                <!-- 面试导航已移除，请从候选人管理页面进入安排面试 -->
                 <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.interviews' else '' }}">
-                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
-                        <span class="ios-nav-text">面试</span>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.reports' else '' }}">
+                        <i class="ios-nav-icon uil uil-chart-pie"></i>
+                        <span class="ios-nav-text">报表</span>
                     </a>
                 </li>
-
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.insights' else '' }}">
+                        <i class="ios-nav-icon uil uil-lightbulb"></i>
+                        <span class="ios-nav-text">AI洞察</span>
+                    </a>
+                </li>
             </ul>
             
             <div class="ios-nav-actions">
@@ -492,6 +322,7 @@
                 </div>
                 
                 <div class="ios-nav-divider"></div>
+                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
                 
                 
                 <button class="ios-nav-button" data-action="profile">
