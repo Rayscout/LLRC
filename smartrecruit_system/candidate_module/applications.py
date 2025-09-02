@@ -16,11 +16,8 @@ from app.utils import _gemini_generate  # 使用 Gemini，避免走 HF 降级
 from app import applications_collection
 from datetime import datetime
 from sqlalchemy import text
-from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import load_only
 from .candidate_ai import update_user_skills_from_resume
 from sqlalchemy import or_
-import hashlib
 
 applications_bp = Blueprint('applications', __name__, url_prefix='/applications')
 
@@ -145,19 +142,10 @@ def api_vi_start():
             cv_text = f"姓名:{g.user.first_name} {g.user.last_name}\n公司:{g.user.company_name}\n职位:{g.user.position or ''}\n简介:{g.user.bio or ''}\n经验:{g.user.experience or ''}\n教育:{g.user.education or ''}\n技能:{g.user.skills or ''}"
         job_desc = request.args.get('job_desc', '')
 
-        # 计算当前简历签名并获取上次题目集（同一份简历）
-        cv_signature = hashlib.sha1((cv_text or '').encode('utf-8')).hexdigest()[:16]
-        last_map = session.get('vi_last_questions', {}) or {}
-        last_questions = last_map.get(cv_signature, [])
-        last_set = set([q.strip() for q in (last_questions or []) if isinstance(q, str)])
-
-        # 强制优先使用 Gemini，避免走 HF，并加入避免重复的提示
-        avoid_clause = ("以下为上一次生成的题目，请尽量避免重复，最多允许出现其中一道：\n" + "\n".join([f"- {q}" for q in list(last_set)[:5]]) + "\n") if last_set else ''
+        # 强制优先使用 Gemini，避免走 HF
         prompt = (
-            "基于以下候选人简历与职位描述，用中文生成10道不重复的结构化面试问题。\n"
-            "要求：避免与上一次题目重复，最多允许重合一道；问题要具体，长度≤40字。\n"
-            "只输出JSON数组，数组元素为字符串，不要任何额外文字。\n"
-            + avoid_clause +
+            "基于以下候选人简历与职位描述，用中文生成5道不重复的结构化面试问题。\n"
+            "每道题尽量具体，长度不超过40字。只输出JSON数组，数组元素为字符串，不要任何额外文字。\n"
             f"简历:\n{cv_text}\n职位描述:\n{job_desc}\n输出:"
         )
         questions = None
@@ -184,55 +172,13 @@ def api_vi_start():
                 if filtered:
                     questions = filtered
 
-        # 约束：与上次（同一简历）重合题目 ≤ 1，最多返回5题
-        def select_with_overlap_constraint(candidates, last_set_ref, limit=5):
-            unique_candidates = []
-            seen = set()
-            for q in candidates or []:
-                qs = (q or '').strip()
-                if not qs or qs in seen:
-                    continue
-                seen.add(qs)
-                unique_candidates.append(qs)
-            non_overlap = [q for q in unique_candidates if q not in last_set_ref]
-            overlap = [q for q in unique_candidates if q in last_set_ref]
-            result = []
-            if overlap:
-                result.append(overlap[0])
-            for q in non_overlap:
-                if len(result) >= limit:
-                    break
-                result.append(q)
-            i = 1
-            while len(result) < limit and i < len(overlap):
-                result.append(overlap[i])
-                i += 1
-            return result[:limit]
-
-        final_questions = []
         if not questions:
-            fallback = generate_interview_questions(cv_text, job_desc)
-            if isinstance(fallback, list):
-                final_questions = select_with_overlap_constraint(fallback, last_set, limit=5)
-            else:
-                final_questions = []
+            # 退回到旧的通用生成（内部仍可能降级），再取前5
+            questions = generate_interview_questions(cv_text, job_desc)
+            questions = questions[:5] if isinstance(questions, list) else []
         else:
-            final_questions = select_with_overlap_constraint(questions, last_set, limit=5)
-            if len(final_questions) < 5:
-                extra_candidates = generate_interview_questions(cv_text, job_desc)
-                if isinstance(extra_candidates, list):
-                    supplemental_pool = [q for q in extra_candidates if q not in final_questions]
-                    merged = (questions or []) + supplemental_pool
-                    final_questions = select_with_overlap_constraint(merged, last_set, limit=5)
-
-        # 持久化此次题目集到 session，按简历签名区分
-        try:
-            last_map[cv_signature] = final_questions
-            session['vi_last_questions'] = last_map
-        except Exception:
-            pass
-
-        return jsonify({'success': True, 'questions': final_questions})
+            questions = questions[:5]
+        return jsonify({'success': True, 'questions': questions})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
@@ -262,183 +208,17 @@ def api_vi_score():
             try:
                 from app import applications_collection
                 from datetime import datetime as _dt
-                # 尝试从反馈中解析形如 “评分：X/10” 的分数
-                import re
-                parsed_score = None
-                try:
-                    m = re.search(r"评分[:：]\s*(\d{1,3})\s*/\s*10", feedback or '')
-                    if m:
-                        # 转为 0-100 分
-                        parsed_score = max(0, min(100, int(m.group(1)) * 10))
-                except Exception:
-                    parsed_score = None
-                # 读取 job_id 便于后续聚合
-                try:
-                    job_id_val = int((request.args.get('job_id') or '0'))
-                except Exception:
-                    job_id_val = 0
                 applications_collection.insert_one({
                     'user_id': str(g.user.id),
                     'type': 'ai_interview_score',
-                    'job_id': str(job_id_val) if job_id_val else None,
                     'question': q,
                     'answer': a,
                     'feedback': feedback,
-                    'score': parsed_score,
                     'created_at': _dt.utcnow()
                 })
             except Exception:
                 pass
-            # 兼容前端未单独调用完成接口的情况：若传入 finalize、job_id、total_score，则即时落盘结果
-            try:
-                finalize = bool(data.get('finalize'))
-                job_id_val = int(data.get('job_id') or 0)
-                total_score_val = int(data.get('total_score') or 0)
-            except Exception:
-                finalize = False
-                job_id_val = 0
-                total_score_val = 0
-            if finalize and job_id_val > 0:
-                total_score_val = max(0, min(100, total_score_val))
-                now_ts = datetime.utcnow()
-                # SQL:
-                try:
-                    app_row = Application.query.filter_by(user_id=g.user.id, job_id=job_id_val).order_by(Application.timestamp.desc()).first()
-                    if app_row:
-                        app_row.ai_official_taken = True
-                        app_row.ai_official_score = total_score_val
-                        app_row.ai_official_taken_at = now_ts
-                        db.session.commit()
-                except Exception:
-                    db.session.rollback()
-                # Mongo 结果聚合：
-                try:
-                    applications_collection.insert_one({
-                        'type': 'ai_interview_result',
-                        'user_id': str(g.user.id),
-                        'job_id': str(job_id_val),
-                        'score': int(total_score_val),
-                        'status': 'pending_hr',
-                        'created_at': now_ts
-                    })
-                except Exception:
-                    pass
         return jsonify({'success': True, 'feedback': feedback})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-
-
-@applications_bp.route('/api/virtual_interview/complete', methods=['POST'])
-def api_vi_complete():
-    """正式AI面试完成后上报综合分数，写入SQL与Mongo，供HR审核页面展示。"""
-    if g.user is None:
-        return jsonify({'success': False, 'message': '请先登录'}), 401
-    try:
-        payload = request.get_json(silent=True) or {}
-        mode = (request.args.get('mode') or payload.get('mode') or 'mock').lower()
-        if mode != 'official':
-            return jsonify({'success': False, 'message': '仅支持正式面试上报'}), 400
-        try:
-            job_id = int(payload.get('job_id') or 0)
-        except Exception:
-            job_id = 0
-        # 优先从Mongo已记录的逐题分数聚合得到真实综合分
-        computed_score = None
-        try:
-            from app import applications_collection
-            from datetime import datetime as _dt, timedelta as _td
-            # 聚合最近2小时内该用户、该职位的逐题分
-            since = _dt.utcnow() - _td(hours=2)
-            cursor = applications_collection.find({
-                'type': 'ai_interview_score',
-                'user_id': str(g.user.id),
-                'job_id': str(job_id),
-                'created_at': { '$gte': since }
-            })
-            vals = []
-            for d in cursor:
-                try:
-                    if 'score' in d and d['score'] is not None:
-                        vals.append(int(d['score']))
-                    else:
-                        # 尝试从反馈文本再次解析
-                        import re
-                        m = re.search(r"评分[:：]\s*(\d{1,3})\s*/\s*10", (d.get('feedback') or ''))
-                        if m:
-                            vals.append(max(0, min(100, int(m.group(1)) * 10)))
-                except Exception:
-                    continue
-            if vals:
-                computed_score = int(round(sum(vals) / len(vals)))
-        except Exception:
-            computed_score = None
-
-        # 若无法聚合到，则回退使用客户端传来的占位分，但仍进行边界约束
-        try:
-            fallback_score = int(payload.get('score') or 0)
-        except Exception:
-            fallback_score = 0
-        fallback_score = max(0, min(100, fallback_score))
-        score = computed_score if computed_score is not None else fallback_score
-        # 若没带 job_id，回退为该用户最近一条（活跃优先）的申请所属职位
-        if job_id <= 0:
-            try:
-                latest_app = (
-                    Application.query
-                    .filter_by(user_id=g.user.id)
-                    .order_by(Application.is_active.desc(), Application.timestamp.desc())
-                    .first()
-                )
-                if latest_app and getattr(latest_app, 'job_id', None):
-                    job_id = int(latest_app.job_id)
-            except Exception:
-                job_id = 0
-        if job_id <= 0:
-            return jsonify({'success': False, 'message': '缺少职位ID'}), 400
-
-        # 更新/写入 SQL 应用记录的正式AI面试字段
-        application = Application.query.filter_by(user_id=g.user.id, job_id=job_id).order_by(Application.timestamp.desc()).first()
-        now_ts = datetime.utcnow()
-        if application:
-            try:
-                # 优先写入专用列
-                try:
-                    application.ai_official_taken = True
-                    application.ai_official_score = score
-                    application.ai_official_taken_at = now_ts
-                except Exception:
-                    pass
-                # 无论是否有新列，都把结果写入 message 以兼容未迁移数据库
-                old_msg = getattr(application, 'message', '') or ''
-                sep = '\n' if old_msg else ''
-                append_line = f"AI正式面试综合分：{score}"
-                application.message = f"{old_msg}{sep}{append_line}"
-                # 标记状态为 interview，方便 HR 页面统计
-                try:
-                    application.status = 'interview'
-                except Exception:
-                    pass
-                db.session.commit()
-            except Exception as e:
-                current_app.logger.warning(f'SQL update failed for ai score: {e}')
-                db.session.rollback()
-
-        # 写入 Mongo 聚合结果文档
-        try:
-            from app import applications_collection
-            doc = {
-                'type': 'ai_interview_result',
-                'user_id': str(g.user.id),
-                'job_id': str(job_id),
-                'score': int(score),
-                'status': 'pending_hr',  # 等待HR审核
-                'created_at': now_ts
-            }
-            applications_collection.insert_one(doc)
-        except Exception as e:
-            current_app.logger.warning(f'Mongo insert ai_interview_result failed: {e}')
-
-        return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
@@ -687,59 +467,22 @@ def my_applications():
     if g.user is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
-    try:
-        # 仅选择旧库中一定存在的字段，避免因缺少新列导致 SELECT 失败
-        applications = (
-            Application.query.options(
-                load_only(
-                    Application.id,
-                    Application.user_id,
-                    Application.job_id,
-                    Application.message,
-                    Application.timestamp,
-                    Application.status,
-                    Application.is_active,
-                )
-            )
-            .filter_by(user_id=g.user.id, is_active=True)
-            .order_by(Application.timestamp.desc())
-            .all()
-        )
-    except OperationalError:
-        # 兼容未迁移数据库：使用原生SQL只取旧字段，并构造轻量对象
-        rows = db.session.execute(
-            text(
-                """
-                SELECT id, user_id, job_id, message, timestamp, status, is_active
-                FROM application
-                WHERE user_id = :uid AND is_active = 1
-                ORDER BY timestamp DESC
-                """
-            ),
-            { 'uid': g.user.id }
-        ).fetchall()
-        class _LightApp:
-            def __init__(self, r):
-                self.id = r.id
-                self.user_id = r.user_id
-                self.job_id = r.job_id
-                self.message = r.message
-                self.timestamp = r.timestamp
-                self.status = r.status
-                self.is_active = r.is_active
-        applications = [_LightApp(r) for r in rows]
 
+    # 从SQLite获取活跃的申请
+    applications = Application.query.filter_by(user_id=g.user.id, is_active=True).order_by(Application.timestamp.desc()).all()
+    
     # 获取职位信息
     applications_with_jobs = []
     for app in applications:
-        job = Job.query.get(getattr(app, 'job_id', None)) if getattr(app, 'job_id', None) else None
+        job = Job.query.get(app.job_id)
         if job:
             applications_with_jobs.append({
                 'application': app,
                 'job': job
             })
-
-    return render_template('smartrecruit/candidate/view_applications.html', applications=applications_with_jobs)
+    
+    return render_template('smartrecruit/candidate/view_applications.html', 
+                         applications=applications_with_jobs)
 
 @applications_bp.route('/withdraw/<int:application_id>', methods=['POST', 'GET'])
 def withdraw(application_id: int):
@@ -784,8 +527,10 @@ def view_applications():
     if g.user is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
-    # 统一跳转到 my_applications，确保模板拿到 applications 数据，避免服务端渲染时报错
-    return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
+    
+    # 这里可以添加获取用户申请列表的逻辑
+    # 目前返回模拟数据
+    return render_template('smartrecruit/candidate/view_applications.html', user=g.user)
 
 @applications_bp.route('/ai_interview')
 def ai_interview_hub():
@@ -857,28 +602,12 @@ def ai_interview_start(mode: str):
         except Exception:
             flash('资格校验失败，请稍后再试。', 'danger')
             return redirect(url_for('smartrecruit.candidate.applications.ai_interview_hub'))
-    # 附带当前用户最近一条（活跃优先）的申请 job_id，便于面试完成时回传成绩
-    job_qid = 0
-    try:
-        latest_app = (
-            Application.query
-            .filter_by(user_id=g.user.id)
-            .order_by(Application.is_active.desc(), Application.timestamp.desc())
-            .first()
-        )
-        if latest_app and getattr(latest_app, 'job_id', None):
-            job_qid = int(latest_app.job_id)
-    except Exception:
-        job_qid = 0
-    # 进入现有AI面试训练界面（沿用页面），通过 query 参数传递模式与job_id
-    sep = '&' if '?' in url_for('smartrecruit.candidate.applications.virtual_interview') else '?'
-    base = url_for('smartrecruit.candidate.applications.virtual_interview')
-    extra = f"mode={mode}" + (f"&job_id={job_qid}" if job_qid else '')
-    return redirect(base + (('?' + extra) if '?' not in base else (sep + extra)))
+    # 进入现有AI面试训练界面（沿用页面），通过 query 参数传递模式
+    return redirect(url_for('smartrecruit.candidate.applications.virtual_interview') + f'?mode={mode}')
 
 @applications_bp.route('/apply_job/<int:job_id>', methods=['GET', 'POST'])
 def apply_job(job_id):
-    """申请职位"""
+    """申请职位（旧接口）: 强制重定向到 pre_apply 以确保简历校验。"""
     if g.user is None:
         if request.headers.get('Content-Type') == 'application/json':
             return jsonify({'success': False, 'message': '请先登录'}), 401
@@ -893,59 +622,11 @@ def apply_job(job_id):
         flash('职位不存在。', 'danger')
         return redirect(url_for('smartrecruit.candidate.jobs.search'))
     
-    if request.method == 'POST':
-        try:
-            # 检查是否已经申请过这个职位
-            existing_application = Application.query.filter_by(
-                user_id=g.user.id, 
-                job_id=job_id
-            ).first()
-            
-            if existing_application:
-                if existing_application.is_active:
-                    if request.headers.get('Content-Type') == 'application/json':
-                        return jsonify({'success': False, 'message': '您已经申请过这个职位'}), 400
-                    flash('您已经申请过这个职位。', 'warning')
-                    return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
-                else:
-                    # 如果之前撤销过，重新激活申请
-                    existing_application.is_active = True
-                    existing_application.status = 'Pending'
-                    existing_application.timestamp = datetime.utcnow()
-                    existing_application.message = '重新申请'
-                    db.session.commit()
-                    
-                    if request.headers.get('Content-Type') == 'application/json':
-                        return jsonify({'success': True, 'message': '申请已重新提交'})
-                    flash('申请已重新提交！', 'success')
-                    return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
-            
-            # 创建新的申请
-            new_application = Application(
-                user_id=g.user.id,
-                job_id=job_id,
-                message=f'申请职位：{job.title}',
-                status='Pending'
-            )
-            
-            db.session.add(new_application)
-            db.session.commit()
-            
-            if request.headers.get('Content-Type') == 'application/json':
-                return jsonify({'success': True, 'message': '申请提交成功'})
-            flash('职位申请已提交！', 'success')
-            return redirect(url_for('smartrecruit.candidate.applications.my_applications'))
-            
-        except Exception as e:
-            db.session.rollback()
-            logging.error(f'申请职位失败: {e}')
-            if request.headers.get('Content-Type') == 'application/json':
-                return jsonify({'success': False, 'message': '申请失败，请稍后重试'}), 500
-            flash('申请失败，请稍后重试。', 'danger')
-            return redirect(url_for('smartrecruit.candidate.jobs.search'))
-    
-    # GET 请求显示申请表单
-    return render_template('smartrecruit/candidate/apply_job.html', job_id=job_id, user=g.user, job=job)
+    # 无论 GET/POST，统一走预申请，确保上传或选择已有简历
+    if request.headers.get('Content-Type') == 'application/json':
+        # 告知前端正确入口
+        return jsonify({'success': False, 'message': '请通过预申请入口提交', 'redirect': url_for('smartrecruit.candidate.applications.pre_apply', job_id=job_id)}), 400
+    return redirect(url_for('smartrecruit.candidate.applications.pre_apply', job_id=job_id))
 
 def get_user_applications_count(user_id):
     """获取用户申请数量"""
