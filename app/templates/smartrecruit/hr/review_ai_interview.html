@@ -1,0 +1,446 @@
+{% extends 'base.html' %}
+
+{% block title %}审核AI面试结果{% endblock %}
+
+{% block content %}
+<style>
+    .review-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #f3f4f6;
+    }
+
+    .page-title {
+        font-size: 28px;
+        color: #1f2937;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .candidate-info {
+        background: #f9fafb;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .candidate-info h3 {
+        margin: 0 0 15px 0;
+        color: #374151;
+        font-size: 18px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-label {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 16px;
+        color: #1f2937;
+        font-weight: 500;
+    }
+
+    .ai-interview-section {
+        background: #f0f9ff;
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border-left: 4px solid #c4dfcc;
+    }
+
+    .ai-interview-section h3 {
+        margin: 0 0 20px 0;
+        color: #1e40af;
+        font-size: 20px;
+    }
+
+    .ai-score-display {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .score-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        color: white;
+    }
+
+    .score-high {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .score-medium {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .score-low {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .score-details {
+        flex: 1;
+    }
+
+    .score-label {
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 5px;
+    }
+
+    .score-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .ai-status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-passed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-failed {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .review-form {
+        background: #f9fafb;
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .review-form h3 {
+        margin: 0 0 20px 0;
+        color: #374151;
+        font-size: 18px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #c4dfcc;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .radio-group {
+        display: flex;
+        gap: 20px;
+        margin-top: 10px;
+    }
+
+    .radio-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .radio-item input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #c4dfcc;
+    }
+
+    .radio-item label {
+        font-size: 16px;
+        color: #374151;
+        cursor: pointer;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #c4dfcc;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #acd2b7;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #4b5563;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+    }
+
+    .btn-success {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 20px;
+        transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+        color: #374151;
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+        .review-container {
+            margin: 10px;
+            padding: 15px;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .ai-score-display {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .button-group {
+            flex-direction: column;
+        }
+
+        .radio-group {
+            flex-direction: column;
+            gap: 10px;
+        }
+    }
+</style>
+
+<div class="review-container">
+    <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+        <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="back-link">
+            ← 返回仪表盘
+        </a>
+        <a href="{{ url_for('smartrecruit.hr.candidates.view_candidates', job_id=job.id) }}" class="back-link">
+            ← 返回候选人列表
+        </a>
+    </div>
+
+    <div class="page-header">
+        <h1 class="page-title">审核AI面试结果</h1>
+    </div>
+
+    <!-- 候选人基本信息 -->
+    <div class="candidate-info">
+        <h3>候选人信息</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">姓名</span>
+                <span class="info-value">{{ candidate.first_name }} {{ candidate.last_name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">邮箱</span>
+                <span class="info-value">{{ candidate.email }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">电话</span>
+                <span class="info-value">{{ candidate.phone_number or '未提供' }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">应聘职位</span>
+                <span class="info-value">{{ job.title }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI面试结果 -->
+    <div class="ai-interview-section">
+        <h3>AI面试结果</h3>
+        
+        <div class="ai-score-display">
+            <div class="score-circle {% if ai_interview_score >= 80 %}score-high{% elif ai_interview_score >= 60 %}score-medium{% else %}score-low{% endif %}">
+                {{ ai_interview_score }}分
+            </div>
+            <div class="score-details">
+                <div class="score-label">AI面试总分</div>
+                <div class="score-value">{{ ai_interview_score }}分</div>
+                <div style="margin-top: 10px;">
+                    <span class="ai-status-badge {% if ai_interview_passed %}status-passed{% else %}status-failed{% endif %}">
+                        {% if ai_interview_passed %}已通过{% else %}未通过{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        {% if ai_interview_details %}
+        <div style="margin-top: 20px;">
+            <h4 style="margin: 0 0 10px 0; color: #374151;">详细评分</h4>
+            <div style="background: white; padding: 15px; border-radius: 6px;">
+                <div style="margin-bottom: 10px;">
+                    <strong>技术能力:</strong> {{ ai_interview_details.get('technical_score', 'N/A') }}分
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <strong>沟通能力:</strong> {{ ai_interview_details.get('communication_score', 'N/A') }}分
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <strong>逻辑思维:</strong> {{ ai_interview_details.get('logic_score', 'N/A') }}分
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <strong>学习能力:</strong> {{ ai_interview_details.get('learning_score', 'N/A') }}分
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if ai_interview_feedback %}
+        <div style="margin-top: 20px;">
+            <h4 style="margin: 0 0 10px 0; color: #374151;">AI面试反馈</h4>
+            <div style="background: white; padding: 15px; border-radius: 6px; color: #374151; line-height: 1.6;">
+                {{ ai_interview_feedback }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- HR审核表单 -->
+    <div class="review-form">
+        <h3>HR审核决定</h3>
+        
+        <form method="POST" action="{{ url_for('smartrecruit.hr.candidates.submit_ai_review', application_id=application.id) }}">
+            <div class="form-group">
+                <label class="form-label">审核结果 *</label>
+                <div class="radio-group">
+                    <div class="radio-item">
+                        <input type="radio" id="approve" name="review_result" value="approve" {% if current_review == 'approve' %}checked{% endif %}>
+                        <label for="approve">通过AI面试</label>
+                    </div>
+                    <div class="radio-item">
+                        <input type="radio" id="reject" name="review_result" value="reject" {% if current_review == 'reject' %}checked{% endif %}>
+                        <label for="reject">不通过AI面试</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="review_notes">审核备注</label>
+                <textarea id="review_notes" name="review_notes" class="form-control" rows="4" placeholder="请说明审核原因和建议...">{{ current_notes or '' }}</textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn btn-success">确认审核结果</button>
+                <a href="{{ url_for('smartrecruit.hr.candidates.view_candidates', job_id=job.id) }}" class="btn btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- 操作按钮 -->
+    {% if ai_interview_passed %}
+    <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+        <a href="{{ url_for('smartrecruit.hr.candidates.schedule_interview', application_id=application.id) }}" class="btn btn-primary">
+            安排面试
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

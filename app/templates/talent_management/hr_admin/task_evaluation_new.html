@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>创建绩效评价</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='executive_ios_style.css') }}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+	<style>
+		:root {
+			--ev-bg: #F2F2F7;
+			--ev-card: rgba(255, 255, 255, 0.6);
+			--ev-text: #1D1D1F;
+			--ev-subtext: #8E8E93;
+			--ev-primary: #0A84FF;
+			--ev-green: #30D158;
+			--ev-border: rgba(0,0,0,0.06);
+			--ev-shadow: 0 10px 30px rgba(0,0,0,0.08);
+			--bg-primary: #F2F2F7;
+			--bg-secondary: rgba(255, 255, 255, 0.6);
+			--bg-card: rgba(255, 255, 255, 0.6);
+			--text-primary: #1D1D1F;
+			--text-secondary: #86868B;
+			--text-tertiary: #C7C7CC;
+			--accent-blue: #007AFF;
+			--accent-green: #34C759;
+			--accent-orange: #FF9500;
+			--accent-red: #FF3B30;
+			--accent-purple: #AF52DE;
+			--shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+			--success-color: #28a745;
+			--warning-color: #ffc107;
+			--danger-color: #dc3545;
+			--info-color: #17a2b8;
+			--light-color: #f8f9fa;
+			--dark-color: #343a40;
+			--shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+			--border-radius: 12px;
+			--border-radius-large: 24px;
+			--transition-fast: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+		}
+
+		body { 
+			background: transparent; 
+			position: relative;
+			overflow-x: hidden;
+		}
+
+		/* Animated Light Blue Background - 与高管仪表盘一致 */
+		.executive-parallax-bg {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: linear-gradient(135deg, #E6F3FF, #F0F8FF, #E8F4FD, #F5F9FF, #E0F0FF);
+			background-size: 400% 400%;
+			animation: gradientShift 15s ease infinite;
+			z-index: -2;
+		}
+
+		/* 透明度为40%的图层 */
+		.overlay-layer {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(255, 255, 255, 0.4);
+			z-index: -1;
+			pointer-events: none;
+		}
+
+		@keyframes gradientShift {
+			0% {
+				background-position: 0% 50%;
+			}
+			50% {
+				background-position: 100% 50%;
+			}
+			100% {
+				background-position: 0% 50%;
+			}
+		}
+
+		/* Floating Background Elements */
+		.executive-parallax-bg::before,
+		.executive-parallax-bg::after {
+			content: '';
+			position: absolute;
+			width: 300px;
+			height: 300px;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.1);
+			animation: float 20s ease-in-out infinite;
+		}
+
+		.executive-parallax-bg::before {
+			top: 10%;
+			left: 10%;
+			animation-delay: 0s;
+		}
+
+		.executive-parallax-bg::after {
+			bottom: 10%;
+			right: 10%;
+			animation-delay: 10s;
+		}
+
+		@keyframes float {
+			0%, 100% {
+				transform: translateY(0px) rotate(0deg);
+				opacity: 0.3;
+			}
+			25% {
+				transform: translateY(-50px) rotate(90deg);
+				opacity: 0.6;
+			}
+			50% {
+				transform: translateY(-100px) rotate(180deg);
+				opacity: 0.3;
+			}
+			75% {
+				transform: translateY(-50px) rotate(270deg);
+				opacity: 0.6;
+			}
+		}
+
+		.page-header {
+			text-align: left;
+			margin: 18px 0 8px;
+			background: rgba(255, 255, 255, 0.6);
+			padding: 80px;
+			border-radius: 12px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
+		.page-title {
+			font-size: 3.2em;
+			font-weight: 800;
+			margin-bottom: 15px;
+			color: #1E40AF;
+			text-shadow: 0 4px 8px rgba(30, 64, 175, 0.3);
+			animation: titleBlink 2s ease-in-out infinite alternate, fadeInUp 1s ease-out forwards;
+			transform: translateY(30px);
+			opacity: 0;
+			letter-spacing: -0.02em;
+			position: relative;
+		}
+		
+		.page-title i {
+			color: #1E40AF;
+			margin-right: 15px;
+		}
+
+		@keyframes titleBlink {
+			0% {
+				opacity: 1;
+				text-shadow: 0 4px 8px rgba(30, 64, 175, 0.3);
+			}
+			100% {
+				opacity: 0.8;
+				text-shadow: 0 4px 16px rgba(30, 64, 175, 0.6);
+			}
+		}
+
+		@keyframes fadeInUp {
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.ev-wrapper { max-width: 1600px; margin: 0 auto; padding: 0 18px 36px; }
+		.ev-card { background: var(--ev-card); border: 1px solid var(--ev-border); box-shadow: var(--ev-shadow); border-radius: 20px; padding: 90px; }
+		.ev-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
+		.ev-field { grid-column: span 12; }
+		@media (min-width: 900px) { .ev-field.half { grid-column: span 6; } }
+
+		.ev-label { display: block; margin-bottom: 8px; color: var(--ev-subtext); font-weight: 600; }
+		.ev-input, .ev-select, .ev-textarea {
+			width: 100%;
+			border: 1px solid var(--ev-border);
+			border-radius: 12px;
+			background: #fff;
+			padding: 14px 14px;
+			font-size: 15px; color: var(--ev-text);
+			transition: box-shadow .2s ease, border-color .2s ease;
+		}
+		.ev-input:focus, .ev-select:focus, .ev-textarea:focus { outline: none; border-color: var(--ev-primary); box-shadow: 0 0 0 4px rgba(10,132,255,0.12); }
+		.ev-hint { margin-top: 6px; font-size: 12px; color: var(--ev-subtext); }
+
+		.ev-rating { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+		.ev-rating .ev-input { text-align: center; }
+
+		.ev-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 8px; }
+		.ev-btn { 
+			border: 0; 
+			border-radius: var(--border-radius); 
+			padding: 12px 24px; 
+			font-weight: 600; 
+			cursor: pointer; 
+			transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+		}
+		.ev-btn.primary { 
+			background: var(--accent-blue); 
+			color: #fff; 
+		}
+		.ev-btn.primary:hover { 
+			background: var(--accent-purple);
+			transform: translateY(-2px);
+			box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+		}
+		.ev-btn.secondary { 
+			background: var(--bg-secondary); 
+			color: var(--text-primary); 
+			border: 1px solid rgba(255, 255, 255, 0.2); 
+		}
+		.ev-btn.secondary:hover { 
+			background: var(--bg-card);
+			transform: translateY(-2px);
+		}
+
+		.logout-btn {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: var(--danger-color);
+			color: white;
+			padding: 12px 24px;
+			border-radius: 8px;
+			text-decoration: none;
+			font-weight: 500;
+			transition: var(--transition);
+			z-index: 1000;
+		}
+
+		.logout-btn:hover {
+			background: #c82333;
+			transform: translateY(-2px);
+		}
+
+		.back-btn {
+			position: fixed;
+			top: 20px;
+			left: 20px;
+			background: var(--info-color);
+			color: white;
+			width: 50px;
+			height: 50px;
+			border-radius: 50%;
+			text-decoration: none;
+			font-weight: 500;
+			transition: var(--transition);
+			z-index: 1000;
+			font-size: 1.2em;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+		}
+
+		.back-btn:hover {
+			background: #138496;
+			transform: translateY(-2px);
+		}
+
+	</style>
+</head>
+<body>
+	<!-- 视差背景 -->
+	<div class="executive-parallax-bg">
+		<div class="blue-orb-1"></div>
+		<div class="blue-orb-2"></div>
+		<div class="blue-orb-3"></div>
+	</div>
+	
+	<!-- 透明度为40%的图层 -->
+	<div class="overlay-layer"></div>
+	
+	<a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_dashboard') }}" class="back-btn">←</a>
+	<a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="logout-btn">退出登录</a>
+	
+	<div class="ev-wrapper">
+		<div class="page-header">
+			<div class="page-title"><i class="fas fa-edit"></i> 创建绩效评价</div>
+			<div style="color:#34C759; margin-top:6px; font-size: 1.2em; font-weight: 500;">请根据任务完成情况，给出客观、公正的评分与评语</div>
+		</div>
+		<form method="POST" class="ev-card">
+			<div class="ev-grid">
+				<div class="ev-field half">
+					<label class="ev-label">选择员工</label>
+					<select class="ev-select" name="employee_id" required>
+						<option value="">请选择</option>
+						{% for m in members %}
+						<option value="{{ m.id }}">{{ m.first_name }} {{ m.last_name }}（{{ m.department or '未知部门' }}）</option>
+						{% endfor %}
+					</select>
+				</div>
+				<div class="ev-field half">
+					<label class="ev-label">任务名称</label>
+					<input class="ev-input" type="text" name="task_title" required placeholder="例如：版本发布、关键客户问题处理">
+				</div>
+				<div class="ev-field">
+					<label class="ev-label">任务描述</label>
+					<textarea class="ev-textarea" name="task_description" rows="4" placeholder="任务背景、目标与关键结果（OKR）、影响范围"></textarea>
+					<div class="ev-hint">尽量提供客观的任务事实，便于复盘</div>
+				</div>
+				<div class="ev-field">
+					<label class="ev-label">评分维度（1-5）</label>
+					<div class="ev-rating">
+						<input class="ev-input" type="number" name="score_quality" min="1" max="5" required placeholder="质量">
+						<input class="ev-input" type="number" name="score_efficiency" min="1" max="5" required placeholder="效率">
+						<input class="ev-input" type="number" name="score_collaboration" min="1" max="5" required placeholder="协作">
+					</div>
+					<div class="ev-hint">建议以 3 为达标、4 为超预期、5 为卓越标准</div>
+				</div>
+				<div class="ev-field">
+					<label class="ev-label">评价评语</label>
+					<textarea class="ev-textarea" name="comment" rows="4" placeholder="优势亮点、改进建议、下一步行动…"></textarea>
+				</div>
+			</div>
+			<div class="ev-actions">
+				<a href="{{ url_for('talent_management.hr_admin.task_evaluation.evaluation_dashboard') }}" class="ev-btn secondary">返回</a>
+				<button type="submit" class="ev-btn primary">提交评价</button>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

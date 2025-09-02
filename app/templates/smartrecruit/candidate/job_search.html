@@ -1,0 +1,522 @@
+{% extends "smartrecruit/candidate/base_ios_new.html" %}
+
+{% block title %}智能岗位搜索{% endblock %}
+
+{% block content %}
+<section class="section" id="job-search">
+    <div style="width: 100%; max-width: 1200px;">
+        <div class="card animate-fade-in-up">
+            <div class="search-header" style="text-align: center; margin-bottom: 30px;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 15px; color: var(--text-primary);">
+                    🔍 智能岗位搜索
+                </h1>
+                <p style="font-size: 1.1rem; color: var(--text-secondary);">基于您的技能和偏好，找到最适合的职位</p>
+            </div>
+
+            <!-- 搜索过滤器 -->
+            <div class="search-filters" style="margin-bottom: 30px;">
+                <div class="grid grid-2" style="margin-bottom: 20px;">
+                    <div class="filter-group">
+                        <label for="searchQuery" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">关键词搜索</label>
+                        <input type="text" id="searchQuery" placeholder="职位名称、技能、公司名称..." 
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                    </div>
+                    <div class="filter-group">
+                        <label for="locationFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">工作地点</label>
+                        <input type="text" id="locationFilter" placeholder="城市、地区..." 
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                    </div>
+                </div>
+                
+                <div class="grid grid-4" style="margin-bottom: 20px;">
+                    <div class="filter-group">
+                        <label for="salaryMin" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">最低薪资</label>
+                        <input type="number" id="salaryMin" placeholder="最低薪资" 
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                    </div>
+                    <div class="filter-group">
+                        <label for="salaryMax" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">最高薪资</label>
+                        <input type="number" id="salaryMax" placeholder="最高薪资" 
+                               style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                    </div>
+                    <div class="filter-group">
+                        <label for="jobTypeFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">工作类型</label>
+                        <select id="jobTypeFilter" 
+                                style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                            <option value="">全部类型</option>
+                            <option value="全职">全职</option>
+                            <option value="兼职">兼职</option>
+                            <option value="实习">实习</option>
+                            <option value="远程">远程</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="experienceFilter" style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary);">经验要求</label>
+                        <select id="experienceFilter" 
+                                style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--button-radius); background: var(--bg-card); color: var(--text-primary);">
+                            <option value="">全部级别</option>
+                            <option value="初级">初级</option>
+                            <option value="中级">中级</option>
+                            <option value="高级">高级</option>
+                            <option value="专家">专家</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-actions" style="text-align: center;">
+                    <button class="btn" onclick="searchJobs()" style="margin-right: 15px;">
+                        <i class="fas fa-search"></i> 搜索
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearFilters()">
+                        <i class="fas fa-redo"></i> 清除筛选
+                    </button>
+                </div>
+            </div>
+
+            <!-- 用户技能展示 -->
+            <div class="user-skills" id="userSkillsSection" style="display: none; margin-bottom: 30px;">
+                <h3 style="margin-bottom: 15px; color: var(--text-primary);">🎯 您的技能匹配</h3>
+                <div class="skills-tags" id="skillsTags"></div>
+            </div>
+
+            <!-- 搜索结果 -->
+            <div class="search-results" id="searchResults" style="display: none;">
+                <div class="results-header" style="margin-bottom: 20px;">
+                    <h3 style="color: var(--text-primary);">📋 搜索结果</h3>
+                    <span class="results-count" id="resultsCount" style="color: var(--text-secondary);"></span>
+                </div>
+                <div class="jobs-grid" id="searchResultsGrid"></div>
+            </div>
+
+            <!-- 相关内容推荐 -->
+            <div class="related-section" id="relatedSection" style="margin-top: 40px;">
+                <h3 style="text-align: center; margin-bottom: 30px; color: var(--text-primary);">你可能还想看看</h3>
+                <div class="grid grid-3">
+                    <div class="card" style="text-align: center;">
+                        <h4 style="margin-bottom: 15px; color: var(--text-primary);">热门关键词</h4>
+                        <div class="related-tags">
+                            <span class="tag" style="cursor: pointer;" onclick="setSearchQuery('Python')">Python</span>
+                            <span class="tag" style="cursor: pointer;" onclick="setSearchQuery('数据分析')">数据分析</span>
+                            <span class="tag" style="cursor: pointer;" onclick="setSearchQuery('算法工程师')">算法工程师</span>
+                            <span class="tag" style="cursor: pointer;" onclick="setSearchQuery('DevOps')">DevOps</span>
+                            <span class="tag" style="cursor: pointer;" onclick="setSearchQuery('前端')">前端</span>
+                        </div>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <h4 style="margin-bottom: 15px; color: var(--text-primary);">快捷筛选</h4>
+                        <div class="related-actions">
+                            <button class="btn btn-secondary" style="margin: 5px;" data-type="remote" onclick="quickFilter('remote')">远程/混合办公</button>
+                            <button class="btn btn-secondary" style="margin: 5px;" data-type="junior" onclick="quickFilter('junior')">应届/初级</button>
+                            <button class="btn btn-secondary" style="margin: 5px;" data-type="hot" onclick="quickFilter('hot')">高薪职位</button>
+                        </div>
+                        <small style="color: var(--text-secondary);">点击即可填充筛选条件</small>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <h4 style="margin-bottom: 15px; color: var(--text-primary);">推荐职位</h4>
+                        <p style="color: var(--text-secondary); margin-bottom: 15px;">基于您的技能推荐</p>
+                        <a href="{{ url_for('smartrecruit.candidate.home') }}" class="btn">
+                            <i class="fas fa-star"></i> 查看推荐
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.job-search-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.search-filters {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 30px;
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--button-radius);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    transition: border-color 0.3s ease;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.1);
+}
+
+.filter-actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.filter-actions .btn {
+    margin: 0 10px;
+    padding: 12px 24px;
+    border-radius: var(--button-radius);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.user-skills {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 30px;
+}
+
+.skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skill-tag {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.search-results {
+    background: var(--bg-card);
+    padding: 25px;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.jobs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 20px;
+}
+
+.job-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--card-radius);
+    padding: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.job-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow);
+    border-color: var(--accent-color);
+}
+
+.job-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.job-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 5px;
+}
+
+.company-name {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.job-badge {
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.job-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.job-meta span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.job-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.tag {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.tag:hover {
+    background: var(--accent-color);
+    color: white;
+}
+
+.related-section {
+    margin-top: 40px;
+}
+
+.related-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+
+.related-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+.no-results {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+.no-results h4 {
+    margin-bottom: 10px;
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .jobs-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-actions .btn {
+        margin: 5px;
+        width: 100%;
+    }
+    
+    .job-meta {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .jobs-grid .job-card { flex: 0 1 calc(50% - 16px); }
+}
+</style>
+
+<script>
+let currentSearchResults = [];
+
+// 页面加载时显示用户技能
+document.addEventListener('DOMContentLoaded', function() {
+    displayUserSkills();
+});
+
+// 显示用户技能
+function displayUserSkills() {
+    const skills = {{ user_skills | tojson }};
+    const skillsSection = document.getElementById('userSkillsSection');
+    const skillsTags = document.getElementById('skillsTags');
+    
+    if (skills && skills.length > 0) {
+        skillsTags.innerHTML = skills.map(skill => 
+            `<span class="skill-tag">${skill}</span>`
+        ).join('');
+        skillsSection.style.display = 'block';
+    }
+}
+
+// 搜索职位
+async function searchJobs() {
+    const searchQuery = document.getElementById('searchQuery').value;
+    const locationFilter = document.getElementById('locationFilter').value;
+    const salaryMin = document.getElementById('salaryMin').value;
+    const salaryMax = document.getElementById('salaryMax').value;
+    const jobType = document.getElementById('jobTypeFilter').value;
+    const experienceLevel = document.getElementById('experienceFilter').value;
+    
+    const searchResults = document.getElementById('searchResults');
+    const searchResultsGrid = document.getElementById('searchResultsGrid');
+    const resultsCount = document.getElementById('resultsCount');
+    
+    searchResultsGrid.innerHTML = '<div class="loading">正在搜索...</div>';
+    searchResults.style.display = 'block';
+    
+    try {
+        const params = new URLSearchParams({
+            q: searchQuery,
+            location: locationFilter
+        });
+        const response = await fetch('{{ url_for("smartrecruit.candidate.jobs.api_search_jobs") }}?' + params.toString());
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            currentSearchResults = data.jobs;
+            displayJobs(data.jobs, searchResultsGrid);
+            resultsCount.textContent = `找到 ${data.total} 个职位`;
+        } else {
+            searchResultsGrid.innerHTML = '<div class="no-results">搜索失败，请稍后重试</div>';
+        }
+    } catch (error) {
+        console.error('搜索失败:', error);
+        searchResultsGrid.innerHTML = '<div class="no-results">搜索失败，请稍后重试</div>';
+    }
+}
+
+// 显示职位列表
+function displayJobs(jobs, container) {
+    if (jobs.length === 0) {
+        container.innerHTML = '<div class="no-results"><h4>暂无职位</h4><p>请尝试调整搜索条件</p></div>';
+        return;
+    }
+    
+    container.innerHTML = jobs.map(job => {
+        const location = job.location || '未注明';
+        const salary = job.salary ? job.salary.toLocaleString() + ' 元/月' : '薪资面议';
+        const company = job.company_name || '';
+        const jobType = job.job_type || '全职';
+        const exp = job.experience_level || '不限';
+        const desc = job.description || '';
+        return `
+        <div class="job-card animate-slide-in-left">
+            <div class="job-header">
+                <div>
+                    <div class="job-title">${job.title}</div>
+                    <div class="company-name">${company}</div>
+                </div>
+                <span class="job-badge">${job.match_score}% 匹配</span>
+            </div>
+            <div class="job-meta">
+                <span><i class="fas fa-map-marker-alt"></i> ${location}</span>
+                <span><i class="fas fa-dollar-sign"></i> ${salary}</span>
+                <span><i class="fas fa-clock"></i> ${jobType}</span>
+            </div>
+            <div class="job-tags">
+                <span class="tag">${exp}</span>
+            </div>
+            <div class="job-actions" style="margin-top: 15px;">
+                <a href="${'{{ url_for("smartrecruit.candidate.jobs.job_detail", job_id=0) }}'.replace('0', job.id)}" class="btn btn-secondary" style="margin-right: 10px;">
+                    <i class="fas fa-eye"></i> 查看详情
+                </a>
+                <button class="btn" onclick="applyForJob(${job.id})">
+                    <i class="fas fa-paper-plane"></i> 立即申请
+                </button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+// 清除筛选条件
+function clearFilters() {
+    document.getElementById('searchQuery').value = '';
+    document.getElementById('locationFilter').value = '';
+    document.getElementById('salaryMin').value = '';
+    document.getElementById('salaryMax').value = '';
+    document.getElementById('jobTypeFilter').value = '';
+    document.getElementById('experienceFilter').value = '';
+    
+    const searchResults = document.getElementById('searchResults');
+    searchResults.style.display = 'none';
+}
+
+// 设置搜索关键词
+function setSearchQuery(query) {
+    document.getElementById('searchQuery').value = query;
+    searchJobs();
+}
+
+// 快捷筛选
+function quickFilter(type) {
+    clearFilters();
+    
+    switch(type) {
+        case 'remote':
+            document.getElementById('jobTypeFilter').value = '远程';
+            break;
+        case 'junior':
+            document.getElementById('experienceFilter').value = '初级';
+            break;
+        case 'hot':
+            document.getElementById('salaryMin').value = '15000';
+            break;
+    }
+    
+    searchJobs();
+}
+
+// 申请职位
+async function applyForJob(jobId) {
+    try {
+        // 构建正确的URL，包含job_id参数
+        const applyUrl = `/smartrecruit/candidate/applications/pre_apply/${jobId}`;
+        
+        window.location.href = applyUrl;
+    } catch (error) {}
+}
+</script>
+{% endblock %}

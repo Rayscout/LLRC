@@ -1,0 +1,545 @@
+from flask import current_app
+from app.models import db
+from app.utils import extract_text_from_resume, ai_extract_skills_from_text, ai_analyze_resume_text
+from .emotion_recognition import get_emotion_recognition_ai
+import logging
+
+# 配置日志
+logger = logging.getLogger(__name__)
+
+def update_user_skills_from_resume(user, file_bytes: bytes, filename: str) -> list:
+    """从上传的简历文件中解析文本，调用AI提取技能，并保存到User.skills(JSON字符串)。
+
+    Returns: 提取到的技能列表
+    """
+    resume_text = ''
+    try:
+        resume_text = extract_text_from_resume(file_bytes, filename) or ''
+    except Exception:
+        resume_text = ''
+
+    # 若无法提取到简历文本，则回退到用户资料拼接文本
+    if not resume_text:
+        resume_text = f"姓名:{getattr(user,'first_name','')} {getattr(user,'last_name','')}. 公司:{getattr(user,'company_name','')}. 职位:{getattr(user,'position','')}. 简介:{getattr(user,'bio','')}. 经验:{getattr(user,'experience','')}. 教育:{getattr(user,'education','')}. 技能:{getattr(user,'skills','')}"
+
+    skills = ai_extract_skills_from_text(resume_text or (getattr(user, 'position', '') or '') )
+    try:
+        import json, hashlib
+        # 保存技能
+        user.skills = json.dumps(skills, ensure_ascii=False)
+        # 生成签名并存储简历分析结果
+        signature = hashlib.sha1((resume_text or '').encode('utf-8')).hexdigest() if resume_text else None
+        analysis = None
+        try:
+            analysis = ai_analyze_resume_text(resume_text)
+        except Exception:
+            analysis = None
+        if analysis:
+            user.resume_analysis = json.dumps(analysis, ensure_ascii=False)
+            from datetime import datetime as _dt
+            user.resume_last_analyzed_at = _dt.utcnow()
+        user.resume_signature = signature
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.warning(f'Failed to save AI skills/analysis: {e}')
+    return skills
+
+
+def analyze_candidate_emotion_from_image(image_data: bytes, filename: str = None) -> dict:
+    """
+    分析候选人照片中的表情，用于评估候选人的精神状态和职业素养
+    
+    Args:
+        image_data: 图片的二进制数据
+        filename: 文件名（可选）
+        
+    Returns:
+        dict: 表情分析结果
+    """
+    try:
+        emotion_ai = get_emotion_recognition_ai()
+        result = emotion_ai.recognize_emotion_from_image(image_data, filename)
+        
+        # 添加职业评估建议
+        if result.get("success") and result.get("faces"):
+            result["career_insights"] = _generate_career_insights(result["faces"])
+            result["interview_recommendations"] = _generate_interview_recommendations(result["emotion_summary"])
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"候选人表情分析失败: {e}")
+        return {"error": f"表情分析失败: {str(e)}"}
+
+
+def analyze_interview_performance(video_data: bytes, filename: str = None) -> dict:
+    """
+    分析面试视频中的候选人表现，包括表情变化、情绪稳定性等
+    
+    Args:
+        video_data: 面试视频的二进制数据
+        filename: 文件名（可选）
+        
+    Returns:
+        dict: 面试表现分析结果
+    """
+    try:
+        emotion_ai = get_emotion_recognition_ai()
+        result = emotion_ai.analyze_interview_video(video_data, filename)
+        
+        # 添加面试评估
+        if result.get("success"):
+            result["performance_analysis"] = _analyze_interview_performance(result)
+            result["candidate_score"] = _calculate_candidate_score(result)
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"面试表现分析失败: {e}")
+        return {"error": f"面试分析失败: {str(e)}"}
+
+
+def _generate_career_insights(faces: list) -> dict:
+    """
+    基于表情分析生成职业洞察
+    
+    Args:
+        faces: 检测到的人脸列表
+        
+    Returns:
+        dict: 职业洞察
+    """
+    insights = {
+        "confidence_level": "未知",
+        "professional_appearance": "未知",
+        "emotional_stability": "未知",
+        "recommendations": []
+    }
+    
+    if not faces:
+        return insights
+    
+    # 分析主要表情
+    emotions = [face["emotion"] for face in faces]
+    confidences = [face["emotion_confidence"] for face in faces]
+    
+    # 评估置信度水平
+    if not confidences:
+        avg_confidence = 0.0
+    else:
+        avg_confidence = sum(confidences) / len(confidences)
+    if avg_confidence > 0.8:
+        insights["confidence_level"] = "高"
+    elif avg_confidence > 0.6:
+        insights["confidence_level"] = "中"
+    else:
+        insights["confidence_level"] = "低"
+    
+    # 评估职业形象
+    positive_emotions = ["高兴", "中性", "惊讶"]
+    negative_emotions = ["愤怒", "厌恶", "恐惧", "悲伤"]
+    
+    positive_count = sum(1 for emotion in emotions if emotion in positive_emotions)
+    negative_count = sum(1 for emotion in emotions if emotion in negative_emotions)
+    
+    if positive_count > negative_count:
+        insights["professional_appearance"] = "积极"
+    elif negative_count > positive_count:
+        insights["professional_appearance"] = "消极"
+    else:
+        insights["professional_appearance"] = "中性"
+    
+    # 评估情绪稳定性
+    unique_emotions = set(emotions)
+    if len(unique_emotions) == 1:
+        insights["emotional_stability"] = "稳定"
+    elif len(unique_emotions) <= 2:
+        insights["emotional_stability"] = "较稳定"
+    else:
+        insights["emotional_stability"] = "不稳定"
+    
+    # 生成建议
+    if insights["professional_appearance"] == "消极":
+        insights["recommendations"].append("建议在面试前进行情绪调节训练")
+    
+    if insights["emotional_stability"] == "不稳定":
+        insights["recommendations"].append("建议提高情绪管理能力")
+    
+    if avg_confidence < 0.6:
+        insights["recommendations"].append("建议提高自信心和表达能力")
+    
+    return insights
+
+
+def _generate_interview_recommendations(emotion_summary: dict) -> list:
+    """
+    基于表情摘要生成面试建议
+    
+    Args:
+        emotion_summary: 表情摘要
+        
+    Returns:
+        list: 面试建议列表
+    """
+    recommendations = []
+    
+    if not emotion_summary:
+        return recommendations
+    
+    dominant_emotion = emotion_summary.get("dominant_emotion", "未知")
+    avg_confidence = emotion_summary.get("average_confidence", 0)
+    
+    # 基于主要表情的建议
+    if dominant_emotion == "高兴":
+        recommendations.append("候选人表现出积极乐观的态度，适合需要团队协作的岗位")
+    elif dominant_emotion == "中性":
+        recommendations.append("候选人情绪稳定，适合需要冷静思考的岗位")
+    elif dominant_emotion == "愤怒":
+        recommendations.append("候选人可能面临压力，建议了解具体情况")
+    elif dominant_emotion == "恐惧":
+        recommendations.append("候选人可能缺乏自信，建议提供更多鼓励和支持")
+    elif dominant_emotion == "悲伤":
+        recommendations.append("候选人情绪低落，建议了解个人情况")
+    
+    # 基于置信度的建议
+    if avg_confidence > 0.8:
+        recommendations.append("表情识别置信度高，分析结果可靠")
+    elif avg_confidence < 0.6:
+        recommendations.append("表情识别置信度较低，建议结合其他评估方法")
+    
+    return recommendations
+
+
+def _analyze_interview_performance(video_result: dict) -> dict:
+    """
+    分析面试视频中的表现
+    
+    Args:
+        video_result: 视频分析结果
+        
+    Returns:
+        dict: 表现分析
+    """
+    analysis = {
+        "emotional_consistency": "未知",
+        "stress_management": "未知",
+        "communication_style": "未知",
+        "overall_impression": "未知"
+    }
+    
+    timeline = video_result.get("emotion_timeline", [])
+    if not timeline:
+        return analysis
+    
+    # 分析情绪一致性
+    all_emotions = []
+    for entry in timeline:
+        for face in entry.get("emotions", []):
+            all_emotions.append(face.get("emotion", "未知"))
+    
+    unique_emotions = set(all_emotions)
+    if len(unique_emotions) <= 2:
+        analysis["emotional_consistency"] = "高"
+    elif len(unique_emotions) <= 4:
+        analysis["emotional_consistency"] = "中"
+    else:
+        analysis["emotional_consistency"] = "低"
+    
+    # 分析压力管理
+    negative_emotions = ["愤怒", "恐惧", "悲伤"]
+    negative_count = sum(1 for emotion in all_emotions if emotion in negative_emotions)
+    total_emotions = len(all_emotions)
+    
+    if total_emotions > 0:
+        negative_ratio = negative_count / total_emotions
+        if negative_ratio < 0.2:
+            analysis["stress_management"] = "优秀"
+        elif negative_ratio < 0.4:
+            analysis["stress_management"] = "良好"
+        else:
+            analysis["stress_management"] = "需要改进"
+    
+    # 分析沟通风格
+    positive_emotions = ["高兴", "中性", "惊讶"]
+    positive_count = sum(1 for emotion in all_emotions if emotion in positive_emotions)
+    
+    if total_emotions > 0:
+        positive_ratio = positive_count / total_emotions
+        if positive_ratio > 0.7:
+            analysis["communication_style"] = "积极开放"
+        elif positive_ratio > 0.5:
+            analysis["communication_style"] = "平衡"
+        else:
+            analysis["communication_style"] = "保守谨慎"
+    
+    # 整体印象
+    try:
+        if analysis["emotional_consistency"] == "高" and analysis["stress_management"] in ["优秀", "良好"]:
+            analysis["overall_impression"] = "优秀候选人"
+        elif analysis["emotional_consistency"] in ["高", "中"] and analysis["stress_management"] != "需要改进":
+            analysis["overall_impression"] = "良好候选人"
+        else:
+            analysis["overall_impression"] = "需要进一步评估"
+    except Exception as e:
+        logger.warning(f"计算整体印象时出错: {e}")
+        analysis["overall_impression"] = "需要进一步评估"
+    
+    return analysis
+
+
+def _calculate_candidate_score(video_result: dict) -> dict:
+    """
+    计算候选人评分
+    
+    Args:
+        video_result: 视频分析结果
+        
+    Returns:
+        dict: 评分结果
+    """
+    score = {
+        "emotional_stability": 0,
+        "confidence": 0,
+        "professionalism": 0,
+        "overall_score": 0,
+        "grade": "未知"
+    }
+    
+    timeline = video_result.get("emotion_timeline", [])
+    if not timeline:
+        return score
+    
+    # 计算情绪稳定性分数
+    all_emotions = []
+    for entry in timeline:
+        for face in entry.get("emotions", []):
+            all_emotions.append(face.get("emotion", "未知"))
+    
+    unique_emotions = set(all_emotions)
+    try:
+        if len(unique_emotions) <= 2:
+            score["emotional_stability"] = 90
+        elif len(unique_emotions) <= 4:
+            score["emotional_stability"] = 75
+        else:
+            score["emotional_stability"] = 60
+    except Exception as e:
+        logger.warning(f"计算情绪稳定性分数时出错: {e}")
+        score["emotional_stability"] = 0
+    
+    # 计算自信心分数
+    confidences = []
+    for entry in timeline:
+        for face in entry.get("emotions", []):
+            confidences.append(face.get("emotion_confidence", 0))
+    
+    if confidences:
+        avg_confidence = sum(confidences) / len(confidences)
+        score["confidence"] = int(avg_confidence * 100)
+    
+    # 计算职业素养分数
+    positive_emotions = ["高兴", "中性", "惊讶"]
+    positive_count = sum(1 for emotion in all_emotions if emotion in positive_emotions)
+    total_emotions = len(all_emotions)
+    
+    if total_emotions > 0:
+        positive_ratio = positive_count / total_emotions
+        score["professionalism"] = int(positive_ratio * 100)
+    
+    # 计算总分
+    score["overall_score"] = (score["emotional_stability"] + score["confidence"] + score["professionalism"]) // 3
+    
+    # 确定等级
+    if score["overall_score"] >= 85:
+        score["grade"] = "A"
+    elif score["overall_score"] >= 75:
+        score["grade"] = "B"
+    elif score["overall_score"] >= 65:
+        score["grade"] = "C"
+    else:
+        score["grade"] = "D"
+    
+    return score
+
+
+def get_ai_analysis_summary(user_id: int) -> dict:
+    """
+    获取用户的AI分析摘要
+    
+    Args:
+        user_id: 用户ID
+        
+    Returns:
+        dict: AI分析摘要
+    """
+    try:
+        # 这里可以从数据库获取用户的AI分析历史
+        # 暂时返回示例数据
+        summary = {
+            "user_id": user_id,
+            "resume_analysis_count": 0,
+            "emotion_analysis_count": 0,
+            "interview_analysis_count": 0,
+            "last_analysis_date": None,
+            "overall_ai_score": 0,
+            "recommendations": []
+        }
+        
+        return summary
+        
+    except Exception as e:
+        logger.error(f"获取AI分析摘要失败: {e}")
+        return {"error": f"获取分析摘要失败: {str(e)}"}
+
+
+def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict:
+    """
+    使用Gemini 1.5 Flash进行语音识别
+    
+    Args:
+        audio_data: 音频文件的二进制数据
+        filename: 文件名（可选）
+        
+    Returns:
+        dict: 语音识别结果
+    """
+    try:
+        import base64
+        import os
+        import requests
+        from io import BytesIO
+        
+        # 获取Gemini API配置
+        api_key = os.getenv('GEMINI_API_KEY') or os.getenv('GOOGLE_API_KEY')
+        model_name = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
+        
+        if not api_key:
+            logger.error("Gemini API密钥未配置")
+            return {"error": "语音识别服务未配置"}
+        
+        # 将音频数据转换为base64
+        audio_base64 = base64.b64encode(audio_data).decode('utf-8')
+        
+        # 构建Gemini API请求
+        url = f'https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent'
+        
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        
+        # 构建请求体，包含音频数据（按Gemini最新字段：role、inlineData、mimeType）
+        payload = {
+            "contents": [{
+                "role": "user",
+                "parts": [
+                    {
+                        "text": "请将这段音频转换为文字。请只返回转写的文字内容，不要添加任何解释或标点符号。"
+                    },
+                    {
+                        "inlineData": {
+                            "mimeType": _get_mime_type(filename),
+                            "data": audio_base64
+                        }
+                    }
+                ]
+            }],
+            "generationConfig": {
+                "maxOutputTokens": 1000,
+                "temperature": 0.1
+            }
+        }
+        
+        # 发送请求到Gemini API
+        response = requests.post(
+            url,
+            headers=headers,
+            params={'key': api_key},
+            json=payload,
+            timeout=60
+        )
+        
+        if response.status_code != 200:
+            logger.error(f"Gemini API请求失败: {response.status_code} - {response.text}")
+            # 将部分错误信息返回给前端，便于定位（隐藏密钥）
+            try:
+                err_js = response.json()
+            except Exception:
+                err_js = {"message": response.text[:300]}
+            return {"error": f"语音识别API请求失败: {response.status_code}", "detail": err_js}
+        
+        # 解析响应
+        data = response.json()
+        candidates = data.get('candidates', [])
+        
+        if not candidates:
+            return {"error": "语音识别未返回结果"}
+        
+        content = candidates[0].get('content', {})
+        parts = content.get('parts', [])
+        
+        # 提取转写文本
+        transcribed_text = ""
+        for part in parts:
+            if 'text' in part:
+                transcribed_text += part['text']
+        
+        if not transcribed_text.strip():
+            return {"error": "语音识别结果为空"}
+        
+        # 返回结果
+        result = {
+            "success": True,
+            "transcribed_text": transcribed_text.strip(),
+            "audio_duration": _estimate_audio_duration(audio_data),
+            "confidence": "high",  # Gemini不提供置信度，设为high
+            "language": "zh-CN",  # 假设为中文
+            "model_used": model_name
+        }
+        
+        logger.info(f"语音识别成功，文本长度: {len(transcribed_text)}")
+        return result
+        
+    except Exception as e:
+        logger.error(f"语音识别失败: {e}")
+        return {"error": f"语音识别失败: {str(e)}"}
+
+
+def _get_mime_type(filename: str) -> str:
+    """
+    根据文件名获取MIME类型
+    
+    Args:
+        filename: 文件名
+        
+    Returns:
+        str: MIME类型
+    """
+    if not filename:
+        return "audio/wav"
+    
+    ext = filename.lower().split('.')[-1]
+    mime_types = {
+        'wav': 'audio/wav',
+        'mp3': 'audio/mpeg',
+        'm4a': 'audio/mp4',
+        'ogg': 'audio/ogg',
+        'webm': 'audio/webm'
+    }
+    
+    return mime_types.get(ext, 'audio/wav')
+
+
+def _estimate_audio_duration(audio_data: bytes) -> float:
+    """
+    估算音频时长（简单估算）
+    
+    Args:
+        audio_data: 音频数据
+        
+    Returns:
+        float: 估算的时长（秒）
+    """
+    # 这是一个简单的估算，实际项目中可以使用更准确的方法
+    # 假设平均比特率为128kbps
+    estimated_duration = len(audio_data) / (128 * 1024 / 8)  # 字节数 / (比特率 / 8)
+    return round(estimated_duration, 2)

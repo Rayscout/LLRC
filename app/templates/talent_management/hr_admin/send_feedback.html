@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>发送反馈 - 团队管理</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth_sign.css') }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-radius: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --bg-primary: #F2F2F7;
+            --bg-secondary: rgba(255, 255, 255, 0.6);
+            --bg-card: rgba(255, 255, 255, 0.6);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --text-tertiary: #C7C7CC;
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-orange: #FF9500;
+            --accent-red: #FF3B30;
+            --accent-purple: #AF52DE;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius-large: 24px;
+            --transition-fast: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: transparent;
+            min-height: 100vh;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Light Blue Background - 与高管仪表盘一致 */
+        .executive-parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #E6F3FF, #F0F8FF, #E8F4FD, #F5F9FF, #E0F0FF);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -2;
+        }
+
+        /* 透明度为40%的图层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* 动态蓝色区域 */
+        .executive-parallax-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(135, 206, 235, 0.4) 0%, rgba(135, 206, 235, 0.2) 30%, transparent 70%),
+                radial-gradient(circle at 80% 70%, rgba(173, 216, 230, 0.5) 0%, rgba(173, 216, 230, 0.25) 35%, transparent 75%),
+                radial-gradient(circle at 40% 80%, rgba(176, 224, 230, 0.4) 0%, rgba(176, 224, 230, 0.2) 30%, transparent 70%),
+                radial-gradient(circle at 90% 20%, rgba(135, 206, 235, 0.35) 0%, rgba(135, 206, 235, 0.15) 25%, transparent 65%);
+            animation: bluePulse 8s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes bluePulse {
+            0%, 100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            25% {
+                opacity: 0.5;
+                transform: scale(1.05);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(1.02);
+            }
+            75% {
+                opacity: 0.7;
+                transform: scale(1.08);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Floating Background Elements */
+        .executive-parallax-bg::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.2) 0%, rgba(173, 216, 230, 0.1) 50%, transparent 100%);
+            animation: float 20s ease-in-out infinite;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        /* 额外的动态蓝色元素 */
+        .executive-parallax-bg .blue-orb-1 {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(100, 149, 237, 0.3) 0%, rgba(70, 130, 180, 0.1) 50%, transparent 100%);
+            animation: float 15s ease-in-out infinite;
+            top: 60%;
+            right: 15%;
+            animation-delay: 5s;
+            z-index: -1;
+        }
+
+        .executive-parallax-bg .blue-orb-2 {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(30, 144, 255, 0.25) 0%, rgba(0, 191, 255, 0.1) 50%, transparent 100%);
+            animation: float 18s ease-in-out infinite;
+            top: 20%;
+            right: 60%;
+            animation-delay: 8s;
+            z-index: -1;
+        }
+
+        .executive-parallax-bg .blue-orb-3 {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(135, 206, 250, 0.2) 0%, rgba(173, 216, 230, 0.1) 50%, transparent 100%);
+            animation: float 22s ease-in-out infinite;
+            bottom: 20%;
+            left: 30%;
+            animation-delay: 12s;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translateY(-50px) rotate(90deg);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-100px) rotate(180deg);
+                opacity: 0.3;
+            }
+            75% {
+                transform: translateY(-50px) rotate(270deg);
+                opacity: 0.6;
+            }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.6);
+            color: black;
+            padding: 80px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: left;
+            box-shadow: var(--shadow);
+        }
+
+        .page-header h1 {
+            font-size: 3.2em;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #1E40AF;
+            text-shadow: 0 4px 8px rgba(30, 64, 175, 0.3);
+            animation: titleBlink 2s ease-in-out infinite alternate, fadeInUp 1s ease-out forwards;
+            transform: translateY(30px);
+            opacity: 0;
+            letter-spacing: -0.02em;
+            position: relative;
+        }
+        
+        .page-header h1 i {
+            color: #1E40AF;
+            margin-right: 15px;
+        }
+
+        @keyframes titleBlink {
+            0% {
+                opacity: 1;
+                text-shadow: 0 4px 8px rgba(30, 64, 175, 0.3);
+            }
+            100% {
+                opacity: 0.8;
+                text-shadow: 0 4px 16px rgba(30, 64, 175, 0.6);
+            }
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header p {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: 500;
+            color: #34C759;
+        }
+
+        .feedback-form {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 90px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            margin: 0 0 20px 0;
+            color: var(--dark-color);
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 1em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .recipient-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .recipient-option {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .recipient-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .recipient-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .recipient-avatar {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .recipient-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .recipient-position {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .recipient-department {
+            background: var(--light-color);
+            color: var(--dark-color);
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .category-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .category-option {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            background: white;
+        }
+
+        .category-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .category-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .category-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+        }
+
+        .category-description {
+            color: #666;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+
+        .feedback-templates {
+            background: var(--light-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .feedback-templates h4 {
+            margin: 0 0 15px 0;
+            color: var(--dark-color);
+            font-size: 1.1em;
+        }
+
+        .template-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .template-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid #e9ecef;
+        }
+
+        .template-item:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .priority-selection {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .priority-option {
+            flex: 1;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            background: white;
+        }
+
+        .priority-option:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .priority-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .priority-icon {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+        }
+
+        .priority-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .priority-description {
+            color: #666;
+            font-size: 0.8em;
+        }
+
+        .priority-option.selected .priority-label,
+        .priority-option.selected .priority-description {
+            color: var(--primary-color);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-outline {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-card);
+            transform: translateY(-2px);
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--danger-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--info-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            z-index: 1000;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-btn:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .flash-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .flash-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .recipient-selection,
+            .category-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .priority-selection {
+                flex-direction: column;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 视差背景 -->
+    <div class="executive-parallax-bg">
+        <div class="blue-orb-1"></div>
+        <div class="blue-orb-2"></div>
+        <div class="blue-orb-3"></div>
+    </div>
+    
+    <!-- 透明度为40%的图层 -->
+    <div class="overlay-layer"></div>
+    
+    <a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_dashboard') }}" class="back-btn">←</a>
+    <a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="logout-btn">退出登录</a>
+    
+    <div class="container">
+        <!-- 页面头部 -->
+        <div class="page-header fade-in">
+            <h1><i class="fas fa-envelope"></i> 发送反馈</h1>
+            <p>为团队成员提供建设性反馈，促进个人成长和团队发展</p>
+        </div>
+
+        <!-- 反馈表单 -->
+        <form class="feedback-form fade-in" method="POST">
+            <!-- 选择反馈对象 -->
+            <div class="form-section">
+                <h3>👥 选择反馈对象</h3>
+                <div class="form-group">
+                    <label>团队成员</label>
+                    <div class="recipient-selection">
+                        {% for member_name, member_data in team_members.items() %}
+                        <div class="recipient-option" data-id="{{ member_data.id }}">
+                            <div class="recipient-avatar">{{ member_data.avatar }}</div>
+                            <div class="recipient-name">{{ member_name }}</div>
+                            <div class="recipient-position">{{ member_data.position }}</div>
+                            <div class="recipient-department">{{ member_data.department }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="recipient_id" id="recipient_id" required>
+                </div>
+            </div>
+
+            <!-- 选择反馈分类 -->
+            <div class="form-section">
+                <h3>📊 选择反馈分类</h3>
+                <div class="form-group">
+                    <label>反馈类型</label>
+                    <div class="category-selection">
+                        {% for category_key, category in feedback_categories.items() %}
+                        <div class="category-option" data-category="{{ category_key }}">
+                            <div class="category-icon">{{ category.icon }}</div>
+                            <div class="category-name">{{ category.name }}</div>
+                            <div class="category-description">{{ category.description }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <input type="hidden" name="category" id="category" required>
+                </div>
+            </div>
+
+            <!-- 反馈内容 -->
+            <div class="form-section">
+                <h3>✍️ 反馈内容</h3>
+                <div class="form-group">
+                    <label for="feedback_type">反馈类型</label>
+                    <select name="feedback_type" id="feedback_type" required>
+                        <option value="">请选择反馈类型</option>
+                        <option value="positive">正面反馈</option>
+                        <option value="constructive">建设性反馈</option>
+                        <option value="improvement">改进建议</option>
+                        <option value="recognition">认可表扬</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content">反馈内容</label>
+                    <textarea name="content" id="content" placeholder="请详细描述您的反馈内容..." required></textarea>
+                    
+                    <!-- 反馈模板 -->
+                    <div class="feedback-templates" id="feedback_templates" style="display: none;">
+                        <h4>💡 反馈模板建议</h4>
+                        <div class="template-list" id="template_list">
+                            <!-- 模板将通过JavaScript动态加载 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 优先级设置 -->
+            <div class="form-section">
+                <h3>⚡ 设置优先级</h3>
+                <div class="form-group">
+                    <label>优先级</label>
+                    <div class="priority-selection">
+                        <div class="priority-option" data-priority="low">
+                            <div class="priority-icon">🐌</div>
+                            <div class="priority-label">低优先级</div>
+                            <div class="priority-description">一般性反馈，可稍后处理</div>
+                        </div>
+                        <div class="priority-option" data-priority="medium">
+                            <div class="priority-icon">⚡</div>
+                            <div class="priority-label">中优先级</div>
+                            <div class="priority-description">需要关注，建议及时处理</div>
+                        </div>
+                        <div class="priority-option" data-priority="high">
+                            <div class="priority-icon">🚨</div>
+                            <div class="priority-label">高优先级</div>
+                            <div class="priority-description">重要反馈，需要立即处理</div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="priority" id="priority" value="medium" required>
+                </div>
+            </div>
+
+            <!-- 表单操作 -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    ✉️ 发送反馈
+                </button>
+                <a href="{{ url_for('talent_management.hr_admin.feedback_system.feedback_dashboard') }}" class="btn btn-outline">
+                    🔄 取消
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 选择反馈对象
+            const recipientOptions = document.querySelectorAll('.recipient-option');
+            recipientOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除其他选中状态
+                    recipientOptions.forEach(opt => opt.classList.remove('selected'));
+                    // 添加当前选中状态
+                    this.classList.add('selected');
+                    // 设置隐藏输入值
+                    document.getElementById('recipient_id').value = this.dataset.id;
+                });
+            });
+
+            // 选择反馈分类
+            const categoryOptions = document.querySelectorAll('.category-option');
+            categoryOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除其他选中状态
+                    categoryOptions.forEach(opt => opt.classList.remove('selected'));
+                    // 添加当前选中状态
+                    this.classList.add('selected');
+                    // 设置隐藏输入值
+                    document.getElementById('category').value = this.dataset.category;
+                    // 加载反馈模板
+                    loadFeedbackTemplates(this.dataset.category);
+                });
+            });
+
+            // 选择优先级
+            const priorityOptions = document.querySelectorAll('.priority-option');
+            priorityOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除其他选中状态
+                    priorityOptions.forEach(opt => opt.classList.remove('selected'));
+                    // 添加当前选中状态
+                    this.classList.add('selected');
+                    // 设置隐藏输入值
+                    document.getElementById('priority').value = this.dataset.priority;
+                });
+            });
+
+            // 默认选中中优先级
+            document.querySelector('[data-priority="medium"]').classList.add('selected');
+
+            // 加载反馈模板
+            function loadFeedbackTemplates(category) {
+                const templatesContainer = document.getElementById('feedback_templates');
+                const templateList = document.getElementById('template_list');
+                
+                if (!category) {
+                    templatesContainer.style.display = 'none';
+                    return;
+                }
+
+                // 这里可以根据分类加载不同的模板
+                const templates = {
+                    'skill': [
+                        '在专业技能方面表现优秀，建议继续保持并分享经验',
+                        '技术能力需要提升，建议参加相关培训课程',
+                        '在技术领域有潜力，建议设定具体发展目标'
+                    ],
+                    'communication': [
+                        '团队协作表现良好，能够有效促进团队合作',
+                        '沟通表达需要改进，建议提升演讲和汇报能力',
+                        '跨部门协作积极主动，是团队的重要桥梁'
+                    ],
+                    'performance': [
+                        '工作成果超出预期，展现了优秀的执行能力',
+                        '任务完成质量良好，建议关注效率提升',
+                        '目标达成率较高，体现了良好的职业素养'
+                    ]
+                };
+
+                if (templates[category]) {
+                    templateList.innerHTML = '';
+                    templates[category].forEach(template => {
+                        const templateItem = document.createElement('div');
+                        templateItem.className = 'template-item';
+                        templateItem.textContent = template;
+                        templateItem.addEventListener('click', function() {
+                            document.getElementById('content').value = template;
+                        });
+                        templateList.appendChild(templateItem);
+                    });
+                    templatesContainer.style.display = 'block';
+                } else {
+                    templatesContainer.style.display = 'none';
+                }
+            }
+
+            // 页面加载动画
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            console.log('发送反馈页面已加载');
+        });
+    </script>
+</body>
+</html>

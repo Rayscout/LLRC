@@ -1,0 +1,427 @@
+{% extends 'base.html' %}
+
+{% block title %}HR设置{% endblock %}
+
+{% block content %}
+<div class="hr-settings-page">
+    <div class="page-header">
+        <h1><i class="uil uil-setting"></i> HR设置</h1>
+        <p>管理您的账户设置和偏好</p>
+    </div>
+
+    <div class="settings-content">
+        <div class="settings-section">
+            <h2>账户设置</h2>
+            <div class="settings-form settings-grid-2">
+                <div class="form-group">
+                    <label for="email">邮箱地址</label>
+                    <input type="email" id="email" value="{{ user.email }}" readonly>
+                    <small>邮箱地址不可修改</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">电话号码</label>
+                    <input type="tel" id="phone" value="{{ user.phone_number }}" placeholder="输入电话号码">
+                </div>
+                
+                <div class="form-group">
+                    <label for="position">职位</label>
+                    <input type="text" id="position" value="{{ user.position or '' }}" placeholder="输入职位">
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>通知设置</h2>
+            <div class="settings-form settings-grid-2">
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="emailNotifications" checked>
+                        <span class="checkmark"></span>
+                        接收邮件通知
+                    </label>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="smsNotifications">
+                        <span class="checkmark"></span>
+                        接收短信通知
+                    </label>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="candidateUpdates" checked>
+                        <span class="checkmark"></span>
+                        候选人状态更新通知
+                    </label>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="interviewReminders" checked>
+                        <span class="checkmark"></span>
+                        面试提醒通知
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>安全设置</h2>
+            <div class="settings-form settings-grid-2">
+                <div class="form-group">
+                    <label for="currentPassword">当前密码</label>
+                    <input type="password" id="currentPassword" placeholder="输入当前密码">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newPassword">新密码</label>
+                    <input type="password" id="newPassword" placeholder="输入新密码">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">确认新密码</label>
+                    <input type="password" id="confirmPassword" placeholder="再次输入新密码">
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-actions">
+            <button type="button" class="btn btn-primary" onclick="saveSettings()">
+                <i class="uil uil-save"></i> 保存设置
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="resetSettings()">
+                <i class="uil uil-refresh"></i> 重置
+            </button>
+            <a href="{{ url_for('smartrecruit.hr.profile.hr_profile') }}" class="btn btn-outline">
+                <i class="uil uil-arrow-left"></i> 返回个人资料
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 隐藏侧边导航栏 */
+nav {
+    display: none !important;
+}
+
+/* 隐藏顶部栏的汉堡菜单按钮 */
+.sidebar-toggle {
+    display: none !important;
+}
+
+/* 调整主内容区域，移除左侧边距并确保居中 */
+.dashboard {
+    margin-left: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+}
+
+.dash-content {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    max-width: 1400px !important;
+}
+
+.top {
+    margin-left: 0 !important;
+    padding-left: 20px !important;
+}
+
+/* 禁用横向滚动条 */
+html, body {
+    overflow-x: hidden !important;
+}
+
+.dashboard, .dash-content {
+    overflow-x: hidden !important;
+}
+
+/* 隐藏所有横向滚动条 */
+* {
+    overflow-x: hidden !important;
+}
+
+/* 确保内容不会超出视口宽度 */
+.hr-settings-page {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 30px;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.page-header h1 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.page-header p {
+    color: #666;
+    font-size: 16px;
+}
+
+.settings-content {
+    background: white;
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.settings-section {
+    margin-bottom: 30px;
+}
+
+.settings-section h2 {
+    color: #333;
+    border-bottom: 2px solid #c4dfcc;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.settings-form {
+    display: grid;
+    gap: 20px;
+}
+
+/* 三列栅格：大屏三列，中屏两列，小屏一列 */
+.settings-grid-2{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+@media (max-width: 1200px){
+    .settings-grid-2{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 768px){
+    .settings-grid-2{ grid-template-columns: 1fr; }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="password"] {
+    padding: 10px 14px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #c4dfcc;
+}
+
+.form-group input[readonly] {
+    background-color: #f8f9fa;
+    color: #666;
+}
+
+.form-group small {
+    color: #666;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+}
+
+/* 卡片化每一节，减少“长条空白”感 */
+.settings-section{ background:#fff; border:1px solid #eef2f7; border-radius:14px; padding:20px; box-shadow:0 4px 14px rgba(0,0,0,.04) }
+body.dark .settings-section{ background:#1f2937; border-color:#2b3441 }
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+    accent-color: #c4dfcc;
+}
+
+.settings-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-primary {
+    background: #c4dfcc;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #acd2b7;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #545b62;
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    color: #c4dfcc;
+    border: 2px solid #c4dfcc;
+}
+
+.btn-outline:hover {
+    background: #c4dfcc;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* 深色模式支持 */
+body.dark .settings-content {
+    background: #1f2937;
+    color: #f9fafb;
+}
+
+body.dark .settings-section h2 {
+    color: #f9fafb;
+}
+
+body.dark .form-group label {
+    color: #f9fafb;
+}
+
+body.dark .form-group input {
+    background: #374151;
+    border-color: #4b5563;
+    color: #f9fafb;
+}
+
+body.dark .form-group input:focus {
+    border-color: #60a5fa;
+}
+
+body.dark .form-group input[readonly] {
+    background-color: #374151;
+    color: #9ca3af;
+}
+
+body.dark .checkbox-label {
+    color: #f9fafb;
+}
+
+@media (max-width: 768px) {
+    .settings-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+function saveSettings() {
+    // 获取表单数据
+    const phone = document.getElementById('phone').value;
+    const position = document.getElementById('position').value;
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    // 验证密码
+    if (newPassword && newPassword !== confirmPassword) {
+        alert('新密码和确认密码不匹配！');
+        return;
+    }
+    
+    // 这里可以添加AJAX请求来保存设置
+    console.log('保存设置:', {
+        phone,
+        position,
+        currentPassword,
+        newPassword
+    });
+    
+    alert('设置已保存！');
+}
+
+function resetSettings() {
+    // 重置表单到默认值
+    document.getElementById('phone').value = '{{ user.phone_number }}';
+    document.getElementById('position').value = '{{ user.position or "" }}';
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+    
+    // 重置复选框
+    document.getElementById('emailNotifications').checked = true;
+    document.getElementById('smsNotifications').checked = false;
+    document.getElementById('candidateUpdates').checked = true;
+    document.getElementById('interviewReminders').checked = true;
+    
+    alert('设置已重置！');
+}
+</script>
+{% endblock %}

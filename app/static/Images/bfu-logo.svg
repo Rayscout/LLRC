@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2d5a27"/>
+      <stop offset="100%" stop-color="#4a7c59"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 外圆环 -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="url(#logoGrad)" stroke-width="4"/>
+  <circle cx="100" cy="100" r="85" fill="none" stroke="url(#logoGrad)" stroke-width="2"/>
+  
+  <!-- 中央图形 - 三座山峰/树木 -->
+  <g transform="translate(100, 100)">
+    <!-- 左侧山峰 -->
+    <path d="M-40 20 L-30 -10 L-20 20 Z" fill="url(#logoGrad)"/>
+    <!-- 中间山峰 -->
+    <path d="M-15 20 L-5 -20 L5 20 Z" fill="url(#logoGrad)"/>
+    <!-- 右侧山峰 -->
+    <path d="M10 20 L20 -10 L30 20 Z" fill="url(#logoGrad)"/>
+  </g>
+  
+  <!-- 中文文字 -->
+  <text x="100" y="60" text-anchor="middle" font-family="SimHei, Microsoft YaHei, sans-serif" font-size="12" font-weight="bold" fill="url(#logoGrad)">北京林业大学</text>
+  
+  <!-- 英文文字 -->
+  <text x="100" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="url(#logoGrad)">BEIJING FORESTRY UNIVERSITY</text>
+  
+  <!-- 建校年份 -->
+  <text x="100" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="url(#logoGrad)">1952</text>
+</svg>

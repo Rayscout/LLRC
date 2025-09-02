@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}求职者中心 - 智能招聘系统{% endblock %}</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='candidate_ios_new.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <div class="navbar-brand" onclick="window.location.href='{{ url_for('smartrecruit.candidate.home') }}'" style="cursor:pointer;display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-briefcase" style="color:#c4dfcc;"></i>
+                    <span>智能招聘系统</span>
+                </div>
+            </div>
+            
+            <div class="navbar-center">
+                <div class="navbar-title">{% block navbar_title %}{% endblock %}</div>
+            </div>
+            
+            <div class="navbar-right">
+                <button class="nav-btn theme-toggle" onclick="toggleTheme()" title="切换主题">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                
+                <div class="user-menu">
+                    <div class="user-avatar" onclick="toggleUserMenu()" title="{{ user.first_name if user else '用户' }}">
+                        {% if user and user.profile_photo %}
+                            <img src="{{ url_for('static', filename='uploads/photos/' ~ user.profile_photo) }}" alt="头像">
+                        {% else %}
+                            {{ user.first_name[0] if user and user.first_name else 'U' }}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            <span>个人资料</span>
+                        </a>
+                        <a href="{{ url_for('smartrecruit.candidate.settings') }}" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>设置</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('smartrecruit.candidate.logout') }}" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>退出登录</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 顶部导航菜单（桌面端显示） -->
+        <div class="navbar-menu">
+            <a href="{{ url_for('smartrecruit.candidate.home') }}" class="menu-item {% if request.endpoint == 'smartrecruit.candidate.home' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>首页</span>
+            </a>
+            <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="menu-item {% if 'job_search' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-search"></i>
+                <span>职位搜索</span>
+            </a>
+            <a href="{{ url_for('smartrecruit.candidate.applications.my_applications') }}" class="menu-item {% if 'applications' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-file-alt"></i>
+                <span>我的申请</span>
+            </a>
+            <a href="{{ url_for('smartrecruit.candidate.applications.ai_interview_hub') }}" class="menu-item {% if request.endpoint == 'smartrecruit.candidate.applications.ai_interview_hub' %}active{% endif %}">
+                <i class="fas fa-microphone"></i>
+                <span>AI面试</span>
+            </a>
+            
+            <a href="{{ url_for('smartrecruit.candidate.messages_inbox') }}" class="menu-item {% if request.endpoint == 'smartrecruit.candidate.messages_inbox' %}active{% endif %}">
+                <i class="fas fa-inbox"></i>
+                <span>收信箱</span>
+            </a>
+            <a href="{{ url_for('smartrecruit.candidate.profile.career_path') }}" class="menu-item {% if 'career_path' in request.endpoint %}active{% endif %}">
+                <i class="fas fa-road"></i>
+                <span>职业路径</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 加载动画 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>加载中...</p>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='candidate_ios_new.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

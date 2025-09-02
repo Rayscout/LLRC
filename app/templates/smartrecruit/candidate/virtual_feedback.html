@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block title %}AI 面试反馈{% endblock %}
+
+{% block content %}
+<style>
+  .vf-wrap { max-width: 1000px; margin: 20px auto; display: grid; gap: 16px; }
+  .vf-card { background: #fff; border-radius: 12px; box-shadow: 0 6px 16px rgba(0,0,0,.08); padding: 16px; }
+  .vf-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
+  .vf-meter { height: 14px; background:#e5e7eb; border-radius: 999px; overflow: hidden; }
+  .vf-meter > div { height: 100%; background: linear-gradient(90deg,#c4dfcc,#acd2b7); width: 0%; }
+  .vf-badges { display:flex; flex-wrap: wrap; gap: 8px; }
+  .vf-badge { background:#eff6ff; color:#1d4ed8; padding:6px 10px; border-radius: 999px; font-size:12px; }
+  .vf-list { list-style: none; padding: 0; margin: 0; display:grid; gap: 8px; }
+  .vf-item { background:#f9fafb; padding:10px; border-radius:10px; }
+  .vf-actions { display:flex; gap:10px; justify-content: flex-end; }
+  .vf-btn { padding:10px 14px; border-radius: 8px; border:none; cursor:pointer; }
+  .vf-btn.primary { background:#acd2b7; color:#fff; }
+  .vf-btn.neutral { background:#f3f4f6; color:#111; }
+  
+  /* 表情分析相关样式 */
+  .emotion-section { margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+  .emotion-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .emotion-icon { font-size: 24px; }
+  .emotion-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .emotion-stat-card { background: #f8fafc; border-radius: 8px; padding: 12px; text-align: center; border: 1px solid #e2e8f0; }
+  .emotion-stat-value { font-size: 20px; font-weight: bold; color: #1e40af; margin-bottom: 4px; }
+  .emotion-stat-label { font-size: 12px; color: #64748b; }
+  .emotion-timeline { background: #f8fafc; border-radius: 8px; padding: 12px; max-height: 200px; overflow-y: auto; }
+  .emotion-entry { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: white; border-radius: 6px; margin-bottom: 6px; border: 1px solid #e2e8f0; }
+  .emotion-entry-time { color: #64748b; font-size: 12px; }
+  .emotion-entry-emotion { font-weight: bold; color: #1e40af; }
+  .emotion-entry-confidence { color: #059669; font-size: 12px; }
+  .emotion-insights { background: #dbece0; border: 1px solid #c4dfcc; border-radius: 8px; padding: 12px; margin-top: 12px; }
+  .emotion-insights h4 { margin: 0 0 8px; color: #0c4a6e; }
+  .emotion-insights ul { margin: 0; padding-left: 20px; color: #0c4a6e; }
+  
+  body.dark .vf-card { background: #1f2937; color: #e5e7eb; }
+  body.dark .vf-item { background: #111827; }
+  body.dark .emotion-stat-card { background: #374151; border-color: #4b5563; }
+  body.dark .emotion-timeline { background: #374151; }
+  body.dark .emotion-entry { background: #1f2937; border-color: #4b5563; }
+  body.dark .emotion-insights { background: #2d5a3d; border-color: #acd2b7; }
+  body.dark .emotion-insights h4 { color: #dbeafe; }
+  body.dark .emotion-insights ul { color: #dbeafe; }
+</style>
+
+<div class="vf-wrap">
+  <div class="vf-card">
+    <h2 style="margin:0 0 12px;">本次面试总体评价</h2>
+    <div class="vf-meter"><div id="vfScore"></div></div>
+    <p id="vfScoreText" style="color:#6b7280; margin:8px 0 0;">正在生成评分...</p>
+  </div>
+
+  <div class="vf-row">
+    <div class="vf-card">
+      <h3 style="margin-top:0;">优势亮点</h3>
+      <div class="vf-badges" id="vfStrengths"></div>
+      <h3>可改进建议</h3>
+      <ul class="vf-list" id="vfImprovements"></ul>
+    </div>
+    <div class="vf-card">
+      <h3 style="margin-top:0;">维度评分</h3>
+      <ul class="vf-list" id="vfDimensions"></ul>
+    </div>
+  </div>
+
+  <!-- 表情分析结果 -->
+  <div class="vf-card" id="emotionAnalysisCard" style="display: none;">
+    <div class="emotion-section">
+      <div class="emotion-header">
+        <span class="emotion-icon">🎭</span>
+        <h3 style="margin: 0;">AI表情分析报告</h3>
+      </div>
+      
+      <div class="emotion-stats">
+        <div class="emotion-stat-card">
+          <div id="totalEmotions" class="emotion-stat-value">-</div>
+          <div class="emotion-stat-label">检测次数</div>
+        </div>
+        <div class="emotion-stat-card">
+          <div id="dominantEmotion" class="emotion-stat-value">-</div>
+          <div class="emotion-stat-label">主要表情</div>
+        </div>
+        <div class="emotion-stat-card">
+          <div id="emotionStability" class="emotion-stat-value">-</div>
+          <div class="emotion-stat-label">情绪稳定性</div>
+        </div>
+        <div class="emotion-stat-card">
+          <div id="avgConfidence" class="emotion-stat-value">-</div>
+          <div class="emotion-stat-label">平均置信度</div>
+        </div>
+      </div>
+      
+      <div class="emotion-timeline">
+        <h4 style="margin: 0 0 8px; color: #374151;">表情变化时间线</h4>
+        <div id="emotionTimelineContent"></div>
+      </div>
+      
+      <div class="emotion-insights">
+        <h4>💡 基于表情分析的改进建议</h4>
+        <ul id="emotionInsights"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="vf-card">
+    <h3 style="margin-top:0;">下一步</h3>
+    <div class="vf-actions">
+      <a class="vf-btn primary" href="{{ url_for('smartrecruit.candidate.home') }}">返回仪表盘</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    // 纯前端假数据与生成逻辑
+    const randomBetween = (a,b)=> Math.floor(Math.random()*(b-a+1))+a;
+    const percent = randomBetween(62, 92);
+    const strengths = ['表达清晰', '思路完整', '案例具体', '动机明确', '逻辑严谨'];
+    const improvements = [
+      '回答可更精炼，突出关键信息。',
+      '多使用数据量化成果以增强可信度。',
+      '可加入风险与复盘思考，体现反思能力。',
+      '注意语速与停顿，提升表达节奏。'
+    ];
+    const dims = [
+      ['沟通表达', randomBetween(60,95)],
+      ['问题分析', randomBetween(60,95)],
+      ['项目经验', randomBetween(60,95)],
+      ['岗位匹配', randomBetween(60,95)],
+      ['压力应对', randomBetween(60,95)]
+    ];
+
+    const vfScore = document.getElementById('vfScore');
+    const vfScoreText = document.getElementById('vfScoreText');
+    const vfStrengths = document.getElementById('vfStrengths');
+    const vfImprovements = document.getElementById('vfImprovements');
+    const vfDimensions = document.getElementById('vfDimensions');
+    
+    // 表情分析相关元素
+    const emotionAnalysisCard = document.getElementById('emotionAnalysisCard');
+    const totalEmotions = document.getElementById('totalEmotions');
+    const dominantEmotion = document.getElementById('dominantEmotion');
+    const emotionStability = document.getElementById('emotionStability');
+    const avgConfidence = document.getElementById('avgConfidence');
+    const emotionTimelineContent = document.getElementById('emotionTimelineContent');
+    const emotionInsights = document.getElementById('emotionInsights');
+
+    // 检查是否有表情分析数据
+    function checkEmotionAnalysis() {
+      const reportData = localStorage.getItem('emotionAnalysisReport');
+      if (reportData) {
+        try {
+          const report = JSON.parse(reportData);
+          displayEmotionAnalysis(report);
+          emotionAnalysisCard.style.display = 'block';
+          
+          // 清理localStorage
+          localStorage.removeItem('emotionAnalysisReport');
+        } catch (error) {
+          console.error('解析表情分析报告失败:', error);
+        }
+      }
+    }
+
+    function displayEmotionAnalysis(report) {
+      // 显示统计数据
+      totalEmotions.textContent = report.totalEmotions || 0;
+      dominantEmotion.textContent = report.dominantEmotion || '未知';
+      emotionStability.textContent = report.stability || '未知';
+      
+      // 计算平均置信度
+      if (report.timeline && report.timeline.length > 0) {
+        const avgConf = report.timeline.reduce((sum, entry) => sum + entry.confidence, 0) / report.timeline.length;
+        avgConfidence.textContent = (avgConf * 100).toFixed(0) + '%';
+      } else {
+        avgConfidence.textContent = '0%';
+      }
+      
+      // 显示时间线
+      if (report.timeline && report.timeline.length > 0) {
+        emotionTimelineContent.innerHTML = '';
+        report.timeline.forEach(entry => {
+          const entryDiv = document.createElement('div');
+          entryDiv.className = 'emotion-entry';
+          entryDiv.innerHTML = `
+            <span class="emotion-entry-time">${entry.time}</span>
+            <span class="emotion-entry-emotion">${entry.emotion}</span>
+            <span class="emotion-entry-confidence">${(entry.confidence * 100).toFixed(0)}%</span>
+          `;
+          emotionTimelineContent.appendChild(entryDiv);
+        });
+      }
+      
+      // 生成改进建议
+      generateEmotionInsights(report);
+    }
+
+    function generateEmotionInsights(report) {
+      const insights = [];
+      
+      if (report.stability === '不稳定') {
+        insights.push('建议进行情绪管理训练，提高面试过程中的情绪稳定性');
+      }
+      
+      if (report.dominantEmotion === '恐惧' || report.dominantEmotion === '悲伤') {
+        insights.push('面试时保持积极心态，多进行自信训练和积极暗示');
+      }
+      
+      if (report.dominantEmotion === '愤怒') {
+        insights.push('注意控制情绪，面试时保持冷静和专业态度');
+      }
+      
+      if (report.timeline && report.timeline.length > 0) {
+        const avgConf = report.timeline.reduce((sum, entry) => sum + entry.confidence, 0) / report.timeline.length;
+        if (avgConf < 0.6) {
+          insights.push('表情识别置信度较低，建议改善光线条件和面部表情的自然性');
+        }
+      }
+      
+      // 如果没有特定建议，提供通用建议
+      if (insights.length === 0) {
+        insights.push('保持良好的面部表情管理，保持适度的微笑和专注');
+        insights.push('面试前进行深呼吸练习，帮助放松心情');
+        insights.push('定期进行模拟面试训练，提高面试技巧和自信心');
+      }
+      
+      // 显示建议
+      emotionInsights.innerHTML = '';
+      insights.forEach(insight => {
+        const li = document.createElement('li');
+        li.textContent = insight;
+        emotionInsights.appendChild(li);
+      });
+    }
+
+    // 渐进式渲染
+    requestAnimationFrame(()=>{ vfScore.style.width = '0%'; });
+    setTimeout(()=>{ vfScore.style.width = percent + '%'; vfScoreText.textContent = `综合评分：${percent}%（模拟）`; }, 400);
+
+    strengths.slice(0, randomBetween(3, strengths.length)).forEach(s=>{
+      const span = document.createElement('span'); span.className='vf-badge'; span.textContent = s; vfStrengths.appendChild(span);
+    });
+
+    improvements.forEach(tip=>{
+      const li = document.createElement('li'); li.className='vf-item'; li.textContent = tip; vfImprovements.appendChild(li);
+    });
+
+    dims.forEach(([name,score])=>{
+      const li = document.createElement('li'); li.className='vf-item';
+      li.innerHTML = `<div style="display:flex; justify-content:space-between; margin-bottom:6px;"><strong>${name}</strong><span>${score}%</span></div>
+      <div class="vf-meter"><div style="width:${score}%; background:linear-gradient(90deg,#22c55e,#16a34a);"></div></div>`;
+      vfDimensions.appendChild(li);
+    });
+    
+    // 检查并显示表情分析结果
+    setTimeout(checkEmotionAnalysis, 600);
+  })();
+ </script>
+{% endblock %}
+
+

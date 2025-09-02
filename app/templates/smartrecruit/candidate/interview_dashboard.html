@@ -1,0 +1,249 @@
+{% extends "smartrecruit/candidate/base_ios.html" %}
+
+{% block title %}AI面试训练{% endblock %}
+
+{% block content %}
+<section class="section" id="interview-dashboard">
+    <div style="width: 100%; max-width: 1200px;">
+        <div class="card animate-fade-in-up">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 15px; background: linear-gradient(135deg, var(--accent-color), var(--accent-hover)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    🎤 AI面试训练
+                </h1>
+                <p style="font-size: 1.1rem; color: var(--text-secondary);">体验AI驱动的智能面试，提升您的面试技巧和表现</p>
+            </div>
+                    
+                    <div class="ios-grid ios-grid-3 mt-xl">
+                        <div class="ios-card">
+                            <i class="fas fa-robot" style="font-size: 3rem; color: var(--ios-blue); margin-bottom: 1rem;"></i>
+                            <h3>AI智能问答</h3>
+                            <p class="ios-metric-value">个性化问题</p>
+                            <p class="ios-metric-label">基于您的简历和职位要求</p>
+                        </div>
+                        
+                        <div class="ios-card">
+                            <i class="fas fa-chart-line" style="font-size: 3rem; color: var(--ios-green); margin-bottom: 1rem;"></i>
+                            <h3>实时反馈</h3>
+                            <p class="ios-metric-value">即时评分</p>
+                            <p class="ios-metric-label">每道题都有详细反馈</p>
+                        </div>
+                        
+                        <div class="ios-card">
+                            <i class="fas fa-trophy" style="font-size: 3rem; color: var(--ios-orange); margin-bottom: 1rem;"></i>
+                            <h3>技能提升</h3>
+                            <p class="ios-metric-value">持续改进</p>
+                            <p class="ios-metric-label">通过练习提升面试技巧</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 可面试职位 -->
+        <section class="ios-section">
+            <div class="ios-container">
+                <h2 class="ios-section-title">可进行面试的职位</h2>
+                
+                {% if available_jobs %}
+                    <div class="ios-grid ios-grid-2">
+                        {% for job_data in available_jobs %}
+                        <div class="ios-card ios-fade-in">
+                            <div class="ios-card-header">
+                                <h3>{{ job_data.job.title }}</h3>
+                                <span class="ios-badge ios-badge-primary">{{ job_data.job.company }}</span>
+                            </div>
+                            
+                            <div class="ios-card-content">
+                                <p class="ios-text-muted">{{ job_data.job.location }} • {{ job_data.job.job_type }}</p>
+                                <p class="ios-text">{{ job_data.job.description[:200] }}...</p>
+                                
+                                <div class="ios-metrics">
+                                    <div class="ios-metric">
+                                        <span class="ios-metric-label">申请状态</span>
+                                        <span class="ios-metric-value">{{ job_data.application.status }}</span>
+                                    </div>
+                                    <div class="ios-metric">
+                                        <span class="ios-metric-label">申请时间</span>
+                                        <span class="ios-metric-value">{{ job_data.application.timestamp.strftime('%Y-%m-%d') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="ios-card-actions">
+                                <button class="ios-button ios-button-primary" onclick="startInterview({{ job_data.job.id }})">
+                                    <i class="fas fa-play"></i>
+                                    开始面试
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="ios-card ios-fade-in">
+                        <div class="ios-empty-state">
+                            <i class="fas fa-inbox" style="font-size: 4rem; color: var(--ios-gray); margin-bottom: 2rem;"></i>
+                            <h3>暂无可面试的职位</h3>
+                            <p class="ios-text-muted">您需要先申请职位才能进行AI虚拟面试</p>
+                            <button class="ios-button" onclick="location.href='{{ url_for('smartrecruit.candidate.jobs.job_list') }}'">
+                                <i class="fas fa-search"></i>
+                                浏览职位
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- 面试技巧提示 -->
+        <section class="ios-section">
+            <div class="ios-container">
+                <h2 class="ios-section-title">面试技巧提示</h2>
+                
+                <div class="ios-grid ios-grid-3">
+                    <div class="ios-card ios-fade-in">
+                        <i class="fas fa-lightbulb" style="font-size: 2rem; color: var(--ios-yellow); margin-bottom: 1rem;"></i>
+                        <h3>准备充分</h3>
+                        <p>提前了解公司和职位信息，准备相关的项目经验和技能说明</p>
+                    </div>
+                    
+                    <div class="ios-card ios-fade-in">
+                        <i class="fas fa-comments" style="font-size: 2rem; color: var(--ios-blue); margin-bottom: 1rem;"></i>
+                        <h3>清晰表达</h3>
+                        <p>用简洁明了的语言回答问题，突出自己的核心能力和成就</p>
+                    </div>
+                    
+                    <div class="ios-card ios-fade-in">
+                        <i class="fas fa-chart-bar" style="font-size: 2rem; color: var(--ios-green); margin-bottom: 1rem;"></i>
+                        <h3>量化成果</h3>
+                        <p>用具体的数据和成果来支撑你的回答，让面试官看到你的价值</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 面试开始模态框 -->
+    <div id="interviewModal" class="ios-modal">
+        <div class="ios-modal-content">
+            <div class="ios-modal-header">
+                <h3>准备开始面试</h3>
+                <button class="ios-modal-close" onclick="closeInterviewModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="ios-modal-body">
+                <div id="interviewInfo">
+                    <p>面试即将开始，请确保：</p>
+                    <ul>
+                        <li>环境安静，无干扰</li>
+                        <li>网络连接稳定</li>
+                        <li>准备好回答技术问题</li>
+                    </ul>
+                </div>
+                
+                <div id="interviewLoading" style="display: none;">
+                    <div class="ios-loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>正在生成面试问题...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ios-modal-footer">
+                <button class="ios-button ios-button-secondary" onclick="closeInterviewModal()">取消</button>
+                <button class="ios-button ios-button-primary" id="confirmStartBtn" onclick="confirmStartInterview()">
+                    确认开始
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 主题切换
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // 检查本地存储的主题设置
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        // 面试相关变量
+        let currentJobId = null;
+        
+        // 开始面试
+        function startInterview(jobId) {
+            currentJobId = jobId;
+            document.getElementById('interviewModal').style.display = 'flex';
+        }
+        
+        // 关闭面试模态框
+        function closeInterviewModal() {
+            document.getElementById('interviewModal').style.display = 'none';
+            document.getElementById('interviewInfo').style.display = 'block';
+            document.getElementById('interviewLoading').style.display = 'none';
+            document.getElementById('confirmStartBtn').disabled = false;
+        }
+        
+        // 确认开始面试
+        function confirmStartInterview() {
+            if (!currentJobId) return;
+            
+            document.getElementById('interviewInfo').style.display = 'none';
+            document.getElementById('interviewLoading').style.display = 'block';
+            document.getElementById('confirmStartBtn').disabled = true;
+            
+            // 发送开始面试请求
+            fetch(`/smartrecruit/candidate/interview/start/${currentJobId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 跳转到面试会话页面
+                    window.location.href = `/smartrecruit/candidate/interview/session/${data.session_id}`;
+                } else {
+                    alert('开始面试失败：' + data.error);
+                    closeInterviewModal();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('网络错误，请稍后重试');
+                closeInterviewModal();
+            });
+        }
+        
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.ios-fade-in');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+            
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+{% endblock %}
+</body>
+</html>

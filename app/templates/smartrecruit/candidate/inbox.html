@@ -1,0 +1,44 @@
+{% extends 'smartrecruit/candidate/base_ios_new.html' %}
+
+{% block title %}收信箱 - 智能招聘系统{% endblock %}
+{% block navbar_title %}收信箱{% endblock %}
+
+{% block content %}
+<section class="section" id="inbox">
+    <div class="section-content">
+        <h1 class="section-title">收信箱</h1>
+        <p class="section-subtitle">查看来自HR的通知与消息</p>
+
+        <div style="max-width:900px;margin:0 auto;display:grid;gap:16px;">
+            {% if messages and messages|length > 0 %}
+                {% for m in messages %}
+                    <div class="card" style="text-align:left;display:grid;gap:8px;">
+                        <div class="card-header">
+                            <div class="card-title">{{ m.title }}</div>
+                            <div class="text-secondary">{{ m.time }}</div>
+                        </div>
+                        <div class="card-body-grid">
+                            <div class="card-block">
+                                <div class="text-secondary">{{ m.content }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="card" style="text-align:center;">
+                    <div class="card-title">暂无消息</div>
+                    <div class="text-secondary">当HR向您发送消息时，会显示在这里。</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
+
+
+
+
+

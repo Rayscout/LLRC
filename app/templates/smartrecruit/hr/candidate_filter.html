@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初筛 - iOS风格</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        .ios-filter-hero { background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%); }
+        .ios-filters-section { background: var(--ios-bg-secondary); }
+        .ios-candidates-list { background: var(--ios-bg-tertiary); }
+        
+        .ios-candidate-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            margin-bottom: var(--ios-spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-candidate-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-candidate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-candidate-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-candidate-title {
+            font-size: 1rem;
+            color: var(--ios-text-secondary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-candidate-meta {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            flex-wrap: wrap;
+        }
+        
+        .ios-candidate-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-xs);
+            font-size: 0.875rem;
+            color: var(--ios-text-tertiary);
+        }
+        
+        .ios-candidate-actions {
+            display: flex;
+            gap: var(--ios-spacing-sm);
+            flex-shrink: 0;
+        }
+        
+        .ios-candidate-status {
+            padding: var(--ios-spacing-xs) var(--ios-spacing-sm);
+            border-radius: var(--ios-radius-small);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: var(--ios-spacing-md);
+            display: inline-block;
+        }
+        
+        .ios-candidate-status.pending {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--ios-orange);
+        }
+        
+        .ios-candidate-status.approved {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--ios-green);
+        }
+        
+        .ios-candidate-status.rejected {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--ios-red);
+        }
+        
+        .ios-candidate-status.interview {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--ios-blue);
+        }
+        
+        .ios-candidate-status.withdrawn {
+            background: rgba(142, 142, 147, 0.1);
+            color: var(--ios-text-quaternary);
+        }
+        
+        .ios-candidate-status.screening_passed {
+            background: rgba(88, 86, 214, 0.1);
+            color: var(--ios-purple);
+        }
+        /* 避免页眉被导航遮挡：为主内容区域预留顶部空间（近似导航高度） */
+        .ios-main {
+            padding-top: 84px;
+        }
+        @media (max-width: 768px) {
+            .ios-main { padding-top: 96px; }
+        }
+        
+        .ios-filter-group {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        
+        .ios-filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+        
+        .ios-filter-label {
+            font-size: 0.85rem;
+            color: var(--ios-text-secondary);
+            font-weight: 600;
+            letter-spacing: .2px;
+            white-space: nowrap;
+        }
+        
+        .ios-filter-item:last-child {
+            margin-left: auto;
+        }
+        
+        .ios-input {
+            height: 58px;
+            border-radius: 16px;
+            border: 1px solid var(--ios-border-secondary);
+            background: var(--ios-bg-secondary);
+            color: var(--ios-text-primary);
+            padding: 0 var(--ios-spacing-md);
+        }
+        
+        .ios-input:focus {
+            outline: none;
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 3px rgba(0,122,255,.12);
+        }
+        
+        .ios-input::placeholder {
+            color: var(--ios-text-quaternary);
+        }
+        
+        select.ios-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 18px 18px;
+            padding-right: 40px;
+        }
+        
+        .ios-smart-filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-md);
+            padding: var(--ios-spacing-lg);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 34px;
+            background: var(--ios-border-secondary);
+            border-radius: 34px;
+            cursor: pointer;
+            transition: background var(--ios-transition-medium);
+        }
+        
+        .ios-toggle-switch.active {
+            background: var(--ios-blue);
+        }
+        
+        .ios-toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border-radius: 50%;
+            transition: transform var(--ios-transition-medium);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .ios-toggle-switch.active .ios-toggle-slider {
+            transform: translateX(26px);
+        }
+        
+        .ios-batch-actions {
+            display: flex;
+            gap: var(--ios-spacing-sm);
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-batch-btn {
+            padding: var(--ios-spacing-sm) var(--ios-spacing-lg);
+            border-radius: var(--ios-radius-medium);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--ios-transition-medium);
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-xs);
+        }
+        
+        .ios-batch-btn.primary {
+            background: var(--ios-blue);
+            color: white;
+        }
+        
+        .ios-batch-btn.primary:hover {
+            background: var(--ios-blue-dark);
+        }
+        
+        .ios-batch-btn.secondary {
+            background: var(--ios-bg-secondary);
+            color: var(--ios-text-primary);
+            border: 1px solid var(--ios-border-secondary);
+        }
+        
+        .ios-batch-btn.secondary:hover {
+            background: var(--ios-bg-tertiary);
+        }
+        
+        .ios-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .ios-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .ios-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+        }
+        
+        .ios-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--ios-text-tertiary);
+        }
+        
+        .ios-modal-body {
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-modal-footer {
+            display: flex;
+            gap: var(--ios-spacing-sm);
+            justify-content: flex-end;
+        }
+        
+        .ios-back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+            color: var(--ios-blue);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: var(--ios-spacing-lg);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-back-button:hover {
+            color: var(--ios-blue-dark);
+            transform: translateX(-4px);
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-brand">
+                <div class="ios-nav-brand-icon">
+                    <i class="uil uil-briefcase"></i>
+                </div>
+                <span>智能招聘系统-HR</span>
+            </a>
+            
+            <ul class="ios-nav-menu">
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-dashboard"></i>
+                        <span class="ios-nav-text">仪表板</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-users-alt"></i>
+                        <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <main class="ios-main">
+        <div class="ios-container">
+            <!-- 返回按钮 -->
+            <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-back-button">
+                <i class="uil uil-arrow-left"></i>
+                返回候选人管理
+            </a>
+
+            <!-- 页面标题 -->
+            <div class="ios-filter-hero">
+                <div class="ios-hero-content">
+                    <h1 class="ios-hero-title">初筛</h1>
+                    <p class="ios-hero-subtitle">使用智能筛选功能快速找到最合适的候选人</p>
+                </div>
+            </div>
+
+            <!-- 智能筛选开关 -->
+            <div class="ios-smart-filter-toggle">
+                <div class="ios-toggle-switch" id="smartFilterToggle">
+                    <div class="ios-toggle-slider"></div>
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 4px 0; color: var(--ios-text-primary);">启用智能筛选</h3>
+                    <p style="margin: 0; color: var(--ios-text-secondary); font-size: 0.875rem;">
+                        自动过滤不符合条件的候选人，提高筛选效率
+                    </p>
+                </div>
+            </div>
+
+            <!-- 筛选表单 -->
+            <div class="ios-filters-section">
+                <form id="filterForm" method="GET" action="{{ url_for('smartrecruit.hr.dashboard.candidates_filter') }}">
+                    <div class="ios-filter-group">
+                        <!-- 搜索框 -->
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">搜索候选人</label>
+                            <input type="text" name="search" class="ios-input" 
+                                   placeholder="搜索姓名、邮箱或职位..." 
+                                   value="{{ search_query }}">
+                        </div>
+
+                        <!-- 状态筛选 -->
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">申请状态</label>
+                            <select name="status" class="ios-input">
+                                <option value="">所有状态</option>
+                                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>待处理</option>
+                                <option value="interview" {% if status_filter == 'interview' %}selected{% endif %}>面试中</option>
+                                <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>已通过</option>
+                                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>已拒绝</option>
+                                <option value="withdrawn" {% if status_filter == 'withdrawn' %}selected{% endif %}>已撤销</option>
+                                <option value="screening_passed" {% if status_filter == 'screening_passed' %}selected{% endif %}>初筛通过</option>
+                            </select>
+                        </div>
+
+                        <!-- 职位筛选 -->
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">申请职位</label>
+                            <select name="job" class="ios-input">
+                                <option value="">所有职位</option>
+                                {% for job in available_jobs %}
+                                <option value="{{ job.id }}" {% if job_filter == job.id|string %}selected{% endif %}>
+                                    {{ job.title }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- 排序方式 -->
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">排序方式</label>
+                            <select name="sort" class="ios-input">
+                                <option value="date_desc" {% if sort_by == 'date_desc' %}selected{% endif %}>申请时间（最新）</option>
+                                <option value="date_asc" {% if sort_by == 'date_asc' %}selected{% endif %}>申请时间（最早）</option>
+                                <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>姓名（A-Z）</option>
+                                <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>姓名（Z-A）</option>
+                                <option value="skills_match" {% if sort_by == 'skills_match' %}selected{% endif %}>技能匹配度</option>
+                                <option value="ai_score" {% if sort_by == 'ai_score' %}selected{% endif %}>AI评分</option>
+                            </select>
+                        </div>
+
+                        <!-- 智能筛选参数（默认隐藏） -->
+                        <div id="smartFilterParams" style="display: none; width: 100%; margin-top: var(--ios-spacing-lg);">
+                            <div class="ios-filter-group">
+                                <!-- 最低技能匹配度 -->
+                                <div class="ios-filter-item">
+                                    <label class="ios-filter-label">最低技能匹配度</label>
+                                    <input type="number" name="min_skills_match" class="ios-input" 
+                                           placeholder="60" min="0" max="100" 
+                                           value="{{ min_skills_match }}">
+                                </div>
+
+                                <!-- 最低工作经验 -->
+                                <div class="ios-filter-item">
+                                    <label class="ios-filter-label">最低工作经验（年）</label>
+                                    <input type="number" name="min_experience" class="ios-input" 
+                                           placeholder="0" min="0" max="50" 
+                                           value="{{ min_experience }}">
+                                </div>
+
+                                <!-- 教育要求 -->
+                                <div class="ios-filter-item">
+                                    <label class="ios-filter-label">教育要求</label>
+                                    <select name="education_required" class="ios-input">
+                                        <option value="">不限</option>
+                                        <option value="高中" {% if education_required == '高中' %}selected{% endif %}>高中</option>
+                                        <option value="专科" {% if education_required == '专科' %}selected{% endif %}>专科</option>
+                                        <option value="本科" {% if education_required == '本科' %}selected{% endif %}>本科</option>
+                                        <option value="硕士" {% if education_required == '硕士' %}selected{% endif %}>硕士</option>
+                                        <option value="博士" {% if education_required == '博士' %}selected{% endif %}>博士</option>
+                                    </select>
+                                </div>
+
+                                <!-- 位置匹配 -->
+                                <div class="ios-filter-item">
+                                    <label class="ios-filter-label">位置匹配</label>
+                                    <input type="text" name="location_match" class="ios-input" 
+                                           placeholder="输入城市名称..." 
+                                           value="{{ location_match }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 隐藏的智能筛选开关 -->
+                        <input type="hidden" name="auto_filter" id="autoFilterInput" value="{{ 'true' if auto_filter else 'false' }}">
+
+                        <!-- 操作按钮 -->
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">&nbsp;</label>
+                            <div style="display: flex; gap: var(--ios-spacing-sm);">
+                                <button type="submit" class="ios-btn ios-btn-primary">
+                                    <i class="uil uil-search"></i>
+                                    筛选
+                                </button>
+                                <button type="button" id="clearFilters" class="ios-btn ios-btn-secondary">
+                                    <i class="uil uil-refresh"></i>
+                                    清除
+                                </button>
+                                <a href="{{ url_for('smartrecruit.hr.dashboard.candidates_filter', status='approved') }}" class="ios-btn ios-btn-secondary" style="text-decoration:none;">
+                                    <i class="uil uil-check-circle"></i>
+                                    筛选通过简历
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 批量操作按钮 -->
+            <div class="ios-batch-actions">
+                <button type="button" id="selectAllBtn" class="ios-batch-btn secondary">
+                    <i class="uil uil-check-square"></i>
+                    全选
+                </button>
+                <button type="button" id="approveSelectedBtn" class="ios-batch-btn primary" style="display: none;">
+                    <i class="uil uil-check-circle"></i>
+                    批量通过
+                </button>
+                <button type="button" id="rejectSelectedBtn" class="ios-batch-btn secondary" style="display: none;">
+                    <i class="uil uil-times-circle"></i>
+                    批量拒绝
+                </button>
+            </div>
+
+            <!-- 候选人列表 -->
+            <div class="ios-candidates-list">
+                <div class="ios-title">
+                    <h2>筛选结果</h2>
+                    <span class="filter-results-count">{{ candidates|length }} 位候选人</span>
+                </div>
+
+                {% if candidates %}
+                    {% for candidate in candidates %}
+                    <div class="ios-candidate-card">
+                        <div class="ios-candidate-header">
+                            <div>
+                                <div class="ios-candidate-name">{{ candidate.name }}</div>
+                                <div class="ios-candidate-title">{{ candidate.job_title }}</div>
+                                
+                                <!-- 状态标签 -->
+                                <span class="ios-candidate-status {{ candidate.status }}">
+                                    {% if candidate.status == 'pending' %}待处理
+                                    {% elif candidate.status == 'interview' %}面试中
+                                    {% elif candidate.status == 'approved' %}已通过
+                                    {% elif candidate.status == 'rejected' %}已拒绝
+                                    {% elif candidate.status == 'withdrawn' %}已撤销
+                                    {% elif candidate.status == 'screening_passed' %}初筛通过
+                                    {% else %}{{ candidate.status }}{% endif %}
+                                </span>
+                                
+                                <div class="ios-candidate-meta">
+                                    <div class="ios-candidate-meta-item">
+                                        <i class="uil uil-envelope"></i>
+                                        {{ candidate.email }}
+                                    </div>
+                                    <div class="ios-candidate-meta-item">
+                                        <i class="uil uil-phone"></i>
+                                        {{ candidate.phone }}
+                                    </div>
+                                    <div class="ios-candidate-meta-item">
+                                        <i class="uil uil-calendar-alt"></i>
+                                        申请时间：{{ candidate.applied_date }}
+                                    </div>
+                                    <div class="ios-candidate-meta-item">
+                                        <i class="uil uil-clock"></i>
+                                        工作经验：{{ candidate.experience_years }}年
+                                    </div>
+                                    <div class="ios-candidate-meta-item">
+                                        <i class="uil uil-graduation-cap"></i>
+                                        教育：{{ candidate.education_level }}
+                                    </div>
+                                </div>
+                                
+                                <!-- 评分显示 -->
+                                <div class="ios-candidate-meta" style="margin-top: var(--ios-spacing-sm);">
+                                    <div class="ios-candidate-meta-item">
+                                        <span>技能匹配度：{{ candidate.skills_match }}%</span>
+                                    </div>
+                                    {% if candidate.ai_score %}
+                                    <div class="ios-candidate-meta-item">
+                                        <span>AI评分：{{ candidate.ai_score }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="ios-candidate-actions">
+                                <input type="checkbox" class="candidate-checkbox" value="{{ candidate.id }}" 
+                                       data-candidate-id="{{ candidate.id }}" data-candidate-name="{{ candidate.name }}">
+                                <a href="{{ url_for('smartrecruit.hr.dashboard.view_candidate', candidate_id=candidate.id) }}" 
+                                   class="ios-btn ios-btn-secondary">
+                                    <i class="uil uil-eye"></i>
+                                    查看详情
+                                </a>
+                                <button type="button" class="ios-btn ios-btn-primary approve-notify-btn" 
+                                        data-candidate-id="{{ candidate.id }}" data-candidate-name="{{ candidate.name }}" data-application-id="{{ candidate.application_id if candidate.application_id else '' }}">
+                                    <i class="uil uil-check-circle"></i>
+                                    通过并通知
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="ios-empty-state">
+                        <i class="uil uil-users-alt" style="font-size: 4rem; color: var(--ios-text-tertiary);"></i>
+                        <h3>暂无符合条件的候选人</h3>
+                        <p>请尝试调整筛选条件或搜索关键词</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <!-- 成功提示模态框 -->
+    <div id="successModal" class="ios-modal">
+        <div class="ios-modal-content">
+            <div class="ios-modal-header">
+                <h3 class="ios-modal-title">操作成功</h3>
+                <button class="ios-modal-close" onclick="closeSuccessModal()">&times;</button>
+            </div>
+            <div class="ios-modal-body">
+                <p id="successMessage" style="margin:0; color: var(--ios-text-primary);">已通过并通知候选人：请你在三天之内完成AI正式面试。</p>
+            </div>
+            <div class="ios-modal-footer">
+                <button type="button" class="ios-btn ios-btn-primary" onclick="closeSuccessModal()">确定</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // 智能筛选开关
+        const smartFilterToggle = document.getElementById('smartFilterToggle');
+        const smartFilterParams = document.getElementById('smartFilterParams');
+        const autoFilterInput = document.getElementById('autoFilterInput');
+        
+        // 初始化开关状态
+        if ('{{ auto_filter }}' === 'True') {
+            smartFilterToggle.classList.add('active');
+            smartFilterParams.style.display = 'block';
+            autoFilterInput.value = 'true';
+        }
+        
+        smartFilterToggle.addEventListener('click', function() {
+            this.classList.toggle('active');
+            if (this.classList.contains('active')) {
+                smartFilterParams.style.display = 'block';
+                autoFilterInput.value = 'true';
+            } else {
+                smartFilterParams.style.display = 'none';
+                autoFilterInput.value = 'false';
+            }
+        });
+        
+        // 全选功能
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const candidateCheckboxes = document.querySelectorAll('.candidate-checkbox');
+        const batchButtons = document.querySelectorAll('.ios-batch-btn:not(#selectAllBtn)');
+        
+        selectAllBtn.addEventListener('click', function() {
+            const isAllSelected = Array.from(candidateCheckboxes).every(cb => cb.checked);
+            candidateCheckboxes.forEach(cb => {
+                cb.checked = !isAllSelected;
+            });
+            updateBatchButtons();
+        });
+        
+        candidateCheckboxes.forEach(cb => {
+            cb.addEventListener('change', updateBatchButtons);
+        });
+        
+        function updateBatchButtons() {
+            const selectedCount = document.querySelectorAll('.candidate-checkbox:checked').length;
+            batchButtons.forEach(btn => {
+                btn.style.display = selectedCount > 0 ? 'flex' : 'none';
+            });
+        }
+        
+
+        // 单个通过并通知（AI面试通知）
+        let notifyInProgress = false;
+        document.querySelectorAll('.approve-notify-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (notifyInProgress) return;
+                notifyInProgress = true;
+                const candidateId = this.dataset.candidateId;
+                const appId = this.dataset.applicationId || '';
+                const formData = new FormData();
+                formData.append('candidate_ids', candidateId);
+                if (appId) formData.append('application_id', appId);
+                formData.append('message', '请你在三天之内完成AI正式面试');
+                fetch('{{ url_for("smartrecruit.hr.dashboard.approve_and_notify") }}', { method: 'POST', body: formData })
+                    .then(async (r) => {
+                        let d = {};
+                        try { d = await r.json(); } catch(e) { d = { success:false, message:'解析失败' }; }
+                        if (d && d.success) { showSuccess('已通过并通知。'); }
+                        else { notifyInProgress = false; alert('操作失败：' + (d.message || '')); }
+                    })
+                    .catch(() => { if (!notifyInProgress) alert('网络错误，请稍后重试'); notifyInProgress = false; });
+            });
+        });
+
+        // 批量通过并通知（AI面试通知）
+        const approveSelectedBtn = document.getElementById('approveSelectedBtn');
+        if (approveSelectedBtn) {
+            approveSelectedBtn.addEventListener('click', function() {
+                if (notifyInProgress) return;
+                const ids = Array.from(document.querySelectorAll('.candidate-checkbox:checked')).map(cb => cb.dataset.candidateId);
+                if (ids.length === 0) { alert('请先选择候选人'); return; }
+                const formData = new FormData();
+                formData.append('candidate_ids', ids.join(','));
+                formData.append('message', '请你在三天之内完成AI正式面试');
+                notifyInProgress = true;
+                fetch('{{ url_for("smartrecruit.hr.dashboard.approve_and_notify") }}', { method: 'POST', body: formData })
+                    .then(async (r) => {
+                        let d = {};
+                        try { d = await r.json(); } catch(e) { d = { success:false, message:'解析失败' }; }
+                        if (d && d.success) { showSuccess('已通过并通知 ' + (d.updated || ids.length) + ' 人。'); }
+                        else { notifyInProgress = false; alert('操作失败：' + (d.message || '')); }
+                    })
+                    .catch(() => { if (!notifyInProgress) alert('网络错误，请稍后重试'); notifyInProgress = false; });
+            });
+        }
+
+        // 成功提示弹窗
+        function showSuccess(text){
+            const modal = document.getElementById('successModal');
+            const msg = document.getElementById('successMessage');
+            if (msg && text) msg.textContent = text;
+            if (modal){
+                modal.style.display = 'block';
+                setTimeout(()=>{ closeSuccessModal(); }, 2000);
+            } else {
+                alert(text || '操作成功');
+                location.reload();
+            }
+        }
+        function closeSuccessModal(){
+            const modal = document.getElementById('successModal');
+            if (modal){ modal.style.display = 'none'; }
+            location.reload();
+        }
+        
+        // 清除筛选
+        document.getElementById('clearFilters').addEventListener('click', function() {
+            window.location.href = '{{ url_for("smartrecruit.hr.dashboard.candidates_filter") }}';
+        });
+        
+    </script>
+</body>
+</html>
+

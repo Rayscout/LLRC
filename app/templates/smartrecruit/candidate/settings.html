@@ -1,0 +1,711 @@
+{% extends 'smartrecruit/candidate/base_ios_new.html' %}
+
+{% block title %}设置{% endblock %}
+
+{% block content %}
+<div class="no-sidebar-layout">
+<div class="hr-profile-page ios-container">
+<div class="profile-content">
+
+<div class="page-header">
+    <h1><i class="uil uil-user"></i> 个人资料设置</h1>
+    <p>完善您的基本信息与简历，获得更精准的职位与面试体验</p>
+</div>
+<div class="settings-hero">
+    <div class="settings-hero-inner">
+        <div class="hero-text">
+            <h1><i class="uil uil-setting"></i> 账户设置</h1>
+            <p>更新你的基本信息、上传头像与简历</p>
+        </div>
+        <div class="hero-actions">
+            <a href="{{ url_for('smartrecruit.candidate.profile.career_path') }}" class="btn btn-outline">职业与技能</a>
+            <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="btn btn-outline">去找职位</a>
+            <a href="{{ url_for('smartrecruit.candidate.applications.virtual_interview') }}" class="btn btn-outline">AI面试训练</a>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+</div>
+
+<div class="settings-layout">
+    <div class="card settings-card">
+        <h2 class="section-title">基本信息</h2>
+        <div class="profile-grid">
+            <div class="avatar-block">
+                <div class="profile-photo-container">
+                    {% if user.profile_photo %}
+                    <img src="{{ url_for('static', filename='uploads/photos/' ~ user.profile_photo) }}" alt="头像" class="profile-photo">
+                    {% else %}
+                    <div class="avatar-placeholder">暂无头像</div>
+                    {% endif %}
+                </div>
+                <form action="{{ url_for('smartrecruit.candidate.profile.settings') }}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="profile_photo">上传头像</label>
+                        <input type="file" id="profile_photo" name="profile_photo" accept="image/*">
+                        <small class="muted">支持格式：PNG, JPG, JPEG, GIF</small>
+                    </div>
+                    <button type="submit" name="save_changes" class="btn btn-primary">保存头像</button>
+                </form>
+            </div>
+            <div class="form-block">
+                <form action="{{ url_for('smartrecruit.candidate.profile.settings') }}" method="post" enctype="multipart/form-data" class="form-grid-2">
+                    <div class="form-group">
+                        <label for="first_name">名字</label>
+                        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="last_name">姓氏</label>
+                        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company_name">公司名称</label>
+                        <input type="text" id="company_name" name="company_name" value="{{ user.company_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="position">职位</label>
+                        <input type="text" id="position" name="position" value="{{ user.position }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">邮箱</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone_number">电话号码</label>
+                        <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="birthday">生日</label>
+                        <input type="date" id="birthday" name="birthday" value="{{ user.birthday }}" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" name="save_changes" class="btn btn-primary">保存更改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- CV Section -->
+    <div class="card settings-card">
+        <h2 class="section-title">简历</h2>
+        <form action="{{ url_for('smartrecruit.candidate.profile.settings') }}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="cv_file">上传简历 (PDF/DOCX/PPT/PPTX/PNG/JPG/视频)</label>
+                <input type="file" id="cv_file" name="cv_file" accept=".pdf,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.mp4,.webm,.ogg,.mov,.avi,.mkv">
+            </div>
+            <button type="submit" name="upload_cv" class="btn btn-primary">上传简历</button>
+        </form>
+        {% if user.cv_file %}
+        <div class="cv-display">
+            <h3>当前简历</h3>
+            {% set ext = user.cv_file.rsplit('.', 1)[-1]|lower %}
+            {% if ext == 'pdf' %}
+                <div class="cv-display">
+                    <h3>PDF简历</h3>
+                    <div class="cv-info">
+                        <p><strong>文件名:</strong> {{ user.cv_file }}</p>
+                        <p><strong>文件类型:</strong> {{ ext.upper() }}</p>
+                        <p><strong>文件路径:</strong> {{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}</p>
+                    </div>
+                    
+                    <div class="cv-preview-notice">
+                        <div class="notice-content">
+                            <h4>PDF文件预览</h4>
+                            <p>您可以在线预览或下载PDF文件：</p>
+                        </div>
+                        <div class="cv-actions">
+                            <!-- 在线预览 -->
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" target="_blank" class="btn btn-primary">
+                                <i class="fas fa-eye"></i> 在线预览
+                            </a>
+                            
+                            <!-- 下载文件 -->
+                            <a href="{{ url_for('common.files.download_file', filename=user.cv_file) }}" class="btn btn-success">
+                                <i class="fas fa-download"></i> 下载文件
+                            </a>
+                            
+                            <!-- 备用下载 -->
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="btn btn-secondary">
+                                <i class="fas fa-download"></i> 备用下载
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% elif ext == 'docx' %}
+                <div class="cv-display">
+                    <h3>Word简历</h3>
+                    <div class="cv-info">
+                        <p><strong>文件名:</strong> {{ user.cv_file }}</p>
+                        <p><strong>文件类型:</strong> {{ ext.upper() }}</p>
+                        <p><strong>文件路径:</strong> {{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}</p>
+                    </div>
+                    
+                    <div class="cv-preview-notice">
+                        <div class="notice-content">
+                            <h4>此处不支持 {{ ext.upper() }} 预览</h4>
+                            <p>您可以在本地下载和查看：</p>
+                        </div>
+                        <div class="cv-actions">
+                            <!-- 主要下载方式 -->
+                            <a href="{{ url_for('common.files.download_file', filename=user.cv_file) }}" class="btn btn-primary">
+                                <i class="fas fa-download"></i> 下载文件
+                            </a>
+                            
+                            <!-- 备用下载方式 -->
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="btn btn-secondary">
+                                <i class="fas fa-download"></i> 备用下载
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% elif ext in ['png','jpg','jpeg'] %}
+                <div class="cv-display">
+                    <h3>图片简历</h3>
+                    <div class="cv-info">
+                        <p><strong>文件名:</strong> {{ user.cv_file }}</p>
+                        <p><strong>文件类型:</strong> {{ ext.upper() }}</p>
+                        <p><strong>文件路径:</strong> {{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}</p>
+                    </div>
+                    
+                    <div class="cv-preview-notice">
+                        <div class="notice-content">
+                            <h4>图片文件预览</h4>
+                            <p>您可以在线预览或下载图片文件：</p>
+                        </div>
+                        <div class="cv-actions">
+                            <!-- 在线预览 -->
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" target="_blank" class="btn btn-primary">
+                                <i class="fas fa-eye"></i> 在线预览
+                            </a>
+                            
+                            <!-- 下载文件 -->
+                            <a href="{{ url_for('common.files.download_file', filename=user.cv_file) }}" class="btn btn-success">
+                                <i class="fas fa-download"></i> 下载文件
+                            </a>
+                            
+                            <!-- 备用下载 -->
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="btn btn-secondary">
+                                <i class="fas fa-download"></i> 备用下载
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 图片预览 -->
+                    <div class="image-preview">
+                <img src="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" alt="Current CV Image" style="max-width:100%; max-height:600px; border:1px solid #ddd; border-radius:4px;" />
+                    </div>
+                </div>
+            {% elif ext in ['mp4','webm','ogg','mov'] %}
+                <div class="cv-display">
+                    <div class="cv-info">
+                        <p><strong>文件名:</strong> {{ user.cv_file }}</p>
+                        <p><strong>文件类型:</strong> {{ ext.upper() }}</p>
+                        <p><strong>文件路径:</strong> {{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}</p>
+                    </div>
+                    
+                    <div class="cv-preview-notice">
+                        <div class="notice-content">
+                            <h4>此处不支持 {{ ext.upper() }} 视频预览</h4>
+                            <p>您可以在本地下载和查看：</p>
+                        </div>
+                        <div class="cv-actions">
+                            <!-- 主要下载方式：使用专用下载路由 -->
+                            <a href="{{ url_for('common.files.download_video', filename=user.cv_file) }}" class="btn btn-warning">
+                                <i class="fas fa-download"></i> 下载视频文件 ({{ ext.upper() }})
+                            </a>
+                            
+                            <!-- 简单下载方式 -->
+                            <a href="{{ url_for('common.files.simple_video_download', filename=user.cv_file) }}" class="btn btn-success">
+                                <i class="fas fa-download"></i> 简单下载 ({{ ext.upper() }})
+                            </a>
+                            
+                            <!-- 备用下载方式：使用静态文件路由 -->
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="btn btn-secondary">
+                                <i class="fas fa-download"></i> 备用下载 ({{ ext.upper() }})
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            {% elif ext in ['avi','mkv'] %}
+                <div class="cv-display">
+                    <div class="cv-info">
+                        <p><strong>文件名:</strong> {{ user.cv_file }}</p>
+                        <p><strong>文件类型:</strong> {{ ext.upper() }}</p>
+                        <p><strong>文件路径:</strong> {{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}</p>
+                    </div>
+                    
+                    <div class="cv-preview-notice unsupported">
+                        <div class="notice-content">
+                            <h4>视频格式不支持预览</h4>
+                            <p>此视频格式 ({{ ext.upper() }}) 无法在浏览器中预览。建议转换为MP4格式。</p>
+                        </div>
+                        <div class="cv-actions">
+                            <!-- 主要下载方式：使用专用下载路由 -->
+                            <a href="{{ url_for('common.files.download_video', filename=user.cv_file) }}" class="btn btn-warning">
+                                <i class="fas fa-download"></i> 下载视频文件 ({{ ext.upper() }})
+                            </a>
+                            
+                            <!-- 简单下载方式 -->
+                            <a href="{{ url_for('common.files.simple_video_download', filename=user.cv_file) }}" class="btn btn-success">
+                                <i class="fas fa-download"></i> 简单下载 ({{ ext.upper() }})
+                            </a>
+                            
+                            <!-- 备用下载方式：使用静态文件路由 -->
+                            <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download class="btn btn-secondary">
+                                <i class="fas fa-download"></i> 备用下载 ({{ ext.upper() }})
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <a href="{{ url_for('static', filename='uploads/cv/' ~ user.cv_file) }}" download>下载当前简历</a>
+            {% endif %}
+        </div>
+        <form action="{{ url_for('smartrecruit.candidate.profile.settings') }}" method="post" onsubmit="return confirm('确定要删除当前简历吗？此操作不可恢复。');" style="margin-top:10px;">
+            <button type="submit" name="delete_cv" class="btn btn-danger">删除简历</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* HR风格容器与标题（参考HR个人资料页） */
+.hr-profile-page { padding:32px 24px; max-width: 1100px; margin: 16px auto; }
+.profile-content { background:#ffffff; border-radius:20px; padding:20px; border:1px solid #e6f0ff; box-shadow:0 10px 24px rgba(16,77,165,.08) }
+.page-header { text-align:center; margin-bottom:18px }
+.page-header h1 { color:#0b1e3a; margin-bottom:6px; font-weight:900; letter-spacing:.2px }
+.page-header p { color:#49618a; font-size:14px }
+/* Hero banner (HR风格) */
+.settings-hero{background:linear-gradient(135deg,#eef5ff,#e8ecff);border:1px solid #e6f0ff;border-radius:24px;box-shadow:0 14px 34px rgba(16,77,165,.12);padding:20px;margin-bottom:20px}
+.settings-hero-inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.settings-hero h1{color:#0b1e3a;margin:0;font-weight:900}
+.settings-hero p{color:#49618a;margin:4px 0 0 0}
+.hero-actions{display:flex;gap:8px}
+
+/* Layout */
+.settings-layout{display:grid;gap:16px}
+.settings-card{padding:20px;border:1px solid #e6f0ff;border-radius:18px;box-shadow:0 16px 40px rgba(16,77,165,.08);background:#fff}
+.section-title{display:flex;align-items:center;gap:8px;color:#0b1e3a;border-bottom:2px solid #60A5FA;padding-bottom:10px;margin-bottom:14px;font-weight:900}
+
+/* Grid cards */
+.profile-grid{display:grid;grid-template-columns:260px 1fr;gap:14px}
+.form-block{background:linear-gradient(180deg,#f9fbff,#f4f8ff);border:1px solid #e7f0ff;border-radius:12px;padding:12px}
+.form-grid-2{display:grid;grid-template-columns:repeat(3,minmax(220px,1fr));gap:12px}
+.form-group{background:#fff;border:1px solid #e6eefc;border-radius:12px;padding:10px 12px;box-shadow:0 6px 14px rgba(16,77,165,.06)}
+.form-group label{display:block;font-weight:700;color:#6b7280;font-size:12px;margin-bottom:6px}
+.form-group input,.form-group textarea{width:100%;padding:10px 12px;border:1px solid #d8e2f0;border-radius:10px;font-size:14px;background:#f9fbff}
+
+/* Avatar card */
+.avatar-block{background:#fff;border:1px solid #e6eefc;border-radius:12px;padding:16px;box-shadow:0 8px 18px rgba(16,77,165,.06)}
+.avatar-placeholder{height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#64748b;background:linear-gradient(180deg,#eef2ff,#eaf0ff);border:1px dashed #c7d2fe}
+
+/* Button styles */
+.btn{padding:12px 20px;border-radius:12px;font-weight:700;display:inline-flex;align-items:center;gap:8px;cursor:pointer;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,#b8d8c1,#c4dfcc);color:#fff;border:none;box-shadow:0 10px 22px rgba(196,223,204,.28)}
+.btn-outline{background:#fff;border:1px solid #bfd4ff;color:#0b1e3a}
+
+/* Center primary action */
+.form-actions{grid-column:1/-1;display:flex;justify-content:center}
+
+/* Profile Photo Styling */
+.profile-photo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #007bff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 修正表单布局冲突：仅非网格表单使用纵向排布 */
+.settings-card form:not(.form-grid-2) { display: flex; flex-direction: column; }
+
+/* Form Styling */
+.settings-card .form-group {
+    margin-bottom: 15px;
+}
+
+.settings-card .form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.settings-card .form-group input,
+.settings-card .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.settings-card .form-group input:focus,
+.settings-card .form-group textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+}
+
+.settings-card .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+
+/* CV Display Styling */
+.cv-display {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.cv-display h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+}
+
+.cv-info {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cv-info p {
+    margin: 8px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+/* 视频预览提示样式 */
+.cv-preview-notice {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cv-preview-notice.unsupported {
+    border-color: #ffc107;
+    background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
+}
+
+.notice-content h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.notice-content p {
+    color: #6c757d;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.cv-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.cv-actions .btn {
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    min-width: 180px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cv-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+}
+
+/* 按钮样式补充 */
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+
+/* Video Preview Styling */
+.video-container {
+    margin: 20px 0;
+    text-align: center;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+}
+
+/* 视频状态指示器样式 */
+.video-status-indicator {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.status-item:last-child {
+    margin-bottom: 0;
+}
+
+.status-item strong {
+    min-width: 80px;
+    color: #495057;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+}
+
+.btn-outline-primary {
+    color: #007bff;
+    border: 1px solid #007bff;
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    color: #fff;
+    background: #007bff;
+}
+
+.btn-outline-secondary {
+    color: #6c757d;
+    border: 1px solid #6c757d;
+    background: transparent;
+}
+
+.btn-outline-secondary:hover {
+    color: #fff;
+    background: #6c757d;
+}
+
+.video-container video {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    max-width: 100%;
+    height: auto;
+}
+
+/* 视频下载提示样式 */
+.video-download-notice {
+    background: #fff;
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    padding: 30px;
+    margin: 20px 0;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.notice-icon {
+    margin-bottom: 20px;
+}
+
+.notice-content h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.notice-content p {
+    color: #6c757d;
+    margin-bottom: 25px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.download-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.download-actions .btn-lg {
+    padding: 15px 25px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+
+.download-actions .btn-lg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* 不支持格式的特殊样式 */
+.unsupported-format {
+    border-color: #ffc107;
+    background: linear-gradient(135deg, #fff9e6 0%, #fff 100%);
+}
+
+.unsupported-format .notice-icon i {
+    color: #ffc107 !important;
+}
+
+.unsupported-format .notice-content h4 {
+    color: #856404;
+}
+
+.unsupported-format .notice-content p {
+    color: #856404;
+}
+
+/* 视频信息显示样式 */
+.video-info-display {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 8px 8px 0 0;
+}
+
+.info-header h5 {
+    margin: 0;
+    color: #495057;
+    font-weight: 600;
+}
+
+.info-content {
+    padding: 20px;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.info-row:last-child {
+    margin-bottom: 0;
+}
+
+.info-label {
+    min-width: 100px;
+    font-weight: 600;
+    color: #495057;
+}
+
+.info-value {
+    color: #6c757d;
+    word-break: break-all;
+}
+
+.info-value a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.info-value a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .settings-container {
+        flex-direction: column;
+    }
+    
+    .settings-section {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .video-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .video-controls .btn {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    .video-container video {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .page-header .icon {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
+</style>
+{% endblock %}

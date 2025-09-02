@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+
+{% block title %}HR仪表板{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='hr_scroll_fix.css') }}">
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='hr_scroll_fix.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+<style>
+    html{scroll-behavior:smooth}
+    .app{display:grid;grid-template-columns:240px 1fr;grid-template-rows:64px 1fr;grid-template-areas:"sidebar topbar" "sidebar main";min-height:calc(100vh - 0px)}
+    .sidebar{grid-area:sidebar;background:#fff;border-right:1px solid rgba(0,0,0,.06);padding:16px 12px}
+    .brand{display:flex;align-items:center;gap:10px;padding:8px 10px;font-weight:700;color:#c4dfcc;text-decoration:none}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:#1D1D1F;text-decoration:none;transition:all .25s ease}
+    .nav-item:hover{background:#F2F2F7}
+    .nav-item.active{background:#dbece0;color:#acd2b7}
+    .topbar{grid-area:topbar;display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:#ffffffaa;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,0,0,.06)}
+    .search{display:flex;align-items:center;gap:10px;background:#F2F2F7;border-radius:10px;padding:8px 12px;min-width:360px}
+    .search input{border:0;outline:none;background:transparent;width:100%;font-size:14px}
+    .actions{display:flex;align-items:center;gap:12px}
+    .icon-btn{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:#F2F2F7;color:#1D1D1F;text-decoration:none}
+    .main{grid-area:main;padding:1px}
+    .card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
+    .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:28px;margin-bottom:16px}
+    .metric-card{padding:18px 20px;border-radius:14px}
+    .metric-card.card{will-change:transform,box-shadow;transition:all .2s ease}
+    .metric-card.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+    .dashboard-section.card{padding:16px;margin-bottom:16px}
+    .quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px}
+    .action-card{padding:18px;border-radius:14px;text-decoration:none;color:inherit;display:block;transition:transform .2s ease}
+    .action-card:hover{transform:translateY(-4px)}
+    @media(max-width:1200px){.app{grid-template-columns:80px 1fr}.brand span,.nav-item span{display:none}.search{min-width:220px}}
+
+    /* iOS 欢迎区与快速开始（合并自 hr_dashboard_ios） */
+    .hero{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:48px 16px;margin-bottom:1px;text-align:center;background:linear-gradient(135deg,#f8fbff,#f3f6ff)}
+    .hero h1{margin:0 0 10px 0;font-size:32px;color:#0a4a8b}
+    .hero p{margin:0;color:#57607a}
+    .quick-start.card{max-width:960px;margin:24px auto;padding:24px;border-radius:20px;background:#fff}
+    .quick-start h3{margin:0 0 12px 0;font-size:18px;display:flex;align-items:center;gap:8px}
+    .quick-start ul{margin:0 0 8px 0;padding-left:18px;color:#5b6270;line-height:1.8}
+    .hero-actions{display:flex;gap:12px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+    .btn-large{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border-radius:12px;text-decoration:none}
+    .btn-primary-lg{background:#c4dfcc;color:#fff}
+    .btn-secondary-lg{background:#dbece0;color:#acd2b7}
+
+    /* 团队目标区（参照图示） */
+    .goals{margin-top:6px}
+    .goals .title{display:flex;align-items:center;gap:10px;font-weight:700;color:#0d355d;margin-bottom:12px}
+    .goal-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px}
+    .goal-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 4px 14px rgba(51,86,255,.06);padding:14px 16px}
+    .goal-card h4{margin:0 0 8px 0;font-size:14px;color:#4b5b76;display:flex;align-items:center;gap:6px}
+    .goal-card .v{font-size:24px;font-weight:800;color:#acd2b7}
+    .goal-card .sub{font-size:12px;color:#94a3b8}
+    .goal-chip{position:static;float:right;margin-top:8px;background:#b8d8c1;color:#fff;border-radius:12px;padding:6px 10px;box-shadow:0 10px 24px rgba(184,216,193,.35)}
+    .goal-table{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.06);overflow:hidden}
+    .goal-table .bar{background:#f7b500;color:#fff;font-weight:700;padding:12px 16px;display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr .8fr}
+    .goal-table .row{display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr .8fr;align-items:center;padding:14px 16px;border-top:1px solid #eef2f7}
+    .goal-table .row:hover{background:#f9fbff}
+    .goal-float{position:relative;margin-top:12px}
+    .goal-float .float{background:#fff;border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.12);display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr .8fr;align-items:center;padding:16px}
+    .mini-avatar{width:28px;height:28px;border-radius:50%;overflow:hidden;margin-right:10px;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+</style>
+
+<div class="app">
+    <aside class="sidebar">
+        <a class="brand" href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}">
+            <span style="display:inline-flex;width:32px;height:32px;border-radius:10px;align-items:center;justify-content:center;background:#c4dfcc;color:#ffffff;margin-right:6px;">
+                <i class="uil uil-briefcase"></i>
+            </span>
+            <span>智能招聘系统-HR</span>
+        </a>
+        <div class="nav-group">
+            <a class="nav-item active" href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}"><i class="uil uil-chart"></i><span>仪表板</span></a>
+            <a class="nav-item" href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}"><i class="uil uil-briefcase"></i><span>职位</span></a>
+            <a class="nav-item" href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}"><i class="uil uil-users-alt"></i><span>候选人</span></a>
+            <a class="nav-item" href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}"><i class="uil uil-calendar-alt"></i><span>面试</span></a>
+
+        </div>
+    </aside>
+    <header class="topbar">
+        <div class="search"><i class="uil uil-search"></i><input type="search" placeholder="搜索职位、候选人、面试..."/></div>
+        <div class="actions">
+            <a class="icon-btn" href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" title="发布"><i class="uil uil-plus"></i></a>
+            <a class="icon-btn" href="#" title="通知"><i class="uil uil-bell"></i></a>
+        </div>
+    </header>
+    <main class="main">
+        <div class="hr-dashboard">
+    <!-- iOS 风格 欢迎区 + 快速开始 -->
+    <section class="hero card">
+        <h1>智能招聘系统-HR</h1>
+        <p>数据驱动的人才获取与招聘管理平台</p>
+        <div class="quick-start card">
+            <h3><i class="uil uil-lightbulb"></i> 快速开始</h3>
+            <ul>
+                <li>📝 <strong>发布职位</strong> - 创建招聘需求，设置要求与截止日期</li>
+                <li>👥 <strong>管理候选人</strong> - 查看申请并初筛评估</li>
+                <li>🗓️ <strong>安排面试</strong> - 为合适候选人安排面试</li>
+                <li>📊 <strong>数据分析</strong> - 查看报表与趋势</li>
+            </ul>
+            <div class="hero-actions">
+                <a class="btn-large btn-primary-lg" href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}"><i class="uil uil-plus"></i> 发布新职位</a>
+                <a class="btn-large btn-secondary-lg" href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}"><i class="uil uil-users-alt"></i> 查看候选人</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关键指标卡片 -->
+    <div class="metrics-grid">
+        <div class="metric-card card">
+            <div class="metric-icon candidates">
+                <i class="uil uil-briefcase-alt"></i>
+            </div>
+            <div class="metric-content">
+                <h3>活跃职位</h3>
+                <div class="metric-value">{{ total_jobs|default(0) }}</div>
+                <div class="metric-change positive">
+                    <i class="uil uil-arrow-up"></i> +12% 本月
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card card">
+            <div class="metric-icon interviews">
+                <i class="uil uil-file-alt"></i>
+            </div>
+            <div class="metric-content">
+                <h3>总申请数</h3>
+                <div class="metric-value">{{ total_applications|default(0) }}</div>
+                <div class="metric-change positive">
+                    <i class="uil uil-arrow-up"></i> +8% 本周
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card card">
+            <div class="metric-icon offers">
+                <i class="uil uil-calendar-alt"></i>
+            </div>
+            <div class="metric-content">
+                <h3>面试安排</h3>
+                <div class="metric-value">0</div>
+                <div class="metric-change neutral">
+                    <i class="uil uil-minus"></i> 0% 变化
+                </div>
+            </div>
+            <div class="metric-action">
+                <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="btn-small">管理面试</a>
+            </div>
+        </div>
+        
+        <div class="metric-card card">
+            <div class="metric-icon reports">
+                <i class="uil uil-chart-pie"></i>
+            </div>
+            <div class="metric-content">
+                <h3>数据分析</h3>
+                <div class="metric-value">实时</div>
+                <div class="metric-change positive">
+                    <i class="uil uil-arrow-up"></i> 数据驱动
+                </div>
+            </div>
+            <div class="metric-action">
+                <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="btn-small">查看报表</a>
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-icon hires">
+                <i class="uil uil-users-alt"></i>
+            </div>
+            <div class="metric-content">
+                <h3>候选人库</h3>
+                <div class="metric-value">0</div>
+                <div class="metric-change positive">
+                    <i class="uil uil-arrow-up"></i> +15% 本月
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="dashboard-content">
+        <!-- 团队目标模块（参照图示） -->
+        <section class="dashboard-section card goals">
+            <div class="title"><i class="uil uil-target"></i> 团队目标</div>
+            <div class="goal-cards">
+                <div class="goal-card">
+                    <h4>人员状态</h4>
+                    <div class="v">23</div>
+                    <div class="sub">未提交 · 4 审批中 · 15 已生效</div>
+                </div>
+                <div class="goal-card" style="position:relative">
+                    <h4>对齐率</h4>
+                    <div class="v">80%</div>
+                    <div class="sub">较上周 +20%</div>
+                    <span class="goal-chip">目标进度分布 60%</span>
+                </div>
+                <div class="goal-card">
+                    <h4>X日更新率</h4>
+                    <div class="v">20%</div>
+                    <div class="sub">较上周 +20%</div>
+                </div>
+            </div>
+
+            <div class="goal-table">
+                <div class="bar">
+                    <div>部门经理负责人</div>
+                    <div>目标数</div>
+                    <div>未提交人数</div>
+                    <div>对齐率</div>
+                    <div>操作</div>
+                </div>
+                <div class="row">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <img class="mini-avatar" src="https://mcp-media.8n6n.com/img/2025/08/20/c0ce9b147f51df7246a8d9ffb6a64012" alt="avatar"/>
+                        北小森
+                    </div>
+                    <div>20</div>
+                    <div>6</div>
+                    <div>40%</div>
+                    <div><a href="#" style="color:#acd2b7;text-decoration:none">提醒部门负责人</a></div>
+                </div>
+            </div>
+        </section>
+        <!-- 最近职位 -->
+        <div class="dashboard-section card">
+            <div class="section-header">
+                <h2><i class="uil uil-briefcase"></i> 最近发布职位</h2>
+                <div class="section-actions">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="btn-secondary">查看全部</a>
+                </div>
+            </div>
+            <div class="recent-jobs">
+                {% if recent_jobs %}
+                    {% for job in recent_jobs %}
+                    <div class="job-item">
+                        <div class="job-info">
+                            <h4><i class="uil uil-briefcase-alt"></i> {{ job.title }}</h4>
+                            <p><i class="uil uil-map-marker"></i> {{ job.location }} • <i class="uil uil-money-bill"></i> {{ job.salary }}</p>
+                        </div>
+                        <div class="job-actions">
+                            <a href="{{ url_for('smartrecruit.hr.recruitment.edit_job', job_id=job.id) }}" class="btn-small">
+                                <i class="uil uil-edit"></i> 编辑
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-data">
+                        <i class="uil uil-briefcase" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <p>暂无活跃职位</p>
+                        <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}">立即发布第一个职位</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 最近申请 -->
+        <div class="dashboard-section card">
+            <div class="section-header">
+                <h2><i class="uil uil-file-alt"></i> 最新申请</h2>
+                <div class="section-actions">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="btn-secondary">查看全部</a>
+                </div>
+            </div>
+            <div class="recent-applications">
+                {% if recent_applications %}
+                    {% for app in recent_applications %}
+                    <div class="application-item">
+                        <div class="application-info">
+                            <h4><i class="uil uil-user-check"></i> 申请 #{{ app.id }}</h4>
+                            <p>{{ app.message|default('新申请') }}</p>
+                        </div>
+                        <div class="application-status">
+                            <span class="status-badge {{ app.status }}">{{ app.status }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="no-data">
+                        <i class="uil uil-file-alt" style="font-size: 48px; color: var(--text-muted); margin-bottom: 16px;"></i>
+                        <p>暂无申请记录</p>
+                        <p>发布职位后，申请将显示在这里</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 快速操作区域 -->
+    <div class="dashboard-section card" style="margin-top: 24px;">
+        <div class="section-header">
+            <h2><i class="uil uil-rocket"></i> 快速操作</h2>
+        </div>
+        <div class="quick-actions">
+            <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="action-card card">
+                <i class="uil uil-plus-circle"></i>
+                <h4>发布职位</h4>
+                <p>创建新的招聘需求</p>
+            </a>
+            <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="action-card card">
+                <i class="uil uil-users-alt"></i>
+                <h4>候选人管理</h4>
+                <p>查看和管理申请者</p>
+            </a>
+            <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="action-card card">
+                <i class="uil uil-calendar-alt"></i>
+                <h4>面试安排</h4>
+                <p>安排和管理面试</p>
+            </a>
+            <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="action-card card">
+                <i class="uil uil-chart-line"></i>
+                <h4>数据报表</h4>
+                <p>招聘数据分析</p>
+            </a>
+        </div>
+    </div>
+        </div>
+    </main>
+</div>
+
+<!-- 添加一些JavaScript增强交互 -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 为指标卡片添加点击效果
+    const metricCards = document.querySelectorAll('.metric-card');
+    metricCards.forEach(card => {
+        card.addEventListener('click', function() {
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+
+    // 为快速操作卡片添加悬停效果
+    const actionCards = document.querySelectorAll('.action-card');
+    actionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+});
+</script>
+{% endblock %}

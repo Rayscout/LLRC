@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>面试结果 - AI虚拟面试</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_unified_style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <div class="ios-nav-brand">
+                <i class="fas fa-microphone"></i>
+                <span>AI虚拟面试</span>
+            </div>
+            
+            <h1 class="ios-nav-title">面试结果</h1>
+            
+            <div class="ios-nav-actions">
+                <button class="ios-nav-button" onclick="location.href='{{ url_for('smartrecruit.candidate.interview.interview_dashboard') }}'">
+                    <i class="fas fa-home"></i>
+                    <span>面试中心</span>
+                </button>
+                
+                <button class="ios-nav-button" onclick="location.href='{{ url_for('smartrecruit.candidate.home') }}'">
+                    <i class="fas fa-home"></i>
+                    <span>返回首页</span>
+                </button>
+                
+                <button class="theme-toggle" id="themeToggle" title="切换主题">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="ios-main">
+        <!-- 面试总结 -->
+        <section class="ios-section">
+            <div class="ios-container">
+                <div class="ios-card ios-fade-in">
+                    <div class="ios-card-header">
+                        <h1 class="ios-title">面试完成！</h1>
+                        <span class="ios-badge ios-badge-success">{{ job.title }}</span>
+                    </div>
+                    
+                    <div class="ios-card-content">
+                        <div class="ios-summary">
+                            <div class="ios-score-display">
+                                <div class="ios-score-circle">
+                                    <span class="ios-score-number">{{ session_data.total_score }}</span>
+                                    <span class="ios-score-label">总分</span>
+                                </div>
+                                <div class="ios-score-details">
+                                    <h3>面试表现评估</h3>
+                                    <p>您在本次面试中展现了良好的专业素养和技能水平</p>
+                                </div>
+                            </div>
+                            
+                            <div class="ios-metrics-grid">
+                                <div class="ios-metric">
+                                    <i class="fas fa-clock"></i>
+                                    <span class="ios-metric-value">{{ session_data.answers|length }}</span>
+                                    <span class="ios-metric-label">回答问题</span>
+                                </div>
+                                <div class="ios-metric">
+                                    <i class="fas fa-calendar"></i>
+                                    <span class="ios-metric-value">{{ session_data.end_time.strftime('%Y-%m-%d') }}</span>
+                                    <span class="ios-metric-label">面试日期</span>
+                                </div>
+                                <div class="ios-metric">
+                                    <i class="fas fa-building"></i>
+                                    <span class="ios-metric-value">{{ job.company }}</span>
+                                    <span class="ios-metric-label">应聘公司</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 详细反馈 -->
+        <section class="ios-section">
+            <div class="ios-container">
+                <h2 class="ios-section-title">详细反馈</h2>
+                
+                <div class="ios-feedback-list">
+                    {% for answer in session_data.answers %}
+                    <div class="ios-card ios-fade-in">
+                        <div class="ios-card-header">
+                            <h3>第 {{ loop.index }} 题</h3>
+                            <span class="ios-badge ios-badge-info">{{ answer.timestamp.strftime('%H:%M') }}</span>
+                        </div>
+                        
+                        <div class="ios-card-content">
+                            <div class="ios-question-section">
+                                <h4>问题：</h4>
+                                <p class="ios-question-text">{{ answer.question }}</p>
+                            </div>
+                            
+                            <div class="ios-answer-section">
+                                <h4>您的回答：</h4>
+                                <p class="ios-answer-text">{{ answer.answer }}</p>
+                            </div>
+                            
+                            <div class="ios-feedback-section">
+                                <h4>AI反馈：</h4>
+                                <div class="ios-feedback-content">
+                                    {{ answer.feedback|safe }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- 改进建议 -->
+        <section class="ios-section">
+            <div class="ios-container">
+                <h2 class="ios-section-title">改进建议</h2>
+                
+                <div class="ios-grid ios-grid-3">
+                    <div class="ios-card ios-fade-in">
+                        <i class="fas fa-lightbulb" style="font-size: 2rem; color: var(--ios-yellow); margin-bottom: 1rem;"></i>
+                        <h3>技能提升</h3>
+                        <p>继续深入学习相关技术，保持技术栈的更新，参与开源项目提升实践能力</p>
+                    </div>
+                    
+                    <div class="ios-card ios-fade-in">
+                        <i class="fas fa-comments" style="font-size: 2rem; color: var(--ios-blue); margin-bottom: 1rem;"></i>
+                        <h3>表达技巧</h3>
+                        <p>练习用更简洁明了的语言表达复杂概念，注重逻辑性和条理性</p>
+                    </div>
+                    
+                    <div class="ios-card ios-fade-in">
+                        <i class="fas fa-chart-bar" style="font-size: 2rem; color: var(--ios-green); margin-bottom: 1rem;"></i>
+                        <h3>项目展示</h3>
+                        <p>准备更多具体的项目案例，用数据和成果来支撑您的回答</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 操作按钮 -->
+        <section class="ios-section">
+            <div class="ios-container">
+                <div class="ios-actions">
+                    <button class="ios-button ios-button-secondary" onclick="location.href='{{ url_for('smartrecruit.candidate.interview.interview_history') }}'">
+                        <i class="fas fa-history"></i>
+                        查看历史
+                    </button>
+                    
+                    <button class="ios-button ios-button-primary" onclick="location.href='{{ url_for('smartrecruit.candidate.interview.interview_dashboard') }}'">
+                        <i class="fas fa-redo"></i>
+                        再次面试
+                    </button>
+                    
+                    <button class="ios-button" onclick="location.href='{{ url_for('smartrecruit.candidate.home') }}'">
+                        <i class="fas fa-home"></i>
+                        返回首页
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 主题切换
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // 检查本地存储的主题设置
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.ios-fade-in');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+            
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

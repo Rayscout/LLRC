@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='auth_sign.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='theme1.css') }}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="https://mcp-media.8n6n.com/img/2025/08/20/c0ce9b147f51df7246a8d9ffb6a64012" />
+    {% block extra_css %}{% endblock %}
+    <title>{% block title %}HR招聘系统{% endblock %}</title>
+    {% block extra_js %}{% endblock %}
+    <style>
+    /* 深色模式开关样式 */
+    #themeToggle{ position:relative; display:inline-block; vertical-align:middle; cursor:pointer; pointer-events:auto; }
+    #themeToggle::after{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:999px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.2); transition:transform .2s ease; }
+    #themeToggle:checked{ background:#111827; border-color:#111827; }
+    #themeToggle:checked::after{ transform:translateX(18px); background:#e5e7eb; }
+
+    /* 全局深色模式基础覆盖 */
+    body.dark { color:#e5e7eb; background:#0b1220; }
+    body.dark a { color:#e5e7eb; }
+    body.dark nav { background:#0f172a; border-right:1px solid #1f2937; }
+    body.dark nav .link-name, body.dark nav i { color:#e5e7eb; }
+    body.dark .dashboard { background:#0b1220; }
+    body.dark .dash-content { background:transparent; }
+    body.dark .logout-mode .mode { background:transparent; }
+
+    /* 顶部快捷主题按钮 */
+    .theme-btn{ border:1px solid #e5e7eb; background:#fff; color:#111827; border-radius:999px; padding:6px 10px; margin-left:10px; cursor:pointer }
+    .theme-btn i{ pointer-events:none }
+    body.dark .theme-btn{ background:#111827; color:#e5e7eb; border-color:#374151 }
+    </style>
+</head>
+<body>
+    <!-- 动效背景元素（全局） -->
+    <div class="scroll-progress"></div>
+    <div class="floating-shapes" id="floatingShapes"></div>
+    <div class="animated-bg"><div class="bg-pattern"></div></div>
+    <div class="particle-system" id="particleSystem"></div>
+    <nav>
+        <div class="logo-name">
+            <div class="logo-image">
+                <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="标志">
+            </div>
+        </div>
+        <div class="menu-items">
+            <ul class="nav-links">
+                {% if user and user.is_hr %}
+                <!-- HR用户菜单 -->
+                <li><a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}">
+                    <i class="uil uil-dashboard"></i>
+                    <span class="link-name">仪表盘</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}">
+                    <i class="uil uil-briefcase"></i>
+                    <span class="link-name">发布职位</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}">
+                    <i class="uil uil-users-alt"></i>
+                    <span class="link-name">候选人管理</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}">
+                    <i class="uil uil-calendar-alt"></i>
+                    <span class="link-name">面试安排</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}">
+                    <i class="uil uil-list-ul"></i>
+                    <span class="link-name">已发布招聘</span>
+                </a></li>
+                {% else %}
+                <!-- 求职者菜单 -->
+                <li><a href="{{ url_for('smartrecruit.candidate.home') }}">
+                    <i class="uil uil-home"></i>
+                    <span class="link-name">首页</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}">
+                    <i class="uil uil-search"></i>
+                    <span class="link-name">职位搜索</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.candidate.jobs.view_all_jobs') }}">
+                    <i class="uil uil-briefcase"></i>
+                    <span class="link-name">查看岗位</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.candidate.applications.my_applications') }}">
+                    <i class="uil uil-list-ul"></i>
+                    <span class="link-name">我的申请</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.candidate.applications.virtual_interview') }}">
+                    <i class="uil uil-robot"></i>
+                    <span class="link-name">AI虚拟面试</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.candidate.profile.career_path') }}">
+                    <i class="uil uil-chart"></i>
+                    <span class="link-name">职业与技能</span>
+                </a></li>
+                <li><a href="{{ url_for('smartrecruit.candidate.profile.settings') }}">
+                    <i class="uil uil-user"></i>
+                    <span class="link-name">个人资料</span>
+                </a></li>
+                {% endif %}
+            </ul>
+            <ul class="logout-mode" style="position:sticky;bottom:12px;align-self:flex-end">
+                <li><a href="{{ url_for('common.auth.logout') }}">
+                    <i class="uil uil-signout"></i>
+                    <span class="link-name">退出登录</span>
+                </a></li>
+                <li class="mode" style="display:flex;align-items:center;gap:10px;padding:8px 12px">
+                    <i class="uil uil-moon"></i>
+                    <span class="link-name">深色模式</span>
+                    <input id="themeToggle" type="checkbox" style="appearance:none;width:42px;height:24px;border-radius:999px;background:#e5e7eb;position:relative;outline:none;border:1px solid #cbd5e1;cursor:pointer;pointer-events:auto;margin-left:auto">
+                    <label id="themeToggleLabel" for="themeToggle" style="cursor:pointer" aria-label="切换主题" title="切换主题"></label>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <section class="dashboard">
+        <div class="top">
+            <i class="uil uil-bars sidebar-toggle"></i>
+            <button id="topThemeBtn" class="theme-btn" type="button" title="切换深色/浅色"><i class="uil uil-moon"></i></button>
+            {% if user and user.profile_photo %}
+                {% if user.is_hr %}
+                    <div class="hr-user-menu">
+                        <img src="{{ url_for('static', filename='uploads/photos/' + user.profile_photo) }}" alt="头像" class="hr-avatar" onclick="toggleHrMenu()">
+                        <div class="hr-dropdown-menu" id="hrDropdownMenu">
+                            <a href="{{ url_for('smartrecruit.hr.profile.hr_profile') }}" class="dropdown-item">
+                                <i class="uil uil-user"></i> 个人资料
+                            </a>
+                            <a href="{{ url_for('smartrecruit.hr.profile.hr_settings') }}" class="dropdown-item">
+                                <i class="uil uil-setting"></i> 设置
+                            </a>
+                            <a href="{{ url_for('common.auth.logout') }}" class="dropdown-item">
+                                <i class="uil uil-signout"></i> 退出登录
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}">
+                        <img src="{{ url_for('static', filename='uploads/photos/' + user.profile_photo) }}" alt="头像">
+                    </a>
+                {% endif %}
+            {% else %}
+                {% if user.is_hr %}
+                    <div class="hr-user-menu">
+                        <img src="{{ url_for('static', filename='Images/profile.jpg') }}" alt="默认头像" class="hr-avatar" onclick="toggleHrMenu()">
+                        <div class="hr-dropdown-menu" id="hrDropdownMenu">
+                            <a href="{{ url_for('smartrecruit.hr.profile.hr_profile') }}" class="dropdown-item">
+                                <i class="uil uil-user"></i> 个人资料
+                            </a>
+                            <a href="{{ url_for('smartrecruit.hr.profile.hr_settings') }}" class="dropdown-item">
+                                <i class="uil uil-setting"></i> 设置
+                            </a>
+                            <a href="{{ url_for('common.auth.logout') }}" class="dropdown-item">
+                                <i class="uil uil-signout"></i> 退出登录
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}">
+                        <img src="{{ url_for('static', filename='Images/profile.jpg') }}" alt="默认头像">
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="dash-content">
+            {% block content %}{% endblock %}
+        </div>
+    </section>
+    <style>
+        /* HR用户菜单样式 */
+        .hr-user-menu {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .hr-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .hr-avatar:hover {
+            border-color: #007AFF;
+            transform: scale(1.05);
+        }
+        
+        .hr-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+        
+        .hr-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s ease;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #007AFF;
+        }
+        
+        .dropdown-item i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* 深色模式支持 */
+        body.dark .hr-dropdown-menu {
+            background: #1f2937;
+            border-color: #374151;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        body.dark .dropdown-item {
+            color: #f9fafb;
+            border-bottom-color: #374151;
+        }
+        
+        body.dark .dropdown-item:hover {
+            background-color: #374151;
+            color: #60a5fa;
+        }
+    </style>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='auth_sign.js') }}"></script>
+    <script>
+    (function(){
+        var body = document.body;
+        var toggle = document.getElementById('themeToggle');
+        var label = document.getElementById('themeToggleLabel');
+        var topBtn = document.getElementById('topThemeBtn');
+        if(!toggle){ return; }
+
+        function initialTheme(){
+            try {
+                var saved = localStorage.getItem('theme');
+                if(saved){ return saved; }
+            } catch(e) {}
+            try {
+                if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+                    return 'dark';
+                }
+            } catch(e) {}
+            return 'light';
+        }
+
+        function applyTheme(val){
+            if(val === 'dark'){
+                body.classList.add('dark');
+                toggle.checked = true;
+            } else {
+                body.classList.remove('dark');
+                toggle.checked = false;
+            }
+            toggle.style.background = toggle.checked ? '#111827' : '#e5e7eb';
+        }
+
+        applyTheme(initialTheme());
+
+        // 主题切换已移除：不再同步任何外部按钮状态
+
+        // HR下拉菜单功能
+        function toggleHrMenu() {
+            const dropdown = document.getElementById('hrDropdownMenu');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+        
+        // 点击其他地方关闭下拉菜单
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('hrDropdownMenu');
+            const hrMenu = document.querySelector('.hr-user-menu');
+            
+            if (dropdown && hrMenu && !hrMenu.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
+        // 将函数添加到全局作用域
+        window.toggleHrMenu = toggleHrMenu;
+
+        // 兼容：点击整块标签也能切换
+        if(label){
+            label.addEventListener('click', function(e){
+                if(e.target !== toggle){
+                    toggle.checked = !toggle.checked;
+                    var theme = toggle.checked ? 'dark' : 'light';
+                    applyTheme(theme);
+                    try { localStorage.setItem('theme', theme); } catch(e){}
+                }
+            });
+        }
+
+        // 顶部按钮切换
+        if(topBtn){
+            topBtn.addEventListener('click', function(){
+                var toDark = !body.classList.contains('dark');
+                applyTheme(toDark ? 'dark' : 'light');
+                try { localStorage.setItem('theme', toDark ? 'dark' : 'light'); } catch(e){}
+            });
+        }
+    })();
+    </script>
+    
+    <!-- 页面特定的JavaScript -->
+    {% block page_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,50 @@
+{% extends 'smartrecruit/candidate/base_ios_new.html' %}
+
+{% block title %}职位详情{% endblock %}
+
+{% block content %}
+<section class="section" id="job-detail">
+  <div class="section-content">
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header" style="align-items:center; gap:12px;">
+        <div style="width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:var(--accent-primary);color:#fff;font-weight:800;">{{ job.title[0] | upper }}</div>
+        <div style="flex:1;">
+          <div class="card-title" style="font-size:1.4rem;">{{ job.title }}</div>
+          <div class="text-secondary">{{ job.company_name or '公司' }} · {{ job.location }}</div>
+        </div>
+        <a href="{{ url_for('smartrecruit.candidate.jobs.job_list') }}" class="btn btn-outline">返回列表</a>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="align-items:start; gap:16px;">
+      <!-- 左侧：职位信息 -->
+      <div class="card">
+        <div class="card-body-grid">
+          <div class="card-block">
+            <div class="card-subtitle">基本信息</div>
+            <div class="skills-wrap">
+              <span class="skill-tag">地点：{{ job.location }}</span>
+              <span class="skill-tag">薪资：{{ job.salary }}</span>
+              <span class="skill-tag">发布日期：{{ job.date_posted.strftime('%Y-%m-%d') }}</span>
+            </div>
+          </div>
+          <div class="card-block">
+            <div class="card-subtitle">职位描述</div>
+            <div class="text-secondary" style="white-space:pre-wrap; line-height:1.7">{{ job.description | safe }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：操作面板 -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">立即申请</div></div>
+        <div style="display:grid; gap:12px;">
+          <div class="text-secondary">匹配度仅供参考，请结合自身情况</div>
+          <a href="{{ url_for('smartrecruit.candidate.applications.pre_apply', job_id=job.id) }}" class="btn btn-primary">申请该职位</a>
+          <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="btn btn-outline">搜索更多</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

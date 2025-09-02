@@ -1,0 +1,553 @@
+{% extends 'base.html' %}
+
+{% block title %}AI洞察{% endblock %}
+
+{% block content %}
+<div class="hr-insights">
+    <!-- 页面标题 -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1><i class="uil uil-lightbulb"></i> AI洞察</h1>
+            <p>智能分析与预测建议</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-secondary" onclick="refreshInsights()">
+                <i class="uil uil-refresh"></i> 刷新洞察
+            </button>
+            <button class="btn-primary" onclick="generateReport()">
+                <i class="uil uil-file-plus"></i> 生成报告
+            </button>
+        </div>
+    </div>
+
+    <!-- 关键洞察概览 -->
+    <div class="insights-overview">
+        <div class="overview-card critical">
+            <div class="overview-icon">
+                <i class="uil uil-exclamation-triangle"></i>
+            </div>
+            <div class="overview-content">
+                <h3>高风险预警</h3>
+                <p>检测到3名员工存在流失风险，建议立即关注</p>
+            </div>
+        </div>
+        
+        <div class="overview-card warning">
+            <div class="overview-icon">
+                <i class="uil uil-money-bill"></i>
+            </div>
+            <div class="overview-content">
+                <h3>薪资竞争力</h3>
+                <p>技术岗位薪资低于市场15%，建议调整</p>
+            </div>
+        </div>
+        
+        <div class="overview-card positive">
+            <div class="overview-icon">
+                <i class="uil uil-chart-line"></i>
+            </div>
+            <div class="overview-content">
+                <h3>组织健康</h3>
+                <p>整体组织健康评分：8.2/10，表现良好</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 流失风险预测 -->
+    <div class="insights-section">
+        <div class="section-header">
+            <h2><i class="uil uil-user-times"></i> 员工流失风险预测</h2>
+            <div class="section-actions">
+                <select id="risk-filter" class="risk-filter">
+                    <option value="all">所有风险等级</option>
+                    <option value="high">高风险</option>
+                    <option value="medium">中风险</option>
+                    <option value="low">低风险</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="risk-prediction-grid">
+            <div class="risk-card high">
+                <div class="risk-header">
+                    <div class="employee-info">
+                        <div class="employee-avatar">
+                            <div class="avatar-placeholder">张</div>
+                        </div>
+                        <div class="employee-details">
+                            <h4>张工程师</h4>
+                            <p>高级软件工程师</p>
+                            <span class="department">技术部</span>
+                        </div>
+                    </div>
+                    <div class="risk-score">
+                        <span class="score-value">85%</span>
+                        <span class="score-label">流失风险</span>
+                    </div>
+                </div>
+                <div class="risk-factors">
+                    <h5>风险因素分析：</h5>
+                    <ul>
+                        <li>薪资满意度低（3.2/5.0）</li>
+                        <li>工作压力指数高（4.5/5.0）</li>
+                        <li>职业发展机会有限</li>
+                        <li>最近3个月请假次数增加</li>
+                    </ul>
+                </div>
+                <div class="ai-recommendations">
+                    <h5>AI建议：</h5>
+                    <div class="recommendation-item">
+                        <i class="uil uil-arrow-up"></i>
+                        <span>立即安排1对1沟通，了解员工真实想法</span>
+                    </div>
+                    <div class="recommendation-item">
+                        <i class="uil uil-money-bill"></i>
+                        <span>考虑薪资调整或绩效奖金激励</span>
+                    </div>
+                    <div class="recommendation-item">
+                        <i class="uil uil-graduation-cap"></i>
+                        <span>提供职业发展路径和培训机会</span>
+                    </div>
+                </div>
+                <div class="risk-actions">
+                    <button class="btn-secondary" onclick="scheduleMeeting('zhang')">安排沟通</button>
+                    <button class="btn-primary" onclick="viewDetails('zhang')">查看详情</button>
+                </div>
+            </div>
+
+            <div class="risk-card medium">
+                <div class="risk-header">
+                    <div class="employee-info">
+                        <div class="employee-avatar">
+                            <div class="avatar-placeholder">李</div>
+                        </div>
+                        <div class="employee-details">
+                            <h4>李设计师</h4>
+                            <p>UI设计师</p>
+                            <span class="department">设计部</span>
+                        </div>
+                    </div>
+                    <div class="risk-score">
+                        <span class="score-value">65%</span>
+                        <span class="score-label">流失风险</span>
+                    </div>
+                </div>
+                <div class="risk-factors">
+                    <h5>风险因素分析：</h5>
+                    <ul>
+                        <li>工作内容单一，缺乏挑战性</li>
+                        <li>团队协作满意度中等（3.8/5.0）</li>
+                        <li>薪资竞争力一般</li>
+                    </ul>
+                </div>
+                <div class="ai-recommendations">
+                    <h5>AI建议：</h5>
+                    <div class="recommendation-item">
+                        <i class="uil uil-lightbulb"></i>
+                        <span>分配更具挑战性的项目任务</span>
+                    </div>
+                    <div class="recommendation-item">
+                        <i class="uil uil-users"></i>
+                        <span>改善团队协作氛围</span>
+                    </div>
+                </div>
+                <div class="risk-actions">
+                    <button class="btn-secondary" onclick="scheduleMeeting('li')">安排沟通</button>
+                    <button class="btn-primary" onclick="viewDetails('li')">查看详情</button>
+                </div>
+            </div>
+
+            <div class="risk-card low">
+                <div class="risk-header">
+                    <div class="employee-info">
+                        <div class="employee-avatar">
+                            <div class="avatar-placeholder">王</div>
+                        </div>
+                        <div class="employee-details">
+                            <h4>王经理</h4>
+                            <p>产品经理</p>
+                            <span class="department">产品部</span>
+                        </div>
+                    </div>
+                    <div class="risk-score">
+                        <span class="score-value">25%</span>
+                        <span class="score-label">流失风险</span>
+                    </div>
+                </div>
+                <div class="risk-factors">
+                    <h5>风险因素分析：</h5>
+                    <ul>
+                        <li>工作满意度高（4.2/5.0）</li>
+                        <li>薪资竞争力强</li>
+                        <li>职业发展前景良好</li>
+                    </ul>
+                </div>
+                <div class="ai-recommendations">
+                    <h5>AI建议：</h5>
+                    <div class="recommendation-item">
+                        <i class="uil uil-thumbs-up"></i>
+                        <span>继续保持当前管理方式</span>
+                    </div>
+                    <div class="recommendation-item">
+                        <i class="uil uil-star"></i>
+                        <span>考虑晋升或加薪激励</span>
+                    </div>
+                </div>
+                <div class="risk-actions">
+                    <button class="btn-secondary" onclick="scheduleMeeting('wang')">安排沟通</button>
+                    <button class="btn-primary" onclick="viewDetails('wang')">查看详情</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 薪资竞争力分析 -->
+    <div class="insights-section">
+        <div class="section-header">
+            <h2><i class="uil uil-money-bill"></i> 薪资竞争力分析</h2>
+            <div class="section-actions">
+                <button class="btn-secondary" onclick="updateMarketData()">更新市场数据</button>
+            </div>
+        </div>
+        
+        <div class="salary-analysis">
+            <div class="salary-overview">
+                <div class="salary-metric">
+                    <h4>整体薪资竞争力</h4>
+                    <div class="competitiveness-score">
+                        <span class="score">85%</span>
+                        <span class="label">vs 市场平均</span>
+                    </div>
+                    <div class="trend-indicator positive">
+                        <i class="uil uil-arrow-up"></i>
+                        <span>较上月提升3%</span>
+                    </div>
+                </div>
+                
+                <div class="salary-breakdown">
+                    <h4>各岗位薪资对比</h4>
+                    <div class="position-salary">
+                        <div class="position-item">
+                            <span class="position-name">高级软件工程师</span>
+                            <div class="salary-bar">
+                                <div class="company-salary" style="width: 85%">¥25K</div>
+                                <div class="market-salary" style="width: 100%">¥30K</div>
+                            </div>
+                            <span class="gap">-17%</span>
+                        </div>
+                        <div class="position-item">
+                            <span class="position-name">产品经理</span>
+                            <div class="salary-bar">
+                                <div class="company-salary" style="width: 90%">¥28K</div>
+                                <div class="market-salary" style="width: 100%">¥32K</div>
+                            </div>
+                            <span class="gap">-13%</span>
+                        </div>
+                        <div class="position-item">
+                            <span class="position-name">UI设计师</span>
+                            <div class="salary-bar">
+                                <div class="company-salary" style="width: 95%">¥18K</div>
+                                <div class="market-salary" style="width: 100%">¥20K</div>
+                            </div>
+                            <span class="gap">-10%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="salary-recommendations">
+                <h4>AI薪资调整建议</h4>
+                <div class="recommendation-list">
+                    <div class="recommendation-item priority-high">
+                        <div class="priority-badge">高优先级</div>
+                        <div class="recommendation-content">
+                            <h5>高级软件工程师</h5>
+                            <p>建议薪资调整至¥28K-32K，提升市场竞争力</p>
+                            <div class="action-buttons">
+                                <button class="btn-small" onclick="applyRecommendation('engineer')">应用建议</button>
+                                <button class="btn-small secondary" onclick="customizeRecommendation('engineer')">自定义</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="recommendation-item priority-medium">
+                        <div class="priority-badge">中优先级</div>
+                        <div class="recommendation-content">
+                            <h5>产品经理</h5>
+                            <p>建议薪资调整至¥30K-35K，保持竞争力</p>
+                            <div class="action-buttons">
+                                <button class="btn-small" onclick="applyRecommendation('pm')">应用建议</button>
+                                <button class="btn-small secondary" onclick="customizeRecommendation('pm')">自定义</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 组织健康评分 -->
+    <div class="insights-section">
+        <div class="section-header">
+            <h2><i class="uil uil-heart-medical"></i> 组织健康评分</h2>
+            <div class="section-actions">
+                <button class="btn-secondary" onclick="viewHealthHistory()">查看历史</button>
+            </div>
+        </div>
+        
+        <div class="health-score-overview">
+            <div class="overall-score">
+                <div class="score-circle">
+                    <svg viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="#10b981" stroke-width="8" 
+                                stroke-dasharray="339.292" stroke-dashoffset="67.858"/>
+                    </svg>
+                    <div class="score-content">
+                        <span class="score-value">8.2</span>
+                        <span class="score-label">/10</span>
+                    </div>
+                </div>
+                <div class="score-details">
+                    <h3>整体健康评分</h3>
+                    <p>组织整体健康状况良好，各项指标表现稳定</p>
+                    <div class="score-trend positive">
+                        <i class="uil uil-arrow-up"></i>
+                        <span>较上月提升0.3分</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="health-metrics">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h4>团队稳定性</h4>
+                    <span class="metric-score">8.5/10</span>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-fill" style="width: 85%"></div>
+                </div>
+                <div class="metric-details">
+                    <p>员工流失率低，团队凝聚力强</p>
+                    <div class="metric-trend positive">
+                        <i class="uil uil-arrow-up"></i>
+                        <span>+0.2</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h4>技能匹配度</h4>
+                    <span class="metric-score">7.8/10</span>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-fill" style="width: 78%"></div>
+                </div>
+                <div class="metric-details">
+                    <p>员工技能与岗位要求匹配良好</p>
+                    <div class="metric-trend neutral">
+                        <i class="uil uil-minus"></i>
+                        <span>0.0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h4>工作满意度</h4>
+                    <span class="metric-score">8.0/10</span>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-fill" style="width: 80%"></div>
+                </div>
+                <div class="metric-details">
+                    <p>员工工作满意度较高</p>
+                    <div class="metric-trend positive">
+                        <i class="uil uil-arrow-up"></i>
+                        <span>+0.1</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <h4>职业发展</h4>
+                    <span class="metric-score">7.5/10</span>
+                </div>
+                <div class="metric-bar">
+                    <div class="metric-fill" style="width: 75%"></div>
+                </div>
+                <div class="metric-details">
+                    <p>职业发展机会有待提升</p>
+                    <div class="metric-trend negative">
+                        <i class="uil uil-arrow-down"></i>
+                        <span>-0.2</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="health-recommendations">
+            <h4>组织健康改善建议</h4>
+            <div class="recommendations-grid">
+                <div class="recommendation-card">
+                    <div class="recommendation-icon">
+                        <i class="uil uil-graduation-cap"></i>
+                    </div>
+                    <div class="recommendation-content">
+                        <h5>加强职业发展</h5>
+                        <p>建立清晰的职业发展路径，提供更多培训和学习机会</p>
+                        <button class="btn-small" onclick="implementRecommendation('career')">实施建议</button>
+                    </div>
+                </div>
+                
+                <div class="recommendation-card">
+                    <div class="recommendation-icon">
+                        <i class="uil uil-users"></i>
+                    </div>
+                    <div class="recommendation-content">
+                        <h5>提升团队协作</h5>
+                        <p>组织团队建设活动，改善跨部门沟通协作</p>
+                        <button class="btn-small" onclick="implementRecommendation('team')">实施建议</button>
+                    </div>
+                </div>
+                
+                <div class="recommendation-card">
+                    <div class="recommendation-icon">
+                        <i class="uil uil-lightbulb"></i>
+                    </div>
+                    <div class="recommendation-content">
+                        <h5>创新激励机制</h5>
+                        <p>设计多元化的激励方案，提升员工积极性</p>
+                        <button class="btn-small" onclick="implementRecommendation('incentive')">实施建议</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setupRiskFilter();
+    setupHealthMetrics();
+});
+
+function setupRiskFilter() {
+    const riskFilter = document.getElementById('risk-filter');
+    riskFilter.addEventListener('change', function() {
+        const selectedRisk = this.value;
+        filterRiskCards(selectedRisk);
+    });
+}
+
+function filterRiskCards(riskLevel) {
+    const riskCards = document.querySelectorAll('.risk-card');
+    
+    riskCards.forEach(card => {
+        if (riskLevel === 'all' || card.classList.contains(riskLevel)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function setupHealthMetrics() {
+    // 初始化健康评分图表
+    updateHealthScore();
+}
+
+function updateHealthScore() {
+    // 这里可以添加动态更新健康评分的逻辑
+    console.log('更新健康评分');
+}
+
+function refreshInsights() {
+    console.log('刷新AI洞察...');
+    
+    // 显示加载状态
+    const refreshBtn = document.querySelector('.btn-secondary');
+    const originalText = refreshBtn.innerHTML;
+    refreshBtn.innerHTML = '<i class="uil uil-spinner"></i> 刷新中...';
+    refreshBtn.disabled = true;
+    
+    // 模拟刷新过程
+    setTimeout(() => {
+        refreshBtn.innerHTML = originalText;
+        refreshBtn.disabled = false;
+        
+        // 更新数据
+        updateInsightsData();
+        
+        alert('洞察数据已更新！');
+    }, 2000);
+}
+
+function updateInsightsData() {
+    // 这里可以添加更新洞察数据的逻辑
+    console.log('更新洞察数据');
+}
+
+function generateReport() {
+    console.log('生成AI洞察报告...');
+    
+    // 这里可以实现报告生成功能
+    alert('报告生成功能开发中...');
+}
+
+function scheduleMeeting(employeeId) {
+    console.log('为员工安排沟通会议:', employeeId);
+    
+    // 这里可以实现会议安排功能
+    alert('会议安排功能开发中...');
+}
+
+function viewDetails(employeeId) {
+    console.log('查看员工详细信息:', employeeId);
+    
+    // 这里可以实现详情查看功能
+    alert('详情查看功能开发中...');
+}
+
+function updateMarketData() {
+    console.log('更新市场薪资数据...');
+    
+    // 这里可以实现市场数据更新功能
+    alert('市场数据更新功能开发中...');
+}
+
+function applyRecommendation(type) {
+    console.log('应用薪资建议:', type);
+    
+    // 这里可以实现建议应用功能
+    alert('建议应用功能开发中...');
+}
+
+function customizeRecommendation(type) {
+    console.log('自定义薪资建议:', type);
+    
+    // 这里可以实现建议自定义功能
+    alert('建议自定义功能开发中...');
+}
+
+function viewHealthHistory() {
+    console.log('查看组织健康历史...');
+    
+    // 这里可以实现历史查看功能
+    alert('历史查看功能开发中...');
+}
+
+function implementRecommendation(type) {
+    console.log('实施组织健康建议:', type);
+    
+    // 这里可以实现建议实施功能
+    alert('建议实施功能开发中...');
+}
+
+// 自动刷新洞察数据（每30分钟）
+setInterval(updateInsightsData, 1800000);
+</script>
+{% endblock %}

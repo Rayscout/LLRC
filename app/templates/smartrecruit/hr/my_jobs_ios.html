@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的职位 - iOS风格</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <style>
+        /* 主题调优：与HR仪表盘首页一致的背景 */
+        :root {
+            --ios-surface: #ffffff;
+            --ios-border: rgba(15, 23, 42, 0.06);
+            --ios-shadow: 0 6px 22px rgba(30,41,59,.06);
+            --ios-shadow-strong: 0 12px 32px rgba(30,41,59,.12);
+            --ios-chip: #c4dfcc;
+            --fx-glow: #b8d8c1;
+            --fx-pink: #acd2b7;
+            --fx-blue: #c4dfcc;
+            --ios-blue: #c4dfcc;
+            --ios-purple: #b8d8c1;
+            --fx-bg-1: #dbece0;
+            --fx-bg-2: #cfe5d6;
+            --fx-bg-3: #c4dfcc;
+        }
+        
+        /* 强制设置页面背景为淡绿色，但不影响按钮文字 */
+        body, html {
+            background: var(--fx-bg-1) !important;
+        }
+        
+        .ios-scroll-container {
+            background: var(--fx-bg-1) !important;
+        }
+        
+        .ios-parallax-bg {
+            display: none !important;
+        }
+        
+        /* 确保所有section都使用与HR仪表盘首页一致的背景 */
+        .ios-jobs-hero { 
+            background: radial-gradient(1200px 420px at 20% -10%, #dbece0 0%, #cfe5d6 40%, #ffffff 100%) !important; 
+            position: relative; 
+            overflow: hidden;
+        }
+        
+        /* 添加与HR仪表盘首页一致的动态背景效果 */
+        .ios-jobs-hero:before {
+            content: ""; 
+            position: absolute; 
+            inset: -20% -10% auto -10%; 
+            height: 320px; 
+            background: conic-gradient(from 180deg, rgba(196,223,204,.18), rgba(207,229,214,.14), rgba(184,216,193,.12), rgba(196,223,204,.18)); 
+            filter: blur(40px); 
+            animation: spinSlow 22s linear infinite; 
+            pointer-events: none;
+        }
+        
+        .ios-jobs-hero:after {
+            content: ""; 
+            position: absolute; 
+            right: -160px; 
+            top: -120px; 
+            width: 520px; 
+            height: 520px; 
+            background: radial-gradient(closest-side, rgba(196,223,204,.25), rgba(196,223,204,0)); 
+            filter: blur(10px); 
+            transform: rotate(15deg); 
+            animation: floatY 12s ease-in-out infinite; 
+            pointer-events: none;
+        }
+        
+        .ios-stats-section { 
+            background: var(--ios-bg-secondary) !important; 
+            position: relative; 
+            overflow: hidden;
+        }
+        
+        .ios-stats-section:before {
+            content: ""; 
+            position: absolute; 
+            inset: 0; 
+            background: linear-gradient(90deg, rgba(196,223,204,.06), rgba(207,229,214,.06)); 
+            opacity: .6; 
+            mix-blend-mode: multiply; 
+            pointer-events: none;
+        }
+        
+        .ios-jobs-list { 
+            background: var(--ios-bg-secondary) !important; 
+            position: relative;
+        }
+        
+        .ios-jobs-list:before {
+            content: ""; 
+            position: absolute; 
+            inset: 0; 
+            background: radial-gradient(1000px 380px at 85% -20%, rgba(196,223,204,.10), transparent 60%), 
+                        radial-gradient(800px 320px at 10% 120%, rgba(184,216,193,.10), transparent 55%);
+        }
+        
+        /* 添加与HR仪表盘首页一致的动画关键帧 */
+        @keyframes spinSlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes floatY {
+            0%, 100% { transform: rotate(15deg) translateY(0px); }
+            50% { transform: rotate(15deg) translateY(-20px); }
+        }
+        
+        /* 大幅减少section之间的间距 */
+        .ios-section {
+            padding-top: var(--ios-spacing-md) !important;
+            padding-bottom: var(--ios-spacing-md) !important;
+            min-height: auto !important;
+            background: var(--ios-bg-primary) !important;
+        }
+        
+        /* 进一步减少特定section的间距 */
+        .ios-jobs-hero {
+            padding-bottom: var(--ios-spacing-sm) !important;
+        }
+        
+        .ios-stats-section {
+            padding-top: var(--ios-spacing-sm) !important;
+            padding-bottom: var(--ios-spacing-sm) !important;
+        }
+        
+        .ios-jobs-list {
+            padding-top: var(--ios-spacing-sm) !important;
+            padding-bottom: var(--ios-spacing-sm) !important;
+        }
+        
+        /* 扩展容器宽度到1400px */
+        .ios-container {
+            max-width: 1400px !important;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 var(--ios-spacing-lg);
+        }
+        
+        /* 确保统计网格在更宽容器中合理分布 */
+        .ios-job-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-xl);
+        }
+        
+        /* 职位卡片在更宽容器中的布局优化 */
+        .ios-job-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--ios-spacing-md);
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        /* 筛选区域在更宽容器中的布局优化 */
+        .ios-filter-group {
+            display: flex;
+            gap: var(--ios-spacing-lg);
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .ios-search-box {
+            flex: 1 1 400px;
+            max-width: 600px;
+        }
+        
+        .ios-filter-item {
+            flex: 0 0 auto;
+        }
+        
+        /* 减少标题和副标题的间距 */
+        .ios-title {
+            margin-bottom: var(--ios-spacing-sm) !important;
+        }
+        
+        .ios-subtitle {
+            margin-bottom: var(--ios-spacing-md) !important;
+        }
+        
+        /* 减少功能按钮区域的间距 */
+        .ios-quick-actions {
+            margin: var(--ios-spacing-md) 0 !important;
+        }
+        
+        /* 减少统计网格的间距 */
+        .ios-job-stats {
+            gap: var(--ios-spacing-md) !important;
+            margin-bottom: var(--ios-spacing-md) !important;
+        }
+        
+        /* 减少职位卡片的间距 */
+        .ios-job-card {
+            margin-bottom: var(--ios-spacing-md) !important;
+        }
+        
+        /* 减少职位头部信息的间距 */
+        .ios-job-header {
+            margin-bottom: var(--ios-spacing-md) !important;
+        }
+        
+        /* 减少职位标题的间距 */
+        .ios-job-title {
+            margin-bottom: var(--ios-spacing-xs) !important;
+        }
+        
+        /* 减少职位详情的间距 */
+        .ios-job-details {
+            gap: var(--ios-spacing-sm) !important;
+            margin-bottom: var(--ios-spacing-md) !important;
+        }
+        
+        /* 减少职位描述的间距 */
+        .ios-job-description {
+            margin-bottom: var(--ios-spacing-md) !important;
+        }
+        
+        /* 减少职位指标的间距 */
+        .ios-job-metrics {
+            gap: var(--ios-spacing-md) !important;
+            margin-bottom: var(--ios-spacing-md) !important;
+        }
+        
+        /* 减少筛选区域的间距 */
+        .ios-filter-section {
+            margin-bottom: var(--ios-spacing-md) !important;
+        }
+        
+        .ios-job-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-xl);
+        }
+        
+        .ios-job-stat-card {
+            background: rgba(255, 255, 255, 0.7) !important;
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-lg);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-job-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-job-stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--ios-blue);
+            margin-bottom: var(--ios-spacing-xs);
+        }
+
+        /* 统计数字颜色定制 */
+        .ios-job-stats .ios-job-stat-card:nth-of-type(1) .ios-job-stat-number {
+            color: #FFE4B5 !important; /* 浅黄色 - 总职位数 */
+        }
+        .ios-job-stats .ios-job-stat-card:nth-of-type(2) .ios-job-stat-number {
+            color: #FF6B6B !important; /* 红/珊瑚色 - 活跃职位 */
+        }
+        .ios-job-stats .ios-job-stat-card:nth-of-type(3) .ios-job-stat-number {
+            color: #20B2AA !important; /* 青/浅蓝色 - 草稿职位 */
+        }
+        .ios-job-stats .ios-job-stat-card:nth-of-type(4) .ios-job-stat-number {
+            color: #87CEEB !important; /* 中蓝/天蓝色 - 已关闭职位 */
+        }
+        
+        .ios-job-stat-label {
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-job-card {
+            background: rgba(255, 255, 255, 0.7) !important;
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            margin-bottom: var(--ios-spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-job-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-job-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-sm);
+        }
+        
+        .ios-job-company {
+            font-size: 1rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-job-status {
+            padding: var(--ios-spacing-xs) var(--ios-spacing-sm);
+            border-radius: var(--ios-radius-small);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .ios-job-status.active {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--ios-green);
+        }
+        
+        .ios-job-status.draft {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--ios-orange);
+        }
+        
+        .ios-job-status.closed {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--ios-red);
+        }
+        
+        .ios-job-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--ios-spacing-md);
+            margin-bottom: var(--ios-spacing-lg);
+        }
+        
+        .ios-job-detail {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-xs);
+            font-size: 0.875rem;
+            color: var(--ios-text-secondary);
+        }
+        
+        .ios-job-description {
+            color: var(--ios-text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--ios-spacing-lg);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .ios-job-actions {
+            display: flex;
+            gap: var(--ios-spacing-sm);
+            flex-wrap: wrap;
+        }
+        
+        .ios-job-metrics {
+            display: flex;
+            gap: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-lg);
+            flex-wrap: wrap;
+        }
+        
+        .ios-job-metric {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--ios-spacing-xs);
+        }
+        
+        .ios-job-metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ios-blue);
+        }
+        
+        .ios-job-metric-label {
+            font-size: 0.75rem;
+            color: var(--ios-text-tertiary);
+            text-align: center;
+        }
+        
+        .ios-quick-actions {
+            display: flex;
+            gap: var(--ios-spacing-lg); /* 增加按钮间距 */
+            justify-content: center;
+            margin-bottom: var(--ios-spacing-xl);
+            flex-wrap: wrap;
+        }
+        
+        /* 按钮颜色定制 - 使用对比度更高的颜色，避免红色 */
+        .ios-quick-action-btn {
+            background: rgba(70, 130, 180, 0.8) !important; /* 钢蓝色 - 对比度更高 */
+            backdrop-filter: blur(20px);
+            border: 2px solid #4682B4 !important;
+            border-radius: var(--ios-radius-medium);
+            padding: var(--ios-spacing-lg) var(--ios-spacing-xl);
+            color: #FFFFFF !important; /* 白色文字 - 对比度更高 */
+            text-decoration: none;
+            transition: all var(--ios-transition-medium);
+            display: flex !important;
+            align-items: center;
+            gap: var(--ios-spacing-md);
+            font-size: 1.1rem;
+            font-weight: 600;
+            min-width: 180px;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(70, 130, 180, 0.3);
+        }
+        
+        .ios-quick-action-btn:hover {
+            background: rgba(70, 130, 180, 1) !important; /* 悬停时完全不透明 */
+            color: #FFFFFF !important;
+            border-color: #4682B4 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(70, 130, 180, 0.4);
+        }
+        
+        .ios-quick-action-btn.primary {
+            background: rgba(46, 139, 87, 0.8) !important; /* 深绿色 - 对比度更高，避免红色 */
+            color: #FFFFFF !important; /* 白色文字 */
+            border-color: #2E8B57 !important;
+            box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
+        }
+        
+        .ios-quick-action-btn.primary:hover {
+            background: rgba(46, 139, 87, 1) !important;
+            border-color: #2E8B57 !important;
+            box-shadow: 0 6px 16px rgba(46, 139, 87, 0.4);
+        }
+        
+        /* 职位卡片中的按钮颜色定制 */
+        .ios-job-actions .ios-button {
+            background: rgba(32, 178, 170, 0.3); /* 青/浅蓝色 30%透明度 */
+            color: #006400; /* 深绿色文字 */
+            border: 1px solid rgba(32, 178, 170, 0.5);
+        }
+        
+        .ios-job-actions .ios-button:hover {
+            background: rgba(32, 178, 170, 0.5);
+            border-color: rgba(32, 178, 170, 0.7);
+        }
+        
+        .ios-job-actions .ios-button.secondary {
+            background: rgba(135, 206, 235, 0.3); /* 中蓝/天蓝色 30%透明度 */
+            color: #000080; /* 深蓝色文字 */
+            border: 1px solid rgba(135, 206, 235, 0.5);
+        }
+        
+        .ios-job-actions .ios-button.secondary:hover {
+            background: rgba(135, 206, 235, 0.5);
+            border-color: rgba(135, 206, 235, 0.7);
+        }
+        
+        /* 职位指标数值颜色定制 - 使用对比度更高的颜色 */
+        .ios-job-metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2E8B57 !important; /* 深绿色 - 对比度更高 */
+            margin-bottom: var(--ios-spacing-xs);
+        }
+        
+        /* 暂无职位时的按钮颜色 - 使用对比度更高的颜色 */
+        .ios-card .ios-button.large {
+            background: rgba(46, 139, 87, 0.3); /* 深绿色 30%透明度 */
+            color: #FFFFFF !important; /* 白色文字 - 对比度更高 */
+            border: 1px solid rgba(46, 139, 87, 0.5);
+        }
+        
+        .ios-card .ios-button.large:hover {
+            background: rgba(46, 139, 87, 0.5);
+            border-color: rgba(46, 139, 87, 0.7);
+        }
+        
+        /* 职位状态颜色优化 - 提高对比度 */
+        .ios-job-status.active {
+            background: rgba(46, 139, 87, 0.1);
+            color: #2E8B57 !important; /* 深绿色 */
+        }
+        
+        .ios-job-status.draft {
+            background: rgba(255, 140, 0, 0.1);
+            color: #FF8C00 !important; /* 深橙色 */
+        }
+        
+        .ios-job-status.closed {
+            background: rgba(220, 20, 60, 0.1);
+            color: #DC143C !important; /* 深红色 */
+        }
+        
+        .ios-filter-section {
+            background: rgba(255, 255, 255, 0.8) !important;
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            padding: var(--ios-spacing-md);
+            margin-bottom: var(--ios-spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        }
+        
+        .ios-filter-group {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .ios-filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .ios-filter-label {
+            font-size: 0.85rem;
+            color: var(--ios-text-secondary);
+            font-weight: 600;
+            letter-spacing: .2px;
+        }
+        
+        .ios-search-box {
+            position: relative;
+            max-width: 520px;
+            flex: 1 1 320px;
+        }
+        
+        .ios-search-box .ios-input {
+            padding-left: 48px;
+        }
+        
+        .ios-search-icon {
+            position: absolute;
+            left: var(--ios-spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--ios-text-tertiary);
+            font-size: 1.125rem;
+        }
+
+        /* 统一控件高度与边框，接近表单搜索条风格 */
+        .ios-input {
+            height: 58px;
+            border-radius: 16px;
+            border: 1px solid var(--ios-border-secondary);
+            background: var(--ios-bg-secondary);
+            color: var(--ios-text-primary);
+        }
+        .ios-input:focus{
+            outline: none;
+            border-color: var(--ios-blue);
+            box-shadow: 0 0 0 3px rgba(0,122,255,.12);
+        }
+        .ios-input::placeholder{ color: var(--ios-text-quaternary); }
+        
+        /* 统一 select 的外观、字体与边框颜色 */
+        select.ios-input{
+            color: var(--ios-text-primary);
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 18px 18px;
+            padding-right: 40px;
+        }
+        
+        /* 确保按钮内所有元素正常显示 */
+        .ios-quick-action-btn i,
+        .ios-quick-action-btn span {
+            color: #FFFFFF !important;
+            display: inline-block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        .ios-quick-action-btn.primary i,
+        .ios-quick-action-btn.primary span {
+            color: #FFFFFF !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <nav class="ios-nav">
+        <div class="ios-nav-container">
+            <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-brand">
+                <div class="ios-nav-brand-icon">
+                    <i class="uil uil-briefcase"></i>
+                </div>
+                <span>智能招聘系统-HR</span>
+            </a>
+            
+            <ul class="ios-nav-menu">
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.hr_dashboard' else '' }}">
+                        <i class="ios-nav-icon uil uil-dashboard"></i>
+                        <span class="ios-nav-text">仪表板</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.recruitment.publish_recruitment' else '' }}">
+                        <i class="ios-nav-icon uil uil-briefcase"></i>
+                        <span class="ios-nav-text">发布职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.candidates' else '' }}">
+                        <i class="ios-nav-icon uil uil-users-alt"></i>
+                        <span class="ios-nav-text">候选人</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.recruitment.my_jobs' else '' }}">
+                        <i class="ios-nav-icon uil uil-briefcase-alt"></i>
+                        <span class="ios-nav-text">我的职位</span>
+                    </a>
+                </li>
+                <li class="ios-nav-item">
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.interviews' else '' }}">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
+                    </a>
+                </li>
+
+            </ul>
+            
+            <div class="ios-nav-actions">
+                <div class="ios-nav-search">
+                    <i class="uil uil-search"></i>
+                    <input type="text" placeholder="搜索..." />
+                </div>
+                
+                <div class="ios-nav-divider"></div>
+                
+                
+                <button class="ios-nav-button" data-action="profile">
+                    <i class="uil uil-user"></i>
+                    <span>HR</span>
+                </button>
+            </div>
+            
+            <!-- 移动端菜单切换按钮 -->
+            <button class="ios-nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="ios-parallax-bg"></div>
+    
+    <div class="ios-scroll-container">
+        <!-- 欢迎Section -->
+        <section class="ios-section ios-jobs-hero">
+            <div class="ios-container">
+                <h1 class="ios-title ios-fade-in">我的职位</h1>
+                <p class="ios-subtitle ios-fade-in">管理已发布的招聘职位，跟踪申请情况，优化招聘效果</p>
+                
+                <div class="ios-quick-actions ios-fade-in-up">
+                    <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-quick-action-btn primary">
+                        <i class="uil uil-plus"></i>
+                        发布新职位
+                    </a>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-quick-action-btn">
+                        <i class="uil uil-users-alt"></i>
+                        查看候选人
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 统计概览Section -->
+        <section class="ios-section ios-stats-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">职位概览</h2>
+                <p class="ios-subtitle ios-fade-in">了解职位发布情况和招聘效果</p>
+                
+                <div class="ios-job-stats">
+                    <div class="ios-job-stat-card ios-fade-in-up">
+                        <div class="ios-job-stat-number">{{ jobs|length if jobs else 0 }}</div>
+                        <div class="ios-job-stat-label">总职位数</div>
+                    </div>
+                    <div class="ios-job-stat-card ios-fade-in-up">
+                        <div class="ios-job-stat-number">
+                            {{ jobs|selectattr('status', 'equalto', 'active')|list|length if jobs else 0 }}
+                        </div>
+                        <div class="ios-job-stat-label">活跃职位</div>
+                    </div>
+                    <div class="ios-job-stat-card ios-fade-in-up">
+                        <div class="ios-job-stat-number">
+                            {{ jobs|selectattr('status', 'equalto', 'draft')|list|length if jobs else 0 }}
+                        </div>
+                        <div class="ios-job-stat-label">草稿职位</div>
+                    </div>
+                    <div class="ios-job-stat-card ios-fade-in-up">
+                        <div class="ios-job-stat-number">
+                            {{ jobs|selectattr('status', 'equalto', 'closed')|list|length if jobs else 0 }}
+                        </div>
+                        <div class="ios-job-stat-label">已关闭职位</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 筛选Section -->
+        <section class="ios-section ios-stats-section">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">筛选与搜索</h2>
+                <p class="ios-subtitle ios-fade-in">快速找到符合要求的已发布职位</p>
+                <div class="ios-filter-section ios-fade-in-up">
+                    <div class="ios-filter-group">
+                        <div class="ios-search-box">
+                            <i class="ios-search-icon uil uil-search"></i>
+                            <input type="text" class="ios-input" placeholder="搜索职位标题、描述或要求..." id="searchInput">
+                        </div>
+                        
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">状态筛选</label>
+                            <select class="ios-input" id="statusFilter" style="min-width: 170px;">
+                                <option value="">全部状态</option>
+                                <option value="active">活跃</option>
+                                <option value="draft">草稿</option>
+                                <option value="closed">已关闭</option>
+                            </select>
+                        </div>
+                        
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">工作类型</label>
+                            <select class="ios-input" id="typeFilter" style="min-width: 170px;">
+                                <option value="">全部类型</option>
+                                <option value="全职">全职</option>
+                                <option value="兼职">兼职</option>
+                                <option value="实习">实习</option>
+                                <option value="远程">远程</option>
+                            </select>
+                        </div>
+                        
+                        <div class="ios-filter-item">
+                            <label class="ios-filter-label">排序方式</label>
+                            <select class="ios-input" id="sortFilter" style="min-width: 170px;">
+                                <option value="date_desc">发布时间 ↓</option>
+                                <option value="date_asc">发布时间 ↑</option>
+                                <option value="title_asc">标题 A-Z</option>
+                                <option value="title_desc">标题 Z-A</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 职位列表Section -->
+        <section class="ios-section ios-jobs-list">
+            <div class="ios-container">
+                <h2 class="ios-title ios-fade-in">职位列表</h2>
+                <p class="ios-subtitle ios-fade-in">管理所有已发布的招聘职位</p>
+                
+                {% if jobs %}
+                    {% for job in jobs %}
+                    <div class="ios-job-card ios-fade-in-up">
+                        <div class="ios-job-header">
+                            <div>
+                                <div class="ios-job-title">{{ job.title }}</div>
+                                <div class="ios-job-company">{{ job.company_name }}</div>
+                            </div>
+                            <span class="ios-job-status {{ job.status }}">
+                                {% if job.status == 'active' %}
+                                    活跃
+                                {% elif job.status == 'draft' %}
+                                    草稿
+                                {% elif job.status == 'closed' %}
+                                    已关闭
+                                {% else %}
+                                    {{ job.status }}
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="ios-job-metrics">
+                            <div class="ios-job-metric">
+                                <div class="ios-job-metric-value">{{ job.positions_needed|default(1) }}</div>
+                                <div class="ios-job-metric-label">招聘人数</div>
+                            </div>
+                            <div class="ios-job-metric">
+                                <div class="ios-job-metric-value">{{ job.experience_years|default('不限') }}</div>
+                                <div class="ios-job-metric-label">经验要求</div>
+                            </div>
+                            <div class="ios-job-metric">
+                                <div class="ios-job-metric-value">{{ job.job_type|default('全职') }}</div>
+                                <div class="ios-job-metric-label">工作类型</div>
+                            </div>
+                        </div>
+                        
+                        <div class="ios-job-details">
+                            <div class="ios-job-detail">
+                                <i class="uil uil-map-marker"></i>
+                                <span>{{ job.location }}</span>
+                            </div>
+                            <div class="ios-job-detail">
+                                <i class="uil uil-money-bill"></i>
+                                <span>{{ job.salary }}</span>
+                            </div>
+                            <div class="ios-job-detail">
+                                <i class="uil uil-calendar-alt"></i>
+                                <span>发布于 {{ job.date_posted.strftime('%Y年%m月%d日') if job.date_posted else '未知' }}</span>
+                            </div>
+                            {% if job.department %}
+                            <div class="ios-job-detail">
+                                <i class="uil uil-building"></i>
+                                <span>{{ job.department }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="ios-job-description">
+                            {{ job.description|truncate(200) }}
+                        </div>
+                        
+                        <div class="ios-job-actions">
+                            <a href="{{ url_for('smartrecruit.hr.recruitment.edit_job', job_id=job.id) }}" class="ios-button">
+                                <i class="uil uil-edit"></i>
+                                编辑职位
+                            </a>
+                            
+                            <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-button secondary">
+                                <i class="uil uil-users-alt"></i>
+                                查看候选人
+                            </a>
+                            
+                            {% if job.status == 'active' %}
+                            <button class="ios-button secondary" onclick="closeJob({{ job.id }})">
+                                <i class="uil uil-times"></i>
+                                关闭职位
+                            </button>
+                            {% elif job.status == 'draft' %}
+                            <button class="ios-button" onclick="publishJob({{ job.id }})">
+                                <i class="uil uil-upload"></i>
+                                发布职位
+                            </button>
+                            {% endif %}
+                            
+                            <button class="ios-button secondary" onclick="deleteJob({{ job.id }})">
+                                <i class="uil uil-trash-alt"></i>
+                                删除职位
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="ios-card ios-fade-in-up">
+                        <div style="text-align: center; padding: var(--ios-spacing-xxl); color: var(--ios-text-tertiary);">
+                            <i class="uil uil-briefcase" style="font-size: 4rem; margin-bottom: var(--ios-spacing-lg); opacity: 0.5;"></i>
+                            <h3 style="font-size: 1.5rem; margin-bottom: var(--ios-spacing-md); color: var(--ios-text-secondary);">暂无职位</h3>
+                            <p>您还没有发布任何招聘职位，立即发布第一个职位开始招聘</p>
+                            <a href="{{ url_for('smartrecruit.hr.recruitment.publish_recruitment') }}" class="ios-button large" style="margin-top: var(--ios-spacing-lg);">
+                                <i class="uil uil-plus"></i>
+                                发布职位
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>    <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+    <script>
+      (function(){
+        var btn = document.getElementById('iosThemeToggle');
+        if(!btn) return;
+        function apply(theme){
+          document.body.classList.toggle('dark', theme==='dark');
+          btn.classList.toggle('active', theme==='dark');
+        }
+        var saved = localStorage.getItem('theme');
+        if(!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){ saved='dark'; }
+        apply(saved||'light');
+        btn.addEventListener('click', function(){
+          var next = document.body.classList.contains('dark') ? 'light' : 'dark';
+          localStorage.setItem('theme', next);
+          apply(next);
+        });
+      })();
+    </script>
+    
+    <script>
+        // 职位管理相关JavaScript功能
+        
+        function closeJob(jobId) {
+            if (confirm('确定要关闭这个职位吗？关闭后将不再接受新的申请。')) {
+                // 这里实现关闭职位的逻辑
+                alert('职位 #' + jobId + ' 已关闭');
+                location.reload();
+            }
+        }
+        
+        function publishJob(jobId) {
+            if (confirm('确定要发布这个职位吗？发布后将开始接受申请。')) {
+                // 这里实现发布职位的逻辑
+                alert('职位 #' + jobId + ' 已发布');
+                location.reload();
+            }
+        }
+        
+        function deleteJob(jobId) {
+            if (confirm('确定要删除这个职位吗？删除后将无法恢复。')) {
+                // 这里实现删除职位的逻辑
+                alert('职位 #' + jobId + ' 已删除');
+                location.reload();
+            }
+        }
+        
+        // 搜索和筛选功能
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterJobs();
+        });
+        
+        document.getElementById('statusFilter').addEventListener('change', function() {
+            filterJobs();
+        });
+        
+        document.getElementById('typeFilter').addEventListener('change', function() {
+            filterJobs();
+        });
+        
+        document.getElementById('sortFilter').addEventListener('change', function() {
+            filterJobs();
+        });
+        
+        function filterJobs() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+            
+            // 这里实现筛选逻辑
+            console.log('筛选条件:', { 
+                search: searchTerm, 
+                status: statusFilter, 
+                type: typeFilter, 
+                sort: sortFilter 
+            });
+            
+            // 可以在这里实现实时筛选或发送AJAX请求
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以在这里添加初始化逻辑
+            console.log('职位管理页面已加载');
+        });
+    </script>
+</body>
+</html>
