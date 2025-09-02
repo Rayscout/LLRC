@@ -188,6 +188,20 @@
             color: var(--ios-blue);
             margin-bottom: var(--ios-spacing-xs);
         }
+
+        /* 统计数字颜色定制 */
+        .ios-job-stats .ios-job-stat-card:nth-of-type(1) .ios-job-stat-number {
+            color: #FFE4B5 !important; /* 浅黄色 - 总职位数 */
+        }
+        .ios-job-stats .ios-job-stat-card:nth-of-type(2) .ios-job-stat-number {
+            color: #FF6B6B !important; /* 红/珊瑚色 - 活跃职位 */
+        }
+        .ios-job-stats .ios-job-stat-card:nth-of-type(3) .ios-job-stat-number {
+            color: #20B2AA !important; /* 青/浅蓝色 - 草稿职位 */
+        }
+        .ios-job-stats .ios-job-stat-card:nth-of-type(4) .ios-job-stat-number {
+            color: #87CEEB !important; /* 中蓝/天蓝色 - 已关闭职位 */
+        }
         
         .ios-job-stat-label {
             font-size: 0.875rem;
@@ -310,7 +324,7 @@
         
         .ios-quick-actions {
             display: flex;
-            gap: var(--ios-spacing-md);
+            gap: var(--ios-spacing-lg); /* 增加按钮间距 */
             justify-content: center;
             margin-bottom: var(--ios-spacing-xl);
             flex-wrap: wrap;
@@ -321,13 +335,17 @@
             backdrop-filter: blur(20px);
             border: 1px solid var(--ios-border-primary);
             border-radius: var(--ios-radius-medium);
-            padding: var(--ios-spacing-md) var(--ios-spacing-lg);
+            padding: var(--ios-spacing-lg) var(--ios-spacing-xl); /* 增加内边距使按钮更大 */
             color: var(--ios-text-secondary);
             text-decoration: none;
             transition: all var(--ios-transition-medium);
             display: flex;
             align-items: center;
-            gap: var(--ios-spacing-sm);
+            gap: var(--ios-spacing-md); /* 增加图标和文字间距 */
+            font-size: 1.1rem; /* 增加字体大小 */
+            font-weight: 600; /* 增加字体粗细 */
+            min-width: 180px; /* 设置最小宽度 */
+            justify-content: center; /* 居中对齐 */
         }
         
         .ios-quick-action-btn:hover {
@@ -511,10 +529,6 @@
                     <a href="{{ url_for('smartrecruit.hr.dashboard.candidates') }}" class="ios-quick-action-btn">
                         <i class="uil uil-users-alt"></i>
                         查看候选人
-                    </a>
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-quick-action-btn">
-                        <i class="uil uil-chart-line"></i>
-                        招聘分析
                     </a>
                 </div>
             </div>
