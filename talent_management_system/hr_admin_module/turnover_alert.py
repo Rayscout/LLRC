@@ -292,40 +292,7 @@ def turnover_dashboard():
             ['高风险员工数', str(report_data['summary']['high_risk_employees'])]
         ]
         
-<<<<<<< HEAD
-        summary_table = Table(summary_data, colWidths=[2*inch, 2*inch])
-        summary_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 14),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-            ('GRID', (0, 0), (-1, -1), 1, colors.black)
-        ]))
-        story.append(summary_table)
-        story.append(Spacer(1, 20))
-=======
-        return render_template('hr_admin/turnover_dashboard.html',
-                             user=user,
-                             dashboard_data=dashboard_data,
-                             causes_analysis=causes_analysis,
-                             prevention_recommendations=prevention_recommendations)
-                             
-    except Exception as e:
-        return jsonify({'error': f'加载页面时发生错误: {str(e)}'}), 500
-
-@turnover_alert_bp.route('/api/department_trends')
-def api_department_trends():
-    """获取部门离职趋势数据"""
-    try:
-        # 生成月度趋势数据
-        months = []
-        trends = {}
->>>>>>> fd5b383a8e7dd6a7be7cd79dafa8a37d782194b8
-        
-        # 部门分析
+        # 部门分
         story.append(Paragraph("部门分析", styles['Heading2']))
         story.append(Spacer(1, 12))
         
