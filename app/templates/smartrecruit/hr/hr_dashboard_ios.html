@@ -8,29 +8,35 @@
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
         /* 主题调优：仅改变风格，不增加结构 */
-        :root{
-            --ios-surface:#ffffff;
-            --ios-border:rgba(15, 23, 42, 0.06);
-            --ios-shadow:0 6px 22px rgba(30,41,59,.06);
-            --ios-shadow-strong:0 12px 32px rgba(30,41,59,.12);
-            --ios-chip:#3b82f6;
-            --fx-glow:#8b5cf6;
-            --fx-pink:#ec4899;
-            --fx-blue:#0ea5e9;
-            --fx-bg-1:#eef2ff;
-            --fx-bg-2:#f5f3ff;
-            --fx-bg-3:#f0f9ff;
-        }
+                 :root{
+             --ios-surface:#ffffff;
+             --ios-border:rgba(15, 23, 42, 0.06);
+             --ios-shadow:0 6px 22px rgba(30,41,59,.06);
+             --ios-shadow-strong:0 12px 32px rgba(30,41,59,.12);
+             --ios-chip:#c4dfcc;
+             --fx-glow:#b8d8c1;
+             --fx-pink:#acd2b7;
+             --fx-blue:#c4dfcc;
+             --ios-blue:#c4dfcc;
+             --ios-purple:#b8d8c1;
+             --fx-bg-1:#dbece0;
+             --fx-bg-2:#cfe5d6;
+             --fx-bg-3:#c4dfcc;
+         }
         /* 页面特定样式 */
-        .ios-hero-section { background: radial-gradient(1200px 420px at 20% -10%, #f0f6ff 0%, #f7f9ff 40%, #ffffff 100%); position:relative; overflow:hidden }
-        .ios-hero-section:before{content:""; position:absolute; inset:-20% -10% auto -10%; height:320px; background:conic-gradient(from 180deg, rgba(14,165,233,.18), rgba(139,92,246,.14), rgba(236,72,153,.12), rgba(14,165,233,.18)); filter:blur(40px); animation:spinSlow 22s linear infinite; pointer-events:none}
-        .ios-hero-section:after{content:""; position:absolute; right:-160px; top:-120px; width:520px; height:520px; background:radial-gradient(closest-side, rgba(99,102,241,.25), rgba(99,102,241,0)); filter:blur(10px); transform:rotate(15deg); animation:floatY 12s ease-in-out infinite; pointer-events:none}
+        /* 间距精确缩小：去除每个Section的最小高度并压缩上下内边距，重点缩小英雄区与关键指标区间隔 */
+        .ios-section{ min-height:auto !important; padding-top:16px !important; padding-bottom:16px !important; }
+        .ios-hero-section{ padding-bottom:8px !important; }
+        .ios-stats-section{ padding-top:8px !important; }
+                 .ios-hero-section { background: radial-gradient(1200px 420px at 20% -10%, #dbece0 0%, #cfe5d6 40%, #ffffff 100%); position:relative; overflow:hidden }
+                 .ios-hero-section:before{content:""; position:absolute; inset:-20% -10% auto -10%; height:320px; background:conic-gradient(from 180deg, rgba(196,223,204,.18), rgba(207,229,214,.14), rgba(184,216,193,.12), rgba(196,223,204,.18)); filter:blur(40px); animation:spinSlow 22s linear infinite; pointer-events:none}
+                 .ios-hero-section:after{content:""; position:absolute; right:-160px; top:-120px; width:520px; height:520px; background:radial-gradient(closest-side, rgba(196,223,204,.25), rgba(196,223,204,0)); filter:blur(10px); transform:rotate(15deg); animation:floatY 12s ease-in-out infinite; pointer-events:none}
         
         .ios-stats-section { background: var(--ios-bg-secondary); position:relative; overflow:hidden }
-        .ios-stats-section:before{content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(99,102,241,.06), rgba(14,165,233,.06)); opacity:.6; mix-blend:multiply; pointer-events:none}
+                 .ios-stats-section:before{content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(196,223,204,.06), rgba(207,229,214,.06)); opacity:.6; mix-blend:multiply; pointer-events:none}
         
         .ios-actions-section { background: var(--ios-bg-tertiary); position:relative }
-        .ios-actions-section:before{content:""; position:absolute; inset:0; background:radial-gradient(1000px 380px at 85% -20%, rgba(14,165,233,.10), transparent 60%), radial-gradient(800px 320px at 10% 120%, rgba(236,72,153,.10), transparent 55%)}
+                 .ios-actions-section:before{content:""; position:absolute; inset:0; background:radial-gradient(1000px 380px at 85% -20%, rgba(196,223,204,.10), transparent 60%), radial-gradient(800px 320px at 10% 120%, rgba(184,216,193,.10), transparent 55%)}
         
         .ios-recent-section { background: var(--ios-bg-secondary); }
 
@@ -39,7 +45,7 @@
         .ios-section{ scroll-snap-align: none !important; }
         
         .ios-insights-section { background: var(--ios-bg-primary); position:relative }
-        .ios-insights-section:before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(236,72,153,.04), rgba(14,165,233,.05)); pointer-events:none}
+                 .ios-insights-section:before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(184,216,193,.04), rgba(196,223,204,.05)); pointer-events:none}
         
         .ios-footer-section {
             background: var(--ios-bg-secondary);
@@ -99,11 +105,11 @@
             text-align: center;
         }
         /* 关怀式欢迎标题与信息胶囊 */
-        .ios-title.hello{font-size: 2.2rem; letter-spacing:.3px; font-weight:800; background:linear-gradient(90deg,#0A84FF,#6C5CE7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-align:center; margin-bottom:12px; background-size:200% 100%; animation:gradientBreath 6s ease-in-out infinite; position:relative}
+                 .ios-title.hello{font-size: 2.2rem; letter-spacing:.3px; font-weight:800; background:linear-gradient(90deg,#acd2b7,#b8d8c1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-align:center; margin-bottom:12px; background-size:200% 100%; animation:gradientBreath 6s ease-in-out infinite; position:relative}
         .ios-title.hello:after{content:""; position:absolute; inset:0; background:linear-gradient(115deg, transparent 0%, rgba(255,255,255,.8) 8%, transparent 16%) no-repeat; background-size:18% 100%; background-position:-25% 0; mix-blend-mode:screen; pointer-events:none; animation:sweepX 3.4s ease-in-out infinite}
         .ios-hero-pills{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom: var(--ios-spacing-lg)}
         .ios-hero-pills .pill{display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#ffffff; border:1px solid var(--ios-border); box-shadow: var(--ios-shadow); color:var(--ios-text-secondary); font-size:.95rem}
-        .ios-hero-pills .pill .v{font-weight:700; color:#0A84FF}
+                 .ios-hero-pills .pill .v{font-weight:700; color:#acd2b7}
         
         .ios-hero-actions {
             display: flex;
@@ -158,7 +164,7 @@
         }
         
         .ios-recent-item:hover { transform: translateX(8px) translateY(-2px); box-shadow: var(--ios-shadow-medium); }
-        .ios-recent-item:before{content:""; position:absolute; right:-60px; top:-60px; width:160px; height:160px; background:radial-gradient(circle at center, rgba(99,102,241,.12), rgba(99,102,241,0) 60%); transform:rotate(12deg)}
+                 .ios-recent-item:before{content:""; position:absolute; right:-60px; top:-60px; width:160px; height:160px; background:radial-gradient(circle at center, rgba(196,223,204,.12), rgba(196,223,204,0) 60%); transform:rotate(12deg)}
         
         .ios-recent-header {
             display: flex;
@@ -192,18 +198,31 @@
         }
         .ios-chart-container:hover{ transform: translateY(-6px) rotateX(2deg); box-shadow: var(--ios-shadow-strong) }
         
-        .ios-chart-placeholder{ height:200px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--ios-text-tertiary); font-size:1.125rem; background: linear-gradient(180deg,#eef4ff,#f8fbff); border:1px dashed rgba(99,102,241,.25); position:relative; overflow:hidden }
+                 .ios-chart-placeholder{ height:200px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--ios-text-tertiary); font-size:1.125rem; background: linear-gradient(180deg,#dbece0,#cfe5d6); border:1px dashed rgba(196,223,204,.25); position:relative; overflow:hidden }
         .ios-chart-placeholder:after{content:""; position:absolute; inset:auto -30% -70% -30%; height:140%; background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.3), rgba(255,255,255,0)); transform:translateY(90%) rotate(8deg); animation:shine 4.6s ease-in-out infinite}
 
         /* 指标卡片风格与浮起徽标（右上角） */
         .ios-metric-card{ background:var(--ios-surface); border:1px solid var(--ios-border); border-radius:16px; box-shadow: var(--ios-shadow); padding: var(--ios-spacing-lg); position:relative; overflow:hidden; isolation:isolate }
-        .ios-metric-card:after{content:""; position:absolute; right:-30px; top:-30px; width:120px; height:120px; background:radial-gradient(circle at center, rgba(14,165,233,.18), rgba(14,165,233,0) 60%); z-index:-1; filter:blur(1px)}
+                 .ios-metric-card:after{content:""; position:absolute; right:-30px; top:-30px; width:120px; height:120px; background:radial-gradient(circle at center, rgba(196,223,204,.18), rgba(196,223,204,0) 60%); z-index:-1; filter:blur(1px)}
         .ios-metric-card:hover{ transform:translateY(-6px); box-shadow: var(--ios-shadow-strong) }
-        .ios-metric-icon i{ color:#2563eb; }
-        .ios-metric-value{ font-weight:800; font-size:28px; color:#0A84FF; }
+                 .ios-metric-icon i{ color:#acd2b7; }
+                 .ios-metric-value{ font-weight:800; font-size:28px; color:#acd2b7; }
 
         /* 头部 tabs 的视觉（明细/分析）可通过链接样式体现）*/
         .ios-title{ display:flex; align-items:center; gap:10px; }
+        
+        /* 统一重要文本字体为SF Pro Display */
+        h1, h2, h3, h4, h5, h6,
+        .ios-title, .ios-subtitle,
+        .ios-recent-title, .ios-metric-label,
+        .ios-quick-action h4, .ios-step-content h4,
+        .ios-guide-header h3, .ios-help-header h3,
+        .overlay-card h4, .ios-feature-card h4,
+        .ios-help-item h4, .ios-chart-container h3,
+        .ios-nav-brand, .ios-nav-text,
+        .ios-button, .ios-metric-value {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
 
         /* 滑动时卡片渐显（不改结构，仅加类名控制） */
         .fade-card{ opacity:0; transform: translateY(12px); transition: opacity .5s ease, transform .6s cubic-bezier(.22,1,.36,1); will-change: transform, opacity; }
@@ -223,7 +242,7 @@
         @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(16px)}}
         @keyframes shine{0%{transform:translateY(120%) rotate(8deg)}45%{transform:translateY(-20%) rotate(8deg)}100%{transform:translateY(-20%) rotate(8deg)}}
         @keyframes ripple{to{transform:scale(8); opacity:0}}
-        @keyframes gradientBreath{0%,100%{filter:drop-shadow(0 6px 14px rgba(99,102,241,.12)); background-position:0% 50%}50%{filter:drop-shadow(0 10px 22px rgba(99,102,241,.22)); background-position:100% 50%}}
+                 @keyframes gradientBreath{0%,100%{filter:drop-shadow(0 6px 14px rgba(196,223,204,.12)); background-position:0% 50%}50%{filter:drop-shadow(0 10px 22px rgba(196,223,204,.22)); background-position:100% 50%}}
         @keyframes sweepX{0%{background-position:-25% 0; opacity:.65}60%{background-position:120% 0; opacity:.9}100%{background-position:120% 0; opacity:.0}}
 
         /* 导航按钮动效：弹簧与铃铛抖动、未读红点 */
@@ -231,15 +250,15 @@
         .ios-nav-button:hover{transform:translateY(-2px)}
         .ios-nav-button.spring{animation:springPop .6s cubic-bezier(.22,1,.36,1)}
         .ios-nav-button[data-action="notify"].has-unread{animation:bellJiggle 2.8s ease-in-out infinite}
-        .ios-nav-button[data-action="notify"].has-unread:after{content:""; position:absolute; width:8px; height:8px; right:6px; top:6px; background:#ef4444; border-radius:999px; box-shadow:0 0 0 6px rgba(239,68,68,.15)}
+                 .ios-nav-button[data-action="notify"].has-unread:after{content:""; position:absolute; width:8px; height:8px; right:6px; top:6px; background:#acd2b7; border-radius:999px; box-shadow:0 0 0 6px rgba(172,210,183,.15)}
         @keyframes springPop{0%{transform:scale(.9)}40%{transform:scale(1.12)}70%{transform:scale(.98)}100%{transform:scale(1)}}
         @keyframes bellJiggle{0%,80%,100%{transform:none}85%{transform:rotate(-12deg)}90%{transform:rotate(10deg)}95%{transform:rotate(-6deg)}}
 
         /* 紧凑模式：缩小一切卡片尺寸、间距、字体 */
         .compact .ios-container{ --ios-spacing-xl:24px; --ios-spacing-lg:16px; --ios-spacing-md:10px; --ios-spacing-sm:6px }
         .compact .ios-title.hello{ font-size:1.8rem }
-        .compact .ios-title{ font-size:1rem }
-        .compact .ios-subtitle{ font-size:.85rem }
+        .compact .ios-title{ font-size:2rem }
+        .compact .ios-subtitle{ font-size:1.125rem }
         .compact .ios-metric-card{ padding: var(--ios-spacing-md); border-radius:12px }
         .compact .ios-metric-value{ font-size:22px }
         .compact .ios-quick-action{ padding: var(--ios-spacing-md); border-radius:12px }
@@ -257,12 +276,12 @@
         .mini-stats{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; margin-top:12px }
         .mini-card{ background:var(--ios-surface); border:1px solid var(--ios-border); border-radius:12px; padding:12px 14px; box-shadow:var(--ios-shadow); display:flex; align-items:center; justify-content:space-between }
         .mini-card .label{ color:var(--ios-text-secondary); font-size:.85rem }
-        .mini-card .value{ font-weight:800; color:#0A84FF }
+                 .mini-card .value{ font-weight:800; color:#acd2b7 }
         .mini-card .delta{ font-size:.75rem; color:#10b981 }
         .mini-card .delta.neg{ color:#ef4444 }
 
         /* 悬浮蓝色分布卡 */
-        .overlay-card{ position:absolute; right:4%; top:-28px; background:#3b82f6; color:#fff; border-radius:16px; box-shadow:0 18px 40px rgba(59,130,246,.35); padding:14px 18px; width:280px; transform:translateZ(0) }
+                 .overlay-card{ position:absolute; right:4%; top:-28px; background:#b8d8c1; color:#fff; border-radius:16px; box-shadow:0 18px 40px rgba(184,216,193,.35); padding:14px 18px; width:280px; transform:translateZ(0) }
         .overlay-card h4{ margin:0 0 8px 0; font-size:1rem }
         .overlay-chart{ height:56px; display:flex; align-items:flex-end; gap:8px }
         .overlay-bar{ flex:1; height:40%; background:rgba(255,255,255,.9); border-radius:6px 6px 0 0; opacity:.85; animation:barUp .9s cubic-bezier(.22,1,.36,1) both }
@@ -364,7 +383,7 @@
         <!-- 欢迎Section -->
         <section class="ios-section ios-hero-section">
             <div class="ios-container">
-                <h1 class="ios-title hello ios-fade-in">欢迎回来，{{ user.name if user else 'HR 管理员' }}！</h1>
+                <h1 class="ios-title hello ios-fade-in">欢迎回来，{{ (user.first_name + ' ' + user.last_name) if user and user.first_name and user.last_name else (user.first_name if user and user.first_name else 'HR 管理员') }}！</h1>
                 <div class="ios-hero-pills ios-fade-in">
                     <div class="pill"><i class="uil uil-schedule"></i> 今天 <span class="v">{{ current_date if current_date else '周五 01/16' }}</span></div>
                     <div class="pill"><i class="uil uil-cloud-sun"></i> 天气 <span class="v">{{ weather|default('晴 18°C') }}</span></div>
@@ -514,7 +533,7 @@
 
         <!-- 快速操作Section -->
         <section class="ios-section ios-actions-section">
-            <div class="ios-container">
+            <div class="ios-container compact">
                 <h2 class="ios-title ios-fade-in">快速操作</h2>
                 <p class="ios-subtitle ios-fade-in">高效管理招聘流程的常用功能</p>
                 
@@ -574,7 +593,7 @@
 
         <!-- 最近活动Section -->
         <section class="ios-section ios-recent-section">
-            <div class="ios-container">
+            <div class="ios-container compact">
                 <h2 class="ios-title ios-fade-in">最近活动</h2>
                 <p class="ios-subtitle ios-fade-in">跟踪最新的招聘动态和申请情况</p>
                 
@@ -693,7 +712,7 @@
 
         <!-- 数据洞察Section -->
         <section class="ios-section ios-insights-section">
-            <div class="ios-container">
+            <div class="ios-container compact">
                 <h2 class="ios-title ios-fade-in">数据洞察</h2>
                 <p class="ios-subtitle ios-fade-in">深度分析招聘效果和趋势</p>
                 
@@ -732,7 +751,7 @@
 
         <!-- 底部导航Section -->
         <section class="ios-section ios-footer-section">
-            <div class="ios-container">
+            <div class="ios-container compact">
                 <h2 class="ios-title ios-fade-in">系统导航</h2>
                 <p class="ios-subtitle ios-fade-in">快速访问所有HR功能模块</p>
                 
@@ -940,7 +959,7 @@
                 x: rand(0,w), y: rand(0,h),
                 vx: rand(-.15,.15)*pr, vy: rand(-.15,.15)*pr,
                 r: rand(1.2,2.6)*pr, o: rand(.25,.65),
-                c: Math.random()<.5? 'rgba(99,102,241,':'rgba(14,165,233,'
+                                 c: Math.random()<.5? 'rgba(196,223,204,':'rgba(207,229,214,'
               });
             }
           }
@@ -962,7 +981,7 @@
                 var pa=particles[a], pb=particles[b];
                 var dx=pa.x-pb.x, dy=pa.y-pb.y; var d=dx*dx+dy*dy;
                 if(d< (120*pr)*(120*pr)){
-                  ctx.strokeStyle = 'rgba(99,102,241,.08)';
+                                     ctx.strokeStyle = 'rgba(196,223,204,.08)';
                   ctx.lineWidth = pr;
                   ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke();
                 }

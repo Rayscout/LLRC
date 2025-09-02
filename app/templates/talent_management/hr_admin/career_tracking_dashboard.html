@@ -497,6 +497,16 @@
             transform: translateY(-1px);
         }
 
+        .btn-info {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-1px);
+        }
+
         .btn-outline {
             background: rgba(255, 255, 255, 0.1);
             color: var(--text-primary);
@@ -1009,6 +1019,9 @@
             <button class="btn btn-success" onclick="exportReport()">
                 <i class="fas fa-download"></i> 导出发展报告
             </button>
+            <button class="btn btn-info" onclick="exportCareerPathData()">
+                <i class="fas fa-file-alt"></i> 导出职业发展路径
+            </button>
             <button class="btn btn-primary" onclick="refreshData()">
                 <i class="fas fa-sync-alt"></i> 刷新数据
             </button>
@@ -1340,6 +1353,79 @@
         function refreshData() {
             alert('正在刷新数据...');
             location.reload();
+        }
+
+        // 导出职业发展路径功能
+        async function exportCareerPathData() {
+            try {
+                console.log('开始导出职业发展路径数据...');
+                
+                // 显示加载状态
+                const exportBtn = event.target.closest('button');
+                if (exportBtn) {
+                    const originalText = exportBtn.innerHTML;
+                    exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 导出中...';
+                    exportBtn.disabled = true;
+                    
+                    // 恢复按钮状态
+                    setTimeout(() => {
+                        exportBtn.innerHTML = originalText;
+                        exportBtn.disabled = false;
+                    }, 5000);
+                }
+                
+                // 调用高管职业发展路径导出接口
+                const response = await fetch('{{ url_for("talent_management.hr_admin.export_executive_career_path") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                console.log('响应状态:', response.status);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    
+                    // 创建下载链接
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `executive_career_path_report_${new Date().toISOString().slice(0,10)}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    // 显示成功通知
+                    showNotification('职业发展路径报告导出成功！', 'success');
+                } else {
+                    const errorText = await response.text();
+                    console.error('错误响应:', errorText);
+                    throw new Error(`导出失败: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('导出错误:', error);
+                
+                // 显示详细错误信息
+                let errorMessage = '导出失败，请重试。';
+                if (error.message.includes('502')) {
+                    errorMessage = '服务器暂时不可用，请稍后重试。错误信息: ' + error.message;
+                } else if (error.message.includes('500')) {
+                    errorMessage = '服务器内部错误，请联系管理员。错误信息: ' + error.message;
+                } else if (error.message.includes('404')) {
+                    errorMessage = '导出接口不存在，请联系管理员。错误信息: ' + error.message;
+                } else if (error.message.includes('403')) {
+                    errorMessage = '权限不足，请检查登录状态。错误信息: ' + error.message;
+                } else if (error.message.includes('401')) {
+                    errorMessage = '请先登录系统。错误信息: ' + error.message;
+                } else {
+                    errorMessage = '导出失败，请重试。错误信息: ' + error.message;
+                }
+                
+                showNotification(errorMessage, 'error');
+            }
         }
 
         // 切换视图功能
