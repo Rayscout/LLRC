@@ -377,7 +377,7 @@
                     预览简历
                 </a>
             {% endif %}
-            <a href="{{ url_for('smartrecruit.hr.candidates.view_candidates', job_id=applied_jobs[0].job.id) if applied_jobs else '#' }}" 
+            <a href="{{ url_for('smartrecruit.hr.dashboard.candidates_list') }}" 
                class="btn-resume btn-back">
                 <i class="uil uil-arrow-left"></i>
                 返回列表

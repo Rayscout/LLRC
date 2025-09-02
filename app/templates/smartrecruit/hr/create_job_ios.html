@@ -7,19 +7,120 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
-        .ios-create-hero { background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%); }
-        .ios-form-section { background: var(--ios-bg-secondary); }
-        .ios-preview-section { background: var(--ios-bg-tertiary); }
+        /* 与HR仪表盘保持一致的背景样式 */
+        .ios-create-hero { 
+            background: radial-gradient(1200px 420px at 20% -10%, #dbece0 0%, #cfe5d6 40%, #ffffff 100%); 
+            position: relative; 
+            overflow: hidden;
+        }
+        .ios-create-hero:before {
+            content: "";
+            position: absolute;
+            inset: -20% -10% auto -10%;
+            height: 320px;
+            background: conic-gradient(from 180deg, rgba(196,223,204,.18), rgba(207,229,214,.14), rgba(184,216,193,.12), rgba(196,223,204,.18));
+            filter: blur(40px);
+            animation: spinSlow 22s linear infinite;
+            pointer-events: none;
+        }
+        .ios-create-hero:after {
+            content: "";
+            position: absolute;
+            right: -160px;
+            top: -120px;
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(closest-side, rgba(196,223,204,.25), rgba(196,223,204,0));
+            filter: blur(10px);
+            transform: rotate(15deg);
+            animation: floatY 12s ease-in-out infinite;
+            pointer-events: none;
+        }
         
-        .ios-form-group { margin-bottom: var(--ios-spacing-xl); }
-        .ios-form-label { display: block; font-size: 1rem; font-weight: 500; color: var(--ios-text-primary); margin-bottom: var(--ios-spacing-sm); }
+        .ios-form-section { 
+            background: var(--ios-bg-secondary); 
+            position: relative; 
+            overflow: hidden;
+        }
+        .ios-form-section:before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(196,223,204,.06), rgba(207,229,214,.06));
+            opacity: .6;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+        }
+        
+        .ios-preview-section { 
+            background: var(--ios-bg-tertiary); 
+            position: relative;
+        }
+        .ios-preview-section:before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(1000px 380px at 85% -20%, rgba(196,223,204,.10), transparent 60%), 
+                        radial-gradient(800px 320px at 10% 120%, rgba(184,216,193,.10), transparent 55%);
+        }
+        
+        /* 大幅减少section之间的间距 */
+        .ios-section {
+            padding-top: var(--ios-spacing-md) !important;
+            padding-bottom: var(--ios-spacing-md) !important;
+            min-height: auto !important;
+        }
+        
+        /* 进一步减少特定section的间距 */
+        .ios-create-hero {
+            padding-bottom: var(--ios-spacing-sm) !important;
+        }
+        
+        .ios-form-section {
+            padding-top: var(--ios-spacing-sm) !important;
+            padding-bottom: var(--ios-spacing-sm) !important;
+        }
+        
+        .ios-preview-section {
+            padding-top: var(--ios-spacing-sm) !important;
+            padding-bottom: var(--ios-spacing-sm) !important;
+        }
+        
+        /* 减少容器内部的间距 */
+        .ios-container {
+            padding-top: var(--ios-spacing-sm) !important;
+            padding-bottom: var(--ios-spacing-sm) !important;
+        }
+        
+        /* 减少标题和副标题的间距 */
+        .ios-title {
+            margin-bottom: var(--ios-spacing-sm) !important;
+        }
+        
+        .ios-subtitle {
+            margin-bottom: var(--ios-spacing-md) !important;
+        }
+        
+        /* 减少卡片间距 */
+        .ios-card {
+            margin-bottom: var(--ios-spacing-md) !important;
+        }
+        
+        /* 减少网格间距 */
+        .ios-grid {
+            gap: var(--ios-spacing-md) !important;
+            margin: var(--ios-spacing-md) 0 !important;
+        }
+        
+        .ios-form-group { margin-bottom: var(--ios-spacing-md); }
+        .ios-form-label { display: block; font-size: 1rem; font-weight: 500; color: var(--ios-text-primary); margin-bottom: var(--ios-spacing-xs); }
         .ios-form-hint { font-size: 0.875rem; color: var(--ios-text-tertiary); margin-top: var(--ios-spacing-xs); }
         
         .ios-form-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: var(--ios-spacing-lg);
-            margin-bottom: var(--ios-spacing-lg);
+            gap: var(--ios-spacing-md);
+            margin-bottom: var(--ios-spacing-md);
         }
         
         .ios-textarea {
@@ -85,7 +186,7 @@
         .ios-preview-meta {
             display: flex;
             gap: var(--ios-spacing-md);
-            margin-bottom: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-md);
             flex-wrap: wrap;
         }
         
@@ -100,19 +201,19 @@
         .ios-preview-description {
             color: var(--ios-text-secondary);
             line-height: 1.6;
-            margin-bottom: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-sm);
         }
         
         .ios-preview-requirements {
             background: var(--ios-bg-tertiary);
-            padding: var(--ios-spacing-lg);
+            padding: var(--ios-spacing-md);
             border-radius: var(--ios-radius-medium);
-            margin-bottom: var(--ios-spacing-lg);
+            margin-bottom: var(--ios-spacing-sm);
         }
         
         .ios-preview-requirements h4 {
             color: var(--ios-text-primary);
-            margin-bottom: var(--ios-spacing-md);
+            margin-bottom: var(--ios-spacing-sm);
         }
         
         .ios-preview-requirements ul {
@@ -136,41 +237,41 @@
         }
         /* cards for drafts highlight */
         .draft-card { position: relative; }
-        .border-highlight { border: 2px solid #007aff !important; }
+        .border-highlight { border: 2px solid #c4dfcc !important; }
         .border-normal { border: 2px solid rgba(255,255,255,0.2) !important; }
         
         .ios-form-actions {
             display: flex;
             gap: var(--ios-spacing-md);
             justify-content: center;
-            margin-top: var(--ios-spacing-xl);
+            margin-top: var(--ios-spacing-md);
             flex-wrap: wrap;
         }
         
         .ios-save-draft {
-            background: transparent;
-            color: var(--ios-text-secondary);
-            border: 1px solid var(--ios-border-primary);
+            background: #FFE4B5; /* 浅黄色 */
+            color: #8B4513;
+            border: 1px solid #DAA520;
         }
         
         .ios-save-draft:hover {
-            background: var(--ios-bg-tertiary);
-            color: var(--ios-text-primary);
+            background: #FFD700;
+            color: #654321;
         }
         
         .ios-publish-job {
-            background: var(--ios-green);
+            background: #20B2AA; /* 青/浅蓝色 */
             color: white;
         }
         
         .ios-publish-job:hover {
-            background: #2db84d;
+            background: #40E0D0;
         }
         
         .ios-form-tabs {
             display: flex;
             gap: var(--ios-spacing-sm);
-            margin-bottom: var(--ios-spacing-xl);
+            margin-bottom: var(--ios-spacing-md);
             border-bottom: 1px solid var(--ios-border-secondary);
         }
         
@@ -208,6 +309,16 @@
             transform: none !important;
             animation: none !important;
             transition: none !important;
+        }
+        
+        /* 与HR仪表盘相同的动画关键帧 */
+        @keyframes spinSlow {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes floatY {
+            0%, 100% { transform: translateY(0) rotate(15deg); }
+            50% { transform: translateY(16px) rotate(15deg); }
         }
     </style>
 </head>
@@ -253,18 +364,7 @@
                         <span class="ios-nav-text">面试</span>
                     </a>
                 </li>
-                <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.reports' else '' }}">
-                        <i class="ios-nav-icon uil uil-chart-pie"></i>
-                        <span class="ios-nav-text">报表</span>
-                    </a>
-                </li>
-                <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.insights' else '' }}">
-                        <i class="ios-nav-icon uil uil-lightbulb"></i>
-                        <span class="ios-nav-text">AI洞察</span>
-                    </a>
-                </li>
+                <!-- 已移除：报表、AI洞察导航项 -->
             </ul>
             
             <div class="ios-nav-actions">
@@ -274,7 +374,6 @@
                 </div>
                 
                 <div class="ios-nav-divider"></div>
-                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
                 
                 
                 <button class="ios-nav-button" data-action="profile">
@@ -417,12 +516,12 @@
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px;">
                             <div style="font-weight:600;">暂存内容</div>
                             <div style="display:flex; gap:8px;">
-                                <button type="button" id="copyDraftBtn" class="ios-button" style="padding:6px 10px;">复制</button>
-                                <button type="button" id="aiPrintBtn" class="ios-button" style="padding:6px 14px; background:#5856d6; color:#fff; border-radius:10px; display:flex; align-items:center; gap:6px;">
+                                <button type="button" id="copyDraftBtn" class="ios-button" style="padding:6px 10px; background:#98FB98; color:#2F4F2F; border:1px solid #90EE90;">复制</button>
+                                <button type="button" id="aiPrintBtn" class="ios-button" style="padding:6px 14px; background:#4169E1; color:#fff !important; border-radius:10px; display:flex; align-items:center; gap:6px;">
                                     <i class="uil uil-terminal"></i>
                                     发送到AI并打印
                                 </button>
-                                <button type="button" id="uploadToFormBtn" class="ios-button" style="padding:6px 12px; background:#34c759; color:#fff; border-radius:10px; display:flex; align-items:center; gap:6px;">
+                                <button type="button" id="uploadToFormBtn" class="ios-button" style="padding:6px 12px; background:#FFE4B5; color:#8B4513; border:1px solid #DAA520; border-radius:10px; display:flex; align-items:center; gap:6px;">
                                     <i class="uil uil-arrow-to-right"></i>
                                     一键上传到职位信息
                                 </button>
