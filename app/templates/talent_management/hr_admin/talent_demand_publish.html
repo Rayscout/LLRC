@@ -9,8 +9,8 @@
     <style>
         :root {
             --bg-primary: #F2F2F7;
-            --bg-secondary: rgba(255, 255, 255, 0.8);
-            --bg-card: rgba(255, 255, 255, 0.9);
+            --bg-secondary: rgba(255, 255, 255, 0.6);
+            --bg-card: rgba(255, 255, 255, 0.6);
             --text-primary: #1D1D1F;
             --text-secondary: #86868B;
             --text-tertiary: #C7C7CC;
@@ -29,8 +29,8 @@
 
         [data-theme="dark"] {
             --bg-primary: #000000;
-            --bg-secondary: rgba(44, 44, 46, 0.8);
-            --bg-card: rgba(44, 44, 46, 0.9);
+            --bg-secondary: rgba(44, 44, 46, 0.6);
+            --bg-card: rgba(44, 44, 46, 0.6);
             --text-primary: #FFFFFF;
             --text-secondary: #EBEBF5;
             --text-tertiary: #8E8E93;
@@ -41,6 +41,25 @@
             --accent-purple: #BF5AF2;
             --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
             --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* 深色主题下的卡片透明度 */
+        [data-theme="dark"] .header,
+        [data-theme="dark"] .feature-card,
+        [data-theme="dark"] .form-container {
+            background: rgba(44, 44, 46, 0.6);
+        }
+
+        /* 透明度为40%的图层 - 放在背景的上一层 */
+        .transparency-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            z-index: 0;
+            pointer-events: none;
         }
 
         * {
@@ -61,17 +80,53 @@
             min-height: 100vh;
         }
 
-        /* Animated Light Blue Background */
+        /* Animated Light Blue Background - 与高管仪表盘一致 */
         .executive-parallax-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(-45deg, #87CEEB, #B0E0E6, #ADD8E6, #E0F6FF, #F0F8FF);
+            background: linear-gradient(135deg, #E6F3FF, #F0F8FF, #E8F4FD, #F5F9FF, #E0F0FF);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
             z-index: -1;
+        }
+
+        /* 动态蓝色区域 */
+        .executive-parallax-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(135, 206, 235, 0.4) 0%, rgba(135, 206, 235, 0.2) 30%, transparent 70%),
+                radial-gradient(circle at 80% 70%, rgba(173, 216, 230, 0.5) 0%, rgba(173, 216, 230, 0.25) 35%, transparent 75%),
+                radial-gradient(circle at 40% 80%, rgba(176, 224, 230, 0.4) 0%, rgba(176, 224, 230, 0.2) 30%, transparent 70%),
+                radial-gradient(circle at 90% 20%, rgba(135, 206, 235, 0.35) 0%, rgba(135, 206, 235, 0.15) 25%, transparent 65%);
+            animation: bluePulse 8s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes bluePulse {
+            0%, 100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            25% {
+                opacity: 0.5;
+                transform: scale(1.05);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(1.02);
+            }
+            75% {
+                opacity: 0.7;
+                transform: scale(1.08);
+            }
         }
 
         @keyframes gradientShift {
@@ -87,27 +142,93 @@
         }
 
         /* Floating Background Elements */
-        .executive-parallax-bg::before,
-        .executive-parallax-bg::after {
+        .executive-parallax-bg::before {
             content: '';
             position: absolute;
             width: 300px;
             height: 300px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.2) 0%, rgba(173, 216, 230, 0.1) 50%, transparent 100%);
             animation: float 20s ease-in-out infinite;
-        }
-
-        .executive-parallax-bg::before {
             top: 10%;
             left: 10%;
             animation-delay: 0s;
         }
 
-        .executive-parallax-bg::after {
-            bottom: 10%;
-            right: 10%;
-            animation-delay: 10s;
+        /* 额外的动态蓝色元素 */
+        .executive-parallax-bg .blue-orb-1 {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(100, 149, 237, 0.3) 0%, rgba(70, 130, 180, 0.1) 50%, transparent 100%);
+            animation: float 15s ease-in-out infinite;
+            top: 60%;
+            right: 15%;
+            animation-delay: 5s;
+            z-index: -1;
+        }
+
+        .executive-parallax-bg .blue-orb-2 {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(30, 144, 255, 0.25) 0%, rgba(0, 191, 255, 0.1) 50%, transparent 100%);
+            animation: float 18s ease-in-out infinite;
+            top: 20%;
+            right: 60%;
+            animation-delay: 8s;
+            z-index: -1;
+        }
+
+        .executive-parallax-bg .blue-orb-3 {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(135, 206, 250, 0.2) 0%, rgba(173, 216, 230, 0.1) 50%, transparent 100%);
+            animation: float 22s ease-in-out infinite;
+            bottom: 20%;
+            left: 30%;
+            animation-delay: 12s;
+            z-index: -1;
+        }
+
+        /* 动态蓝色波浪效果 */
+        .executive-parallax-bg .blue-wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, 
+                rgba(135, 206, 235, 0.2) 0%, 
+                rgba(173, 216, 230, 0.3) 25%, 
+                rgba(100, 149, 237, 0.2) 50%, 
+                rgba(30, 144, 255, 0.3) 75%, 
+                rgba(135, 206, 235, 0.2) 100%);
+            animation: waveMove 10s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes waveMove {
+            0%, 100% {
+                transform: translateX(0) scaleY(1);
+                opacity: 0.4;
+            }
+            25% {
+                transform: translateX(-20px) scaleY(1.1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateX(10px) scaleY(0.9);
+                opacity: 0.5;
+            }
+            75% {
+                transform: translateX(-15px) scaleY(1.05);
+                opacity: 0.7;
+            }
         }
 
         @keyframes float {
@@ -141,40 +262,55 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1600px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: var(--accent-blue);
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
             text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition-fast);
-            animation: slideInLeft 0.6s ease-out;
-            animation-delay: 0.1s;
-            animation-fill-mode: both;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 1000;
         }
 
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
         }
 
-        .back-link:hover {
-            transform: translateX(-5px);
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #17a2b8;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .back-link i {
-            margin-right: 8px;
+        .back-btn:hover {
+            background: #138496;
+            transform: translateY(-2px);
         }
 
         .header {
@@ -335,36 +471,36 @@
         }
 
         .btn {
-            padding: 16px 32px;
+            padding: 12px 24px;
             border-radius: var(--border-radius);
-            font-size: 1.1em;
+            font-size: 1em;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition-fast);
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             border: none;
             font-family: inherit;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            background: var(--accent-blue);
             color: white;
             box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            background: var(--accent-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
         }
 
         .btn-secondary {
             background: var(--bg-secondary);
             color: var(--text-primary);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
         }
@@ -377,8 +513,8 @@
 
         .feature-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
             margin-bottom: 30px;
             animation: slideInUp 0.8s ease-out;
             animation-delay: 0.7s;
@@ -390,11 +526,12 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: var(--border-radius);
-            padding: 25px;
+            padding: 35px;
             box-shadow: var(--shadow-light);
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: var(--transition-fast);
             text-align: center;
+            min-height: 220px;
         }
 
         .feature-card:hover {
@@ -509,13 +646,20 @@
     </style>
 </head>
 <body>
-    <!-- 视差背景 -->
-    <div class="executive-parallax-bg"></div>
+    <!-- 视差背景 - 与高管仪表盘一致 -->
+    <div class="executive-parallax-bg">
+        <div class="blue-orb-1"></div>
+        <div class="blue-orb-2"></div>
+        <div class="blue-orb-3"></div>
+        <div class="blue-wave"></div>
+    </div>
+    
+    <!-- 透明度为40%的图层 -->
+    <div class="transparency-layer"></div>
     
     <div class="container">
-        <a href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}" class="back-link">
-            <i class="fas fa-arrow-left"></i> 返回高管首页
-        </a>
+        <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="back-btn">←</a>
+        <a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="logout-btn">退出登录</a>
 
         <div class="header">
             <h1>
@@ -595,7 +739,7 @@
                         <span class="btn-text">立即发布需求</span>
                         <div class="loading-spinner"></div>
                     </button>
-                    <a href="{{ url_for('talent_management.hr_admin.executive_dashboard') }}" class="btn btn-secondary">
+                    <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i>
                         取消返回
                     </a>

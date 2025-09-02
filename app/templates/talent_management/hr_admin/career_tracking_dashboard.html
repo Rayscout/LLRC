@@ -12,6 +12,23 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
+            --bg-primary: #F2F2F7;
+            --bg-secondary: rgba(255, 255, 255, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --text-tertiary: #C7C7CC;
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-orange: #FF9500;
+            --accent-red: #FF3B30;
+            --accent-purple: #AF52DE;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius: 16px;
+            --border-radius-large: 24px;
+            --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            --transition-fast: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
             --primary-color: #667eea;
             --secondary-color: #764ba2;
             --success-color: #28a745;
@@ -20,9 +37,23 @@
             --info-color: #17a2b8;
             --light-color: #f8f9fa;
             --dark-color: #343a40;
-            --border-radius: 12px;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #000000;
+            --bg-secondary: rgba(44, 44, 46, 0.8);
+            --bg-card: rgba(44, 44, 46, 0.9);
+            --text-primary: #FFFFFF;
+            --text-secondary: #EBEBF5;
+            --text-tertiary: #8E8E93;
+            --accent-blue: #0A84FF;
+            --accent-green: #30D158;
+            --accent-orange: #FF9F0A;
+            --accent-red: #FF453A;
+            --accent-purple: #BF5AF2;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
 
         * {
@@ -33,24 +64,74 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: var(--bg-primary);
             min-height: 100vh;
-            color: #333;
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            animation: fadeIn 0.6s ease-out;
             position: relative;
             overflow-x: hidden;
         }
 
-        /* Animated Light Blue Background */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animated Light Blue Background - 与高管仪表盘一致 */
         .executive-parallax-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(-45deg, #87CEEB, #B0E0E6, #ADD8E6, #E0F6FF, #F0F8FF);
+            background: linear-gradient(135deg, #E6F3FF, #F0F8FF, #E8F4FD, #F5F9FF, #E0F0FF);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
             z-index: -1;
+        }
+
+        /* 动态蓝色区域 */
+        .executive-parallax-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(135, 206, 235, 0.4) 0%, rgba(135, 206, 235, 0.2) 30%, transparent 70%),
+                radial-gradient(circle at 80% 70%, rgba(173, 216, 230, 0.5) 0%, rgba(173, 216, 230, 0.25) 35%, transparent 75%),
+                radial-gradient(circle at 40% 80%, rgba(176, 224, 230, 0.4) 0%, rgba(176, 224, 230, 0.2) 30%, transparent 70%),
+                radial-gradient(circle at 90% 20%, rgba(135, 206, 235, 0.35) 0%, rgba(135, 206, 235, 0.15) 25%, transparent 65%);
+            animation: bluePulse 8s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes bluePulse {
+            0%, 100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            25% {
+                opacity: 0.5;
+                transform: scale(1.05);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(1.02);
+            }
+            75% {
+                opacity: 0.7;
+                transform: scale(1.08);
+            }
         }
 
         @keyframes gradientShift {
@@ -66,27 +147,56 @@
         }
 
         /* Floating Background Elements */
-        .executive-parallax-bg::before,
-        .executive-parallax-bg::after {
+        .executive-parallax-bg::before {
             content: '';
             position: absolute;
             width: 300px;
             height: 300px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.2) 0%, rgba(173, 216, 230, 0.1) 50%, transparent 100%);
             animation: float 20s ease-in-out infinite;
-        }
-
-        .executive-parallax-bg::before {
             top: 10%;
             left: 10%;
             animation-delay: 0s;
         }
 
-        .executive-parallax-bg::after {
-            bottom: 10%;
-            right: 10%;
-            animation-delay: 10s;
+        /* 额外的动态蓝色元素 */
+        .executive-parallax-bg .blue-orb-1 {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(100, 149, 237, 0.3) 0%, rgba(70, 130, 180, 0.1) 50%, transparent 100%);
+            animation: float 15s ease-in-out infinite;
+            top: 60%;
+            right: 15%;
+            animation-delay: 5s;
+            z-index: -1;
+        }
+
+        .executive-parallax-bg .blue-orb-2 {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(30, 144, 255, 0.25) 0%, rgba(0, 191, 255, 0.1) 50%, transparent 100%);
+            animation: float 18s ease-in-out infinite;
+            top: 20%;
+            right: 60%;
+            animation-delay: 8s;
+            z-index: -1;
+        }
+
+        /* 透明度为40%的图层 - 放在背景的上一层 */
+        .transparency-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            z-index: 0;
+            pointer-events: none;
         }
 
         @keyframes float {
@@ -116,44 +226,77 @@
         }
 
         .dashboard-header {
-            background: white;
-            color: black;
-            padding: 40px;
-            border-radius: var(--border-radius);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
             margin-bottom: 30px;
-            text-align: left;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInDown 0.8s ease-out;
             position: relative;
         }
 
 
 
         .dashboard-header h1 {
-            margin: 0 0 15px 0;
             font-size: 3.2em;
             font-weight: 800;
-            color: #667eea;
+            margin-bottom: 15px;
+            color: #1E40AF;
+            text-shadow: 0 4px 8px rgba(30, 64, 175, 0.3);
+            animation: titleBlink 2s ease-in-out infinite alternate, fadeInUp 1s ease-out forwards;
+            transform: translateY(30px);
+            opacity: 0;
             letter-spacing: -0.02em;
             position: relative;
-            text-shadow: 
-                2px 2px 0px #4c63d2,
-                4px 4px 0px #3b4f9e,
-                6px 6px 0px #2a3b6a,
-                0 0 10px rgba(102, 126, 234, 0.5),
-                0 0 20px rgba(102, 126, 234, 0.3);
         }
 
-        .dashboard-header h1 i {
+        /* 职业发展图标 */
+        .dashboard-header h1 i.fas.fa-chart-line {
+            color: #1E40AF;
             margin-right: 15px;
-            color: #667eea;
         }
 
         .dashboard-header p {
-            margin: 0;
             font-size: 1.4em;
             font-weight: 600;
             color: #34C759;
-            font-style: italic;
+            text-shadow: 0 2px 4px rgba(52, 199, 89, 0.3);
+            font-style: normal;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        @keyframes titleBlink {
+            0% {
+                opacity: 1;
+                text-shadow: 0 2px 4px rgba(30, 64, 175, 0.3);
+            }
+            100% {
+                opacity: 0.7;
+                text-shadow: 0 2px 8px rgba(30, 64, 175, 0.6);
+            }
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
 
@@ -168,7 +311,7 @@
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 16px;
@@ -229,7 +372,7 @@
         }
 
         .filter-section {
-            background: white;
+            background: rgba(255, 255, 255, 0.6);
             padding: 25px;
             border-radius: var(--border-radius);
             margin-bottom: 30px;
@@ -277,50 +420,57 @@
             flex-wrap: wrap;
         }
 
+        /* 按钮样式 - 使用人才流失预警系统配色 */
         .btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
             padding: 12px 24px;
-            border-radius: 16px;
-            text-decoration: none;
+            border-radius: var(--border-radius-large);
             font-size: 1em;
             font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-            border: none;
             cursor: pointer;
+            transition: var(--transition-fast);
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
         }
 
+        .btn:hover {
+            background: #0056CC;
+            transform: translateY(-1px);
+        }
+
         .btn-primary {
-            background: #007AFF;
+            background: var(--accent-blue);
             color: white;
         }
 
         .btn-primary:hover {
-            background: #AF52DE;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+            background: #0056CC;
+            transform: translateY(-1px);
         }
 
         .btn-success {
-            background: #007AFF;
+            background: var(--accent-blue);
             color: white;
         }
 
         .btn-success:hover {
-            background: #AF52DE;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
+            background: #0056CC;
+            transform: translateY(-1px);
         }
 
         .btn-outline {
-            background: rgba(255, 255, 255, 0.8);
-            color: #1D1D1F;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
         }
 
         .main-grid {
@@ -332,7 +482,7 @@
         }
 
         .chart-section {
-            background: white;
+            background: rgba(255, 255, 255, 0.6);
             padding: 30px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
@@ -371,7 +521,7 @@
         }
 
         .info-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.6);
             padding: 25px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
@@ -428,7 +578,7 @@
         }
 
         .member-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.6);
             padding: 25px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
@@ -619,7 +769,7 @@
         }
 
         .lagging-alert {
-            background: #fff3cd;
+            background: rgba(255, 243, 205, 0.6);
             border: 1px solid #ffeaa7;
             color: #856404;
             padding: 15px;
@@ -740,7 +890,13 @@
 </head>
 <body>
     <!-- 视差背景 -->
-    <div class="executive-parallax-bg"></div>
+    <div class="executive-parallax-bg">
+        <div class="blue-orb-1"></div>
+        <div class="blue-orb-2"></div>
+    </div>
+    
+    <!-- 透明度为40%的图层 -->
+    <div class="transparency-layer"></div>
     
     <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="back-btn">←</a>
     <a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="logout-btn">退出登录</a>

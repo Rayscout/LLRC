@@ -23,6 +23,21 @@
             --border-radius: 12px;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.3s ease;
+            --bg-primary: #F2F2F7;
+            --bg-secondary: rgba(255, 255, 255, 0.8);
+            --bg-card: rgba(255, 255, 255, 0.6);
+            --text-primary: #1D1D1F;
+            --text-secondary: #86868B;
+            --text-tertiary: #C7C7CC;
+            --accent-blue: #007AFF;
+            --accent-green: #34C759;
+            --accent-orange: #FF9500;
+            --accent-red: #FF3B30;
+            --accent-purple: #AF52DE;
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius-large: 24px;
+            --transition-fast: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         * {
@@ -33,24 +48,24 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: transparent;
             min-height: 100vh;
             color: #333;
             position: relative;
             overflow-x: hidden;
         }
 
-        /* Animated Light Blue Background */
+        /* Animated Light Blue Background - 与团队管理界面一致 */
         .executive-parallax-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(-45deg, #87CEEB, #B0E0E6, #ADD8E6, #E0F6FF, #F0F8FF);
+            background: linear-gradient(135deg, #E6F3FF, #F0F8FF, #E8F4FD, #F5F9FF, #E0F0FF);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
-            z-index: -1;
+            z-index: -2;
         }
 
         @keyframes gradientShift {
@@ -65,28 +80,54 @@
             }
         }
 
-        /* Floating Background Elements */
-        .executive-parallax-bg::before,
+        /* 动态蓝色区域 */
         .executive-parallax-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(135, 206, 235, 0.4) 0%, rgba(135, 206, 235, 0.2) 30%, transparent 70%),
+                radial-gradient(circle at 80% 70%, rgba(173, 216, 230, 0.5) 0%, rgba(173, 216, 230, 0.25) 35%, transparent 75%),
+                radial-gradient(circle at 40% 80%, rgba(176, 224, 230, 0.4) 0%, rgba(176, 224, 230, 0.2) 30%, transparent 70%),
+                radial-gradient(circle at 90% 20%, rgba(135, 206, 235, 0.35) 0%, rgba(135, 206, 235, 0.15) 25%, transparent 65%);
+            animation: bluePulse 8s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes bluePulse {
+            0%, 100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            25% {
+                opacity: 0.5;
+                transform: scale(1.05);
+            }
+            50% {
+                opacity: 0.4;
+                transform: scale(1.02);
+            }
+            75% {
+                opacity: 0.7;
+                transform: scale(1.08);
+            }
+        }
+
+        /* Floating Background Elements */
+        .executive-parallax-bg::before {
             content: '';
             position: absolute;
             width: 300px;
             height: 300px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
+            background: radial-gradient(circle, rgba(135, 206, 235, 0.2) 0%, rgba(173, 216, 230, 0.1) 50%, transparent 100%);
             animation: float 20s ease-in-out infinite;
-        }
-
-        .executive-parallax-bg::before {
             top: 10%;
             left: 10%;
             animation-delay: 0s;
-        }
-
-        .executive-parallax-bg::after {
-            bottom: 10%;
-            right: 10%;
-            animation-delay: 10s;
         }
 
         @keyframes float {
@@ -108,54 +149,107 @@
             }
         }
 
+        /* 透明度为40%的图层 - 放在背景的上一层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.4);
+            z-index: -1;
+            pointer-events: none;
+        }
+
         .dashboard-container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 20px;
             width: 100%;
+            position: relative;
+            z-index: 1;
         }
 
-        .dashboard-header {
-            background: white;
-            color: black;
-            padding: 40px;
-            border-radius: var(--border-radius);
+        .header {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-large);
+            padding: 30px;
             margin-bottom: 30px;
-            text-align: left;
-            box-shadow: var(--shadow);
-            position: relative;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInDown 0.8s ease-out;
         }
 
-        .dashboard-header > * {
-            position: relative;
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .dashboard-header h1 {
-            margin: 0 0 15px 0;
+        .header h1 {
             font-size: 3.2em;
             font-weight: 800;
-            color: #FFD700;
+            margin-bottom: 15px;
+            color: #DC2626;
+            text-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
+            animation: titleBlink 2s ease-in-out infinite alternate, fadeInUp 1s ease-out forwards;
+            transform: translateY(30px);
+            opacity: 0;
             letter-spacing: -0.02em;
-            text-shadow: 
-                2px 2px 0px #B8860B,
-                4px 4px 0px #8B6914,
-                6px 6px 0px #654321,
-                0 0 10px rgba(255, 215, 0, 0.5),
-                0 0 20px rgba(255, 215, 0, 0.3);
+            position: relative;
         }
 
         /* 标题图标样式 */
-        .dashboard-header h1 i.fas.fa-coins {
-            color: #FFD700;
+        .header h1 i.fas.fa-coins {
+            color: #DC2626;
             margin-right: 15px;
         }
 
-        .dashboard-header p {
-            margin: 0;
+        .header p {
             font-size: 1.4em;
             font-weight: 600;
             color: #34C759;
-            font-style: italic;
+            text-shadow: 0 2px 4px rgba(52, 199, 89, 0.3);
+            font-style: normal;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        @keyframes titleBlink {
+            0% {
+                opacity: 1;
+                text-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+            }
+            100% {
+                opacity: 0.7;
+                text-shadow: 0 2px 8px rgba(220, 38, 38, 0.6);
+            }
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
 
@@ -174,14 +268,14 @@
         }
 
         .stat-card {
-            background: rgba(255, 255, 255, 0.9);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-radius: 16px;
+            border-radius: var(--border-radius);
             padding: 25px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-light);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: var(--transition-fast);
             text-align: center;
             animation: slideInUp 0.6s ease-out;
             animation-fill-mode: both;
@@ -195,7 +289,7 @@
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            box-shadow: var(--shadow-medium);
         }
 
         @keyframes slideInUp {
@@ -238,8 +332,10 @@
         .action-bar {
             display: flex;
             gap: 15px;
-            justify-content: center;
-            margin: 30px 0;
+            margin-bottom: 30px;
+            animation: slideInUp 0.8s ease-out;
+            animation-delay: 0.7s;
+            animation-fill-mode: both;
         }
 
         .action-bar .btn {
@@ -282,20 +378,15 @@
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
-        .action-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
+
 
         .btn {
             padding: 12px 24px;
-            border-radius: 16px;
+            border-radius: var(--border-radius);
             text-decoration: none;
             font-size: 1em;
             font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: var(--transition-fast);
             border: none;
             cursor: pointer;
             display: inline-flex;
@@ -304,35 +395,35 @@
         }
 
         .btn-primary {
-            background: #007AFF;
+            background: var(--accent-blue);
             color: white;
         }
 
         .btn-primary:hover {
-            background: #AF52DE;
+            background: var(--accent-purple);
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
         }
 
         .btn-success {
-            background: #007AFF;
+            background: var(--accent-blue);
             color: white;
         }
 
         .btn-success:hover {
-            background: #AF52DE;
+            background: var(--accent-purple);
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
         }
 
         .btn-outline {
-            background: rgba(255, 255, 255, 0.8);
-            color: #1D1D1F;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .btn-outline:hover {
-            background: rgba(255, 255, 255, 0.9);
+            background: var(--bg-card);
         }
 
         .main-grid {
@@ -344,7 +435,7 @@
         }
 
         .chart-section {
-            background: white;
+            background: var(--bg-card);
             padding: 30px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
@@ -383,7 +474,7 @@
         }
 
         .info-card {
-            background: white;
+            background: var(--bg-card);
             padding: 25px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
@@ -440,7 +531,7 @@
         }
 
         .position-card {
-            background: white;
+            background: var(--bg-card);
             padding: 25px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
@@ -605,18 +696,20 @@
     <!-- 视差背景 -->
     <div class="executive-parallax-bg"></div>
     
+    <!-- 透明度为40%的图层 -->
+    <div class="overlay-layer"></div>
+    
     <a href="{{ url_for('talent_management.executive_auth.executive_dashboard') }}" class="back-btn">←</a>
     <a href="{{ url_for('talent_management.executive_auth.executive_logout') }}" class="logout-btn">退出登录</a>
     
     <div class="dashboard-container">
         <!-- 仪表盘头部 -->
-        <div class="dashboard-header fade-in">
+        <div class="header">
             <h1>
                 <i class="fas fa-coins"></i>
                 薪酬分析仪表板
             </h1>
             <p>公司vs行业薪酬对比分析 - 越周 (校长)</p>
-            
         </div>
         
         <!-- 统计卡片 -->
