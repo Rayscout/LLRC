@@ -300,19 +300,13 @@
                         <span class="ios-nav-text">我的职位</span>
                     </a>
                 </li>
-                <!-- 面试导航已移除，请从候选人管理页面进入安排面试 -->
                 <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.reports' else '' }}">
-                        <i class="ios-nav-icon uil uil-chart-pie"></i>
-                        <span class="ios-nav-text">报表</span>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.interviews' else '' }}">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
                     </a>
                 </li>
-                <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.insights' else '' }}">
-                        <i class="ios-nav-icon uil uil-lightbulb"></i>
-                        <span class="ios-nav-text">AI洞察</span>
-                    </a>
-                </li>
+
             </ul>
             
             <div class="ios-nav-actions">
@@ -322,7 +316,6 @@
                 </div>
                 
                 <div class="ios-nav-divider"></div>
-                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
                 
                 
                 <button class="ios-nav-button" data-action="profile">
