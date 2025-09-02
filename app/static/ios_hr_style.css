@@ -3,8 +3,8 @@
 
 :root {
     /* iOS系统颜色 */
-    --ios-blue: #c4dfcc;
-    --ios-blue-dark: #acd2b7;
+    --ios-blue: #007AFF;
+    --ios-blue-dark: #0056CC;
     --ios-green: #34C759;
     --ios-orange: #FF9500;
     --ios-red: #FF3B30;
@@ -229,7 +229,7 @@ html { overflow: auto; }
 
 .ios-input:focus {
     border-color: var(--ios-blue);
-    box-shadow: 0 0 0 3px rgba(196, 223, 204, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
 .ios-input::placeholder {
@@ -418,7 +418,7 @@ html { overflow: auto; }
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(196, 223, 204, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(0, 122, 255, 0.1), transparent);
     transition: left var(--ios-transition-medium);
 }
 
@@ -429,13 +429,13 @@ html { overflow: auto; }
 .ios-nav-link:hover,
 .ios-nav-link.active {
     color: var(--ios-blue);
-    background: rgba(196, 223, 204, 0.08);
+    background: rgba(0, 122, 255, 0.08);
     transform: translateY(-1px);
 }
 
 .ios-nav-link.active {
-    background: rgba(196, 223, 204, 0.12);
-    box-shadow: 0 2px 8px rgba(196, 223, 204, 0.2);
+    background: rgba(0, 122, 255, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
 }
 
 .ios-nav-icon {
@@ -473,13 +473,13 @@ html { overflow: auto; }
     font-size: 0.9rem;
     cursor: pointer;
     transition: all var(--ios-transition-fast);
-    box-shadow: 0 2px 8px rgba(196, 223, 204, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
 .ios-nav-button:hover {
     background: var(--ios-blue-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(196, 223, 204, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
 }
 
 .ios-nav-button.secondary {
@@ -492,7 +492,7 @@ html { overflow: auto; }
 .ios-nav-button.secondary:hover {
     background: var(--ios-blue);
     color: white;
-    box-shadow: 0 2px 8px rgba(196, 223, 204, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
 /* 移动端导航菜单 */
@@ -760,7 +760,7 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
 }
 
 .ios-status.info {
-    background: rgba(196, 223, 204, 0.1);
+    background: rgba(0, 122, 255, 0.1);
     color: var(--ios-blue);
 }
 
@@ -792,7 +792,7 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
 }
 
 .ios-profile-menu-item:hover {
-    background: rgba(196, 223, 204, 0.08);
+    background: rgba(0, 122, 255, 0.08);
     color: var(--ios-blue);
 }
 
@@ -873,7 +873,7 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
     outline: none;
     border-color: var(--ios-blue);
     background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 0 0 3px rgba(196, 223, 204, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
 .ios-nav-search i {
@@ -968,7 +968,7 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
 .ios-guide-header i {
     font-size: 1.5rem;
     color: var(--ios-blue);
-    background: rgba(196, 223, 204, 0.1);
+    background: rgba(0, 122, 255, 0.1);
     padding: var(--ios-spacing-sm);
     border-radius: 50%;
 }
@@ -1298,7 +1298,7 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
 
 .ios-help-trigger:hover {
     color: var(--ios-blue);
-    background: rgba(196, 223, 204, 0.1);
+    background: rgba(0, 122, 255, 0.1);
 }
 
 .ios-help-popup {

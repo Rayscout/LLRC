@@ -26,46 +26,16 @@ def home():
     except Exception:
         user_skills = []
 
-    # 尝试优先使用持久化的简历分析；若简历发生变化则刷新
+    # 生成简历AI分析（轻量运行，失败忽略）
     resume_analysis = None
     try:
-        import json, hashlib
-        persisted = getattr(g.user, 'resume_analysis', None)
-        persisted_sig = getattr(g.user, 'resume_signature', None)
-        if persisted:
-            try:
-                resume_analysis = json.loads(persisted)
-            except Exception:
-                resume_analysis = None
-        # 检查简历是否有变化（或从未分析）
-        current_sig = None
         cv_text = ''
         if getattr(g.user, 'cv_data', None) and getattr(g.user, 'cv_file', None):
-            try:
-                cv_text = extract_text_from_resume(g.user.cv_data, g.user.cv_file) or ''
-            except Exception:
-                cv_text = ''
+            cv_text = extract_text_from_resume(g.user.cv_data, g.user.cv_file) or ''
         if cv_text:
-            current_sig = hashlib.sha1((cv_text or '').encode('utf-8')).hexdigest()
-        if cv_text and (not resume_analysis or (persisted_sig and current_sig and persisted_sig != current_sig)):
-            try:
-                ai_res = ai_analyze_resume_text(cv_text)
-            except Exception:
-                ai_res = None
-            if ai_res:
-                resume_analysis = ai_res
-                # 覆写持久化，避免每次登录重复计算
-                try:
-                    g.user.resume_analysis = json.dumps(ai_res, ensure_ascii=False)
-                    g.user.resume_signature = current_sig
-                    from app.models import db as _db
-                    from datetime import datetime as _dt
-                    g.user.resume_last_analyzed_at = _dt.utcnow()
-                    _db.session.commit()
-                except Exception:
-                    pass
+            resume_analysis = ai_analyze_resume_text(cv_text)
     except Exception:
-        resume_analysis = resume_analysis or None
+        resume_analysis = None
 
     # 使用可用的首页模板（带回退）
     try:

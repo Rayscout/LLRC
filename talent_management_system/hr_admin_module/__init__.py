@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, flash, redirect, url_for, jsonify
+from flask import Blueprint, render_template, session, flash, redirect, url_for
 from app.models import User
 
 # 创建HR管理主蓝图
@@ -99,53 +99,33 @@ def executive_dashboard():
                     'type': 'evaluation',
                     'title': f'任务评价: {evaluation.task_title}',
                     'time': evaluation.created_at,
-                    'description': f'评价 {employee_name}: {evaluation.comment[:50]}...'
+                    'description': f'评价 {employee_name}: {evaluation.total_score}分'
                 })
             
-            # 按时间排序活动
+            # 按时间排序
             activities.sort(key=lambda x: x['time'], reverse=True)
-            dashboard_stats['recent_activities'] = activities[:10]
+            dashboard_stats['recent_activities'] = activities[:10]  # 只显示最近10个活动
             
-            return render_template('talent_management/hr_admin/executive_dashboard.html',
-                                user=user,
-                                subordinates=subordinates,
-                                dashboard_stats=dashboard_stats)
-            
-        except Exception as e:
-            print(f"高管仪表板数据获取错误: {e}")
-            # 返回基本数据
-            return render_template('talent_management/hr_admin/executive_dashboard.html',
-                                user=user,
-                                subordinates=[],
-                                dashboard_stats={
-                                    'total_subordinates': 0,
-                                    'total_talent_demands': 0,
-                                    'total_feedback': 0,
-                                    'total_evaluations': 0,
-                                    'recent_activities': []
-                                })
-            
+            return render_template('talent_management/hr_admin/executive_dashboard.html', 
+                                 user=user, 
+                                 subordinates=subordinates,
+                                 dashboard_stats=dashboard_stats,
+                                 talent_demands=talent_demands,
+                                 received_feedback=received_feedback,
+                                 task_evaluations=task_evaluations)
+                                 
+        except Exception as data_error:
+            print(f"获取仪表板数据失败: {data_error}")
+            # 如果数据获取失败，返回基本页面
+            return render_template('talent_management/hr_admin/executive_dashboard.html', 
+                                 user=user, 
+                                 subordinates=[],
+                                 dashboard_stats={'total_subordinates': 0, 'total_talent_demands': 0, 'total_feedback': 0, 'total_evaluations': 0, 'recent_activities': []},
+                                 talent_demands=[],
+                                 received_feedback=[],
+                                 task_evaluations=[])
+                                 
     except Exception as e:
-        print(f"高管仪表板路由错误: {e}")
-        flash('系统错误，请稍后重试。', 'danger')
+        print(f"高管仪表板页面错误: {e}")
+        flash('页面加载失败，请重试', 'danger')
         return redirect(url_for('talent_management.executive_auth.executive_auth'))
-
-# 高管职业发展路径导出路由
-@hr_admin_bp.route('/export_executive_career_path', methods=['POST'])
-def export_executive_career_path():
-    """高管职业发展路径导出接口"""
-    try:
-        if 'user_id' not in session or session.get('user_type') != 'executive':
-            return jsonify({'error': '请先登录高管账户'}), 401
-        
-        user = User.query.get(session['user_id'])
-        if not user or user.user_type != 'executive':
-            return jsonify({'error': '权限不足'}), 403
-        
-        # 导入职业发展追踪模块的导出功能
-        from .career_tracking import export_career_report
-        return export_career_report()
-        
-    except Exception as e:
-        print(f"高管职业发展路径导出错误: {e}")
-        return jsonify({'error': f'导出失败: {str(e)}'}), 500

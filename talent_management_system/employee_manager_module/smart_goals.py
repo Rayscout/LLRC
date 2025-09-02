@@ -162,7 +162,7 @@ def goals_dashboard():
 
     except Exception as e:
         flash(f'加载目标页面时发生错误: {str(e)}', 'danger')
-        return redirect(url_for('talent_management.employee_auth.employee_dashboard'))
+        return redirect(url_for('talent_management.employee_management.employee_dashboard'))
 
 @smart_goals_bp.route('/create', methods=['GET', 'POST'])
 def create_goal():
@@ -231,7 +231,7 @@ def create_goal():
     return render_template('talent_management/employee_management/create_goal.html')
 
 @smart_goals_bp.route('/<int:goal_id>/update_progress', methods=['POST'])
-def update_progress():
+def update_progress(goal_id):
     """更新目标进度"""
     try:
         if 'user_id' not in session:
@@ -548,3 +548,116 @@ def calculate_goal_stats(user_goals):
     }
 
 # 模拟数据函数已被移除，现在使用真正的数据库操作
+
+@smart_goals_bp.route('/my_goals')
+def my_goals():
+    """我的目标页面"""
+    try:
+        if 'user_id' not in session:
+            flash('请先登录', 'warning')
+            return redirect(url_for('common.auth.sign'))
+
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'employee':
+            flash('用户信息获取失败', 'warning')
+            return redirect(url_for('common.auth.sign'))
+
+        # 从数据库获取用户的目标
+        user_goals = SmartGoal.query.filter_by(user_id=user.id).order_by(SmartGoal.created_at.desc()).all()
+
+        # 转换目标数据为前端需要的格式
+        formatted_goals = []
+        for goal in user_goals:
+            formatted_goals.append({
+                'id': goal.id,
+                'title': goal.title,
+                'specific': goal.specific,
+                'measurable': goal.measurable,
+                'achievable': goal.achievable,
+                'relevant': goal.relevant,
+                'time_bound': goal.time_bound,
+                'category': goal.category,
+                'priority': goal.priority,
+                'status': goal.status,
+                'progress': goal.progress,
+                'target_date': goal.target_date,
+                'estimated_hours': goal.estimated_hours,
+                'completed_hours': goal.completed_hours,
+                'created_at': goal.created_at,
+                'last_updated': goal.last_updated,
+                'notes': goal.notes or '',
+                'is_overdue': goal.is_overdue,
+                'remaining_hours': goal.remaining_hours
+            })
+
+        # 计算目标完成统计
+        goal_stats = calculate_goal_stats(formatted_goals)
+
+        return render_template('talent_management/employee_management/smart_goals_dashboard.html',
+                             user=user,
+                             user_goals=formatted_goals,
+                             goal_stats=goal_stats)
+
+    except Exception as e:
+        flash(f'加载目标页面时发生错误: {str(e)}', 'danger')
+        return redirect(url_for('talent_management.employee_management.employee_dashboard'))
+
+@smart_goals_bp.route('/recommended_goals')
+def recommended_goals():
+    """推荐目标页面"""
+    try:
+        if 'user_id' not in session:
+            flash('请先登录', 'warning')
+            return redirect(url_for('common.auth.sign'))
+
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'employee':
+            flash('用户信息获取失败', 'warning')
+            return redirect(url_for('common.auth.sign'))
+
+        # 分析技能差距
+        skill_gaps = analyze_skill_gaps(user)
+        
+        # 生成推荐目标
+        recommended_goals = generate_recommended_goals(user, skill_gaps)
+
+        return render_template('talent_management/employee_management/recommended_goals.html',
+                             user=user,
+                             recommended_goals=recommended_goals,
+                             skill_gaps=skill_gaps)
+
+    except Exception as e:
+        flash(f'加载推荐目标页面时发生错误: {str(e)}', 'danger')
+        return redirect(url_for('talent_management.employee_management.employee_dashboard'))
+
+@smart_goals_bp.route('/skill_gaps')
+def skill_gaps():
+    """技能差距分析页面"""
+    try:
+        if 'user_id' not in session:
+            flash('请先登录', 'warning')
+            return redirect(url_for('common.auth.sign'))
+
+        user = User.query.get(session['user_id'])
+        if not user or user.user_type != 'employee':
+            flash('用户信息获取失败', 'warning')
+            return redirect(url_for('common.auth.sign'))
+
+        # 分析技能差距
+        skill_gaps = analyze_skill_gaps(user)
+        
+        # 获取用户当前技能
+        current_skills = extract_user_skills(user)
+        
+        # 根据用户职位确定目标技能
+        target_skills = get_target_skills_by_position(user.position)
+
+        return render_template('talent_management/employee_management/skill_gaps.html',
+                             user=user,
+                             skill_gaps=skill_gaps,
+                             current_skills=current_skills,
+                             target_skills=target_skills)
+
+    except Exception as e:
+        flash(f'加载技能差距页面时发生错误: {str(e)}', 'danger')
+        return redirect(url_for('talent_management.employee_management.employee_dashboard'))

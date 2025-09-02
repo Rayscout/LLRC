@@ -329,7 +329,7 @@ def dashboard():
     except Exception as e:
         print(f"学习推荐页面错误: {e}")
         flash(f'加载学习推荐时出错: {str(e)}', 'error')
-        return redirect(url_for('talent_management.employee_auth.employee_dashboard'))
+        return redirect(url_for('talent_management.employee_management.employee_dashboard'))
 
 @learning_recommendation_bp.route('/analyze/<int:job_id>')
 @login_required

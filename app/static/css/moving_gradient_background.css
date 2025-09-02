@@ -25,26 +25,32 @@
 .gradient-shape {
     position: absolute;
     border-radius: 50%;
-    background: linear-gradient(45deg, var(--gradient-primary), var(--gradient-secondary), var(--gradient-accent));
-    opacity: 0.6;
-    animation: moveGradient 20s infinite linear;
-    filter: blur(1px);
+    background: 
+        radial-gradient(ellipse, 
+            rgba(228, 246, 236, 0.4) 0%, 
+            rgba(224, 245, 233, 0.3) 30%, 
+            rgba(221, 244, 231, 0.2) 60%, 
+            transparent 100%);
+    opacity: 0.8;
+    animation: moveGradient 40s infinite linear; /* 改为40秒一圈 */
+    filter: blur(2px); /* 增加模糊效果，更像光晕 */
+    box-shadow: 0 0 20px rgba(228, 246, 236, 0.3); /* 添加光晕阴影 */
 }
 
 /* 不同大小的形状 */
 .gradient-shape.small {
-    width: 60px;
-    height: 60px;
+    width: 80px; /* 稍微增大尺寸 */
+    height: 60px; /* 椭圆形状 */
 }
 
 .gradient-shape.medium {
-    width: 100px;
-    height: 100px;
+    width: 120px; /* 椭圆形状 */
+    height: 90px;
 }
 
 .gradient-shape.large {
-    width: 150px;
-    height: 150px;
+    width: 180px; /* 椭圆形状 */
+    height: 140px;
 }
 
 /* 移动动画 */
@@ -76,18 +82,18 @@
 /* 响应式设计 */
 @media (max-width: 768px) {
     .gradient-shape.small {
-        width: 40px;
-        height: 40px;
+        width: 60px; /* 椭圆形状 */
+        height: 45px;
     }
     
     .gradient-shape.medium {
-        width: 70px;
+        width: 90px; /* 椭圆形状 */
         height: 70px;
     }
     
     .gradient-shape.large {
-        width: 100px;
-        height: 100px;
+        width: 120px; /* 椭圆形状 */
+        height: 90px;
     }
 }
 
@@ -99,12 +105,52 @@ body {
 
 /* 为有背景色的容器添加半透明效果 */
 .container, .card, .panel {
-    background-color: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(5px);
 }
 
-/* 导航栏半透明效果 */
-.navbar {
-    background-color: rgba(255, 255, 255, 0.9) !important;
+/* 拆分不同区域的样式 */
+/* 主要内容区域 */
+.main-content-area {
+    background-color: rgba(255, 255, 255, 0.35) !important;
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 侧边栏区域 */
+.sidebar-area {
+    background-color: rgba(255, 255, 255, 0.35) !important;
+    backdrop-filter: blur(6px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* 顶部导航区域 */
+.top-nav-area {
+    background-color: rgba(255, 255, 255, 0.35) !important;
     backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 底部区域 */
+.footer-area {
+    background-color: rgba(255, 255, 255, 0.35) !important;
+    backdrop-filter: blur(6px);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 卡片区域 */
+.card-area {
+    background-color: rgba(255, 255, 255, 0.35) !important;
+    backdrop-filter: blur(5px);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 面板区域 */
+.panel-area {
+    background-color: rgba(255, 255, 255, 0.35) !important;
+    backdrop-filter: blur(7px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
 }
