@@ -24,20 +24,20 @@
     .search input{border:0;outline:none;background:transparent;width:100%;font-size:14px}
     .actions{display:flex;align-items:center;gap:12px}
     .icon-btn{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:#F2F2F7;color:#1D1D1F;text-decoration:none}
-    .main{grid-area:main;padding:20px}
+    .main{grid-area:main;padding:1px}
     .card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.06)}
-    .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:20px}
+    .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;margin-bottom:1px}
     .metric-card{padding:18px 20px;border-radius:14px}
     .metric-card.card{will-change:transform,box-shadow;transition:all .2s ease}
     .metric-card.card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
-    .dashboard-section.card{padding:20px;margin-bottom:16px}
-    .quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+    .dashboard-section.card{padding:1px;margin-bottom:1px}
+    .quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px}
     .action-card{padding:18px;border-radius:14px;text-decoration:none;color:inherit;display:block;transition:transform .2s ease}
     .action-card:hover{transform:translateY(-4px)}
     @media(max-width:1200px){.app{grid-template-columns:80px 1fr}.brand span,.nav-item span{display:none}.search{min-width:220px}}
 
     /* iOS 欢迎区与快速开始（合并自 hr_dashboard_ios） */
-    .hero{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:48px 16px;margin-bottom:12px;text-align:center;background:linear-gradient(135deg,#f8fbff,#f3f6ff)}
+    .hero{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:48px 16px;margin-bottom:1px;text-align:center;background:linear-gradient(135deg,#f8fbff,#f3f6ff)}
     .hero h1{margin:0 0 10px 0;font-size:32px;color:#0a4a8b}
     .hero p{margin:0;color:#57607a}
     .quick-start.card{max-width:960px;margin:24px auto;padding:24px;border-radius:20px;background:#fff}
@@ -51,7 +51,7 @@
     /* 团队目标区（参照图示） */
     .goals{margin-top:6px}
     .goals .title{display:flex;align-items:center;gap:10px;font-weight:700;color:#0d355d;margin-bottom:12px}
-    .goal-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:12px}
+    .goal-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;margin-bottom:1px}
     .goal-card{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 4px 14px rgba(51,86,255,.06);padding:14px 16px}
     .goal-card h4{margin:0 0 8px 0;font-size:14px;color:#4b5b76;display:flex;align-items:center;gap:6px}
     .goal-card .v{font-size:24px;font-weight:800;color:#0A84FF}
@@ -68,7 +68,12 @@
 
 <div class="app">
     <aside class="sidebar">
-        <a class="brand" href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}"><i class="uil uil-apps"></i><span>智能招聘系统-HR</span></a>
+        <a class="brand" href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}">
+            <span style="display:inline-flex;width:32px;height:32px;border-radius:10px;align-items:center;justify-content:center;background:#c4dfcc;color:#ffffff;margin-right:6px;">
+                <i class="uil uil-briefcase"></i>
+            </span>
+            <span>智能招聘系统-HR</span>
+        </a>
         <div class="nav-group">
             <a class="nav-item active" href="{{ url_for('smartrecruit.hr.dashboard.hr_dashboard') }}"><i class="uil uil-chart"></i><span>仪表板</span></a>
             <a class="nav-item" href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}"><i class="uil uil-briefcase"></i><span>职位</span></a>

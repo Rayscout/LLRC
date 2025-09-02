@@ -7,95 +7,1349 @@
 <!-- 顶部：标题与技能 -->
 <section class="section" id="home-recommend">
   <div class="section-content">
-    <h1 class="section-title">智能职位推荐</h1>
+    <!-- 顶部信息栏：天气、日期、用户状态 -->
+    <div class="top-info-bar animate-fade-in-down">
+      <div class="info-left">
+        <div class="weather-widget">
+          <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+            <path d="M8 14l4 4 4-4"/>
+          </svg>
+          <div class="weather-info">
+            <span class="weather-temp">22°C</span>
+            <span class="weather-desc">晴朗</span>
+          </div>
+        </div>
+        <div class="date-info">
+          <div class="current-date" id="currentDate"></div>
+          <div class="current-time" id="currentTime"></div>
+        </div>
+      </div>
+      <div class="info-right">
+        <div class="user-status-card">
+          <div class="status-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="status-info">
+            <div class="status-title">求职状态</div>
+            <div class="status-value">积极求职中</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+            <h1 class="section-title animate-fade-in-up">智能职位推荐</h1>
+        
+        <!-- 欢迎信息 -->
+        <div class="welcome-message animate-fade-in-up">
+            <div class="welcome-content">
+                <div class="welcome-header">
+                    <svg class="welcome-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <h3>欢迎回来！</h3>
+                </div>
+                <p class="welcome-description">基于您的技能和偏好，我们为您精心挑选了最适合的职位机会</p>
+            </div>
+        </div>
+
+        <!-- 数据统计卡片 -->
+    <div class="stats-grid animate-fade-in-up" style="margin-top: 20px;">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-4"/>
+            <rect x="9" y="3" width="6" height="8" rx="1"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ applications_count or 0 }}</div>
+          <div class="stat-label">已投递简历</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12,6 12,12 16,14"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ interview_count or 0 }}</div>
+          <div class="stat-label">面试安排</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ match_score or 85 }}%</div>
+          <div class="stat-label">匹配度</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ connections_count or 12 }}</div>
+          <div class="stat-label">HR联系</div>
+        </div>
+      </div>
+    </div>
+
+    {% if resume_analysis %}
+    <div class="card resume-analysis-card animate-fade-in-up" style="margin-top: 20px;">
+      <div class="card-header">
+        <div class="card-title">
+          <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10,9 9,9 8,9"/>
+          </svg>
+          基于最新简历的AI分析
+        </div>
+        <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="btn btn-outline">更新简历</a>
+      </div>
+      
+      <div class="analysis-content">
+        <div class="analysis-summary">
+          <div class="summary-text">{{ resume_analysis.summary }}</div>
+        </div>
+        
+        {% if resume_analysis.score is not none %}
+        <div class="score-section">
+          <div class="score-label">简历评分</div>
+          <div class="score-display">
+            <div class="score-circle">
+              <svg class="score-svg" viewBox="0 0 36 36">
+                <path class="score-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                <path class="score-fill" stroke-dasharray="{{ resume_analysis.score }}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              </svg>
+              <div class="score-text">{{ resume_analysis.score }}</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        <div class="analysis-details">
+          {% if resume_analysis.strengths %}
+          <div class="detail-section">
+            <div class="detail-title">
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"/>
+                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+                <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+                <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"/>
+                <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"/>
+              </svg>
+              优势
+            </div>
+            <div class="detail-items">
+              {% for s in resume_analysis.strengths %}
+              <span class="detail-item strength">{{ s }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+          
+          {% if resume_analysis.weaknesses %}
+          <div class="detail-section">
+            <div class="detail-title">
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+              可改进
+            </div>
+            <div class="detail-items">
+              {% for s in resume_analysis.weaknesses %}
+              <span class="detail-item weakness">{{ s }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+          
+          {% if resume_analysis.suggestions %}
+          <div class="detail-section">
+            <div class="detail-title">
+              <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"/>
+                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+                <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+                <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"/>
+                <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"/>
+              </svg>
+              建议
+            </div>
+            <div class="detail-items">
+              {% for s in resume_analysis.suggestions %}
+              <span class="detail-item suggestion">{{ s }}</span>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        
+        {% if resume_analysis.recommended_roles %}
+        <div class="recommended-roles">
+          <div class="roles-label">推荐岗位</div>
+          <div class="roles-tags">
+            {% for role in resume_analysis.recommended_roles %}
+            <span class="role-tag">{{ role }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      
+      <div class="analysis-footer">
+        <svg class="footer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12,6 12,12 16,14"/>
+        </svg>
+        每次更新简历后，此分析将自动刷新
+      </div>
+    </div>
+    {% endif %}
 
     {% if user_skills %}
-    <div class="card" style="margin-top: 12px;">
+    <div class="card skills-card animate-fade-in-up" style="margin-top: 20px;">
       <div class="card-header">
-        <div class="card-title">你的技能</div>
+        <div class="card-title">
+          <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          你的技能
+        </div>
         <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="btn btn-outline">更新技能</a>
       </div>
-      <div class="skills-wrap" style="padding-top:8px;">
-        {% for sk in user_skills %}
-          <span class="skill-tag skill-tag-success">{{ sk }}</span>
-        {% endfor %}
+      <div class="skills-container">
+        <div class="skills-grid">
+          {% for sk in user_skills %}
+          <div class="skill-item">
+            <div class="skill-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"/>
+                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+                <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+                <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"/>
+                <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"/>
+              </svg>
+            </div>
+            <span class="skill-name">{{ sk }}</span>
+            <div class="skill-level">
+              <div class="skill-bar">
+                <div class="skill-progress" style="width: 75%"></div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
       </div>
     </div>
     {% endif %}
 
     <!-- 推荐职位列表 -->
-    <div class="card" style="margin-top:24px;">
+    <div class="card jobs-recommendation-card animate-fade-in-up" style="margin-top: 20px;">
       <div class="card-header">
-        <div class="card-title">为你推荐</div>
+        <div class="card-title">
+          <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
+          为你推荐
+        </div>
         <a href="{{ url_for('smartrecruit.candidate.jobs.job_search') }}" class="btn btn-outline">去搜索更多</a>
       </div>
 
       {% if recommended_jobs and recommended_jobs|length %}
-      <div class="grid grid-3" style="margin-top: 8px;">
+      <div class="jobs-grid">
         {% for rec in recommended_jobs %}
-        <div class="card" style="text-align:left; position:relative;">
-          <div class="card-header" style="border-bottom:none; padding-bottom:8px;">
-            <div class="card-title" style="font-size:1.05rem;">{{ rec.job.title }}</div>
-            <span class="tag" style="background:rgba(0,122,255,.12);color:var(--accent-primary);padding:6px 10px;border-radius:12px;">匹配 {{ rec.match_score }}%</span>
+        <div class="job-card animate-slide-in-up" style="animation-delay: 0.1s;">
+          <div class="job-header">
+            <div class="job-title">{{ rec.job.title }}</div>
+            <div class="match-badge">
+              <svg class="match-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"/>
+                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+                <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+                <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"/>
+                <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"/>
+              </svg>
+              {{ rec.match_score }}%
+            </div>
           </div>
-          <div class="text-secondary" style="margin-bottom:6px;">{{ rec.job.company_name }}</div>
-          <div class="text-secondary" style="margin-bottom:12px;">{{ rec.job.location }} · {{ rec.job.salary }}</div>
-          <div style="display:flex;gap:12px;">
-            <a href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=rec.job.id) }}" class="btn btn-outline">查看</a>
-            <a href="{{ url_for('smartrecruit.candidate.applications.pre_apply', job_id=rec.job.id) }}" class="btn btn-primary">申请</a>
+          <div class="job-company">
+            <svg class="company-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 21h18"/>
+              <path d="M5 21V7l8-4v18"/>
+              <path d="M19 21V11l-6-4"/>
+            </svg>
+            {{ rec.job.company_name }}
+          </div>
+          <div class="job-details">
+            <div class="job-location">
+              <svg class="location-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              {{ rec.job.location }}
+            </div>
+            <div class="job-salary">
+              <svg class="salary-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              {{ rec.job.salary }}
+            </div>
+          </div>
+          <div class="job-actions">
+            <a href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=rec.job.id) }}" class="btn btn-outline">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              查看
+            </a>
+            <a href="{{ url_for('smartrecruit.candidate.applications.pre_apply', job_id=rec.job.id) }}" class="btn btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <line x1="20" y1="8" x2="20" y2="14"/>
+                <line x1="23" y1="11" x2="17" y2="11"/>
+              </svg>
+              申请
+            </a>
           </div>
         </div>
         {% endfor %}
       </div>
       {% else %}
-        <div class="card" style="margin-top:8px;">
-          <div style="margin-bottom:8px;font-weight:600">暂无推荐</div>
-          <div class="text-secondary" style="margin-bottom:14px">完善个人资料或上传简历，获取更精准的推荐。</div>
-          <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="btn btn-primary">完善资料</a>
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <div class="empty-title">暂无推荐</div>
+          <div class="empty-description">完善个人资料或上传简历，获取更精准的推荐</div>
+          <a href="{{ url_for('smartrecruit.candidate.profile.settings') }}" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="8.5" cy="7" r="4"/>
+              <line x1="20" y1="8" x2="20" y2="14"/>
+              <line x1="23" y1="11" x2="17" y2="11"/>
+            </svg>
+            完善资料
+          </a>
         </div>
       {% endif %}
     </div>
 
     <!-- 求职进度追踪：沿用职业路径的卡片风格 -->
-    <div class="card" style="margin-top:24px;">
+    <div class="card progress-tracking-card animate-fade-in-up" style="margin-top: 20px;">
       <div class="card-header">
-        <div class="card-title">求职进度追踪</div>
+        <div class="card-title">
+          <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          求职进度追踪
+        </div>
       </div>
-      <div class="progress-timeline" style="max-width:880px;margin:12px auto 0;">
-        <div class="timeline-item completed" style="display:flex;gap:24px;margin-bottom:24px;align-items:flex-start;">
-          <div class="timeline-icon" style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent-success);color:#fff;flex-shrink:0;">
-            <i class="fas fa-check"></i>
+      <div class="progress-timeline">
+        <div class="timeline-item completed animate-slide-in-left">
+          <div class="timeline-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4"/>
+              <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
+              <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
+              <path d="M12 3c0 1-1 3-3 3s-3-2-3-3 1-3 3-3 3 2 3 3"/>
+              <path d="M12 21c0-1 1-3 3-3s3 2 3 3-1 3-3 3-3-2-3-3"/>
+            </svg>
           </div>
           <div class="timeline-content">
-            <h4 style="margin:0 0 6px;color:var(--text-primary);">简历投递完成</h4>
-            <p class="text-secondary" style="margin:0 0 6px;">已成功投递最近的目标职位</p>
-            <span class="timeline-time">近期</span>
+            <div class="timeline-text-line">
+              <span class="timeline-title">简历投递完成</span>
+              <span class="timeline-desc">已成功投递最近的目标职位</span>
+              <span class="timeline-time">近期</span>
+            </div>
           </div>
         </div>
 
-        <div class="timeline-item active" style="display:flex;gap:24px;margin-bottom:24px;align-items:flex-start;">
-          <div class="timeline-icon" style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent-primary);color:#fff;flex-shrink:0;">
-            <i class="fas fa-clock"></i>
+        <div class="timeline-item active animate-slide-in-left" style="animation-delay: 0.2s;">
+          <div class="timeline-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12,6 12,12 16,14"/>
+            </svg>
           </div>
           <div class="timeline-content">
-            <h4 style="margin:0 0 6px;color:var(--text-primary);">等待HR回复</h4>
-            <p class="text-secondary" style="margin:0 0 6px;">简历已被查看，等待进一步通知</p>
-            <span class="timeline-time">进行中</span>
+            <div class="timeline-text-line">
+              <span class="timeline-title">等待HR回复</span>
+              <span class="timeline-desc">简历已被查看，等待进一步通知</span>
+              <span class="timeline-time">进行中</span>
+            </div>
           </div>
         </div>
 
-        <div class="timeline-item pending" style="display:flex;gap:24px;margin-bottom:8px;align-items:flex-start;">
-          <div class="timeline-icon" style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--text-tertiary);color:#fff;flex-shrink:0;">
-            <i class="fas fa-users"></i>
+        <div class="timeline-item pending animate-slide-in-left" style="animation-delay: 0.4s;">
+          <div class="timeline-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
           </div>
           <div class="timeline-content">
-            <h4 style="margin:0 0 6px;color:var(--text-primary);">面试安排</h4>
-            <p class="text-secondary" style="margin:0 0 6px;">通过筛选后将安排技术/HR面试</p>
-            <span class="timeline-time">待定</span>
+            <div class="timeline-text-line">
+              <span class="timeline-title">面试安排</span>
+              <span class="timeline-desc">通过筛选后将安排技术/HR面试</span>
+              <span class="timeline-time">待定</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<!-- 添加自定义样式和脚本 -->
+<style>
+/* 顶部信息栏样式 */
+.top-info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #4ECDC4 0%, #4FC3F7 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 32px rgba(78, 205, 196, 0.3);
+}
+
+.info-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.weather-widget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weather-icon {
+  width: 32px;
+  height: 32px;
+  color: #FDFD96;
+}
+
+.weather-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.weather-temp {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.weather-desc {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.date-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.current-date {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.current-time {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.info-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-status-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.status-icon {
+  width: 32px;
+  height: 32px;
+  color: #A8DDA8;
+}
+
+.status-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-title {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.status-value {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 统计卡片网格 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #F7797D 0%, #4ECDC4 100%);
+  color: white;
+}
+
+.stat-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2d3748;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #718096;
+  margin-top: 4px;
+}
+
+/* 简历分析卡片 */
+.resume-analysis-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.analysis-content {
+  padding: 24px;
+}
+
+.analysis-summary {
+  margin-bottom: 24px;
+}
+
+.summary-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #4a5568;
+  background: #f7fafc;
+  padding: 16px;
+  border-radius: 12px;
+  border-left: 4px solid #4FC3F7;
+}
+
+.score-section {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #4FC3F7;
+  border-radius: 16px;
+  color: white;
+}
+
+.score-label {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.score-display {
+  display: flex;
+  align-items: center;
+}
+
+.score-circle {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.score-svg {
+  width: 80px;
+  height: 80px;
+  transform: rotate(-90deg);
+}
+
+.score-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 3;
+}
+
+.score-fill {
+  fill: none;
+  stroke: white;
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1s ease;
+}
+
+.score-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.analysis-details {
+  display: grid;
+  gap: 20px;
+}
+
+.detail-section {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.detail-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 12px;
+}
+
+.detail-icon {
+  width: 20px;
+  height: 20px;
+  color: #A8DDA8;
+}
+
+.detail-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-item {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.detail-item.strength {
+  background: #FDFD96;
+  color: #2d3748;
+}
+
+.detail-item.weakness {
+  background: #F7797D;
+  color: white;
+}
+
+.detail-item.suggestion {
+  background: #4ECDC4;
+  color: white;
+}
+
+.recommended-roles {
+  margin-top: 20px;
+  padding: 20px;
+  background: #A8DDA8;
+  border-radius: 16px;
+}
+
+.roles-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 12px;
+}
+
+.roles-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.role-tag {
+  padding: 8px 16px;
+  background: white;
+  color: #4a5568;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.analysis-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 24px;
+  background: #f7fafc;
+  color: #718096;
+  font-size: 14px;
+}
+
+.footer-icon {
+  width: 16px;
+  height: 16px;
+  color: #F7797D;
+}
+
+/* 技能卡片 */
+.skills-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.skills-container {
+  padding: 24px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.skill-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.skill-item:hover {
+  background: #edf2f7;
+  transform: translateX(4px);
+}
+
+.skill-icon {
+  width: 32px;
+  height: 32px;
+  color: #FDFD96;
+  flex-shrink: 0;
+}
+
+.skill-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.skill-name {
+  flex: 1;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.skill-level {
+  width: 80px;
+}
+
+.skill-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.skill-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #4FC3F7 0%, #A8DDA8 100%);
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+/* 职位推荐卡片 */
+.jobs-recommendation-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 24px;
+}
+
+.job-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.job-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #4FC3F7 0%, #A8DDA8 100%);
+}
+
+.job-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  border-color: #4FC3F7;
+}
+
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.job-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+  line-height: 1.3;
+}
+
+.match-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #F7797D 0%, #4ECDC4 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.match-icon {
+  width: 12px;
+  height: 12px;
+  color: #A8DDA8;
+}
+
+.job-company {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4a5568;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.company-icon {
+  width: 16px;
+  height: 16px;
+  color: #4ECDC4;
+}
+
+.job-details {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.job-location, .job-salary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #718096;
+  font-size: 13px;
+}
+
+.location-icon, .salary-icon {
+  width: 14px;
+  height: 14px;
+  color: #F7797D;
+}
+
+.job-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.job-actions .btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.job-actions .btn svg {
+  width: 14px;
+  height: 14px;
+  color: inherit;
+}
+
+.job-actions .btn-outline {
+  background: white;
+  color: #4FC3F7;
+  border: 1px solid #4FC3F7;
+}
+
+.job-actions .btn-outline:hover {
+  background: #4FC3F7;
+  color: white;
+}
+
+.job-actions .btn-primary {
+  background: linear-gradient(135deg, #A8DDA8 0%, #FDFD96 100%);
+  color: #2d3748;
+  border: none;
+}
+
+.job-actions .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(168, 221, 168, 0.4);
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.empty-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  color: #4FC3F7;
+}
+
+.empty-icon svg {
+  width: 80px;
+  height: 80px;
+}
+
+.empty-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 8px;
+}
+
+.empty-description {
+  color: #718096;
+  margin-bottom: 24px;
+}
+
+/* 进度追踪 */
+.progress-tracking-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.progress-timeline {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 32px;
+  align-items: center;
+  width: 100%;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.timeline-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.timeline-item.completed .timeline-icon {
+  background: linear-gradient(135deg, #4ECDC4 0%, #4FC3F7 100%);
+  color: white;
+}
+
+.timeline-item.active .timeline-icon {
+  background: linear-gradient(135deg, #F7797D 0%, #A8DDA8 100%);
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+.timeline-item.pending .timeline-icon {
+  background: #e2e8f0;
+  color: #4FC3F7;
+}
+
+.timeline-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.timeline-text-line {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.timeline-title {
+  color: #2d3748;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.timeline-desc {
+  color: #718096;
+  font-size: 14px;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.timeline-time {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #edf2f7;
+  color: #4a5568;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* 动画 */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.1); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.15); }
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 标题图标 */
+.title-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  color: #4ECDC4;
+  vertical-align: middle;
+}
+
+/* 欢迎信息样式 */
+.welcome-message {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 16px 0 0 0;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.welcome-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.welcome-icon {
+  width: 32px;
+  height: 32px;
+  color: #F7797D;
+  flex-shrink: 0;
+  animation: heartBeat 2s ease-in-out infinite;
+}
+
+.welcome-header h3 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.welcome-description {
+  margin: 0;
+  font-size: 16px;
+  color: #718096;
+  line-height: 1.6;
+  max-width: 600px;
+  text-align: center;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .top-info-bar {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .info-left {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .jobs-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .timeline-item {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .welcome-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+}
+</style>
+
+<script>
+// 实时时间更新
+function updateTime() {
+  const now = new Date();
+  const timeString = now.toLocaleTimeString('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+  const dateString = now.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
+  const timeElement = document.getElementById('currentTime');
+  const dateElement = document.getElementById('currentDate');
+  
+  if (timeElement) {
+    timeElement.textContent = timeString;
+  }
+  if (dateElement) {
+    dateElement.textContent = dateString;
+  }
+}
+
+// 页面加载完成后启动时间更新
+document.addEventListener('DOMContentLoaded', function() {
+  updateTime();
+  setInterval(updateTime, 1000);
+  
+  // 添加滚动动画观察器
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+  
+  // 观察所有动画元素
+  document.querySelectorAll('.animate-fade-in-up, .animate-slide-in-up, .animate-slide-in-left').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    observer.observe(el);
+  });
+});
+</script>
 {% endblock %}
