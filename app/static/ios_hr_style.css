@@ -1,22 +1,10 @@
 /* iOS风格HR界面样式 */
 @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Pro+Text:wght@300;400;500;600&display=swap');
 
-/* HR页面通用容器宽度设置 */
-.hr-page-container,
-.hr-settings-page,
-.review-container,
-.schedule-interview-container,
-.interviews-debug {
-    max-width: 1400px !important;
-    margin: 0 auto !important;
-    padding: 20px !important;
-    box-sizing: border-box !important;
-}
-
 :root {
     /* iOS系统颜色 */
-    --ios-blue: #c4dfcc;
-    --ios-blue-dark: #acd2b7;
+    --ios-blue: #007AFF;
+    --ios-blue-dark: #0056CC;
     --ios-green: #34C759;
     --ios-orange: #FF9500;
     --ios-red: #FF3B30;
@@ -119,7 +107,7 @@ html { overflow: auto; }
 
 /* 主容器 */
 .ios-container {
-    max-width: 1400px;
+    max-width: 1200px;
     width: 100%;
     margin: 0 auto;
     padding: 0 var(--ios-spacing-md);
@@ -241,7 +229,7 @@ html { overflow: auto; }
 
 .ios-input:focus {
     border-color: var(--ios-blue);
-    box-shadow: 0 0 0 3px rgba(196, 223, 204, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
 .ios-input::placeholder {
@@ -292,20 +280,6 @@ html { overflow: auto; }
     background: linear-gradient(90deg, var(--ios-blue), var(--ios-purple));
 }
 
-/* 指标卡片上边沿颜色映射 - 使用甜甜圈图表的颜色 */
-.ios-grid .ios-metric-card:nth-of-type(1)::before {
-    background: linear-gradient(90deg, #FDF0B2, #FBE6A3); /* 浅黄色 */
-}
-.ios-grid .ios-metric-card:nth-of-type(2)::before {
-    background: linear-gradient(90deg, #F87979, #FF6B6B); /* 珊瑚粉 */
-}
-.ios-grid .ios-metric-card:nth-of-type(3)::before {
-    background: linear-gradient(90deg, #60C7B8, #41C7BD); /* 青绿色 */
-}
-.ios-grid .ios-metric-card:nth-of-type(4)::before {
-    background: linear-gradient(90deg, #58B0D9, #4DB3E6); /* 天空蓝 */
-}
-
 .ios-metric-card:hover {
     transform: translateY(-8px);
     box-shadow: var(--ios-shadow-heavy);
@@ -322,25 +296,6 @@ html { overflow: auto; }
     margin: 0 auto var(--ios-spacing-lg);
     color: white;
     font-size: 1.5rem;
-}
-
-/* 指标卡片图标背景颜色映射 - 使用甜甜圈图表的颜色 */
-.ios-grid .ios-metric-card:nth-of-type(1) .ios-metric-icon {
-    background: linear-gradient(135deg, #FDF0B2, #FBE6A3); /* 浅黄色 */
-}
-.ios-grid .ios-metric-card:nth-of-type(2) .ios-metric-icon {
-    background: linear-gradient(135deg, #F87979, #FF6B6B); /* 珊瑚粉 */
-}
-.ios-grid .ios-metric-card:nth-of-type(3) .ios-metric-icon {
-    background: linear-gradient(135deg, #60C7B8, #41C7BD); /* 青绿色 */
-}
-.ios-grid .ios-metric-card:nth-of-type(4) .ios-metric-icon {
-    background: linear-gradient(135deg, #58B0D9, #4DB3E6); /* 天空蓝 */
-}
-
-/* 指标卡片图标颜色设为白色，确保在彩色背景上可见 */
-.ios-grid .ios-metric-card .ios-metric-icon i {
-    color: white !important;
 }
 
 .ios-metric-value {
@@ -463,7 +418,7 @@ html { overflow: auto; }
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(196, 223, 204, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(0, 122, 255, 0.1), transparent);
     transition: left var(--ios-transition-medium);
 }
 
@@ -474,13 +429,13 @@ html { overflow: auto; }
 .ios-nav-link:hover,
 .ios-nav-link.active {
     color: var(--ios-blue);
-    background: rgba(196, 223, 204, 0.08);
+    background: rgba(0, 122, 255, 0.08);
     transform: translateY(-1px);
 }
 
 .ios-nav-link.active {
-    background: rgba(196, 223, 204, 0.12);
-    box-shadow: 0 2px 8px rgba(196, 223, 204, 0.2);
+    background: rgba(0, 122, 255, 0.12);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
 }
 
 .ios-nav-icon {
@@ -518,13 +473,13 @@ html { overflow: auto; }
     font-size: 0.9rem;
     cursor: pointer;
     transition: all var(--ios-transition-fast);
-    box-shadow: 0 2px 8px rgba(196, 223, 204, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
 .ios-nav-button:hover {
     background: var(--ios-blue-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(196, 223, 204, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
 }
 
 .ios-nav-button.secondary {
@@ -537,7 +492,7 @@ html { overflow: auto; }
 .ios-nav-button.secondary:hover {
     background: var(--ios-blue);
     color: white;
-    box-shadow: 0 2px 8px rgba(196, 223, 204, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
 }
 
 /* 移动端导航菜单 */
@@ -619,7 +574,7 @@ html { overflow: auto; }
 
 /* 调整页面内容以适应顶部导航 */
 .ios-section {
-    padding-top: calc(var(--ios-spacing-xl) + 80px);
+    padding-top: calc(var(--ios-spacing-xl) + 120px);
     padding-bottom: var(--ios-spacing-xl);
 }
 
@@ -805,7 +760,7 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
 }
 
 .ios-status.info {
-    background: rgba(196, 223, 204, 0.1);
+    background: rgba(0, 122, 255, 0.1);
     color: var(--ios-blue);
 }
 
@@ -837,7 +792,7 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
 }
 
 .ios-profile-menu-item:hover {
-    background: rgba(196, 223, 204, 0.08);
+    background: rgba(0, 122, 255, 0.08);
     color: var(--ios-blue);
 }
 
@@ -918,7 +873,7 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
     outline: none;
     border-color: var(--ios-blue);
     background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 0 0 3px rgba(196, 223, 204, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
 .ios-nav-search i {
@@ -1013,7 +968,7 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
 .ios-guide-header i {
     font-size: 1.5rem;
     color: var(--ios-blue);
-    background: rgba(196, 223, 204, 0.1);
+    background: rgba(0, 122, 255, 0.1);
     padding: var(--ios-spacing-sm);
     border-radius: 50%;
 }
@@ -1343,7 +1298,7 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
 
 .ios-help-trigger:hover {
     color: var(--ios-blue);
-    background: rgba(196, 223, 204, 0.1);
+    background: rgba(0, 122, 255, 0.1);
 }
 
 .ios-help-popup {
@@ -1419,137 +1374,3 @@ body.dark .ios-nav-toggle span{ background: var(--ios-text-primary); }
         margin-left: -75px;
     }
 }
-
-/* 通用悬停动效与过渡（不影响背景） */
-* { transition: transform .25s ease, box-shadow .25s ease, opacity .25s ease, color .25s ease, background-color .25s ease, border-color .25s ease; }
-
-/***** 卡片类 *****/
-.ios-card,
-.ios-metric-card,
-.ios-feature-card,
-.ios-report-card,
-.ios-interview-stat-card,
-.ios-interview-list .ios-interview-item,
-.ios-chart-container,
-.ios-recent-item {
-    transform: translateZ(0);
-}
-.ios-card:hover,
-.ios-metric-card:hover,
-.ios-feature-card:hover,
-.ios-report-card:hover,
-.ios-interview-stat-card:hover,
-.ios-interview-list .ios-interview-item:hover,
-.ios-chart-container:hover,
-.ios-recent-item:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--ios-shadow-strong, 0 12px 32px rgba(0,0,0,.18));
-}
-
-/***** 按钮类 *****/
-.ios-button,
-.ios-quick-action-btn,
-.theme-toggle,
-.ios-nav-button {
-    transform: translateZ(0);
-}
-.ios-button:hover,
-.ios-quick-action-btn:hover,
-.theme-toggle:hover,
-.ios-nav-button:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 24px rgba(0,0,0,.12);
-}
-.ios-button:active,
-.ios-quick-action-btn:active,
-.theme-toggle:active,
-.ios-nav-button:active { transform: translateY(0) scale(.98); }
-
-/* 按钮对比度与透明度调整（HR iOS） */
-.ios-button,
-.ios-quick-action-btn,
-.theme-toggle,
-.ios-nav-button {
-  opacity: .9;                 /* 默认略降不透明度 */
-  filter: contrast(1.25) saturate(1.10); /* 提升对比度与饱和度（更强） */
-}
-.ios-button:hover,
-.ios-quick-action-btn:hover,
-.theme-toggle:hover,
-.ios-nav-button:hover {
-  opacity: 1;                  /* 悬停恢复全不透明 */
-  filter: contrast(1.35) saturate(1.15);
-}
-.ios-button:disabled,
-.ios-quick-action-btn:disabled,
-.theme-toggle:disabled,
-.ios-nav-button:disabled { opacity:.5; filter: none; }
-
-/* 统一按钮文字为黑色 */
-.ios-button,
-.ios-quick-action-btn,
-.theme-toggle,
-.ios-nav-button { color: #000 !important; }
-.ios-button:hover,
-.ios-quick-action-btn:hover,
-.theme-toggle:hover,
-.ios-nav-button:hover { color: #000 !important; }
-.ios-button:disabled,
-.ios-quick-action-btn:disabled,
-.theme-toggle:disabled,
-.ios-nav-button:disabled { color: #000 !important; opacity:.5; }
-
-/***** 导航项 *****/
-.ios-nav-link { position: relative; transform: translateZ(0); }
-.ios-nav-link:hover { filter: saturate(1.05); transform: translateY(-1px); }
-.ios-nav-link:hover .ios-nav-icon { transform: translateY(-1px) scale(1.06); }
-
-/***** 列表与表格行（如有） *****/
-.ios-table-row:hover,
-.ios-list-item:hover,
-.ios-candidate-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.12); }
-
-/***** 输入与表单 *****/
-.ios-input:focus,
-input.ios-input:focus,
-textarea.ios-input:focus { box-shadow: 0 0 0 3px rgba(196,223,204,.25); border-color: var(--ios-blue); }
-
-/***** 微交互：图标轻微浮动 *****/
-.uil:hover { transform: translateY(-2px) scale(1.04); }
-
-/* 按钮点击波纹效果（不改变背景，仅元素内微交互） */
-.ios-button, .ios-quick-action-btn, .theme-toggle, .ios-nav-button { position: relative; overflow: hidden; }
-.ios-button::after, .ios-quick-action-btn::after, .theme-toggle::after, .ios-nav-button::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(circle at var(--rx,50%) var(--ry,50%), rgba(255,255,255,.35), rgba(255,255,255,0) 45%);
-  opacity: 0; transform: scale(.2); transition: opacity .45s ease, transform .45s ease; pointer-events: none;
-}
-.ios-button:active::after, .ios-quick-action-btn:active::after, .theme-toggle:active::after, .ios-nav-button:active::after { opacity: 1; transform: scale(1); }
-
-/* 标题高光扫过与轻微下沉 */
-.ios-title { position: relative; display: inline-block; transform: translateZ(0); }
-.ios-title::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,.7) 14%, transparent 22%) no-repeat; background-size: 18% 100%; background-position: -25% 0; mix-blend-mode: screen; opacity: .0; transition: opacity .4s ease, background-position 1.2s ease; pointer-events: none; }
-.ios-title:hover { transform: translateY(-1px); }
-.ios-title:hover::after { opacity: .9; background-position: 120% 0; }
-
-/* 大标题居中（HR iOS 全局） */
-.ios-title{ text-align:center; display:block; margin-left:auto; margin-right:auto; }
-
-/* 徽章/状态脉动 */
-.badge, .ios-status { position: relative; }
-.badge.pulse::after, .ios-status.pulse::after { content: ""; position: absolute; inset: -2px; border-radius: inherit; border: 2px solid currentColor; opacity: .0; transform: scale(.9); animation: pulseGlow 1.8s ease-out infinite; }
-@keyframes pulseGlow { 0%{opacity:.5; transform:scale(.9)} 60%{opacity:0; transform:scale(1.2)} 100%{opacity:0; transform:scale(1.25)} }
-
-/* 链接下划线滑入 */
-.ios-link, .ios-nav-link .ios-nav-text { position: relative; }
-.ios-link::after, .ios-nav-link .ios-nav-text::after { content: ""; position: absolute; left: 0; right: 100%; bottom: -2px; height: 2px; background: currentColor; transition: right .25s ease; opacity: .6; }
-.ios-link:hover::after, .ios-nav-link:hover .ios-nav-text::after { right: 0; }
-
-/* 数字轻跳（用于统计数字） */
-[data-counter], .ios-metric-value, .ios-interview-stat-card .value { transition: transform .25s ease; display: inline-block; }
-[data-counter]:hover, .ios-metric-value:hover, .ios-interview-stat-card .value:hover { transform: translateY(-2px) scale(1.04); }
-
-/* 图标旋转/抖动轻动画 */
-.uil.spin-on-hover:hover { animation: spin360 .8s linear; }
-@keyframes spin360 { to{ transform: rotate(360deg); } }
-.uil.wiggle-on-hover:hover { animation: wiggle .6s ease-in-out; }
-@keyframes wiggle { 0%,100%{transform:none} 25%{transform:rotate(-6deg)} 50%{transform:rotate(4deg)} 75%{transform:rotate(-2deg)} }

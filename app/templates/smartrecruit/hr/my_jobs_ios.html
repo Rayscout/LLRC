@@ -24,13 +24,13 @@
             --fx-bg-3: #c4dfcc;
         }
         
-        /* 强制设置页面背景为淡绿色，但不影响按钮文字 */
+        /* 设置页面背景为白色 */
         body, html {
-            background: var(--fx-bg-1) !important;
+            background: #ffffff !important;
         }
         
         .ios-scroll-container {
-            background: var(--fx-bg-1) !important;
+            background: #ffffff !important;
         }
         
         .ios-parallax-bg {
@@ -39,64 +39,37 @@
         
         /* 确保所有section都使用与HR仪表盘首页一致的背景 */
         .ios-jobs-hero { 
-            background: radial-gradient(1200px 420px at 20% -10%, #dbece0 0%, #cfe5d6 40%, #ffffff 100%) !important; 
+            background: #ffffff !important; 
             position: relative; 
             overflow: hidden;
         }
         
-        /* 添加与HR仪表盘首页一致的动态背景效果 */
+        /* 移除动态背景效果，使用纯白色背景 */
         .ios-jobs-hero:before {
-            content: ""; 
-            position: absolute; 
-            inset: -20% -10% auto -10%; 
-            height: 320px; 
-            background: conic-gradient(from 180deg, rgba(196,223,204,.18), rgba(207,229,214,.14), rgba(184,216,193,.12), rgba(196,223,204,.18)); 
-            filter: blur(40px); 
-            animation: spinSlow 22s linear infinite; 
-            pointer-events: none;
+            display: none;
         }
         
         .ios-jobs-hero:after {
-            content: ""; 
-            position: absolute; 
-            right: -160px; 
-            top: -120px; 
-            width: 520px; 
-            height: 520px; 
-            background: radial-gradient(closest-side, rgba(196,223,204,.25), rgba(196,223,204,0)); 
-            filter: blur(10px); 
-            transform: rotate(15deg); 
-            animation: floatY 12s ease-in-out infinite; 
-            pointer-events: none;
+            display: none;
         }
         
         .ios-stats-section { 
-            background: var(--ios-bg-secondary) !important; 
+            background: #ffffff !important; 
             position: relative; 
             overflow: hidden;
         }
         
         .ios-stats-section:before {
-            content: ""; 
-            position: absolute; 
-            inset: 0; 
-            background: linear-gradient(90deg, rgba(196,223,204,.06), rgba(207,229,214,.06)); 
-            opacity: .6; 
-            mix-blend-mode: multiply; 
-            pointer-events: none;
+            display: none;
         }
         
         .ios-jobs-list { 
-            background: var(--ios-bg-secondary) !important; 
+            background: #ffffff !important; 
             position: relative;
         }
         
         .ios-jobs-list:before {
-            content: ""; 
-            position: absolute; 
-            inset: 0; 
-            background: radial-gradient(1000px 380px at 85% -20%, rgba(196,223,204,.10), transparent 60%), 
-                        radial-gradient(800px 320px at 10% 120%, rgba(184,216,193,.10), transparent 55%);
+            display: none;
         }
         
         /* 添加与HR仪表盘首页一致的动画关键帧 */
@@ -112,10 +85,10 @@
         
         /* 大幅减少section之间的间距 */
         .ios-section {
-            padding-top: var(--ios-spacing-md) !important;
+            padding-top: calc(var(--ios-spacing-xl) + 120px) !important;
             padding-bottom: var(--ios-spacing-md) !important;
             min-height: auto !important;
-            background: var(--ios-bg-primary) !important;
+            background: #ffffff !important;
         }
         
         /* 进一步减少特定section的间距 */
@@ -239,16 +212,15 @@
             margin-bottom: var(--ios-spacing-xl);
         }
         
-        .ios-job-stat-card {
-            background: rgba(255, 255, 255, 0.7) !important;
-            backdrop-filter: blur(20px);
-            border-radius: var(--ios-radius-large);
-            padding: var(--ios-spacing-lg);
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: var(--ios-shadow-light);
-            transition: all var(--ios-transition-medium);
-        }
+                 .ios-job-stat-card {
+             background: #ffffff !important;
+             border-radius: var(--ios-radius-large);
+             padding: var(--ios-spacing-lg);
+             text-align: center;
+             border: 1px solid rgba(0, 0, 0, 0.08);
+             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+             transition: all var(--ios-transition-medium);
+         }
         
         .ios-job-stat-card:hover {
             transform: translateY(-4px);
@@ -281,16 +253,15 @@
             color: var(--ios-text-secondary);
         }
         
-        .ios-job-card {
-            background: rgba(255, 255, 255, 0.7) !important;
-            backdrop-filter: blur(20px);
-            border-radius: var(--ios-radius-large);
-            padding: var(--ios-spacing-xl);
-            margin-bottom: var(--ios-spacing-lg);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: var(--ios-shadow-light);
-            transition: all var(--ios-transition-medium);
-        }
+                 .ios-job-card {
+             background: #ffffff !important;
+             border-radius: var(--ios-radius-large);
+             padding: var(--ios-spacing-xl);
+             margin-bottom: var(--ios-spacing-lg);
+             border: 1px solid rgba(0, 0, 0, 0.08);
+             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+             transition: all var(--ios-transition-medium);
+         }
         
         .ios-job-card:hover {
             transform: translateY(-4px);
@@ -403,69 +374,68 @@
             flex-wrap: wrap;
         }
         
-        /* 按钮颜色定制 - 使用对比度更高的颜色，避免红色 */
-        .ios-quick-action-btn {
-            background: rgba(70, 130, 180, 0.8) !important; /* 钢蓝色 - 对比度更高 */
-            backdrop-filter: blur(20px);
-            border: 2px solid #4682B4 !important;
-            border-radius: var(--ios-radius-medium);
-            padding: var(--ios-spacing-lg) var(--ios-spacing-xl);
-            color: #FFFFFF !important; /* 白色文字 - 对比度更高 */
-            text-decoration: none;
-            transition: all var(--ios-transition-medium);
-            display: flex !important;
-            align-items: center;
-            gap: var(--ios-spacing-md);
-            font-size: 1.1rem;
-            font-weight: 600;
-            min-width: 180px;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(70, 130, 180, 0.3);
-        }
+                 /* 按钮颜色定制 - 使用纯色背景，去除半透明效果 */
+         .ios-quick-action-btn {
+             background: #4682B4 !important; /* 钢蓝色 - 纯色背景 */
+             border: 2px solid #4682B4 !important;
+             border-radius: var(--ios-radius-medium);
+             padding: var(--ios-spacing-lg) var(--ios-spacing-xl);
+             color: #FFFFFF !important; /* 白色文字 */
+             text-decoration: none;
+             transition: all var(--ios-transition-medium);
+             display: flex !important;
+             align-items: center;
+             gap: var(--ios-spacing-md);
+             font-size: 1.1rem;
+             font-weight: 600;
+             min-width: 180px;
+             justify-content: center;
+             box-shadow: 0 2px 8px rgba(70, 130, 180, 0.2);
+         }
         
-        .ios-quick-action-btn:hover {
-            background: rgba(70, 130, 180, 1) !important; /* 悬停时完全不透明 */
-            color: #FFFFFF !important;
-            border-color: #4682B4 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(70, 130, 180, 0.4);
-        }
+                 .ios-quick-action-btn:hover {
+             background: #3A6B8A !important; /* 悬停时稍深的蓝色 */
+             color: #FFFFFF !important;
+             border-color: #3A6B8A !important;
+             transform: translateY(-2px);
+             box-shadow: 0 4px 12px rgba(70, 130, 180, 0.3);
+         }
+         
+         .ios-quick-action-btn.primary {
+             background: #2E8B57 !important; /* 深绿色 - 纯色背景 */
+             color: #FFFFFF !important; /* 白色文字 */
+             border-color: #2E8B57 !important;
+             box-shadow: 0 2px 8px rgba(46, 139, 87, 0.2);
+         }
+         
+         .ios-quick-action-btn.primary:hover {
+             background: #228B22 !important; /* 悬停时稍深的绿色 */
+             border-color: #228B22 !important;
+             box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
+         }
         
-        .ios-quick-action-btn.primary {
-            background: rgba(46, 139, 87, 0.8) !important; /* 深绿色 - 对比度更高，避免红色 */
-            color: #FFFFFF !important; /* 白色文字 */
-            border-color: #2E8B57 !important;
-            box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
-        }
-        
-        .ios-quick-action-btn.primary:hover {
-            background: rgba(46, 139, 87, 1) !important;
-            border-color: #2E8B57 !important;
-            box-shadow: 0 6px 16px rgba(46, 139, 87, 0.4);
-        }
-        
-        /* 职位卡片中的按钮颜色定制 */
-        .ios-job-actions .ios-button {
-            background: rgba(32, 178, 170, 0.3); /* 青/浅蓝色 30%透明度 */
-            color: #006400; /* 深绿色文字 */
-            border: 1px solid rgba(32, 178, 170, 0.5);
-        }
-        
-        .ios-job-actions .ios-button:hover {
-            background: rgba(32, 178, 170, 0.5);
-            border-color: rgba(32, 178, 170, 0.7);
-        }
-        
-        .ios-job-actions .ios-button.secondary {
-            background: rgba(135, 206, 235, 0.3); /* 中蓝/天蓝色 30%透明度 */
-            color: #000080; /* 深蓝色文字 */
-            border: 1px solid rgba(135, 206, 235, 0.5);
-        }
-        
-        .ios-job-actions .ios-button.secondary:hover {
-            background: rgba(135, 206, 235, 0.5);
-            border-color: rgba(135, 206, 235, 0.7);
-        }
+                 /* 职位卡片中的按钮颜色定制 - 使用纯色背景 */
+         .ios-job-actions .ios-button {
+             background: #20B2AA !important; /* 青/浅蓝色 - 纯色背景 */
+             color: #FFFFFF !important; /* 白色文字 */
+             border: 1px solid #20B2AA !important;
+         }
+         
+         .ios-job-actions .ios-button:hover {
+             background: #1A9B94 !important; /* 悬停时稍深的青色 */
+             border-color: #1A9B94 !important;
+         }
+         
+         .ios-job-actions .ios-button.secondary {
+             background: #87CEEB !important; /* 中蓝/天蓝色 - 纯色背景 */
+             color: #FFFFFF !important; /* 白色文字 */
+             border: 1px solid #87CEEB !important;
+         }
+         
+         .ios-job-actions .ios-button.secondary:hover {
+             background: #6BB6FF !important; /* 悬停时稍深的天蓝色 */
+             border-color: #6BB6FF !important;
+         }
         
         /* 职位指标数值颜色定制 - 使用对比度更高的颜色 */
         .ios-job-metric-value {
@@ -475,43 +445,42 @@
             margin-bottom: var(--ios-spacing-xs);
         }
         
-        /* 暂无职位时的按钮颜色 - 使用对比度更高的颜色 */
-        .ios-card .ios-button.large {
-            background: rgba(46, 139, 87, 0.3); /* 深绿色 30%透明度 */
-            color: #FFFFFF !important; /* 白色文字 - 对比度更高 */
-            border: 1px solid rgba(46, 139, 87, 0.5);
-        }
+                 /* 暂无职位时的按钮颜色 - 使用纯色背景 */
+         .ios-card .ios-button.large {
+             background: #2E8B57 !important; /* 深绿色 - 纯色背景 */
+             color: #FFFFFF !important; /* 白色文字 */
+             border: 1px solid #2E8B57 !important;
+         }
+         
+         .ios-card .ios-button.large:hover {
+             background: #228B22 !important; /* 悬停时稍深的绿色 */
+             border-color: #228B22 !important;
+         }
         
-        .ios-card .ios-button.large:hover {
-            background: rgba(46, 139, 87, 0.5);
-            border-color: rgba(46, 139, 87, 0.7);
-        }
+                 /* 职位状态颜色优化 - 使用更明亮的背景 */
+         .ios-job-status.active {
+             background: #E8F5E8 !important; /* 浅绿色背景 */
+             color: #2E8B57 !important; /* 深绿色 */
+         }
+         
+         .ios-job-status.draft {
+             background: #FFF4E6 !important; /* 浅橙色背景 */
+             color: #FF8C00 !important; /* 深橙色 */
+         }
+         
+         .ios-job-status.closed {
+             background: #FFE8E8 !important; /* 浅红色背景 */
+             color: #DC143C !important; /* 深红色 */
+         }
         
-        /* 职位状态颜色优化 - 提高对比度 */
-        .ios-job-status.active {
-            background: rgba(46, 139, 87, 0.1);
-            color: #2E8B57 !important; /* 深绿色 */
-        }
-        
-        .ios-job-status.draft {
-            background: rgba(255, 140, 0, 0.1);
-            color: #FF8C00 !important; /* 深橙色 */
-        }
-        
-        .ios-job-status.closed {
-            background: rgba(220, 20, 60, 0.1);
-            color: #DC143C !important; /* 深红色 */
-        }
-        
-        .ios-filter-section {
-            background: rgba(255, 255, 255, 0.8) !important;
-            backdrop-filter: blur(8px);
-            border-radius: 16px;
-            padding: var(--ios-spacing-md);
-            margin-bottom: var(--ios-spacing-xl);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-        }
+                 .ios-filter-section {
+             background: #ffffff !important;
+             border-radius: 16px;
+             padding: var(--ios-spacing-md);
+             margin-bottom: var(--ios-spacing-xl);
+             border: 1px solid rgba(0, 0, 0, 0.08);
+             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+         }
         
         .ios-filter-group {
             display: flex;
@@ -552,19 +521,19 @@
             font-size: 1.125rem;
         }
 
-        /* 统一控件高度与边框，接近表单搜索条风格 */
-        .ios-input {
-            height: 58px;
-            border-radius: 16px;
-            border: 1px solid var(--ios-border-secondary);
-            background: var(--ios-bg-secondary);
-            color: var(--ios-text-primary);
-        }
-        .ios-input:focus{
-            outline: none;
-            border-color: var(--ios-blue);
-            box-shadow: 0 0 0 3px rgba(0,122,255,.12);
-        }
+                 /* 统一控件高度与边框，接近表单搜索条风格 */
+         .ios-input {
+             height: 58px;
+             border-radius: 16px;
+             border: 1px solid rgba(0, 0, 0, 0.12);
+             background: #ffffff !important;
+             color: var(--ios-text-primary);
+         }
+                 .ios-input:focus{
+             outline: none;
+             border-color: #4682B4 !important;
+             box-shadow: 0 0 0 3px rgba(70, 130, 180, 0.15) !important;
+         }
         .ios-input::placeholder{ color: var(--ios-text-quaternary); }
         
         /* 统一 select 的外观、字体与边框颜色 */
