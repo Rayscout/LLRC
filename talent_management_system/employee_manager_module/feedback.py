@@ -49,7 +49,7 @@ def feedback_dashboard():
                              
     except Exception as e:
         flash(f'加载反馈页面时发生错误: {str(e)}', 'danger')
-        return redirect(url_for('talent_management.employee_auth.employee_dashboard'))
+        return redirect(url_for('talent_management.employee_management.employee_dashboard'))
 
 @feedback_bp.route('/send', methods=['GET', 'POST'])
 def send_feedback():

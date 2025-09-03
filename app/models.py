@@ -1,7 +1,13 @@
 from . import db
 from datetime import datetime
+try:
+    from flask_login import UserMixin
+except Exception:
+    # 如果Flask-Login不可用，提供兼容基类
+    class UserMixin:
+        pass  # Flask-Login 方法将在User模型中实现
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
@@ -26,15 +32,23 @@ class User(db.Model):
     skills = db.Column(db.Text)  # 技能标签（JSON格式存储）
     education = db.Column(db.Text)  # 教育经历
     experience = db.Column(db.Text)  # 工作经历
-    # 简历AI分析持久化
-    resume_analysis = db.Column(db.Text)  # 最新一次简历分析（JSON字符串）
-    resume_last_analyzed_at = db.Column(db.DateTime)
-    resume_signature = db.Column(db.String(64))  # 用于检测简历是否变化（如 sha1）
     
     # 账号状态管理字段
     is_active = db.Column(db.Boolean, default=True)  # 账号是否活跃
     deactivated_at = db.Column(db.DateTime)  # 注销时间
     deactivated_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # 注销操作人ID
+    
+    # Flask-Login 所需的方法
+    def get_id(self):
+        return str(self.id)
+    
+    @property
+    def is_authenticated(self):
+        return True
+    
+    @property
+    def is_anonymous(self):
+        return False
 
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -70,13 +84,6 @@ class Application(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), nullable=False, default='Pending')
     is_active = db.Column(db.Boolean, default=True)  # 添加活跃状态字段
-    # AI 正式面试与HR审批（第一轮）
-    ai_official_taken = db.Column(db.Boolean, default=False)
-    ai_official_score = db.Column(db.Integer)  # 0-100 综合分
-    ai_official_taken_at = db.Column(db.DateTime)
-    hr_stage1_decision = db.Column(db.String(20))  # passed / failed
-    hr_stage1_decided_at = db.Column(db.DateTime)
-    hr_stage1_note = db.Column(db.Text)
 
     user = db.relationship('User', backref=db.backref('applications', lazy=True))
     job = db.relationship('Job', backref=db.backref('applications', lazy=True))
@@ -418,4 +425,70 @@ class Project(db.Model):
             delta = end_date - self.start_date
             return delta.days // 30  # 粗略计算月数
         return 0
+
+
+class InterviewSchedule(db.Model):
+    """面试安排数据模型"""
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # 关联字段
+    hr_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # HR用户ID
+    candidate_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # 候选人ID
+    job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)  # 职位ID
+    application_id = db.Column(db.Integer, db.ForeignKey('application.id'), nullable=False)  # 申请ID
+    
+    # 面试时间信息
+    interview_date = db.Column(db.Date, nullable=False)  # 面试日期
+    start_time = db.Column(db.Time, nullable=False)  # 开始时间
+    end_time = db.Column(db.Time, nullable=False)  # 结束时间
+    
+    # 面试详情
+    interview_type = db.Column(db.String(20), nullable=False)  # online, onsite, phone
+    location = db.Column(db.String(200))  # 面试地点或在线链接
+    interviewer_name = db.Column(db.String(100))  # 面试官姓名
+    notes = db.Column(db.Text)  # 备注信息
+    
+    # 状态管理
+    status = db.Column(db.String(20), default='scheduled')  # scheduled, completed, cancelled, rescheduled
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 关系
+    hr = db.relationship('User', foreign_keys=[hr_id], backref=db.backref('scheduled_interviews', lazy=True))
+    candidate = db.relationship('User', foreign_keys=[candidate_id], backref=db.backref('my_interviews', lazy=True))
+    job = db.relationship('Job', backref=db.backref('interview_schedules', lazy=True))
+    application = db.relationship('Application', backref=db.backref('interview_schedules', lazy=True))
+    
+    def __repr__(self):
+        return f'<InterviewSchedule {self.id}: {self.candidate_id} -> {self.job_id}>'
+    
+    @property
+    def interview_datetime(self):
+        """获取完整的面试日期时间"""
+        from datetime import datetime
+        return datetime.combine(self.interview_date, self.start_time)
+    
+    @property
+    def duration_minutes(self):
+        """计算面试时长（分钟）"""
+        if self.start_time and self.end_time:
+            start_minutes = self.start_time.hour * 60 + self.start_time.minute
+            end_minutes = self.end_time.hour * 60 + self.end_time.minute
+            return end_minutes - start_minutes
+        return 0
+    
+    @property
+    def is_today(self):
+        """是否为今天的面试"""
+        return self.interview_date == datetime.utcnow().date()
+    
+    @property
+    def is_upcoming(self):
+        """是否为即将到来的面试（今天或未来）"""
+        return self.interview_date >= datetime.utcnow().date()
+    
+    @property
+    def is_past(self):
+        """是否为过去的面试"""
+        return self.interview_date < datetime.utcnow().date()
 

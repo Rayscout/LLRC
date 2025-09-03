@@ -3,9 +3,9 @@
 /* CSS变量定义 */
 :root {
     /* 亮色模式 */
-    --bg-primary: #F2F2F7;
-    --bg-secondary: rgba(255, 255, 255, 0.8);
-    --bg-card: rgba(255, 255, 255, 0.9);
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
     --text-primary: #1D1D1F;
     --text-secondary: #86868B;
     --accent-color: #007AFF;
@@ -17,6 +17,12 @@
     --blur-bg: blur(20px);
     --card-radius: 20px;
     --button-radius: 12px;
+}
+
+/* 全局关闭毛玻璃效果 */
+* {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
 }
 
 /* 深色模式 */
@@ -72,6 +78,52 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* 柔和的移动渐变点缀背景（#C6FFDD, #FBD786, #F7797D） */
+body::before {
+    content: '';
+    position: fixed;
+    inset: -10% -10% auto -10%;
+    height: 58vh;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(60% 70% at 12% 52%, #FFFFF0 0%, rgba(255,255,240,0) 65%),
+                radial-gradient(60% 70% at 52% 45%, #FFFACD 0%, rgba(255,250,205,0) 68%),
+                radial-gradient(60% 70% at 88% 42%, #FFF8DC 0%, rgba(255,248,220,0) 72%);
+    filter: blur(32px);
+    opacity: .60;
+    transform: translate3d(0,0,0);
+    animation: candidate-bg-drift 22s ease-in-out infinite;
+}
+
+@keyframes candidate-bg-drift {
+    0%   { transform: translate3d(-2%, -2%, 0) scale(1); }
+    50%  { transform: translate3d(2%, 1%, 0) scale(1.03); }
+    100% { transform: translate3d(-2%, -2%, 0) scale(1); }
+}
+
+/* 底部对称的淡色渐变点缀 */
+body::after {
+    content: '';
+    position: fixed;
+    inset: auto -10% -10% -10%;
+    height: 52vh;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(60% 70% at 18% 50%, #FFFFF0 0%, rgba(255,255,240,0) 65%),
+                radial-gradient(60% 70% at 52% 55%, #FFFACD 0%, rgba(255,250,205,0) 68%),
+                radial-gradient(60% 70% at 84% 58%, #FFF8DC 0%, rgba(255,248,220,0) 72%);
+    filter: blur(30px);
+    opacity: .54;
+    transform: translate3d(0,0,0);
+    animation: candidate-bg-drift-bottom 26s ease-in-out infinite;
+}
+
+@keyframes candidate-bg-drift-bottom {
+    0%   { transform: translate3d(2%, 2%, 0) scale(1); }
+    50%  { transform: translate3d(-2%, -1%, 0) scale(1.03); }
+    100% { transform: translate3d(2%, 2%, 0) scale(1); }
+}
+
 /* 顶部导航栏 */
 .navbar {
     position: fixed;
@@ -80,8 +132,8 @@ body {
     right: 0;
     z-index: 1000;
     background: var(--bg-secondary);
-    backdrop-filter: var(--blur-bg);
-    -webkit-backdrop-filter: var(--blur-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     border-bottom: 1px solid var(--border-color);
     transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     padding: 0 20px;
@@ -266,12 +318,12 @@ body {
 
 /* 卡片样式 */
 .card {
-    background: var(--bg-card);
+    background: #ffffff;
     border-radius: var(--card-radius);
     padding: 30px;
     box-shadow: var(--shadow-medium);
-    backdrop-filter: var(--blur-bg);
-    -webkit-backdrop-filter: var(--blur-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     border: 1px solid var(--border-color);
     transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     position: relative;
@@ -357,7 +409,7 @@ body {
     display: grid;
     gap: 20px;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
@@ -379,8 +431,8 @@ body {
     border-radius: var(--card-radius);
     padding: 25px;
     box-shadow: var(--shadow-light);
-    backdrop-filter: var(--blur-bg);
-    -webkit-backdrop-filter: var(--blur-bg);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     border: 1px solid var(--border-color);
     transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     position: relative;

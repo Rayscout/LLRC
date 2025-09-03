@@ -1,12 +1,12 @@
 /* 员工系统按钮颜色统一更新 */
-/* 基于图中的天蓝色/浅蓝色 */
+/* 基于个人资料界面的绿色系 */
 
 /* 定义按钮颜色变量 */
 :root {
-    --button-primary-color: #A8D8EA; /* 天蓝色/浅蓝色 */
-    --button-primary-hover: #8BC8E0; /* 稍深的天蓝色用于悬停 */
-    --button-text-color: #2F4F4F; /* 深色文字确保可读性 */
-    --button-shadow: rgba(168, 216, 234, 0.4); /* 天蓝色阴影 */
+    --button-primary-color: #7ED321; /* 绿色 */
+    --button-primary-hover: #6BC02A; /* 稍深的绿色用于悬停 */
+    --button-text-color: #FFFFFF; /* 白色文字确保可读性 */
+    --button-shadow: rgba(126, 211, 33, 0.4); /* 绿色阴影 */
 }
 
 /* 主要按钮样式 - 覆盖所有.btn类 */
