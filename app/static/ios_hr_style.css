@@ -292,20 +292,6 @@ html { overflow: auto; }
     background: linear-gradient(90deg, var(--ios-blue), var(--ios-purple));
 }
 
-/* 指标卡片上边沿颜色映射 - 使用甜甜圈图表的颜色 */
-.ios-grid .ios-metric-card:nth-of-type(1)::before {
-    background: linear-gradient(90deg, #FDF0B2, #FBE6A3); /* 浅黄色 */
-}
-.ios-grid .ios-metric-card:nth-of-type(2)::before {
-    background: linear-gradient(90deg, #F87979, #FF6B6B); /* 珊瑚粉 */
-}
-.ios-grid .ios-metric-card:nth-of-type(3)::before {
-    background: linear-gradient(90deg, #60C7B8, #41C7BD); /* 青绿色 */
-}
-.ios-grid .ios-metric-card:nth-of-type(4)::before {
-    background: linear-gradient(90deg, #58B0D9, #4DB3E6); /* 天空蓝 */
-}
-
 .ios-metric-card:hover {
     transform: translateY(-8px);
     box-shadow: var(--ios-shadow-heavy);
@@ -322,25 +308,6 @@ html { overflow: auto; }
     margin: 0 auto var(--ios-spacing-lg);
     color: white;
     font-size: 1.5rem;
-}
-
-/* 指标卡片图标背景颜色映射 - 使用甜甜圈图表的颜色 */
-.ios-grid .ios-metric-card:nth-of-type(1) .ios-metric-icon {
-    background: linear-gradient(135deg, #FDF0B2, #FBE6A3); /* 浅黄色 */
-}
-.ios-grid .ios-metric-card:nth-of-type(2) .ios-metric-icon {
-    background: linear-gradient(135deg, #F87979, #FF6B6B); /* 珊瑚粉 */
-}
-.ios-grid .ios-metric-card:nth-of-type(3) .ios-metric-icon {
-    background: linear-gradient(135deg, #60C7B8, #41C7BD); /* 青绿色 */
-}
-.ios-grid .ios-metric-card:nth-of-type(4) .ios-metric-icon {
-    background: linear-gradient(135deg, #58B0D9, #4DB3E6); /* 天空蓝 */
-}
-
-/* 指标卡片图标颜色设为白色，确保在彩色背景上可见 */
-.ios-grid .ios-metric-card .ios-metric-icon i {
-    color: white !important;
 }
 
 .ios-metric-value {

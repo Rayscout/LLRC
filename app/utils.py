@@ -361,7 +361,7 @@ def ai_extract_skills_from_text(resume_text: str) -> list:
 def ai_analyze_resume_text(resume_text: str) -> dict:
     """对简历文本做详尽分析，返回结构化结果。
 
-    返回字段：summary, strengths, weaknesses, suggestions, recommended_roles
+    返回字段：summary, strengths, weaknesses, suggestions, recommended_roles, score
     """
     prompt = (
         "你是一名资深HR。请深入分析下面的中文简历，输出JSON，字段为：\n"
@@ -369,7 +369,8 @@ def ai_analyze_resume_text(resume_text: str) -> dict:
         "strengths: 用条目列出3-6条优势；\n"
         "weaknesses: 用条目列出2-4条可改进点；\n"
         "suggestions: 给出具体可执行的改进建议（3-6条）；\n"
-        "recommended_roles: 推荐3-6个适合的岗位名称。\n"
+        "recommended_roles: 推荐3-6个适合的岗位名称；\n"
+        "score: 给出1-100的简历评分，基于内容完整性、技能匹配度、经验相关性等。\n"
         "只输出JSON，不要额外说明。\n\n"
         f"简历：\n{resume_text}\n\n输出："
     )
@@ -408,6 +409,7 @@ def ai_analyze_resume_text(resume_text: str) -> dict:
             'weaknesses': weaknesses,
             'suggestions': suggestions,
             'recommended_roles': recommended_roles,
+            'score': 75,  # 默认评分
         }
     # 规整类型
     def _to_list(x):
@@ -424,6 +426,7 @@ def ai_analyze_resume_text(resume_text: str) -> dict:
         'weaknesses': _to_list(result.get('weaknesses', [])),
         'suggestions': _to_list(result.get('suggestions', [])),
         'recommended_roles': _to_list(result.get('recommended_roles', [])),
+        'score': int(result.get('score', 75)),  # 确保score是整数
     }
     return result
 
