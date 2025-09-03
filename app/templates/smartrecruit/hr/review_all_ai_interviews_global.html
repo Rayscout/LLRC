@@ -44,6 +44,20 @@
             color: var(--ios-blue);
             margin-bottom: var(--ios-spacing-xs);
         }
+
+        /* 统计数字颜色定制 */
+        .ios-stats-grid .ios-stat-card:nth-of-type(1) .ios-stat-number {
+            color: #FFE4B5 !important; /* 浅黄色 - 总候选人 */
+        }
+        .ios-stats-grid .ios-stat-card:nth-of-type(2) .ios-stat-number {
+            color: #FF6B6B !important; /* 红/珊瑚色 - 通过面试 */
+        }
+        .ios-stats-grid .ios-stat-card:nth-of-type(3) .ios-stat-number {
+            color: #20B2AA !important; /* 青/浅蓝色 - 通过率 */
+        }
+        .ios-stats-grid .ios-stat-card:nth-of-type(4) .ios-stat-number {
+            color: #87CEEB !important; /* 中蓝/天蓝色 - 平均分数 */
+        }
         
         .ios-stat-label {
             font-size: 0.875rem;
@@ -354,7 +368,7 @@
         .ios-form-group select:focus,
         .ios-form-group textarea:focus {
             outline: none;
-            border-color: #007AFF;
+            border-color: #c4dfcc;
             box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
         }
         
@@ -365,7 +379,7 @@
         }
         
         .ios-action-button.primary {
-            background: #007AFF;
+            background: #c4dfcc;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -378,7 +392,7 @@
         }
         
         .ios-action-button.primary:hover {
-            background: #0056CC;
+            background: #acd2b7;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
         }
@@ -445,18 +459,7 @@
                         <span class="ios-nav-text">面试</span>
                     </a>
                 </li>
-                <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link">
-                        <i class="ios-nav-icon uil uil-chart-pie"></i>
-                        <span class="ios-nav-text">报表</span>
-                    </a>
-                </li>
-                <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link">
-                        <i class="ios-nav-icon uil uil-lightbulb"></i>
-                        <span class="ios-nav-text">AI洞察</span>
-                    </a>
-                </li>
+
             </ul>
             
             <div class="ios-nav-actions">
@@ -466,7 +469,6 @@
                 </div>
                 
                 <div class="ios-nav-divider"></div>
-                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
                 
                 <button class="ios-nav-button" data-action="profile">
                     <i class="uil uil-user"></i>
@@ -572,11 +574,11 @@
                         </div>
                         
                         <div class="ios-actions">
-                            <button class="ios-action-button approve" onclick="approveCandidate({{ candidate.application_id }})">
+                            <button class="ios-action-button approve" onclick="approveCandidate('{{ candidate.application_id }}')">
                                 <i class="uil uil-check"></i>
                                 通过审核
                             </button>
-                            <button class="ios-action-button reject" onclick="rejectCandidate({{ candidate.application_id }})">
+                            <button class="ios-action-button reject" onclick="rejectCandidate('{{ candidate.application_id }}')">
                                 <i class="uil uil-times"></i>
                                 拒绝
                             </button>

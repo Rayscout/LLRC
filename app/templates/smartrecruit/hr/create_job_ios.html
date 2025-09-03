@@ -237,7 +237,7 @@
         }
         /* cards for drafts highlight */
         .draft-card { position: relative; }
-        .border-highlight { border: 2px solid #007aff !important; }
+        .border-highlight { border: 2px solid #c4dfcc !important; }
         .border-normal { border: 2px solid rgba(255,255,255,0.2) !important; }
         
         .ios-form-actions {
@@ -249,23 +249,23 @@
         }
         
         .ios-save-draft {
-            background: transparent;
-            color: var(--ios-text-secondary);
-            border: 1px solid var(--ios-border-primary);
+            background: #FFE4B5; /* 浅黄色 */
+            color: #8B4513;
+            border: 1px solid #DAA520;
         }
         
         .ios-save-draft:hover {
-            background: var(--ios-bg-tertiary);
-            color: var(--ios-text-primary);
+            background: #FFD700;
+            color: #654321;
         }
         
         .ios-publish-job {
-            background: var(--ios-green);
+            background: #20B2AA; /* 青/浅蓝色 */
             color: white;
         }
         
         .ios-publish-job:hover {
-            background: #2db84d;
+            background: #40E0D0;
         }
         
         .ios-form-tabs {
@@ -364,18 +364,7 @@
                         <span class="ios-nav-text">面试</span>
                     </a>
                 </li>
-                <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.reports' else '' }}">
-                        <i class="ios-nav-icon uil uil-chart-pie"></i>
-                        <span class="ios-nav-text">报表</span>
-                    </a>
-                </li>
-                <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link {{ 'active' if request.endpoint == 'smartrecruit.hr.dashboard.insights' else '' }}">
-                        <i class="ios-nav-icon uil uil-lightbulb"></i>
-                        <span class="ios-nav-text">AI洞察</span>
-                    </a>
-                </li>
+                <!-- 已移除：报表、AI洞察导航项 -->
             </ul>
             
             <div class="ios-nav-actions">
@@ -385,7 +374,6 @@
                 </div>
                 
                 <div class="ios-nav-divider"></div>
-                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
                 
                 
                 <button class="ios-nav-button" data-action="profile">
@@ -528,12 +516,12 @@
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px;">
                             <div style="font-weight:600;">暂存内容</div>
                             <div style="display:flex; gap:8px;">
-                                <button type="button" id="copyDraftBtn" class="ios-button" style="padding:6px 10px;">复制</button>
-                                <button type="button" id="aiPrintBtn" class="ios-button" style="padding:6px 14px; background:#5856d6; color:#fff; border-radius:10px; display:flex; align-items:center; gap:6px;">
+                                <button type="button" id="copyDraftBtn" class="ios-button" style="padding:6px 10px; background:#98FB98; color:#2F4F2F; border:1px solid #90EE90;">复制</button>
+                                <button type="button" id="aiPrintBtn" class="ios-button" style="padding:6px 14px; background:#4169E1; color:#fff !important; border-radius:10px; display:flex; align-items:center; gap:6px;">
                                     <i class="uil uil-terminal"></i>
                                     发送到AI并打印
                                 </button>
-                                <button type="button" id="uploadToFormBtn" class="ios-button" style="padding:6px 12px; background:#34c759; color:#fff; border-radius:10px; display:flex; align-items:center; gap:6px;">
+                                <button type="button" id="uploadToFormBtn" class="ios-button" style="padding:6px 12px; background:#FFE4B5; color:#8B4513; border:1px solid #DAA520; border-radius:10px; display:flex; align-items:center; gap:6px;">
                                     <i class="uil uil-arrow-to-right"></i>
                                     一键上传到职位信息
                                 </button>
