@@ -10,133 +10,276 @@
     <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
-        :root {
-            --bg-primary: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            --bg-secondary: rgba(228, 246, 236, 0.3);
-            --bg-card: rgba(228, 246, 236, 0.3);
-            --text-primary: #2F4F4F;
-            --text-secondary: #666;
-            --text-tertiary: #999;
-            --accent-blue: #20B2AA;
-            --accent-green: #34C759;
-            --accent-orange: #FF9500;
-            --accent-red: #FF3B30;
-            --accent-purple: #20B2AA;
-            --shadow-light: 0 4px 20px rgba(228, 246, 236, 0.3);
-            --shadow-medium: 0 8px 30px rgba(228, 246, 236, 0.3);
-            --border-radius: 16px;
-            --border-radius-large: 24px;
-            --transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-            --transition-fast: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        [data-theme="dark"] {
-            --bg-primary: #000000;
-            --bg-secondary: rgba(44, 44, 46, 0.8);
-            --bg-card: rgba(44, 44, 46, 0.9);
-            --text-primary: #FFFFFF;
-            --text-secondary: #EBEBF5;
-            --text-tertiary: #8E8E93;
-            --accent-blue: #0A84FF;
-            --accent-green: #30D158;
-            --accent-orange: #FF9F0A;
-            --accent-red: #FF453A;
-            --accent-purple: #BF5AF2;
-            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            color: var(--text-primary);
-            line-height: 1.6;
-            transition: var(--transition);
-            animation: fadeIn 0.6s ease-out;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
             min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+        
+        /* 动态背景 - 采用绩效界面的优雅渐变晕染设计 */
+        .feedback-parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        /* 微妙的渐变晕染背景装饰 */
+        .feedback-parallax-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(144, 238, 144, 0.12) 0%, transparent 70%), /* 左下角光晕 - 淡绿色 */
+                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(152, 251, 152, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(173, 255, 47, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(50, 205, 50, 0.08) 0%, transparent 70%), /* 右下角光晕 - 淡绿色 */
+                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(34, 139, 34, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 60s ease-in-out infinite;
+        }
+        
+        /* 添加彩色光晕装饰 */
+        .feedback-parallax-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 400px 300px at 15% 85%, rgba(255, 107, 107, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 300px 400px at 85% 15%, rgba(78, 205, 196, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 500px 250px at 45% 45%, rgba(69, 183, 209, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 350px 450px at 88% 65%, rgba(150, 206, 180, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse 250px 350px at 12% 25%, rgba(255, 234, 167, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 80s ease-in-out infinite reverse;
+        }
+        
+        /* 半透明遮罩层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            z-index: -1;
+        }
+        
+        /* 微妙的渐变晕染动画 */
+        @keyframes gentleDrift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
             }
-            to {
+            25% {
+                transform: translate(30px, -20px) scale(1.01);
+                opacity: 0.98;
+            }
+            50% {
+                transform: translate(-25px, 35px) scale(0.99);
+                opacity: 1.02;
+            }
+            75% {
+                transform: translate(20px, 25px) scale(1.005);
+                opacity: 0.99;
+            }
+        }
+        
+        /* 添加卡片入场动画 */
+        @keyframes cardEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-
+        
+        .feedback-card {
+            animation: cardEntrance 0.6s ease-out;
+        }
+        
+        .feedback-card:nth-child(1) { animation-delay: 0.1s; }
+        .feedback-card:nth-child(2) { animation-delay: 0.2s; }
+        
+        /* 添加图标呼吸动画 */
+        @keyframes iconBreath {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .card-title i {
+            animation: iconBreath 3s ease-in-out infinite;
+        }
+        
+        /* 返回按钮 - 固定在左上角 */
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #7FB069, #9DC183); /* 柔和的薄荷绿渐变 */
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(127, 176, 105, 0.4);
+            border: none;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(127, 176, 105, 0.6);
+            background: linear-gradient(135deg, #9DC183, #7FB069);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .back-button i {
+            font-size: 1.2rem;
+        }
+        
         .container {
-            max-width: 800px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            background: transparent;
+            border-radius: 15px;
+            overflow: hidden;
+            padding-top: 80px;
         }
 
-        .header {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--border-radius-large);
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: slideInDown 0.8s ease-out;
+        /* 页面标题卡片 */
+        .page-header-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 为页面标题添加简洁的白色边框 */
+        .page-header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #ffffff;
+            border-radius: 25px 25px 0 0;
         }
 
-        .header h1 {
-            font-size: 2.5em;
+        .page-header-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .page-title {
+            color: #1a4d1a;
+            font-size: 2.2em;
             font-weight: 700;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .page-title i {
+            color: #052505; /* 深绿色 */
+            font-size: 1.2em;
+            background: rgba(5, 37, 5, 0.15);
+            padding: 15px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .page-header-card:hover .page-title i {
+            transform: rotate(10deg) scale(1.1);
+            background: rgba(5, 37, 5, 0.25);
+        }
+
+        .page-subtitle {
+            color: #2d5a2d;
+            font-size: 1.1em;
+            font-weight: 500;
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #2d5a2d, #4ECDC4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
-        .header p {
-            font-size: 1.2em;
-            color: var(--text-secondary);
-        }
-
+        /* 表单卡片 */
         .form-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: var(--border-radius-large);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
             padding: 40px;
-            box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: slideInUp 0.8s ease-out;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 为表单卡片添加简洁的白色边框 */
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #ffffff;
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes slideInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .form-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.8);
         }
 
         .form-group {
@@ -147,32 +290,50 @@
             display: block;
             font-size: 1.1em;
             font-weight: 600;
-            color: var(--text-primary);
+            color: #1a4d1a;
             margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-label i {
+            color: #2d5a2d;
+            font-size: 1.1em;
+            background: rgba(45, 90, 45, 0.1);
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .form-group:hover .form-label i {
+            transform: rotate(5deg) scale(1.1);
+            background: rgba(78, 205, 196, 0.25);
         }
 
         .form-control {
             width: 100%;
             padding: 15px;
             border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--border-radius);
+            border-radius: 20px;
             background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary);
+            color: #1a4d1a;
             font-size: 1em;
-            transition: var(--transition-fast);
+            transition: all 0.3s ease;
             backdrop-filter: blur(10px);
         }
 
         .form-control:focus {
             outline: none;
-            border-color: #20B2AA;
+            border-color: #4ECDC4;
             background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.1);
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+            transform: scale(1.02);
         }
 
         .form-control option {
-            background: var(--bg-card);
-            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a4d1a;
         }
 
         textarea.form-control {
@@ -196,11 +357,11 @@
         .btn {
             padding: 15px 30px;
             border: none;
-            border-radius: var(--border-radius);
+            border-radius: 20px;
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition-fast);
+            transition: all 0.3s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -225,42 +386,28 @@
         }
 
         .btn-primary {
-            background: #20B2AA;
+            background: linear-gradient(135deg, #4ECDC4, #45B7D1);
             color: white;
             flex: 1;
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
         }
 
         .btn-primary:hover {
-            background: #2F4F4F;
+            background: linear-gradient(135deg, #45B7D1, #4ECDC4);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(32, 178, 170, 0.3);
+            box-shadow: 0 12px 35px rgba(78, 205, 196, 0.4);
         }
 
         .btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(45, 90, 45, 0.1);
+            color: #2d5a2d;
+            border: 1px solid rgba(45, 90, 45, 0.2);
         }
 
         .btn-secondary:hover {
-            background: var(--bg-card);
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #20B2AA;
-            text-decoration: none;
-            font-weight: 600;
-            transition: var(--transition-fast);
-        }
-
-        .back-link:hover {
-            transform: translateX(-5px);
-        }
-
-        .back-link i {
-            margin-right: 8px;
+            background: rgba(45, 90, 45, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 90, 45, 0.2);
         }
 
         .priority-options {
@@ -274,12 +421,21 @@
             align-items: center;
             gap: 8px;
             cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .priority-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .priority-option input[type="radio"] {
             width: 18px;
             height: 18px;
-            accent-color: #20B2AA;
+            accent-color: #4ECDC4;
         }
 
         .priority-option label {
@@ -287,9 +443,34 @@
             font-weight: 500;
         }
 
-        .priority-high { color: var(--accent-red); }
-        .priority-medium { color: var(--accent-orange); }
-        .priority-low { color: var(--accent-green); }
+        .priority-high { 
+            color: #FF6B6B; 
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+        .priority-medium { 
+            color: #FFEAA7; 
+            border: 1px solid rgba(255, 234, 167, 0.3);
+        }
+        .priority-low { 
+            color: #A8D5BA; 
+            border: 1px solid rgba(168, 213, 186, 0.3);
+        }
+
+        /* 为不同优先级选项添加悬停时的彩色边框 */
+        .priority-option:hover.priority-high {
+            border: 1px solid rgba(255, 107, 107, 0.6);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.2);
+        }
+
+        .priority-option:hover.priority-medium {
+            border: 1px solid rgba(255, 234, 167, 0.6);
+            box-shadow: 0 5px 15px rgba(255, 234, 167, 0.2);
+        }
+
+        .priority-option:hover.priority-low {
+            border: 1px solid rgba(168, 213, 186, 0.6);
+            box-shadow: 0 5px 15px rgba(168, 213, 186, 0.2);
+        }
 
         @media (max-width: 768px) {
             .form-row {
@@ -307,21 +488,32 @@
             .form-card {
                 padding: 25px;
             }
+            
+            .page-header-card {
+                padding: 25px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a href="{{ url_for('talent_management.employee_manager.feedback.feedback_dashboard') }}" class="back-link">
-            <i class="fas fa-arrow-left"></i> 返回反馈管理
-        </a>
+    <!-- 动态背景 -->
+    <div class="feedback-parallax-bg"></div>
+    <div class="overlay-layer"></div>
 
-        <div class="header">
-            <h1><i class="fas fa-paper-plane"></i> 发送反馈</h1>
-            <p>向高管或主管发送反馈，促进沟通和团队协作</p>
+    <!-- 返回按钮 -->
+    <a href="{{ url_for('talent_management.employee_manager.feedback.feedback_dashboard') }}" class="back-button">
+        <i class="fas fa-arrow-left"></i> 返回反馈管理
+    </a>
+
+    <div class="container">
+        <div class="page-header-card feedback-card">
+            <h1 class="page-title">
+                <i class="fas fa-paper-plane"></i> 发送反馈
+            </h1>
+            <p class="page-subtitle">向高管或主管发送反馈，促进沟通和团队协作</p>
         </div>
 
-        <div class="form-card">
+        <div class="form-card feedback-card">
             <form method="POST" action="{{ url_for('talent_management.employee_manager.feedback.send_feedback') }}">
                 <div class="form-group">
                     <label for="recipient_id" class="form-label">
@@ -371,17 +563,17 @@
                         <i class="fas fa-exclamation-triangle"></i> 优先级
                     </label>
                     <div class="priority-options">
-                        <div class="priority-option">
+                        <div class="priority-option priority-low">
                             <input type="radio" name="priority" id="priority-low" value="low" checked>
-                            <label for="priority-low" class="priority-low">低优先级</label>
+                            <label for="priority-low">低优先级</label>
                         </div>
-                        <div class="priority-option">
+                        <div class="priority-option priority-medium">
                             <input type="radio" name="priority" id="priority-medium" value="medium">
-                            <label for="priority-medium" class="priority-medium">中优先级</label>
+                            <label for="priority-medium">中优先级</label>
                         </div>
-                        <div class="priority-option">
+                        <div class="priority-option priority-high">
                             <input type="radio" name="priority" id="priority-high" value="high">
-                            <label for="priority-high" class="priority-high">高优先级</label>
+                            <label for="priority-high">高优先级</label>
                         </div>
                     </div>
                 </div>
@@ -452,9 +644,9 @@
             const minLength = 10;
             
             if (length < minLength) {
-                this.style.borderColor = '#FF3B30';
+                this.style.borderColor = '#FF6B6B';
             } else {
-                this.style.borderColor = '#34C759';
+                this.style.borderColor = '#A8D5BA';
             }
         });
     </script>

@@ -361,16 +361,15 @@ def ai_extract_skills_from_text(resume_text: str) -> list:
 def ai_analyze_resume_text(resume_text: str) -> dict:
     """对简历文本做详尽分析，返回结构化结果。
 
-    返回字段：summary, strengths, weaknesses, suggestions, recommended_roles, score(0-100)
+    返回字段：summary, strengths, weaknesses, suggestions, recommended_roles
     """
     prompt = (
-        "你是一名资深HR。请深入分析下面的中文简历，输出严格JSON对象，字段为：\n"
+        "你是一名资深HR。请深入分析下面的中文简历，输出JSON，字段为：\n"
         "summary: 对候选人的背景做150-250字概述；\n"
         "strengths: 用条目列出3-6条优势；\n"
         "weaknesses: 用条目列出2-4条可改进点；\n"
         "suggestions: 给出具体可执行的改进建议（3-6条）；\n"
-        "recommended_roles: 推荐3-6个适合的岗位名称；\n"
-        "score: 对该简历与一般岗位匹配度综合评分，0-100的整数。\n"
+        "recommended_roles: 推荐3-6个适合的岗位名称。\n"
         "只输出JSON，不要额外说明。\n\n"
         f"简历：\n{resume_text}\n\n输出："
     )
@@ -403,22 +402,12 @@ def ai_analyze_resume_text(resume_text: str) -> dict:
         weaknesses = ['简历中的量化成果偏少', '项目角色与个人贡献需更清晰']
         suggestions = ['补充关键项目的指标与影响（如性能提升、成本下降）', '在技能小节中突出核心技术与掌握程度', '增加与目标岗位匹配的关键词']
         recommended_roles = ['Python后端工程师', '数据开发工程师', '平台工程师']
-        # 简单启发式评分：依据信息量、关键字、长度
-        base = 50
-        info_bonus = 10 if len(resume_text) > 800 else (5 if len(resume_text) > 300 else 0)
-        kw_bonus = 0
-        for kw in ['python','java','sql','flask','django','docker','kubernetes','aws','azure','react','vue','nlp','ml','ai']:
-            if kw in tokens:
-                kw_bonus += 2
-        kw_bonus = min(20, kw_bonus)
-        score = max(40, min(95, base + info_bonus + kw_bonus))
         result = {
             'summary': '候选人具备一定的软件开发背景与实践能力，技术栈集中在后端/数据方向，具备学习与落地能力，适合进一步在目标岗位进行深耕与提升。',
             'strengths': strengths,
             'weaknesses': weaknesses,
             'suggestions': suggestions,
             'recommended_roles': recommended_roles,
-            'score': int(score),
         }
     # 规整类型
     def _to_list(x):
@@ -429,20 +418,12 @@ def ai_analyze_resume_text(resume_text: str) -> dict:
             parts = [i.strip('- •\t ').strip() for i in re.split(r"[\n;]\s*", x) if i.strip()]
             return parts or [x.strip()]
         return []
-    # 规整类型并补足 score
-    def _to_int_score(x):
-        try:
-            v = int(float(x))
-            return max(0, min(100, v))
-        except Exception:
-            return None
     result = {
         'summary': str(result.get('summary', '')).strip(),
         'strengths': _to_list(result.get('strengths', [])),
         'weaknesses': _to_list(result.get('weaknesses', [])),
         'suggestions': _to_list(result.get('suggestions', [])),
         'recommended_roles': _to_list(result.get('recommended_roles', [])),
-        'score': (_to_int_score(result.get('score')) or 0),
     }
     return result
 

@@ -70,10 +70,6 @@
                     <i class="uil uil-calendar-alt"></i>
                     <span class="link-name">面试安排</span>
                 </a></li>
-                <li><a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}">
-                    <i class="uil uil-chart-pie"></i>
-                    <span class="link-name">报表与分析</span>
-                </a></li>
                 <li><a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}">
                     <i class="uil uil-list-ul"></i>
                     <span class="link-name">已发布招聘</span>
@@ -300,26 +296,8 @@
 
         applyTheme(initialTheme());
 
-        // 同步导航上的 iOS 风格按钮（若存在）
-        var iosToggles = document.querySelectorAll('#iosThemeToggle');
-        iosToggles.forEach(function(btn){
-            btn.classList.toggle('active', body.classList.contains('dark'));
-            btn.addEventListener('click', function(){
-                var next = body.classList.contains('dark') ? 'light' : 'dark';
-                applyTheme(next);
-                try { localStorage.setItem('theme', next); } catch(e){}
-                iosToggles.forEach(function(b){ b.classList.toggle('active', next==='dark'); });
-            });
-        });
+        // 主题切换已移除：不再同步任何外部按钮状态
 
-        // 监听切换（侧边开关）
-        toggle.addEventListener('change', function(){
-            var theme = this.checked ? 'dark' : 'light';
-            applyTheme(theme);
-            try { localStorage.setItem('theme', theme); } catch(e){}
-            iosToggles.forEach(function(b){ b.classList.toggle('active', theme==='dark'); });
-        });
-        
         // HR下拉菜单功能
         function toggleHrMenu() {
             const dropdown = document.getElementById('hrDropdownMenu');
@@ -359,7 +337,6 @@
                 var toDark = !body.classList.contains('dark');
                 applyTheme(toDark ? 'dark' : 'light');
                 try { localStorage.setItem('theme', toDark ? 'dark' : 'light'); } catch(e){}
-                iosToggles.forEach(function(b){ b.classList.toggle('active', toDark); });
             });
         }
     })();
