@@ -5,6 +5,10 @@ try:
 except Exception:
     Session = None
 from flask_migrate import Migrate
+try:
+    from flask_login import LoginManager
+except Exception:
+    LoginManager = None
 from pymongo import MongoClient
 from .config import Config
 import logging
@@ -26,6 +30,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 db = SQLAlchemy()
 migrate = Migrate()
 sess = Session() if Session is not None else None
+login_manager = LoginManager() if LoginManager is not None else None
 
 mongo_client = None
 mongodb = None
@@ -89,6 +94,28 @@ def create_app():
             logger.info("Flask-Session initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize Flask-Session: {e}")
+            raise
+    
+    # 初始化Flask-Login
+    if login_manager is not None:
+        try:
+            login_manager.init_app(app)
+            login_manager.login_view = 'common.auth.sign'
+            login_manager.login_message = '请登录以访问此页面'
+            login_manager.login_message_category = 'info'
+            
+            @login_manager.user_loader
+            def load_user(user_id):
+                try:
+                    from .models import User
+                    return User.query.get(int(user_id))
+                except Exception as e:
+                    logger.error(f"Failed to load user {user_id}: {e}")
+                    return None
+                    
+            logger.info("Flask-Login initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize Flask-Login: {e}")
             raise
 
     try:
