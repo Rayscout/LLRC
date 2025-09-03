@@ -24,6 +24,10 @@
              --fx-bg-3:#c4dfcc;
          }
         /* 页面特定样式 */
+        /* 间距精确缩小：去除每个Section的最小高度并压缩上下内边距，重点缩小英雄区与关键指标区间隔 */
+        .ios-section{ min-height:auto !important; padding-top:16px !important; padding-bottom:16px !important; }
+        .ios-hero-section{ padding-bottom:12px !important; }
+        .ios-stats-section{ padding-top:16px !important; }
                  .ios-hero-section { background: radial-gradient(1200px 420px at 20% -10%, #dbece0 0%, #cfe5d6 40%, #ffffff 100%); position:relative; overflow:hidden }
                  .ios-hero-section:before{content:""; position:absolute; inset:-20% -10% auto -10%; height:320px; background:conic-gradient(from 180deg, rgba(196,223,204,.18), rgba(207,229,214,.14), rgba(184,216,193,.12), rgba(196,223,204,.18)); filter:blur(40px); animation:spinSlow 22s linear infinite; pointer-events:none}
                  .ios-hero-section:after{content:""; position:absolute; right:-160px; top:-120px; width:520px; height:520px; background:radial-gradient(closest-side, rgba(196,223,204,.25), rgba(196,223,204,0)); filter:blur(10px); transform:rotate(15deg); animation:floatY 12s ease-in-out infinite; pointer-events:none}
@@ -206,6 +210,19 @@
 
         /* 头部 tabs 的视觉（明细/分析）可通过链接样式体现）*/
         .ios-title{ display:flex; align-items:center; gap:10px; }
+        
+        /* 统一重要文本字体为SF Pro Display */
+        h1, h2, h3, h4, h5, h6,
+        .ios-title, .ios-subtitle,
+        .ios-recent-title, .ios-metric-label,
+        .ios-quick-action h4, .ios-step-content h4,
+        .ios-guide-header h3, .ios-help-header h3,
+        .overlay-card h4, .ios-feature-card h4,
+        .ios-help-item h4, .ios-chart-container h3,
+        .ios-nav-brand, .ios-nav-text,
+        .ios-button, .ios-metric-value {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        }
 
         /* 滑动时卡片渐显（不改结构，仅加类名控制） */
         .fade-card{ opacity:0; transform: translateY(12px); transition: opacity .5s ease, transform .6s cubic-bezier(.22,1,.36,1); will-change: transform, opacity; }
@@ -240,8 +257,8 @@
         /* 紧凑模式：缩小一切卡片尺寸、间距、字体 */
         .compact .ios-container{ --ios-spacing-xl:24px; --ios-spacing-lg:16px; --ios-spacing-md:10px; --ios-spacing-sm:6px }
         .compact .ios-title.hello{ font-size:1.8rem }
-        .compact .ios-title{ font-size:1rem }
-        .compact .ios-subtitle{ font-size:.85rem }
+        .compact .ios-title{ font-size:2rem }
+        .compact .ios-subtitle{ font-size:1.125rem }
         .compact .ios-metric-card{ padding: var(--ios-spacing-md); border-radius:12px }
         .compact .ios-metric-value{ font-size:22px }
         .compact .ios-quick-action{ padding: var(--ios-spacing-md); border-radius:12px }
@@ -263,8 +280,8 @@
         .mini-card .delta{ font-size:.75rem; color:#10b981 }
         .mini-card .delta.neg{ color:#ef4444 }
 
-        /* 悬浮蓝色分布卡 */
-                 .overlay-card{ position:absolute; right:4%; top:-28px; background:#b8d8c1; color:#fff; border-radius:16px; box-shadow:0 18px 40px rgba(184,216,193,.35); padding:14px 18px; width:280px; transform:translateZ(0) }
+        /* 悬浮蓝色分布卡：调整为常规流布局，避免与上方标题重叠 */
+                 .overlay-card{ position:relative; background:#b8d8c1; color:#fff; border-radius:16px; box-shadow:0 18px 40px rgba(184,216,193,.35); padding:14px 18px; width:auto; grid-column:1 / -1; margin:0 0 12px 0 }
         .overlay-card h4{ margin:0 0 8px 0; font-size:1rem }
         .overlay-chart{ height:56px; display:flex; align-items:flex-end; gap:8px }
         .overlay-bar{ flex:1; height:40%; background:rgba(255,255,255,.9); border-radius:6px 6px 0 0; opacity:.85; animation:barUp .9s cubic-bezier(.22,1,.36,1) both }
@@ -272,8 +289,6 @@
         .overlay-bar:nth-child(3){ height:35%; animation-delay:.1s }
         .overlay-bar:nth-child(4){ height:70%; animation-delay:.15s }
         @keyframes barUp{from{transform:translateY(12px); opacity:0}to{transform:none; opacity:1}}
-<<<<<<< HEAD
-=======
 
         /* 仪表盘首页色彩点缀（仅本页生效） */
         :root{
@@ -301,7 +316,57 @@
         /* 顶部胶囊条轻渐变描边 */
         .ios-hero-pills .pill{ background:linear-gradient(#ffffff,#ffffff); border:1px solid rgba(0,0,0,.08); position:relative }
         .ios-hero-pills .pill:after{ content:""; position:absolute; inset:0; border-radius:999px; pointer-events:none; background:linear-gradient(135deg, rgba(196,223,204,.28), rgba(167,211,231,.2), rgba(201,184,232,.2)); mix-blend-mode:multiply; opacity:.55 }
->>>>>>> RayScout
+
+        /* 快速操作卡片图标颜色定制 */
+        .ios-grid .ios-quick-action:nth-of-type(1) i{ color: #20B2AA !important; } /* 青/浅蓝色 - 发布职位 */
+        .ios-grid .ios-quick-action:nth-of-type(2) i{ color: #FF6B6B !important; } /* 红/橙色 - HR消息通知 */
+        .ios-grid .ios-quick-action:nth-of-type(3) i{ color: #98FB98 !important; } /* 浅绿/薄荷绿色 - 候选人管理 */
+        .ios-grid .ios-quick-action:nth-of-type(4) i{ color: #4169E1 !important; } /* 中蓝色 - 面试安排 */
+
+        /* 步骤卡片圆形图标颜色定制 */
+        .ios-step-guide .ios-step:nth-of-type(1) .ios-step-number {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E8E) !important; /* 红/橙色 - 查看申请 */
+            box-shadow: 0 6px 14px rgba(255, 107, 107, 0.25) !important;
+        }
+        .ios-step-guide .ios-step:nth-of-type(2) .ios-step-number {
+            background: linear-gradient(135deg, #20B2AA, #40E0D0) !important; /* 青/浅蓝色 - 评估候选人 */
+            box-shadow: 0 6px 14px rgba(32, 178, 170, 0.25) !important;
+        }
+        .ios-step-guide .ios-step:nth-of-type(3) .ios-step-number {
+            background: linear-gradient(135deg, #4169E1, #6495ED) !important; /* 中蓝色 - 安排面试 */
+            box-shadow: 0 6px 14px rgba(65, 105, 225, 0.25) !important;
+        }
+
+        /* 帮助中心链接颜色定制 */
+        .ios-help-center .ios-help-item:nth-of-type(1) .ios-link {
+            color: #FF6B6B !important; /* 红/橙色 - 查看指南 */
+        }
+        .ios-help-center .ios-help-item:nth-of-type(1) .ios-link:hover {
+            color: #FF8E8E !important;
+        }
+        .ios-help-center .ios-help-item:nth-of-type(2) .ios-link {
+            color: #20B2AA !important; /* 青/浅蓝色 - 查看FAQ */
+        }
+        .ios-help-center .ios-help-item:nth-of-type(2) .ios-link:hover {
+            color: #40E0D0 !important;
+        }
+        .ios-help-center .ios-help-item:nth-of-type(3) .ios-link {
+            color: #4169E1 !important; /* 中蓝色 - 联系支持 */
+        }
+        .ios-help-center .ios-help-item:nth-of-type(3) .ios-link:hover {
+            color: #6495ED !important;
+        }
+
+        /* 底部导航管理卡片标题颜色定制 */
+        .ios-footer-section .ios-card:nth-of-type(1) h3 {
+            color: #FF6B6B !important; /* 红/橙色 - 招聘管理 */
+        }
+        .ios-footer-section .ios-card:nth-of-type(2) h3 {
+            color: #20B2AA !important; /* 青/浅蓝色 - 候选人管理 */
+        }
+        .ios-footer-section .ios-card:nth-of-type(3) h3 {
+            color: #4169E1 !important; /* 中蓝色 - 数据分析 */
+        }
     </style>
 </head>
 <body>
@@ -340,19 +405,13 @@
                         <span class="ios-nav-text">已发布职位</span>
                     </a>
                 </li>
-                <!-- 面试导航已移除，请从候选人管理页面进入安排面试 -->
                 <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-nav-link">
-                        <i class="ios-nav-icon uil uil-chart-pie"></i>
-                        <span class="ios-nav-text">报表</span>
+                    <a href="{{ url_for('smartrecruit.hr.dashboard.interviews') }}" class="ios-nav-link">
+                        <i class="ios-nav-icon uil uil-calendar-alt"></i>
+                        <span class="ios-nav-text">面试</span>
                     </a>
                 </li>
-                <li class="ios-nav-item">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" class="ios-nav-link">
-                        <i class="ios-nav-icon uil uil-lightbulb"></i>
-                        <span class="ios-nav-text">AI洞察</span>
-                    </a>
-                </li>
+
             </ul>
             
             <div class="ios-nav-actions">
@@ -367,7 +426,7 @@
                     <i class="uil uil-bell"></i>
                 </button>
                 
-                <button class="theme-toggle" id="iosThemeToggle" title="切换主题"></button>
+                <!-- 主题切换按钮已移除 -->
                 
                 
                 
@@ -482,17 +541,7 @@
                     </div>
                 </div>
 
-                <div class="ios-grid ios-grid-4" style="position:relative; margin-top:12px;">
-                    <!-- 悬浮分布卡 -->
-                    <div class="overlay-card fade-card visible">
-                        <h4>目标进度分布</h4>
-                        <div class="overlay-chart">
-                            <div class="overlay-bar"></div>
-                            <div class="overlay-bar"></div>
-                            <div class="overlay-bar"></div>
-                            <div class="overlay-bar"></div>
-                        </div>
-                    </div>
+                <div class="ios-grid ios-grid-4" style="position:relative; margin-top:28px; row-gap:16px;">
                     <div class="ios-metric-card ios-fade-in-up" data-counter="{{ total_jobs|default(0) }}">
                         <div class="ios-metric-icon">
                             <i class="uil uil-briefcase-alt"></i>
@@ -546,7 +595,7 @@
 
         <!-- 快速操作Section -->
         <section class="ios-section ios-actions-section">
-            <div class="ios-container">
+            <div class="ios-container compact">
                 <h2 class="ios-title ios-fade-in">快速操作</h2>
                 <p class="ios-subtitle ios-fade-in">高效管理招聘流程的常用功能</p>
                 
@@ -591,22 +640,14 @@
                         </div>
                     </a>
                     
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-quick-action ios-fade-in-up">
-                        <i class="uil uil-chart-line"></i>
-                        <h4>数据报表</h4>
-                        <p>招聘数据分析</p>
-                        <div class="ios-feature-tooltip">
-                            <i class="uil uil-info-circle"></i>
-                            <span class="ios-tooltip-text">查看招聘效果分析，了解申请趋势和成功率数据</span>
-                        </div>
-                    </a>
+
                 </div>
             </div>
         </section>
 
         <!-- 最近活动Section -->
         <section class="ios-section ios-recent-section">
-            <div class="ios-container">
+            <div class="ios-container compact">
                 <h2 class="ios-title ios-fade-in">最近活动</h2>
                 <p class="ios-subtitle ios-fade-in">跟踪最新的招聘动态和申请情况</p>
                 
@@ -723,48 +764,11 @@
             </div>
         </section>
 
-        <!-- 数据洞察Section -->
-        <section class="ios-section ios-insights-section">
-            <div class="ios-container">
-                <h2 class="ios-title ios-fade-in">数据洞察</h2>
-                <p class="ios-subtitle ios-fade-in">深度分析招聘效果和趋势</p>
-                
-                <div class="ios-grid ios-grid-2">
-                    <div class="ios-chart-container ios-fade-in-up">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
-                            <i class="uil uil-chart-line"></i>
-                            申请趋势
-                        </h3>
-                        <div class="ios-chart-placeholder">
-                            <i class="uil uil-chart-line" style="font-size: 3rem; margin-right: var(--ios-spacing-md);"></i>
-                            申请趋势图表
-                        </div>
-                    </div>
-                    
-                    <div class="ios-chart-container ios-fade-in-up">
-                        <h3 style="margin-bottom: var(--ios-spacing-lg); color: var(--ios-text-primary);">
-                            <i class="uil uil-chart-pie"></i>
-                            职位分布
-                        </h3>
-                        <div class="ios-chart-placeholder">
-                            <i class="uil uil-chart-pie" style="font-size: 3rem; margin-right: var(--ios-spacing-md);"></i>
-                            职位分布图表
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="text-align: center; margin-top: var(--ios-spacing-xl);">
-                    <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" class="ios-button large">
-                        <i class="uil uil-chart-bar"></i>
-                        查看详细报表
-                    </a>
-                </div>
-            </div>
-        </section>
+
 
         <!-- 底部导航Section -->
         <section class="ios-section ios-footer-section">
-            <div class="ios-container">
+            <div class="ios-container compact">
                 <h2 class="ios-title ios-fade-in">系统导航</h2>
                 <p class="ios-subtitle ios-fade-in">快速访问所有HR功能模块</p>
                 
@@ -838,11 +842,7 @@
                             数据分析
                         </h3>
                         <ul style="list-style: none; padding: 0;">
-                            <li style="margin-bottom: var(--ios-spacing-sm);">
-                                <a href="{{ url_for('smartrecruit.hr.dashboard.reports') }}" style="color: var(--ios-text-secondary); text-decoration: none;">
-                                    <i class="uil uil-chart-bar"></i> 数据报表
-                                </a>
-                            </li>
+
                             <li style="margin-bottom: var(--ios-spacing-sm);">
                                 <a href="{{ url_for('smartrecruit.hr.dashboard.insights') }}" style="color: var(--ios-text-secondary); text-decoration: none;">
                                     <i class="uil uil-lightbulb"></i> 智能洞察
@@ -859,190 +859,174 @@
     <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
     <script>
       (function(){
-        var btn = document.getElementById('iosThemeToggle');
-        if(!btn) return;
-        function apply(theme){
-          document.body.classList.toggle('dark', theme==='dark');
-          btn.classList.toggle('active', theme==='dark');
-        }
-        var saved = localStorage.getItem('theme');
-        if(!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){ saved='dark'; }
-        apply(saved||'light');
-        btn.addEventListener('click', function(){
-          var next = document.body.classList.contains('dark') ? 'light' : 'dark';
-          localStorage.setItem('theme', next);
-          apply(next);
-        });
-      })();
-
-      // 连续滚动 + 渐显：观察进入视窗的卡片
-      (function(){
-        var observer;
-        if('IntersectionObserver' in window){
-          observer = new IntersectionObserver(function(entries){
-            entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
-          }, { threshold: 0.12 });
-        }
-        function mountFade(selector){
-          var list = document.querySelectorAll(selector);
-          for(var i=0;i<list.length;i++){
-            list[i].classList.add('fade-card');
-            if(observer) observer.observe(list[i]); else list[i].classList.add('visible');
+        // 连续滚动 + 渐显：观察进入视窗的卡片
+        (function(){
+          var observer;
+          if('IntersectionObserver' in window){
+            observer = new IntersectionObserver(function(entries){
+              entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
+            }, { threshold: 0.12 });
           }
-        }
-        // 应用于页面现有卡片：指标卡、快速操作、最近项、图表容器
-        document.addEventListener('DOMContentLoaded', function(){
-          mountFade('.ios-metric-card');
-          mountFade('.ios-quick-action');
-          mountFade('.ios-recent-item');
-          mountFade('.ios-chart-container');
-        });
-      })();
-
-      // 视差背景与磁性按钮、点击涟漪、粒子动画
-      (function(){
-        var root = document.documentElement;
-        // 视差：根据鼠标移动调整背景偏移
-        var parallax = document.querySelector('.ios-parallax-bg');
-        if(parallax){
-          window.addEventListener('mousemove', function(e){
-            var x = (e.clientX / window.innerWidth - .5) * 10;
-            var y = (e.clientY / window.innerHeight - .5) * 10;
-            parallax.style.transform = 'translate3d(' + (-x) + 'px,' + (-y) + 'px,0)';
-          });
-        }
-
-        // 磁性按钮：靠近鼠标微吸附
-        function mountMagnet(selector){
-          var items = document.querySelectorAll(selector);
-          for(var i=0;i<items.length;i++){
-            (function(el){
-              el.classList.add('magnet');
-              var r=0, active=false;
-              el.addEventListener('mousemove', function(ev){
-                var rect = el.getBoundingClientRect();
-                var cx = rect.left + rect.width/2;
-                var cy = rect.top + rect.height/2;
-                var dx = (ev.clientX - cx) * .18;
-                var dy = (ev.clientY - cy) * .18;
-                el.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
-                active = true; r = 0;
-              });
-              el.addEventListener('mouseleave', function(){ el.style.transform = ''; active=false; });
-            })(items[i]);
-          }
-        }
-        mountMagnet('.ios-button, .ios-quick-action');
-
-        // 点击涟漪效果（按钮与卡片）
-        function enableRipple(selector){
-          document.addEventListener('click', function(e){
-            var t = e.target.closest(selector);
-            if(!t) return;
-            var rect = t.getBoundingClientRect();
-            var ripple = document.createElement('span');
-            ripple.className = 'ripple';
-            var size = Math.max(rect.width, rect.height);
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
-            ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
-            t.appendChild(ripple);
-            setTimeout(function(){ ripple.remove(); }, 600);
-          });
-        }
-        enableRipple('.ios-button, .ios-quick-action, .ios-recent-item');
-
-        // 背景粒子动画（轻量，无依赖）
-        var canvas = document.getElementById('bgParticles');
-        if(canvas){
-          var ctx = canvas.getContext('2d');
-          var w, h, pr = window.devicePixelRatio || 1;
-          var particles = [], num = 70; // 数量适中
-          function resize(){
-            w = canvas.width = Math.floor(window.innerWidth * pr);
-            h = canvas.height = Math.floor(window.innerHeight * pr);
-            canvas.style.width = window.innerWidth + 'px';
-            canvas.style.height = window.innerHeight + 'px';
-          }
-          function rand(a,b){ return Math.random()*(b-a)+a }
-          function init(){
-            particles.length = 0;
-            for(var i=0;i<num;i++){
-              particles.push({
-                x: rand(0,w), y: rand(0,h),
-                vx: rand(-.15,.15)*pr, vy: rand(-.15,.15)*pr,
-                r: rand(1.2,2.6)*pr, o: rand(.25,.65),
-                                 c: Math.random()<.5? 'rgba(196,223,204,':'rgba(207,229,214,'
-              });
+          function mountFade(selector){
+            var list = document.querySelectorAll(selector);
+            for(var i=0;i<list.length;i++){
+              list[i].classList.add('fade-card');
+              if(observer) observer.observe(list[i]); else list[i].classList.add('visible');
             }
           }
-          function step(){
-            ctx.clearRect(0,0,w,h);
-            for(var i=0;i<particles.length;i++){
-              var p = particles[i];
-              p.x += p.vx; p.y += p.vy;
-              if(p.x<0||p.x>w) p.vx*=-1;
-              if(p.y<0||p.y>h) p.vy*=-1;
-              ctx.beginPath();
-              ctx.fillStyle = p.c + p.o + ')';
-              ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-              ctx.fill();
+          // 应用于页面现有卡片：指标卡、快速操作、最近项、图表容器
+          document.addEventListener('DOMContentLoaded', function(){
+            mountFade('.ios-metric-card');
+            mountFade('.ios-quick-action');
+            mountFade('.ios-recent-item');
+            mountFade('.ios-chart-container');
+          });
+        })();
+
+        // 视差背景与磁性按钮、点击涟漪、粒子动画
+        (function(){
+          var root = document.documentElement;
+          // 视差：根据鼠标移动调整背景偏移
+          var parallax = document.querySelector('.ios-parallax-bg');
+          if(parallax){
+            window.addEventListener('mousemove', function(e){
+              var x = (e.clientX / window.innerWidth - .5) * 10;
+              var y = (e.clientY / window.innerHeight - .5) * 10;
+              parallax.style.transform = 'translate3d(' + (-x) + 'px,' + (-y) + 'px,0)';
+            });
+          }
+
+          // 磁性按钮：靠近鼠标微吸附
+          function mountMagnet(selector){
+            var items = document.querySelectorAll(selector);
+            for(var i=0;i<items.length;i++){
+              (function(el){
+                el.classList.add('magnet');
+                var r=0, active=false;
+                el.addEventListener('mousemove', function(ev){
+                  var rect = el.getBoundingClientRect();
+                  var cx = rect.left + rect.width/2;
+                  var cy = rect.top + rect.height/2;
+                  var dx = (ev.clientX - cx) * .18;
+                  var dy = (ev.clientY - cy) * .18;
+                  el.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+                  active = true; r = 0;
+                });
+                el.addEventListener('mouseleave', function(){ el.style.transform = ''; active=false; });
+              })(items[i]);
             }
-            // 连接近邻
-            for(var a=0;a<particles.length;a++){
-              for(var b=a+1;b<particles.length;b++){
-                var pa=particles[a], pb=particles[b];
-                var dx=pa.x-pb.x, dy=pa.y-pb.y; var d=dx*dx+dy*dy;
-                if(d< (120*pr)*(120*pr)){
-                                     ctx.strokeStyle = 'rgba(196,223,204,.08)';
-                  ctx.lineWidth = pr;
-                  ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke();
+          }
+          mountMagnet('.ios-button, .ios-quick-action');
+
+          // 点击涟漪效果（按钮与卡片）
+          function enableRipple(selector){
+            document.addEventListener('click', function(e){
+              var t = e.target.closest(selector);
+              if(!t) return;
+              var rect = t.getBoundingClientRect();
+              var ripple = document.createElement('span');
+              ripple.className = 'ripple';
+              var size = Math.max(rect.width, rect.height);
+              ripple.style.width = ripple.style.height = size + 'px';
+              ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+              ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+              t.appendChild(ripple);
+              setTimeout(function(){ ripple.remove(); }, 600);
+            });
+          }
+          enableRipple('.ios-button, .ios-quick-action, .ios-recent-item');
+
+          // 背景粒子动画（轻量，无依赖）
+          var canvas = document.getElementById('bgParticles');
+          if(canvas){
+            var ctx = canvas.getContext('2d');
+            var w, h, pr = window.devicePixelRatio || 1;
+            var particles = [], num = 70; // 数量适中
+            function resize(){
+              w = canvas.width = Math.floor(window.innerWidth * pr);
+              h = canvas.height = Math.floor(window.innerHeight * pr);
+              canvas.style.width = window.innerWidth + 'px';
+              canvas.style.height = window.innerHeight + 'px';
+            }
+            function rand(a,b){ return Math.random()*(b-a)+a }
+            function init(){
+              particles.length = 0;
+              for(var i=0;i<num;i++){
+                particles.push({
+                  x: rand(0,w), y: rand(0,h),
+                  vx: rand(-.15,.15)*pr, vy: rand(-.15,.15)*pr,
+                  r: rand(1.2,2.6)*pr, o: rand(.25,.65),
+                                   c: Math.random()<.5? 'rgba(196,223,204,':'rgba(207,229,214,'
+                });
+              }
+            }
+            function step(){
+              ctx.clearRect(0,0,w,h);
+              for(var i=0;i<particles.length;i++){
+                var p = particles[i];
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0||p.x>w) p.vx*=-1;
+                if(p.y<0||p.y>h) p.vy*=-1;
+                ctx.beginPath();
+                ctx.fillStyle = p.c + p.o + ')';
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                ctx.fill();
+              }
+              // 连接近邻
+              for(var a=0;a<particles.length;a++){
+                for(var b=a+1;b<particles.length;b++){
+                  var pa=particles[a], pb=particles[b];
+                  var dx=pa.x-pb.x, dy=pa.y-pb.y; var d=dx*dx+dy*dy;
+                  if(d< (120*pr)*(120*pr)){
+                                       ctx.strokeStyle = 'rgba(196,223,204,.08)';
+                    ctx.lineWidth = pr;
+                    ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke();
+                  }
                 }
               }
+              requestAnimationFrame(step);
             }
-            requestAnimationFrame(step);
+            window.addEventListener('resize', function(){ resize(); init(); });
+            resize(); init(); step();
           }
-          window.addEventListener('resize', function(){ resize(); init(); });
-          resize(); init(); step();
-        }
 
-        // 导航铃铛：模拟未读 + 弹簧效果
-        var bell = document.querySelector('.ios-nav-button[data-action="notify"]');
-        if(bell){
-          bell.classList.add('spring');
-          setTimeout(function(){ bell.classList.remove('spring'); bell.classList.add('has-unread'); }, 800);
-          bell.addEventListener('click', function(){ bell.classList.remove('has-unread'); bell.classList.add('spring'); setTimeout(function(){ bell.classList.remove('spring'); }, 600); });
-        }
-
-        // 指标卡数字滚动计数器（进入视口时启动）
-        function animateCounter(el, to){
-          var start = 0; var dur = 1200; var t0 = performance.now();
-          function tick(now){
-            var p = Math.min(1, (now - t0)/dur);
-            var ease = 1 - Math.pow(1-p, 3);
-            el.textContent = Math.floor(start + (to - start) * ease).toLocaleString();
-            if(p<1) requestAnimationFrame(tick);
+          // 导航铃铛：模拟未读 + 弹簧效果
+          var bell = document.querySelector('.ios-nav-button[data-action="notify"]');
+          if(bell){
+            bell.classList.add('spring');
+            setTimeout(function(){ bell.classList.remove('spring'); bell.classList.add('has-unread'); }, 800);
+            bell.addEventListener('click', function(){ bell.classList.remove('has-unread'); bell.classList.add('spring'); setTimeout(function(){ bell.classList.remove('spring'); }, 600); });
           }
-          requestAnimationFrame(tick);
-        }
-        var counterCards = document.querySelectorAll('.ios-metric-card[data-counter]');
-        if('IntersectionObserver' in window){
-          var ob = new IntersectionObserver(function(entries){
-            entries.forEach(function(e){
-              if(e.isIntersecting){
-                var target = e.target;
-                var val = parseInt(target.getAttribute('data-counter')||'0',10);
-                var num = target.querySelector('.js-count');
-                if(num && !target.__counted){ animateCounter(num, val); target.__counted=true; }
-                ob.unobserve(target);
-              }
-            });
-          }, { threshold:.35 });
-          counterCards.forEach(function(c){ ob.observe(c); });
-        }else{
-          counterCards.forEach(function(c){ var val = parseInt(c.getAttribute('data-counter')||'0',10); var num=c.querySelector('.js-count'); if(num) num.textContent = val; });
-        }
-      })();
+
+          // 指标卡数字滚动计数器（进入视口时启动）
+          function animateCounter(el, to){
+            var start = 0; var dur = 1200; var t0 = performance.now();
+            function tick(now){
+              var p = Math.min(1, (now - t0)/dur);
+              var ease = 1 - Math.pow(1-p, 3);
+              el.textContent = Math.floor(start + (to - start) * ease).toLocaleString();
+              if(p<1) requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+          }
+          var counterCards = document.querySelectorAll('.ios-metric-card[data-counter]');
+          if('IntersectionObserver' in window){
+            var ob = new IntersectionObserver(function(entries){
+              entries.forEach(function(e){
+                if(e.isIntersecting){
+                  var target = e.target;
+                  var val = parseInt(target.getAttribute('data-counter')||'0',10);
+                  var num = target.querySelector('.js-count');
+                  if(num && !target.__counted){ animateCounter(num, val); target.__counted=true; }
+                  ob.unobserve(target);
+                }
+              });
+            }, { threshold:.35 });
+            counterCards.forEach(function(c){ ob.observe(c); });
+          }else{
+            counterCards.forEach(function(c){ var val = parseInt(c.getAttribute('data-counter')||'0',10); var num=c.querySelector('.js-count'); if(num) num.textContent = val; });
+          }
+        })();
     </script>
 </body>
 </html>
