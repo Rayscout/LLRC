@@ -403,14 +403,14 @@ def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict
         # 将音频数据转换为base64
         audio_base64 = base64.b64encode(audio_data).decode('utf-8')
         
-        # 构建Gemini API请求
+        # 构建Gemini API请求 - 修复后的格式
         url = f'https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent'
         
         headers = {
             'Content-Type': 'application/json'
         }
         
-        # 构建请求体，包含音频数据
+        # 修复后的请求体格式
         payload = {
             "contents": [{
                 "parts": [
@@ -431,6 +431,12 @@ def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict
             }
         }
         
+        # 添加调试日志
+        logger.info(f"发送语音识别请求到: {url}")
+        logger.info(f"使用模型: {model_name}")
+        logger.info(f"音频MIME类型: {_get_mime_type(filename)}")
+        logger.info(f"音频数据大小: {len(audio_data)} 字节")
+        
         # 发送请求到Gemini API
         response = requests.post(
             url,
@@ -440,15 +446,24 @@ def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict
             timeout=60
         )
         
+        # 详细的错误日志
+        logger.info(f"API响应状态码: {response.status_code}")
+        logger.info(f"API响应头: {dict(response.headers)}")
+        
         if response.status_code != 200:
-            logger.error(f"Gemini API请求失败: {response.status_code} - {response.text}")
-            return {"error": f"语音识别API请求失败: {response.status_code}"}
+            error_detail = response.text if response.text else "无响应内容"
+            logger.error(f"Gemini API请求失败: {response.status_code} - {error_detail}")
+            logger.error(f"请求URL: {url}")
+            logger.error(f"请求头: {headers}")
+            logger.error(f"请求体大小: {len(str(payload))}")
+            return {"error": f"语音识别API请求失败: {response.status_code}", "detail": error_detail}
         
         # 解析响应
         data = response.json()
         candidates = data.get('candidates', [])
         
         if not candidates:
+            logger.error(f"API响应中没有candidates: {data}")
             return {"error": "语音识别未返回结果"}
         
         content = candidates[0].get('content', {})
@@ -461,6 +476,7 @@ def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict
                 transcribed_text += part['text']
         
         if not transcribed_text.strip():
+            logger.error(f"转写文本为空，完整响应: {data}")
             return {"error": "语音识别结果为空"}
         
         # 返回结果
@@ -478,6 +494,8 @@ def recognize_speech_from_audio(audio_data: bytes, filename: str = None) -> dict
         
     except Exception as e:
         logger.error(f"语音识别失败: {e}")
+        import traceback
+        logger.error(f"详细错误信息: {traceback.format_exc()}")
         return {"error": f"语音识别失败: {str(e)}"}
 
 

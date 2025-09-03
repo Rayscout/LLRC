@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>������Ŀ���� - �˲Ź���ϵͳ</title>
+    <title>添加项目经验 - 人才管理系统</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #F2F2F7;
-            --bg-secondary: rgba(255, 255, 255, 0.8);
-            --bg-card: rgba(255, 255, 255, 0.9);
-            --text-primary: #1D1D1F;
-            --text-secondary: #86868B;
-            --text-tertiary: #C7C7CC;
-            --accent-blue: #007AFF;
-            --accent-green: #34C759;
-            --accent-orange: #FF9500;
-            --accent-red: #FF3B30;
+            --bg-primary: #ffffff;
+            --bg-secondary: rgba(255, 255, 255, 0.9);
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --text-primary: #2F4F4F;
+            --text-secondary: #666;
+            --text-tertiary: #999;
+            --accent-blue: #4A90E2;
+            --accent-green: #7ED321;
+            --accent-orange: #F5A623;
+            --accent-red: #D0021B;
             --accent-purple: #AF52DE;
             --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
             --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
@@ -30,19 +31,12 @@
         }
 
         [data-theme="dark"] {
-            --bg-primary: #000000;
-            --bg-secondary: rgba(44, 44, 46, 0.8);
-            --bg-card: rgba(44, 44, 46, 0.6);
+            --bg-primary: #1a1a1a;
+            --bg-secondary: rgba(44, 44, 46, 0.9);
+            --bg-card: rgba(44, 44, 46, 0.95);
             --text-primary: #FFFFFF;
             --text-secondary: #EBEBF5;
             --text-tertiary: #8E8E93;
-            --accent-blue: #0A84FF;
-            --accent-green: #30D158;
-            --accent-orange: #FF9F0A;
-            --accent-red: #FF453A;
-            --accent-purple: #BF5AF2;
-            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
 
         * {
@@ -52,52 +46,77 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             line-height: 1.6;
             transition: var(--transition);
             position: relative;
             overflow-x: hidden;
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        /* Animated Light Blue Background - �뼨Ч��������һ�� */
-        .executive-parallax-bg {
+        /* 动态背景 - 采用员工界面的优雅渐变晕染设计 */
+        .employee-parallax-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #E6F3FF, #F0F8FF, #E8F4FD, #F5F9FF, #E0F0FF);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
-            z-index: -1;
+            background: #ffffff;
+            z-index: -2;
+            overflow: hidden;
         }
 
-        .executive-parallax-bg::after {
+        /* 微妙的渐变晕染背景装饰 */
+        .employee-parallax-bg::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(144, 238, 144, 0.12) 0%, transparent 70%), /* 左下角光晕 - 更绿更明显 */
+                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(152, 251, 152, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(173, 255, 47, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(50, 205, 50, 0.08) 0%, transparent 70%), /* 右下角光晕 - 更绿更明显 */
+                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(34, 139, 34, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 60s ease-in-out infinite;
+        }
+
+        /* 半透明遮罩层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(135, 206, 235, 0.4) 0%, rgba(135, 206, 235, 0.2) 30%, transparent 70%),
-                radial-gradient(circle at 80% 70%, rgba(173, 216, 230, 0.5) 0%, rgba(173, 216, 230, 0.25) 35%, transparent 75%),
-                radial-gradient(circle at 40% 80%, rgba(176, 224, 230, 0.4) 0%, rgba(176, 224, 230, 0.2) 30%, transparent 70%),
-                radial-gradient(circle at 90% 20%, rgba(135, 206, 235, 0.35) 0%, rgba(135, 206, 235, 0.15) 25%, transparent 65%);
-            animation: bluePulse 8s ease-in-out infinite;
+            background: rgba(255, 255, 255, 0.02);
             z-index: -1;
         }
 
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        @keyframes bluePulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 0.4; }
+        /* 微妙的渐变晕染动画 */
+        @keyframes gentleDrift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: translate(30px, -20px) scale(1.01);
+                opacity: 0.98;
+            }
+            50% {
+                transform: translate(-25px, 35px) scale(0.99);
+                opacity: 1.02;
+            }
+            75% {
+                transform: translate(20px, 25px) scale(1.005);
+                opacity: 0.99;
+            }
         }
 
         .container {
@@ -117,6 +136,9 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(26, 77, 26, 0.1);
         }
 
         .header::before {
@@ -134,7 +156,7 @@
             font-weight: 700;
             color: var(--text-primary);
             margin-bottom: 15px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -155,6 +177,9 @@
             box-shadow: var(--shadow-light);
             transition: var(--transition-fast);
             border-left: 4px solid var(--accent-blue);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(26, 77, 26, 0.1);
         }
 
         .form-section:hover {
@@ -201,7 +226,7 @@
         .form-group textarea {
             width: 100%;
             padding: 15px;
-            border: 2px solid var(--text-tertiary);
+            border: 2px solid rgba(26, 77, 26, 0.2);
             border-radius: var(--border-radius);
             background: var(--bg-secondary);
             font-size: 1em;
@@ -213,7 +238,7 @@
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: var(--accent-blue);
+            border-color: var(--accent-green);
             background: var(--bg-card);
             transform: translateY(-1px);
             box-shadow: var(--shadow-light);
@@ -231,6 +256,9 @@
             margin-bottom: 25px;
             box-shadow: var(--shadow-light);
             border-left: 4px solid var(--accent-green);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(26, 77, 26, 0.1);
         }
 
         .skills-grid {
@@ -250,6 +278,8 @@
             border: 2px solid transparent;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
         .skill-item::before {
@@ -297,6 +327,9 @@
             margin-bottom: 25px;
             box-shadow: var(--shadow-light);
             border-left: 4px solid var(--accent-purple);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(26, 77, 26, 0.1);
         }
 
         .timeline-item {
@@ -321,6 +354,9 @@
             margin-bottom: 25px;
             box-shadow: var(--shadow-light);
             border-left: 4px solid var(--accent-orange);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(26, 77, 26, 0.1);
         }
 
         .achievement-item {
@@ -365,34 +401,34 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
             color: white;
-            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+            box-shadow: 0 8px 25px rgba(74, 144, 226, 0.4);
         }
 
         .btn-secondary {
             background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
             color: white;
-            box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3);
+            box-shadow: 0 4px 15px rgba(126, 211, 33, 0.3);
         }
 
         .btn-secondary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(52, 199, 89, 0.4);
+            box-shadow: 0 8px 25px rgba(126, 211, 33, 0.4);
         }
 
         .btn-success {
             background: linear-gradient(135deg, var(--accent-green), var(--accent-purple));
             color: white;
-            box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3);
+            box-shadow: 0 4px 15px rgba(126, 211, 33, 0.3);
         }
 
         .btn-success:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(52, 199, 89, 0.4);
+            box-shadow: 0 8px 25px rgba(126, 211, 33, 0.4);
         }
 
         .progress-bar {
@@ -417,56 +453,71 @@
             50% { transform: translateX(0%); }
         }
 
-        .floating-shapes {
+        /* 移动渐变色背景 */
+        .moving-gradient-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: -3;
+            overflow: hidden;
             pointer-events: none;
-            z-index: -1;
         }
 
-        .shape {
+        .gradient-shape {
             position: absolute;
-            opacity: 0.1;
-            animation: float 6s ease-in-out infinite;
+            border-radius: 50%;
+            background: 
+                radial-gradient(ellipse, 
+                    rgba(228, 246, 236, 0.4) 0%, 
+                    rgba(224, 245, 233, 0.3) 30%, 
+                    rgba(221, 244, 231, 0.2) 60%, 
+                    transparent 100%);
+            opacity: 0.8;
+            animation: moveGradient 40s infinite linear;
+            filter: blur(2px);
+            box-shadow: 0 0 20px rgba(228, 246, 236, 0.3);
         }
 
-        .shape:nth-child(1) {
-            top: 20%;
-            left: 10%;
+        .gradient-shape.small {
             width: 80px;
-            height: 80px;
-            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
-            border-radius: 50%;
-            animation-delay: 0s;
+            height: 60px;
         }
 
-        .shape:nth-child(2) {
-            top: 60%;
-            right: 10%;
+        .gradient-shape.medium {
             width: 120px;
-            height: 120px;
-            background: linear-gradient(45deg, var(--accent-green), var(--accent-blue));
-            border-radius: 20px;
-            animation-delay: 2s;
+            height: 90px;
         }
 
-        .shape:nth-child(3) {
-            bottom: 20%;
-            left: 20%;
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(45deg, var(--accent-purple), var(--accent-orange));
-            border-radius: 50%;
-            animation-delay: 4s;
+        .gradient-shape.large {
+            width: 180px;
+            height: 140px;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
+        @keyframes moveGradient {
+            0% {
+                transform: translateX(-100px) translateY(-100px) rotate(0deg);
+            }
+            25% {
+                transform: translateX(calc(100vw + 100px)) translateY(calc(100vh + 100px)) rotate(90deg);
+            }
+            50% {
+                transform: translateX(calc(100vw + 100px)) translateY(-100px) rotate(180deg);
+            }
+            75% {
+                transform: translateX(-100px) translateY(calc(100vh + 100px)) rotate(270deg);
+            }
+            100% {
+                transform: translateX(-100px) translateY(-100px) rotate(360deg);
+            }
         }
+
+        .gradient-shape:nth-child(1) { animation-delay: 0s; }
+        .gradient-shape:nth-child(2) { animation-delay: -5s; }
+        .gradient-shape:nth-child(3) { animation-delay: -10s; }
+        .gradient-shape:nth-child(4) { animation-delay: -15s; }
+        .gradient-shape:nth-child(5) { animation-delay: -20s; }
 
         @media (max-width: 768px) {
             .container {
@@ -494,9 +545,24 @@
                 width: 100%;
                 max-width: 300px;
             }
+
+            .gradient-shape.small {
+                width: 60px;
+                height: 45px;
+            }
+            
+            .gradient-shape.medium {
+                width: 90px;
+                height: 70px;
+            }
+            
+            .gradient-shape.large {
+                width: 120px;
+                height: 90px;
+            }
         }
 
-        /* ��ɫ����֧�� */
+        /* 深色模式支持 */
         @media (prefers-color-scheme: dark) {
             body {
                 background: var(--bg-primary);
@@ -505,119 +571,125 @@
     </style>
 </head>
 <body>
-    <div class="executive-parallax-bg"></div>
-    <div class="floating-shapes">
-        <div class="shape"></div>
-        <div class="shape"></div>
-        <div class="shape"></div>
+    <!-- 员工界面风格的背景 -->
+    <div class="employee-parallax-bg"></div>
+    <div class="overlay-layer"></div>
+    
+    <!-- 移动渐变色背景 -->
+    <div class="moving-gradient-background">
+        <div class="gradient-shape small"></div>
+        <div class="gradient-shape medium"></div>
+        <div class="gradient-shape large"></div>
+        <div class="gradient-shape small"></div>
+        <div class="gradient-shape medium"></div>
     </div>
 
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-project-diagram"></i> ������Ŀ����</h1>
-            <p>��¼����רҵ��Ŀ�ɾͣ�չʾ���ļ������ֵ��Ϊְҵ��չ����</p>
+            <h1><i class="fas fa-project-diagram"></i> 添加项目经验</h1>
+            <p>记录您的专业项目成就，展示您的技术价值，为职业发展助力</p>
             <div class="progress-bar">
                 <div class="progress-fill"></div>
             </div>
         </div>
 
         <form method="POST" action="{{ url_for('talent_management.employee_manager.projects.add_project') }}">
-            <!-- ������Ϣ -->
+            <!-- 项目基本信息 -->
             <div class="form-section">
                 <h2 class="section-title">
-                    <i class="fas fa-info-circle"></i> ��Ŀ������Ϣ
+                    <i class="fas fa-info-circle"></i> 项目基本信息
                 </h2>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="project_name">
-                            <i class="fas fa-tag"></i> ��Ŀ����
+                            <i class="fas fa-tag"></i> 项目名称
                         </label>
-                        <input type="text" id="project_name" name="project_name" required placeholder="��������Ŀ����">
+                        <input type="text" id="project_name" name="project_name" required placeholder="请输入项目名称">
                     </div>
                     <div class="form-group">
                         <label for="project_role">
-                            <i class="fas fa-user-tie"></i> ���ν�ɫ
+                            <i class="fas fa-user-tie"></i> 担任角色
                         </label>
                         <select id="project_role" name="project_role" required>
-                            <option value="">��ѡ���ɫ</option>
-                            <option value="��Ŀ����">��Ŀ����</option>
-                            <option value="����������">����������</option>
-                            <option value="��������ʦ">��������ʦ</option>
-                            <option value="���Թ���ʦ">���Թ���ʦ</option>
-                            <option value="��Ʒ����">��Ʒ����</option>
-                            <option value="UI/UX���ʦ">UI/UX���ʦ</option>
-                            <option value="���ݷ���ʦ">���ݷ���ʦ</option>
-                            <option value="��ά����ʦ">��ά����ʦ</option>
+                            <option value="">请选择角色</option>
+                            <option value="项目经理">项目经理</option>
+                            <option value="技术负责人">技术负责人</option>
+                            <option value="高级工程师">高级工程师</option>
+                            <option value="测试工程师">测试工程师</option>
+                            <option value="产品经理">产品经理</option>
+                            <option value="UI/UX设计师">UI/UX设计师</option>
+                            <option value="数据分析师">数据分析师</option>
+                            <option value="运维工程师">运维工程师</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="company_name">
-                            <i class="fas fa-building"></i> ��˾/��֯
+                            <i class="fas fa-building"></i> 公司/组织
                         </label>
-                        <input type="text" id="company_name" name="company_name" required placeholder="�����빫˾����֯����">
+                        <input type="text" id="company_name" name="company_name" required placeholder="请输入公司或组织名称">
                     </div>
                     <div class="form-group">
                         <label for="project_type">
-                            <i class="fas fa-layer-group"></i> ��Ŀ����
+                            <i class="fas fa-layer-group"></i> 项目类型
                         </label>
                         <select id="project_type" name="project_type" required>
-                            <option value="">��ѡ����Ŀ����</option>
-                            <option value="WebӦ�ÿ���">WebӦ�ÿ���</option>
-                            <option value="�ƶ�Ӧ�ÿ���">�ƶ�Ӧ�ÿ���</option>
-                            <option value="��ҵ����ϵͳ">��ҵ����ϵͳ</option>
-                            <option value="���ݷ�����Ŀ">���ݷ�����Ŀ</option>
-                            <option value="�˹�������Ŀ">�˹�������Ŀ</option>
-                            <option value="������ʩ��Ŀ">������ʩ��Ŀ</option>
-                            <option value="��Ʒ�����Ŀ">��Ʒ�����Ŀ</option>
-                            <option value="����">����</option>
+                            <option value="">请选择项目类型</option>
+                            <option value="Web应用开发">Web应用开发</option>
+                            <option value="移动应用开发">移动应用开发</option>
+                            <option value="企业管理系统">企业管理系统</option>
+                            <option value="数据分析项目">数据分析项目</option>
+                            <option value="人工智能项目">人工智能项目</option>
+                            <option value="基础设施项目">基础设施项目</option>
+                            <option value="产品设计项目">产品设计项目</option>
+                            <option value="其他">其他</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <!-- ��Ŀʱ�� -->
+            <!-- 项目时间 -->
             <div class="timeline-section">
                 <h2 class="section-title">
-                    <i class="fas fa-calendar-alt"></i> ��Ŀʱ����
+                    <i class="fas fa-calendar-alt"></i> 项目时间安排
                 </h2>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="start_date">
-                            <i class="fas fa-play"></i> ��ʼʱ��
+                            <i class="fas fa-play"></i> 开始时间
                         </label>
                         <input type="date" id="start_date" name="start_date" required>
                     </div>
                     <div class="form-group">
                         <label for="end_date">
-                            <i class="fas fa-stop"></i> ����ʱ��
+                            <i class="fas fa-stop"></i> 结束时间
                         </label>
                         <input type="date" id="end_date" name="end_date">
                     </div>
                     <div class="form-group">
                         <label for="duration">
-                            <i class="fas fa-clock"></i> ��Ŀ����
+                            <i class="fas fa-clock"></i> 项目时长
                         </label>
-                        <input type="text" id="duration" name="duration" placeholder="�Զ�����" readonly>
+                        <input type="text" id="duration" name="duration" placeholder="自动计算" readonly>
                     </div>
                     <div class="form-group">
                         <label for="current_status">
-                            <i class="fas fa-toggle-on"></i> ��Ŀ״̬
+                            <i class="fas fa-toggle-on"></i> 项目状态
                         </label>
                         <select id="current_status" name="current_status" required>
-                            <option value="">��ѡ��״̬</option>
-                            <option value="������">������</option>
-                            <option value="�����">�����</option>
-                            <option value="����ͣ">����ͣ</option>
-                            <option value="��ȡ��">��ȡ��</option>
+                            <option value="">请选择状态</option>
+                            <option value="进行中">进行中</option>
+                            <option value="已完成">已完成</option>
+                            <option value="已暂停">已暂停</option>
+                            <option value="已取消">已取消</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <!-- �������� -->
+            <!-- 技术技能 -->
             <div class="skills-section">
                 <h2 class="section-title">
-                    <i class="fas fa-code"></i> ��������Ӧ��
+                    <i class="fas fa-code"></i> 技术技能应用
                 </h2>
                 <div class="skills-grid">
                     <div class="skill-item" data-skill="Python">
@@ -664,88 +736,88 @@
                         <i class="fas fa-leaf"></i>
                         <span>MongoDB</span>
                     </div>
-                    <div class="skill-item" data-skill="����">
+                    <div class="skill-item" data-skill="其他">
                         <i class="fas fa-plus"></i>
-                        <span>��������</span>
+                        <span>添加技能</span>
                     </div>
                 </div>
                 <input type="hidden" id="selected_skills" name="selected_skills">
             </div>
 
-            <!-- ��Ŀ���� -->
+            <!-- 项目描述 -->
             <div class="form-section">
                 <h2 class="section-title">
-                    <i class="fas fa-align-left"></i> ��Ŀ����
+                    <i class="fas fa-align-left"></i> 项目描述
                 </h2>
                 <div class="form-group">
                     <label for="project_description">
-                        <i class="fas fa-file-alt"></i> ��Ŀ����
+                        <i class="fas fa-file-alt"></i> 项目描述
                     </label>
-                    <textarea id="project_description" name="project_description" required placeholder="����ϸ������Ŀ������Ŀ�ꡢ��ģ����Ϣ..."></textarea>
+                    <textarea id="project_description" name="project_description" required placeholder="请详细描述项目背景、目标、规模等信息..."></textarea>
                 </div>
                 <div class="form-group">
                     <label for="responsibilities">
-                        <i class="fas fa-tasks"></i> ��Ҫְ��
+                        <i class="fas fa-tasks"></i> 主要职责
                     </label>
-                    <textarea id="responsibilities" name="responsibilities" required placeholder="������������Ŀ�е���Ҫְ��͹���..."></textarea>
+                    <textarea id="responsibilities" name="responsibilities" required placeholder="请描述您在项目中的主要职责和工作..."></textarea>
                 </div>
             </div>
 
-            <!-- ��Ŀ�ɾ� -->
+            <!-- 项目成就 -->
             <div class="achievements-section">
                 <h2 class="section-title">
-                    <i class="fas fa-trophy"></i> ��Ŀ�ɾ���Ӱ��
+                    <i class="fas fa-trophy"></i> 项目成就与影响
                 </h2>
                 <div class="form-group">
                     <label for="achievements">
-                        <i class="fas fa-star"></i> ��Ҫ�ɾ�
+                        <i class="fas fa-star"></i> 主要成就
                     </label>
-                    <textarea id="achievements" name="achievements" required placeholder="��������Ŀ����Ҫ�ɹ�����������⡢�����ļ�ֵ��..."></textarea>
+                    <textarea id="achievements" name="achievements" required placeholder="请描述项目的主要成功、解决的问题、创造的价值等..."></textarea>
                 </div>
                 <div class="form-group">
                     <label for="metrics">
-                        <i class="fas fa-chart-line"></i> ����ָ��
+                        <i class="fas fa-chart-line"></i> 关键指标
                     </label>
-                    <textarea id="metrics" name="metrics" placeholder="��������Ŀ�Ĺؼ���Чָ�ꡢ���ݱ��ֵȣ��磺����Ч��30%�����ͳɱ�20%�ȣ�..."></textarea>
+                    <textarea id="metrics" name="metrics" placeholder="请描述项目的关键绩效指标、数据表现等，如：提升效率30%、降低成本20%等..."></textarea>
                 </div>
             </div>
 
-            <!-- ��ս��ѧϰ -->
+            <!-- 挑战与学习 -->
             <div class="form-section">
                 <h2 class="section-title">
-                    <i class="fas fa-lightbulb"></i> ��ս��ѧϰ
+                    <i class="fas fa-lightbulb"></i> 挑战与学习
                 </h2>
                 <div class="form-group">
                     <label for="challenges">
-                        <i class="fas fa-exclamation-triangle"></i> ��Ҫ��ս
+                        <i class="fas fa-exclamation-triangle"></i> 主要挑战
                     </label>
-                    <textarea id="challenges" name="challenges" placeholder="��������Ŀ��������������Ҫ��ս������..."></textarea>
+                    <textarea id="challenges" name="challenges" placeholder="请描述项目过程中遇到的主要挑战和困难..."></textarea>
                 </div>
                 <div class="form-group">
                     <label for="learnings">
-                        <i class="fas fa-graduation-cap"></i> ѧϰ�ջ�
+                        <i class="fas fa-graduation-cap"></i> 学习收获
                     </label>
-                    <textarea id="learnings" name="learnings" placeholder="������ͨ����Ŀ��õ�ѧϰ�ջ񡢼���������..."></textarea>
+                    <textarea id="learnings" name="learnings" placeholder="请描述通过项目获得的学习收获、技能提升等..."></textarea>
                 </div>
             </div>
 
-            <!-- ��ť���� -->
+            <!-- 按钮区域 -->
             <div class="btn-container">
                 <button type="submit" class="btn btn-success">
-                    <i class="fas fa-save"></i> ������Ŀ����
+                    <i class="fas fa-save"></i> 保存项目信息
                 </button>
-                <a href="{{ url_for('talent_management.employee_manager.projects.projects_dashboard') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> ������Ŀ�б�
+                <a href="{{ url_for('talent_management.employee_manager.projects.projects_dashboard') }}" class="btn btn-secondary" style="color: #000000;">
+                    <i class="fas fa-arrow-left"></i> 返回项目列表
                 </a>
                 <button type="reset" class="btn btn-primary">
-                    <i class="fas fa-redo"></i> ���ñ���
+                    <i class="fas fa-redo"></i> 重置表单
                 </button>
             </div>
         </form>
     </div>
 
     <script>
-        // ����ѡ����
+        // 技能选择功能
         document.querySelectorAll('.skill-item').forEach(item => {
             item.addEventListener('click', function() {
                 this.classList.toggle('selected');
@@ -759,7 +831,7 @@
             document.getElementById('selected_skills').value = selectedSkills.join(',');
         }
 
-        // ʱ����㹦��
+        // 时间计算功能
         document.getElementById('start_date').addEventListener('change', calculateDuration);
         document.getElementById('end_date').addEventListener('change', calculateDuration);
 
@@ -777,24 +849,24 @@
                 
                 let duration = '';
                 if (months > 0) {
-                    duration = `${months}����`;
-                    if (days > 0) duration += `${days}��`;
+                    duration = `${months}个月`;
+                    if (days > 0) duration += `${days}天`;
                 } else {
-                    duration = `${days}��`;
+                    duration = `${days}天`;
                 }
                 
                 document.getElementById('duration').value = duration;
             }
         }
 
-        // ������֤
+        // 表单验证
         document.querySelector('form').addEventListener('submit', function(e) {
             const requiredFields = this.querySelectorAll('[required]');
             let isValid = true;
             
             requiredFields.forEach(field => {
                 if (!field.value.trim()) {
-                    field.style.borderColor = var(--accent-red);
+                    field.style.borderColor = 'var(--accent-red)';
                     isValid = false;
                 } else {
                     field.style.borderColor = '';
@@ -803,11 +875,11 @@
             
             if (!isValid) {
                 e.preventDefault();
-                alert('����д���б����ֶΣ�');
+                alert('请填写所有必填字段！');
             }
         });
 
-        // ����򽹵�Ч��
+        // 输入框焦点效果
         document.querySelectorAll('input, select, textarea').forEach(field => {
             field.addEventListener('focus', function() {
                 this.parentElement.style.transform = 'scale(1.02)';
@@ -818,7 +890,7 @@
             });
         });
 
-        // ҳ����ض���
+        // 页面加载动画
         window.addEventListener('load', function() {
             document.querySelector('.container').style.opacity = '0';
             document.querySelector('.container').style.transform = 'translateY(30px)';
@@ -830,7 +902,7 @@
             }, 100);
         });
 
-        // ��ɫ�����л�
+        // 主题切换功能
         function toggleTheme() {
             const body = document.body;
             if (body.getAttribute('data-theme') === 'dark') {
@@ -840,7 +912,7 @@
             }
         }
 
-        // �Զ����ϵͳ����
+        // 自动跟随系统主题
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.body.setAttribute('data-theme', 'dark');
         }
