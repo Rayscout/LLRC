@@ -4,435 +4,1305 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>学习课程库 - 员工仪表板</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/icon_colors.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/button_colors.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/moving_gradient_background.css') }}" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
         
-        .courses-container {
-            padding: 2rem 0;
+        /* 动态背景 - 采用绩效分析界面的优雅渐变晕染设计 */
+        .courses-parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: -2;
+            overflow: hidden;
         }
         
-        .card {
-            background: rgba(228, 246, 236, 0.3);
-            backdrop-filter: blur(10px);
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(228, 246, 236, 0.3);
-            margin-bottom: 2rem;
+        /* 微妙的渐变晕染背景装饰 */
+        .courses-parallax-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(144, 238, 144, 0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(152, 251, 152, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(173, 255, 47, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(50, 205, 50, 0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(34, 139, 34, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 60s ease-in-out infinite;
         }
         
-        .card-header {
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
-            color: white;
-            border-radius: 15px 15px 0 0 !important;
-            padding: 1.5rem;
+        /* 添加彩色光晕装饰 */
+        .courses-parallax-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 400px 300px at 15% 85%, rgba(255, 107, 107, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 300px 400px at 85% 15%, rgba(78, 205, 196, 0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 500px 250px at 45% 45%, rgba(69, 183, 209, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse 350px 450px at 88% 65%, rgba(150, 206, 180, 0.05) 0%, transparent 60%),
+                radial-gradient(ellipse 250px 350px at 12% 25%, rgba(255, 234, 167, 0.03) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 80s ease-in-out infinite reverse;
         }
         
-        .skill-badge {
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            margin: 0.25rem;
-            display: inline-block;
+        /* 半透明遮罩层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            z-index: -1;
+        }
+        
+        /* 微妙的渐变晕染动画 */
+        @keyframes gentleDrift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: translate(30px, -20px) scale(1.01);
+                opacity: 0.98;
+            }
+            50% {
+                transform: translate(-25px, 35px) scale(0.99);
+                opacity: 1.02;
+            }
+            75% {
+                transform: translate(20px, 25px) scale(1.005);
+                opacity: 0.99;
+            }
+        }
+        
+        /* 导航栏样式 */
+        .top-navigation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(26, 77, 26, 0.1);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            padding: 0;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a4d1a;
+        }
+        
+        .nav-brand i {
+            font-size: 1.8rem;
+            color: #2d5a2d;
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            color: #2d5a2d;
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
             font-size: 0.9rem;
         }
         
-        .skill-badge.mastered {
-            background: linear-gradient(135deg, #2ed573 0%, #1e90ff 100%);
+        .nav-item:hover {
+            background: rgba(26, 77, 26, 0.08);
+            color: #1a4d1a;
+            transform: translateY(-1px);
         }
         
-        .skill-badge.missing {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        .nav-item i {
+            font-size: 1rem;
         }
         
-        .course-card {
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 15px rgba(228, 246, 236, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border-left: 4px solid #20B2AA;
+        .nav-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2d5a2d, #1a4d1a);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(45, 90, 45, 0.3);
+        }
+        
+        .nav-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(45, 90, 45, 0.4);
+            background: linear-gradient(135deg, #1a4d1a, #2d5a2d);
+        }
+        
+        .nav-logout i {
+            font-size: 1rem;
+        }
+        
+        /* 调整主容器位置，避免被导航栏遮挡 */
+        .courses-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 20px 20px 20px;
             position: relative;
+            z-index: 1;
         }
         
+        /* 页面标题卡片 */
+        .page-header-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 页面标题卡片顶部装饰条 */
+        .page-header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7);
+            opacity: 0.8;
+        }
+        
+        .page-title {
+            color: #1a4d1a;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-title i {
+            color: #4ECDC4;
+            background: rgba(78, 205, 196, 0.15);
+            padding: 15px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .page-header-card:hover .page-title i {
+            transform: scale(1.1);
+            background: rgba(78, 205, 196, 0.25);
+        }
+        
+        .page-subtitle {
+            color: #2d5a2d;
+            font-size: 1.2em;
+            font-weight: 500;
+            margin-bottom: 25px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.8);
+            color: #2d5a2d;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(45, 90, 45, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-header:hover {
+            background: #4ECDC4;
+            color: white;
+            border-color: #4ECDC4;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
+        }
+        
+        /* 统计卡片网格 - 采用五彩单色设计 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stats-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 统计卡片顶部装饰条 */
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .stats-card:hover::before {
+            opacity: 1;
+        }
+        
+        /* 第一个统计卡片 - 珊瑚红色系 */
+        .stats-card:nth-child(1) {
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+        
+        .stats-card:nth-child(1)::before {
+            background: linear-gradient(90deg, #FF6B6B, #FF8E53);
+        }
+        
+        .stats-card:nth-child(1) .stats-number {
+            color: #FF6B6B;
+        }
+        
+        .stats-card:nth-child(1) .stats-icon {
+            color: #FF6B6B;
+            background: rgba(255, 107, 107, 0.15);
+        }
+        
+        .stats-card:nth-child(1):hover {
+            border-color: rgba(255, 107, 107, 0.6);
+            box-shadow: 0 12px 40px rgba(255, 107, 107, 0.2);
+        }
+        
+        /* 第二个统计卡片 - 青绿色系 */
+        .stats-card:nth-child(2) {
+            border-color: rgba(78, 205, 196, 0.3);
+        }
+        
+        .stats-card:nth-child(2)::before {
+            background: linear-gradient(90deg, #4ECDC4, #44A08D);
+        }
+        
+        .stats-card:nth-child(2) .stats-number {
+            color: #4ECDC4;
+        }
+        
+        .stats-card:nth-child(2) .stats-icon {
+            color: #4ECDC4;
+            background: rgba(78, 205, 196, 0.15);
+        }
+        
+        .stats-card:nth-child(2):hover {
+            border-color: rgba(78, 205, 196, 0.6);
+            box-shadow: 0 12px 40px rgba(78, 205, 196, 0.2);
+        }
+        
+        /* 第三个统计卡片 - 金黄色系 */
+        .stats-card:nth-child(3) {
+            border-color: rgba(255, 230, 109, 0.3);
+        }
+        
+        .stats-card:nth-child(3)::before {
+            background: linear-gradient(90deg, #FFE66D, #FFD93D);
+        }
+        
+        .stats-card:nth-child(3) .stats-number {
+            color: #FFE66D;
+        }
+        
+        .stats-card:nth-child(3) .stats-icon {
+            color: #FFE66D;
+            background: rgba(255, 230, 109, 0.15);
+        }
+        
+        .stats-card:nth-child(3):hover {
+            border-color: rgba(255, 230, 109, 0.6);
+            box-shadow: 0 12px 40px rgba(255, 230, 109, 0.2);
+        }
+        
+        /* 第四个统计卡片 - 淡绿色系 */
+        .stats-card:nth-child(4) {
+            border-color: rgba(168, 230, 207, 0.3);
+        }
+        
+        .stats-card:nth-child(4)::before {
+            background: linear-gradient(90deg, #A8E6CF, #88D8A3);
+        }
+        
+        .stats-card:nth-child(4) .stats-number {
+            color: #A8E6CF;
+        }
+        
+        .stats-card:nth-child(4) .stats-icon {
+            color: #A8E6CF;
+            background: rgba(168, 230, 207, 0.15);
+        }
+        
+        .stats-card:nth-child(4):hover {
+            border-color: rgba(168, 230, 207, 0.6);
+            box-shadow: 0 12px 40px rgba(168, 230, 207, 0.2);
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .stats-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover .stats-icon {
+            transform: scale(1.1);
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-label {
+            color: #2d5a2d;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        /* 筛选器卡片 */
+        .filter-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 筛选器卡片顶部装饰条 */
+        .filter-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #45B7D1, #69B7D1, #8DC7D1);
+            opacity: 0.8;
+        }
+        
+        .filter-card h4 {
+            color: #1a4d1a;
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-card h4 i {
+            color: #45B7D1;
+            background: rgba(69, 183, 209, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-card:hover h4 i {
+            transform: scale(1.1);
+            background: rgba(69, 183, 209, 0.25);
+        }
+        
+        .filter-card h6 {
+            color: #2d5a2d;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .filter-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-badge {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(69, 183, 209, 0.3);
+            color: #2d5a2d;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .filter-badge:hover {
+            background: #45B7D1;
+            color: white;
+            border-color: #45B7D1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(69, 183, 209, 0.3);
+        }
+        
+        .filter-badge.active {
+            background: #45B7D1;
+            color: white;
+            border-color: #45B7D1;
+            box-shadow: 0 4px 15px rgba(69, 183, 209, 0.3);
+        }
+        
+        /* 分类导航卡片 */
+        .category-nav-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 分类导航卡片顶部装饰条 */
+        .category-nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #96CEB4, #A8E6CF, #B8E6CF);
+            opacity: 0.8;
+        }
+        
+        .category-nav-card h5 {
+            color: #1a4d1a;
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-nav-card h5 i {
+            color: #96CEB4;
+            background: rgba(150, 206, 180, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .category-nav-card:hover h5 i {
+            transform: scale(1.1);
+            background: rgba(150, 206, 180, 0.25);
+        }
+        
+        .category-tab {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .category-tab:hover {
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-tab.active {
+            background: linear-gradient(135deg, #96CEB4, #A8E6CF);
+            color: white;
+            border-color: #96CEB4;
+            box-shadow: 0 8px 25px rgba(150, 206, 180, 0.3);
+        }
+        
+        .category-tab.active h6,
+        .category-tab.active small {
+            color: white;
+        }
+        
+        .category-tab h6 {
+            color: #1a4d1a;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .category-tab small {
+            color: #2d5a2d;
+            font-size: 0.9em;
+        }
+        
+        /* 课程列表卡片 */
+        .courses-list-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 课程列表卡片顶部装饰条 */
+        .courses-list-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #FFEAA7, #FFD93D, #FFC107);
+            opacity: 0.8;
+        }
+        
+        .courses-list-card h5 {
+            color: #1a4d1a;
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .courses-list-card h5 i {
+            color: #FFEAA7;
+            background: rgba(255, 234, 167, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .courses-list-card:hover h5 i {
+            transform: scale(1.1);
+            background: rgba(255, 234, 167, 0.25);
+        }
+        
+        /* 课程分类标题 */
+        .category-section h4 {
+            color: #1a4d1a;
+            font-size: 1.6em;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(26, 77, 26, 0.2);
+        }
+        
+        .category-section h4 i {
+            color: #4ECDC4;
+            background: rgba(78, 205, 196, 0.15);
+            padding: 12px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .category-section:hover h4 i {
+            transform: scale(1.1);
+            background: rgba(78, 205, 196, 0.25);
+        }
+        
+        .subcategory-section h5 {
+            color: #2d5a2d;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(45, 90, 45, 0.2);
+        }
+        
+        /* 课程卡片网格 */
+        .courses-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        /* 课程卡片 - 采用五彩单色设计 */
+        .course-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 280px;
+        }
+        
+        /* 课程卡片顶部装饰条 */
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .course-card:hover::before {
+            opacity: 1;
+        }
+        
+        /* 课程卡片悬停效果 */
         .course-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.8);
         }
         
+        /* 课程等级标签 */
         .course-level {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.25rem 0.75rem;
+            top: 20px;
+            right: 20px;
+            padding: 6px 12px;
             border-radius: 15px;
             font-size: 0.8rem;
             font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
         }
         
-        .level-beginner { background: #28a745; color: white; }
-        .level-intermediate { background: #ffc107; color: black; }
-        .level-advanced { background: #dc3545; color: white; }
+        .level-beginner {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .level-intermediate {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        }
+        
+        .level-advanced {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+        }
+        
+        .course-card:hover .course-level {
+            transform: scale(1.1);
+        }
+        
+        .course-card h6 {
+            color: #1a4d1a;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            margin-right: 80px;
+            transition: color 0.3s ease;
+        }
+        
+        .course-card:hover h6 {
+            color: #2E7D32;
+        }
+        
+        .course-info {
+            color: #2d5a2d;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .course-info i {
+            color: #4ECDC4;
+            width: 16px;
+        }
+        
+        /* 学习进度 */
+        .progress-section {
+            margin-bottom: 20px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .progress-header small {
+            color: #2d5a2d;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
         
         .progress-bar {
             height: 8px;
             border-radius: 4px;
-            background: #e9ecef;
+            background: rgba(255, 255, 255, 0.5);
             overflow: hidden;
-            margin: 1rem 0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
+            background: linear-gradient(90deg, #4ECDC4, #44A08D);
+            border-radius: 4px;
             transition: width 0.3s ease;
+            box-shadow: 0 2px 4px rgba(78, 205, 196, 0.3);
         }
         
-        .btn-custom {
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
+        /* 技能标签 */
+        .skills-section {
+            margin-bottom: 20px;
+        }
+        
+        .skills-section small {
+            color: #2d5a2d;
+            font-size: 0.9em;
+            font-weight: 500;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .skill-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .skill-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .skill-badge.mastered {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+        }
+        
+        .skill-badge.missing {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+        }
+        
+        .skill-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        /* 课程按钮 */
+        .btn-course {
+            width: 100%;
+            padding: 12px 20px;
             border: none;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.9em;
             transition: all 0.3s ease;
-        }
-        
-        .btn-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(32, 178, 170, 0.4);
-            color: white;
-        }
-        
-        .category-tab {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
-        .category-tab:hover {
-            background: rgba(255, 255, 255, 1);
+        .btn-course.start {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+            color: white;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+        }
+        
+        .btn-course.start:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
         }
         
-        .category-tab.active {
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
+        .btn-course.continue {
+            background: linear-gradient(135deg, #FFEAA7, #FFD93D);
+            color: #2d5a2d;
+            box-shadow: 0 4px 15px rgba(255, 234, 167, 0.3);
+        }
+        
+        .btn-course.continue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 234, 167, 0.4);
+        }
+        
+        .btn-course.completed {
+            background: linear-gradient(135deg, #96CEB4, #88D8A3);
             color: white;
+            box-shadow: 0 4px 15px rgba(150, 206, 180, 0.3);
         }
         
-        .filter-badge {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            color: #6c757d;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            margin: 0.25rem;
-            display: inline-block;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .btn-course.completed:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(150, 206, 180, 0.4);
         }
         
-        .filter-badge:hover {
-            background: #20B2AA;
-            color: white;
-            border-color: #20B2AA;
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .courses-row {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+            }
         }
         
-        .filter-badge.active {
-            background: #20B2AA;
-            color: white;
-            border-color: #20B2AA;
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .courses-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .page-title {
+                font-size: 2em;
+            }
+            
+            .stats-card {
+                padding: 20px;
+            }
+            
+            .stats-icon {
+                font-size: 2rem;
+                padding: 15px;
+            }
+            
+            .stats-number {
+                font-size: 2rem;
+            }
         }
         
-        .stats-card {
-            text-align: center;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
-            border-radius: 10px;
-            margin-bottom: 1rem;
+        /* 全局动画效果 */
+        .page-header-card,
+        .stats-card,
+        .filter-card,
+        .category-nav-card,
+        .courses-list-card {
+            animation: fadeInUp 0.6s ease-out;
         }
         
-        .stats-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #20B2AA;
-        }
+        .page-header-card { animation-delay: 0.1s; }
+        .stats-card:nth-child(1) { animation-delay: 0.2s; }
+        .stats-card:nth-child(2) { animation-delay: 0.3s; }
+        .stats-card:nth-child(3) { animation-delay: 0.4s; }
+        .stats-card:nth-child(4) { animation-delay: 0.5s; }
+        .filter-card { animation-delay: 0.6s; }
+        .category-nav-card { animation-delay: 0.7s; }
+        .courses-list-card { animation-delay: 0.8s; }
         
-        .stats-label {
-            color: #2F4F4F;
-            font-size: 0.9rem;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 动态背景 -->
+    <div class="courses-parallax-bg"></div>
+    
+    <!-- 半透明遮罩层 -->
+    <div class="overlay-layer"></div>
+    
+    <!-- 导航栏 -->
+    <nav class="top-navigation">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <span>学习中心</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>员工仪表盘</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.profile.profile_dashboard') }}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>个人资料</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.performance.performance_dashboard') }}" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>绩效分析</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.learning_recommendation.dashboard') }}" class="nav-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>学习中心</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.smart_goals.goals_dashboard') }}" class="nav-item">
+                    <i class="fas fa-bullseye"></i>
+                    <span>目标设定</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.feedback.feedback_dashboard') }}" class="nav-item">
+                    <i class="fas fa-comments"></i>
+                    <span>反馈管理</span>
+                </a>
+                <a href="{{ url_for('talent_management.employee_management.projects.projects_dashboard') }}" class="nav-item">
+                    <i class="fas fa-project-diagram"></i>
+                    <span>项目经验</span>
+                </a>
+            </div>
+            
+            <div class="nav-actions">
+                <a href="{{ url_for('common.auth.logout') }}" class="nav-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出登录</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
     <div class="courses-container">
-        <div class="container">
-            <!-- 页面标题 -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h2 class="mb-0">
-                                        <i class="fas fa-book me-2"></i>
-                                        学习课程库
-                                    </h2>
-                                    <p class="mb-0 mt-2">探索丰富的学习资源，提升职业技能</p>
-                                </div>
-                                                                 <div class="text-end">
-                                     <a href="{{ url_for('talent_management.employee_manager.learning_recommendation.dashboard') }}" class="btn btn-light">
-                                         <i class="fas fa-dashboard me-2"></i>返回仪表板
-                                     </a>
-                                 </div>
-                            </div>
-                        </div>
-                    </div>
+        <!-- 页面标题 -->
+        <div class="page-header-card">
+            <div class="page-title">
+                <i class="fas fa-book"></i>
+                学习课程库
+            </div>
+            <div class="page-subtitle">探索丰富的学习资源，提升职业技能</div>
+            <div class="header-actions">
+                <a href="{{ url_for('talent_management.employee_manager.learning_recommendation.dashboard') }}" class="btn-header">
+                    <i class="fas fa-dashboard"></i>返回仪表板
+                </a>
+            </div>
+        </div>
+
+        <!-- 统计概览 -->
+        <div class="stats-grid">
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stats-number">{{ user_skills|length }}</div>
+                <div class="stats-label">已掌握技能</div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stats-number">
+                    {% set total_courses = 0 %}
+                    {% for category, subcategories in all_courses.items() %}
+                        {% for subcategory, courses in subcategories.items() %}
+                            {% set total_courses = total_courses + courses|length %}
+                        {% endfor %}
+                    {% endfor %}
+                    {{ total_courses }}
+                </div>
+                <div class="stats-label">总课程数</div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stats-number">
+                    {% set completed_courses = 0 %}
+                    {% for category, subcategories in all_courses.items() %}
+                        {% for subcategory, courses in subcategories.items() %}
+                            {% for course in courses %}
+                                {% if course.progress == 1.0 %}
+                                    {% set completed_courses = completed_courses + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                    {{ completed_courses }}
+                </div>
+                <div class="stats-label">已完成课程</div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="stats-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-number">
+                    {% set in_progress_courses = 0 %}
+                    {% for category, subcategories in all_courses.items() %}
+                        {% for subcategory, courses in subcategories.items() %}
+                            {% for course in courses %}
+                                {% if course.progress > 0 and course.progress < 1.0 %}
+                                    {% set in_progress_courses = in_progress_courses + 1 %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                    {{ in_progress_courses }}
+                </div>
+                <div class="stats-label">进行中课程</div>
+            </div>
+        </div>
+
+        <!-- 筛选器 -->
+        <div class="filter-card">
+            <h4>
+                <i class="fas fa-filter"></i>
+                课程筛选
+            </h4>
+            <div>
+                <h6>技能分类：</h6>
+                <div class="filter-badges">
+                    <span class="filter-badge active" data-category="all">全部</span>
+                    <span class="filter-badge" data-category="technical">技术技能</span>
+                    <span class="filter-badge" data-category="soft_skills">软技能</span>
+                    <span class="filter-badge" data-category="business">商业技能</span>
                 </div>
             </div>
+            <div>
+                <h6>难度等级：</h6>
+                <div class="filter-badges">
+                    <span class="filter-badge active" data-level="all">全部</span>
+                    <span class="filter-badge" data-level="beginner">初级</span>
+                    <span class="filter-badge" data-level="intermediate">中级</span>
+                    <span class="filter-badge" data-level="advanced">高级</span>
+                </div>
+            </div>
+            <div>
+                <h6>学习进度：</h6>
+                <div class="filter-badges">
+                    <span class="filter-badge active" data-progress="all">全部</span>
+                    <span class="filter-badge" data-progress="not_started">未开始</span>
+                    <span class="filter-badge" data-progress="in_progress">进行中</span>
+                    <span class="filter-badge" data-progress="completed">已完成</span>
+                </div>
+            </div>
+        </div>
 
-            <!-- 统计概览 -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <div class="stats-number">{{ user_skills|length }}</div>
-                        <div class="stats-label">已掌握技能</div>
-                    </div>
+        <!-- 课程分类 -->
+        <div style="display: grid; grid-template-columns: 300px 1fr; gap: 30px;">
+            <!-- 分类导航 -->
+            <div class="category-nav-card">
+                <h5>
+                    <i class="fas fa-th-large"></i>
+                    课程分类
+                </h5>
+                <div class="category-tab active" data-category="all">
+                    <h6>全部课程</h6>
+                    <small>查看所有可用课程</small>
                 </div>
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <div class="stats-number">
-                            {% set total_courses = 0 %}
-                            {% for category, subcategories in all_courses.items() %}
-                                {% for subcategory, courses in subcategories.items() %}
-                                    {% set total_courses = total_courses + courses|length %}
-                                {% endfor %}
+                {% for category, subcategories in all_courses.items() %}
+                    <div class="category-tab" data-category="{{ category }}">
+                        <h6>
+                            {% if category == 'technical' %}
+                                <i class="fas fa-code"></i>技术技能
+                            {% elif category == 'soft_skills' %}
+                                <i class="fas fa-users"></i>软技能
+                            {% elif category == 'business' %}
+                                <i class="fas fa-chart-line"></i>商业技能
+                            {% endif %}
+                        </h6>
+                        <small>
+                            {% set category_count = 0 %}
+                            {% for subcategory, courses in subcategories.items() %}
+                                {% set category_count = category_count + courses|length %}
                             {% endfor %}
-                            {{ total_courses }}
-                        </div>
-                        <div class="stats-label">总课程数</div>
+                            {{ category_count }} 门课程
+                        </small>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <div class="stats-number">
-                            {% set completed_courses = 0 %}
-                            {% for category, subcategories in all_courses.items() %}
-                                {% for subcategory, courses in subcategories.items() %}
+                {% endfor %}
+            </div>
+            
+            <!-- 课程列表 -->
+            <div class="courses-list-card">
+                <h5>
+                    <i class="fas fa-list"></i>
+                    课程列表
+                </h5>
+                {% for category, subcategories in all_courses.items() %}
+                    <div class="category-section" data-category="{{ category }}">
+                        <h4>
+                            {% if category == 'technical' %}
+                                <i class="fas fa-code"></i>技术技能课程
+                            {% elif category == 'soft_skills' %}
+                                <i class="fas fa-users"></i>软技能课程
+                            {% elif category == 'business' %}
+                                <i class="fas fa-chart-line"></i>商业技能课程
+                            {% endif %}
+                        </h4>
+                        
+                        {% for subcategory, courses in subcategories.items() %}
+                            <div class="subcategory-section">
+                                <h5>{{ subcategory }}</h5>
+                                <div class="courses-row">
                                     {% for course in courses %}
-                                        {% if course.progress == 1.0 %}
-                                            {% set completed_courses = completed_courses + 1 %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endfor %}
-                            {% endfor %}
-                            {{ completed_courses }}
-                        </div>
-                        <div class="stats-label">已完成课程</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <div class="stats-number">
-                            {% set in_progress_courses = 0 %}
-                            {% for category, subcategories in all_courses.items() %}
-                                {% for subcategory, courses in subcategories.items() %}
-                                    {% for course in courses %}
-                                        {% if course.progress > 0 and course.progress < 1.0 %}
-                                            {% set in_progress_courses = in_progress_courses + 1 %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endfor %}
-                            {% endfor %}
-                            {{ in_progress_courses }}
-                        </div>
-                        <div class="stats-label">进行中课程</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 筛选器 -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="mb-0">
-                                <i class="fas fa-filter me-2"></i>
-                                课程筛选
-                            </h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <h6>技能分类：</h6>
-                                <div class="filter-badges">
-                                    <span class="filter-badge active" data-category="all">全部</span>
-                                    <span class="filter-badge" data-category="technical">技术技能</span>
-                                    <span class="filter-badge" data-category="soft_skills">软技能</span>
-                                    <span class="filter-badge" data-category="business">商业技能</span>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <h6>难度等级：</h6>
-                                <div class="filter-badges">
-                                    <span class="filter-badge active" data-level="all">全部</span>
-                                    <span class="filter-badge" data-level="beginner">初级</span>
-                                    <span class="filter-badge" data-level="intermediate">中级</span>
-                                    <span class="filter-badge" data-level="advanced">高级</span>
-                                </div>
-                            </div>
-                            <div>
-                                <h6>学习进度：</h6>
-                                <div class="filter-badges">
-                                    <span class="filter-badge active" data-progress="all">全部</span>
-                                    <span class="filter-badge" data-progress="not_started">未开始</span>
-                                    <span class="filter-badge" data-progress="in_progress">进行中</span>
-                                    <span class="filter-badge" data-progress="completed">已完成</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 课程分类 -->
-            <div class="row">
-                <div class="col-md-3">
-                    <!-- 分类导航 -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">
-                                <i class="fas fa-th-large me-2"></i>
-                                课程分类
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="category-tab active" data-category="all">
-                                <h6 class="mb-1">全部课程</h6>
-                                <small class="text-muted">查看所有可用课程</small>
-                            </div>
-                            {% for category, subcategories in all_courses.items() %}
-                                <div class="category-tab" data-category="{{ category }}">
-                                    <h6 class="mb-1">
-                                        {% if category == 'technical' %}
-                                            <i class="fas fa-code me-2"></i>技术技能
-                                        {% elif category == 'soft_skills' %}
-                                            <i class="fas fa-users me-2"></i>软技能
-                                        {% elif category == 'business' %}
-                                            <i class="fas fa-chart-line me-2"></i>商业技能
-                                        {% endif %}
-                                    </h6>
-                                    <small class="text-muted">
-                                        {% set category_count = 0 %}
-                                        {% for subcategory, courses in subcategories.items() %}
-                                            {% set category_count = category_count + courses|length %}
-                                        {% endfor %}
-                                        {{ category_count }} 门课程
-                                    </small>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-9">
-                    <!-- 课程列表 -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">
-                                <i class="fas fa-list me-2"></i>
-                                课程列表
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            {% for category, subcategories in all_courses.items() %}
-                                <div class="category-section" data-category="{{ category }}">
-                                    <h4 class="mb-3">
-                                        {% if category == 'technical' %}
-                                            <i class="fas fa-code me-2"></i>技术技能课程
-                                        {% elif category == 'soft_skills' %}
-                                            <i class="fas fa-users me-2"></i>软技能课程
-                                        {% elif category == 'business' %}
-                                            <i class="fas fa-chart-line me-2"></i>商业技能课程
-                                        {% endif %}
-                                    </h4>
-                                    
-                                    {% for subcategory, courses in subcategories.items() %}
-                                        <div class="subcategory-section mb-4">
-                                            <h5 class="mb-3">{{ subcategory }}</h5>
-                                            <div class="row">
-                                                {% for course in courses %}
-                                                    <div class="col-md-6 mb-3 course-item" 
-                                                         data-category="{{ category }}"
-                                                         data-level="{{ course.level }}"
-                                                         data-progress="{% if course.progress == 0 %}not_started{% elif course.progress == 1.0 %}completed{% else %}in_progress{% endif %}">
-                                                        <div class="course-card">
-                                                            <span class="course-level level-{{ course.level }}">
-                                                                {{ course.level }}
-                                                            </span>
-                                                            
-                                                            <h6>{{ course.name }}</h6>
-                                                            <p class="text-muted mb-2">
-                                                                <i class="fas fa-clock me-1"></i>
-                                                                {{ course.duration }}
-                                                            </p>
-                                                            
-                                                            <!-- 学习进度 -->
-                                                            <div class="mb-3">
-                                                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                                                    <small class="text-muted">学习进度</small>
-                                                                    <small class="text-muted">{{ "%.0f"|format(course.progress * 100) }}%</small>
-                                                                </div>
-                                                                <div class="progress-bar">
-                                                                    <div class="progress-fill" style="width: {{ course.progress * 100 }}%"></div>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <!-- 技能标签 -->
-                                                            <div class="mb-3">
-                                                                <small class="text-muted d-block mb-1">相关技能：</small>
-                                                                {% for skill in course.skills %}
-                                                                    {% if skill in course.mastered_skills %}
-                                                                        <span class="skill-badge mastered">{{ skill }}</span>
-                                                                    {% else %}
-                                                                        <span class="skill-badge missing">{{ skill }}</span>
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                            </div>
-                                                            
-                                                            <button class="btn btn-custom btn-sm w-100">
-                                                                {% if course.progress == 0 %}
-                                                                    <i class="fas fa-play me-1"></i>开始学习
-                                                                {% elif course.progress == 1.0 %}
-                                                                    <i class="fas fa-check me-1"></i>已完成
-                                                                {% else %}
-                                                                    <i class="fas fa-play me-1"></i>继续学习
-                                                                {% endif %}
-                                                            </button>
-                                                        </div>
+                                        <div class="course-item" 
+                                             data-category="{{ category }}"
+                                             data-level="{{ course.level }}"
+                                             data-progress="{% if course.progress == 0 %}not_started{% elif course.progress == 1.0 %}completed{% else %}in_progress{% endif %}">
+                                            <div class="course-card">
+                                                <span class="course-level level-{{ course.level }}">
+                                                    {{ course.level }}
+                                                </span>
+                                                
+                                                <h6>{{ course.name }}</h6>
+                                                <div class="course-info">
+                                                    <i class="fas fa-clock"></i>
+                                                    <span>{{ course.duration }}</span>
+                                                </div>
+                                                
+                                                <!-- 学习进度 -->
+                                                <div class="progress-section">
+                                                    <div class="progress-header">
+                                                        <small>学习进度</small>
+                                                        <small>{{ "%.0f"|format(course.progress * 100) }}%</small>
                                                     </div>
-                                                {% endfor %}
+                                                    <div class="progress-bar">
+                                                        <div class="progress-fill" style="width: {{ course.progress * 100 }}%"></div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- 技能标签 -->
+                                                <div class="skills-section">
+                                                    <small>相关技能：</small>
+                                                    <div class="skill-badges">
+                                                        {% for skill in course.skills %}
+                                                            {% if skill in course.mastered_skills %}
+                                                                <span class="skill-badge mastered">{{ skill }}</span>
+                                                            {% else %}
+                                                                <span class="skill-badge missing">{{ skill }}</span>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                
+                                                <button class="btn-course {% if course.progress == 0 %}start{% elif course.progress == 1.0 %}completed{% else %}continue{% endif %}">
+                                                    {% if course.progress == 0 %}
+                                                        <i class="fas fa-play"></i>开始学习
+                                                    {% elif course.progress == 1.0 %}
+                                                        <i class="fas fa-check"></i>已完成
+                                                    {% else %}
+                                                        <i class="fas fa-play"></i>继续学习
+                                                    {% endif %}
+                                                </button>
                                             </div>
                                         </div>
                                     {% endfor %}
                                 </div>
-                            {% endfor %}
-                        </div>
+                            </div>
+                        {% endfor %}
                     </div>
-                </div>
+                {% endfor %}
             </div>
+        </div>
         </div>
     </div>
 
@@ -502,6 +1372,48 @@
                 
                 item.style.display = show ? 'block' : 'none';
             });
+        }
+        
+        // 页面加载完成后的动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为统计卡片添加数字动画效果
+            const statValues = document.querySelectorAll('.stats-number');
+            statValues.forEach(stat => {
+                const text = stat.textContent;
+                if (text && !isNaN(text)) {
+                    const number = parseInt(text);
+                    animateNumber(stat, 0, number, 2000);
+                }
+            });
+            
+            // 为进度条添加动画效果
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                if (width) {
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 500);
+                }
+            });
+        });
+        
+        // 数字动画函数
+        function animateNumber(element, start, end, duration) {
+            const startTime = performance.now();
+            const animate = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.floor(start + (end - start) * progress);
+                
+                element.textContent = current;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            };
+            requestAnimationFrame(animate);
         }
     </script>
     

@@ -103,10 +103,47 @@
 </div>
 
 <style>
+/* 隐藏侧边导航栏 */
+nav {
+    display: none !important;
+}
+
+/* 隐藏顶部栏的汉堡菜单按钮 */
+.sidebar-toggle {
+    display: none !important;
+}
+
+/* 调整主内容区域，移除左侧边距 */
+.dashboard {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+.top {
+    margin-left: 0 !important;
+    padding-left: 20px !important;
+}
+
+/* 禁用横向滚动条 */
+html, body {
+    overflow-x: hidden !important;
+}
+
+.dashboard, .dash-content {
+    overflow-x: hidden !important;
+}
+
+/* 隐藏所有横向滚动条 */
+* {
+    overflow-x: hidden !important;
+}
+
+/* 确保内容不会超出视口宽度 */
 .hr-settings-page {
     padding: 20px;
-    max-width: 800px;
+    max-width: 1400px;
     margin: 0 auto;
+    box-sizing: border-box !important;
 }
 
 .page-header {
@@ -127,7 +164,7 @@
 .settings-content {
     background: white;
     border-radius: 12px;
-    padding: 30px;
+    padding: 40px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -147,11 +184,15 @@
     gap: 20px;
 }
 
-/* 两列栅格：大屏两列，小屏一列 */
+/* 三列栅格：大屏三列，中屏两列，小屏一列 */
 .settings-grid-2{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
 }
-@media (max-width: 900px){
+@media (max-width: 1200px){
+    .settings-grid-2{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 768px){
     .settings-grid-2{ grid-template-columns: 1fr; }
 }
 

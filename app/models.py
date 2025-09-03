@@ -1,7 +1,13 @@
 from . import db
 from datetime import datetime
+try:
+    from flask_login import UserMixin
+except Exception:
+    # 如果Flask-Login不可用，提供兼容基类
+    class UserMixin:
+        pass  # Flask-Login 方法将在User模型中实现
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
@@ -31,6 +37,18 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)  # 账号是否活跃
     deactivated_at = db.Column(db.DateTime)  # 注销时间
     deactivated_by = db.Column(db.Integer, db.ForeignKey('user.id'))  # 注销操作人ID
+    
+    # Flask-Login 所需的方法
+    def get_id(self):
+        return str(self.id)
+    
+    @property
+    def is_authenticated(self):
+        return True
+    
+    @property
+    def is_anonymous(self):
+        return False
 
 class Job(db.Model):
     id = db.Column(db.Integer, primary_key=True)

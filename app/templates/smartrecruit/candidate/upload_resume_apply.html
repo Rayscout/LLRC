@@ -1,67 +1,915 @@
-{% extends 'base.html' %}
+{% extends 'smartrecruit/candidate/base_ios_new.html' %}
 
 {% block title %}上传简历并申请{% endblock %}
+{% block navbar_title %}上传简历申请{% endblock %}
 
 {% block content %}
-<style>
-  .ua-wrap{max-width:820px;margin:20px auto;background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.08);padding:20px}
-  .ua-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-  .ua-title{font-size:20px;font-weight:700;color:#333}
-  .ua-sub{color:#6b7280;font-size:13px}
-  .ua-form{display:grid;gap:12px;margin-top:10px}
-  .ua-drop{position:relative;border:2px dashed #d9d9d9;border-radius:12px;background:#fafafa;transition:.2s}
-  .ua-drop:hover{border-color:#333;background:#f5f5f5}
-  .ua-input{padding:10px;border:1px solid #e5e7eb;border-radius:8px}
-  .ua-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
-  .ua-dz-content{padding:22px;text-align:left;display:flex;flex-direction:column;align-items:flex-start}
-  .ua-dz-content i{font-size:26px;color:#666}
-  .ua-dz-title{margin-top:6px;font-weight:700;color:#333}
-  .ua-dz-hint{margin-top:2px;color:#999;font-size:12px}
-  .ua-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
-  .ua-btn{padding:12px 16px;border-radius:10px;border:1px solid transparent;cursor:pointer;font-weight:700}
-  .ua-btn.primary{background:#333;color:#fff}
-  .ua-btn.primary:hover{background:#555}
-  .ua-btn.neutral{background:#efefef;color:#333;border-color:#e5e5e5;text-decoration:none}
-  .ua-btn.neutral:hover{background:#e5e5e5}
-  @media (max-width:768px){.ua-wrap{padding:16px}}
-</style>
-<style>
-/* 深色模式 */
-body.dark .ua-wrap{ background:#111827; box-shadow: 0 6px 20px rgba(0,0,0,.6) }
-body.dark .ua-title{ color:#e5e7eb }
-body.dark .ua-sub{ color:#9ca3af }
-body.dark .ua-drop{ border-color:#374151; background:#0f172a }
-body.dark .ua-drop:hover{ border-color:#9ca3af; background:#111827 }
-body.dark .ua-btn.primary{ background:#e5e7eb; color:#111827 }
-body.dark .ua-btn.primary:hover{ background:#d1d5db }
-body.dark .ua-btn.neutral{ background:#1f2937; color:#e5e7eb; border-color:#374151 }
-body.dark .ua-btn.neutral:hover{ background:#374151 }
-</style>
-
-<div class="ua-wrap">
-  <div class="ua-head">
-    <div>
-      <div class="ua-title">上传简历后立即申请</div>
-      <div class="ua-sub">职位：{{ job.title }} · {{ job.company_name }}</div>
-    </div>
-    <a class="ua-btn neutral" href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=job.id) }}">返回</a>
-  </div>
-
-  <form class="ua-form" method="post" enctype="multipart/form-data">
-    <label>选择简历文件（PDF/DOCX/PNG/JPG，或可上传视频简历）</label>
-    <div class="ua-drop">
-      <input class="ua-input" type="file" name="cv_file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.mp4,.webm,.ogg,.mov,.avi,.mkv" required>
-      <div class="ua-dz-content">
-        <i class="uil uil-cloud-upload"></i>
-        <div class="ua-dz-title">拖拽文件到此处，或点击选择文件</div>
-        <div class="ua-dz-hint">单文件最大 20MB；视频简历不参与自动解析，但可正常申请</div>
+<section class="section" id="upload-resume">
+  <div class="section-content">
+    <!-- 顶部信息栏：天气、日期、用户状态 -->
+    <div class="top-info-bar animate-fade-in-down">
+      <div class="info-left">
+        <div class="weather-widget">
+          <svg class="weather-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+            <path d="M8 14l4 4 4-4"/>
+          </svg>
+          <div class="weather-info">
+            <span class="weather-temp">22°C</span>
+            <span class="weather-desc">晴朗</span>
+          </div>
+        </div>
+        <div class="date-info">
+          <div class="current-date" id="currentDate"></div>
+          <div class="current-time" id="currentTime"></div>
+        </div>
+      </div>
+      <div class="info-right">
+        <div class="user-status-card">
+          <div class="status-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14,2 14,8 20,8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10,9 9,9 8,9"/>
+            </svg>
+          </div>
+          <div class="status-info">
+            <div class="status-title">申请状态</div>
+            <div class="status-value">准备上传简历</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="ua-actions">
-      <button type="submit" class="ua-btn primary">上传并申请</button>
+
+    <!-- 页面标题 -->
+    <h1 class="section-title animate-fade-in-up">上传简历申请</h1>
+    
+    <!-- 欢迎信息 -->
+    <div class="welcome-message animate-fade-in-up">
+      <div class="welcome-content">
+        <div class="welcome-header">
+          <svg class="welcome-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10,9 9,9 8,9"/>
+          </svg>
+          <h3>准备申请职位</h3>
+  </div>
+        <p class="welcome-description">请上传您的简历文件，我们将为您处理申请流程</p>
+      </div>
+    </div>
+
+    <!-- 职位信息卡片 -->
+    <div class="card job-info-card animate-fade-in-up" style="margin-top: 20px;">
+      <div class="card-header">
+        <div class="card-title">
+          <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
+          申请职位信息
+        </div>
+      </div>
+      <div class="job-info-content">
+        <div class="job-details">
+          <div class="job-title">{{ job.title }}</div>
+          <div class="company-name">{{ job.company_name }}</div>
+          <div class="job-meta">
+            <span class="job-location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              {{ job.location or '工作地点待定' }}
+            </span>
+            <span class="job-salary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              {{ job.salary or '薪资面议' }}
+            </span>
+          </div>
+        </div>
+        <div class="job-actions">
+          <a href="{{ url_for('smartrecruit.candidate.jobs.job_detail', job_id=job.id) }}" class="btn btn-outline">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            查看职位详情
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 上传简历卡片 -->
+    <div class="card upload-card animate-fade-in-up" style="margin-top: 20px;">
+      <div class="card-header">
+        <div class="card-title">
+          <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7,10 12,15 17,10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          上传简历文件
+        </div>
+      </div>
+      
+      <form class="upload-form" method="post" enctype="multipart/form-data">
+        <div class="upload-area">
+          <div class="upload-dropzone" id="uploadDropzone">
+            <input type="file" name="cv_file" id="cvFile" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.mp4,.webm,.ogg,.mov,.avi,.mkv" required>
+            <div class="upload-content">
+              <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7,10 12,15 17,10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <div class="upload-text">
+                <div class="upload-title">拖拽文件到此处，或点击选择文件</div>
+                <div class="upload-hint">支持 PDF、DOC、DOCX、图片格式，或视频简历</div>
+                <div class="upload-size">单文件最大 20MB</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="file-preview" id="filePreview" style="display: none;">
+            <div class="preview-content">
+              <svg class="preview-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+              <div class="preview-info">
+                <div class="preview-name" id="previewFileName"></div>
+                <div class="preview-size" id="previewFileSize"></div>
+              </div>
+              <button type="button" class="preview-remove" id="removeFile">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="upload-actions">
+          <button type="submit" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            上传并申请
+          </button>
     </div>
   </form>
 </div>
+
+    <!-- 申请流程说明 -->
+    <div class="card process-card animate-fade-in-up" style="margin-top: 20px;">
+      <div class="card-header">
+        <div class="card-title">
+          <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12,6 12,12 16,14"/>
+          </svg>
+          申请流程
+        </div>
+      </div>
+      <div class="process-timeline">
+        <div class="timeline-item active">
+          <div class="timeline-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7,10 12,15 17,10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-text-line">
+              <span class="timeline-title">上传简历</span>
+              <span class="timeline-desc">选择并上传您的简历文件</span>
+              <span class="timeline-time">当前步骤</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item pending">
+          <div class="timeline-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-4"/>
+              <rect x="9" y="3" width="6" height="8" rx="1"/>
+            </svg>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-text-line">
+              <span class="timeline-title">简历审核</span>
+              <span class="timeline-desc">HR将审核您的简历并安排面试</span>
+              <span class="timeline-time">等待中</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item pending">
+          <div class="timeline-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-text-line">
+              <span class="timeline-title">面试安排</span>
+              <span class="timeline-desc">通过筛选后将安排技术/HR面试</span>
+              <span class="timeline-time">待定</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 添加自定义样式和脚本 -->
+<style>
+/* 顶部信息栏样式 */
+.top-info-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #4ECDC4 0%, #4FC3F7 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 32px rgba(78, 205, 196, 0.3);
+}
+
+.info-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.weather-widget {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weather-icon {
+  width: 32px;
+  height: 32px;
+  color: #FDFD96;
+}
+
+.weather-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.weather-temp {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.weather-desc {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.date-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.current-date {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.current-time {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.info-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-status-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.status-icon {
+  width: 32px;
+  height: 32px;
+  color: #A8DDA8;
+}
+
+.status-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-title {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.status-value {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* 欢迎信息样式 */
+.welcome-message {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
+  text-align: center;
+}
+
+.welcome-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.welcome-icon {
+  width: 48px;
+  height: 48px;
+  color: #F7797D;
+  animation: heartBeat 2s ease-in-out infinite;
+}
+
+.welcome-header h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+}
+
+.welcome-description {
+  font-size: 16px;
+  color: #718096;
+  margin: 0;
+  max-width: 600px;
+}
+
+/* 卡片样式 */
+.card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 24px 24px 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.title-icon {
+  width: 24px;
+  height: 24px;
+  color: #4ECDC4;
+}
+
+/* 职位信息卡片 */
+.job-info-card {
+  padding: 24px;
+}
+
+.job-info-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.job-details {
+  flex: 1;
+}
+
+.job-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 8px;
+}
+
+.company-name {
+  font-size: 16px;
+  color: #718096;
+  margin-bottom: 16px;
+}
+
+.job-meta {
+  display: flex;
+  gap: 24px;
+}
+
+.job-meta span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #718096;
+}
+
+.job-meta svg {
+  width: 16px;
+  height: 16px;
+}
+
+.job-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* 上传卡片 */
+.upload-card {
+  padding: 24px;
+}
+
+.upload-form {
+  margin-top: 20px;
+}
+
+.upload-area {
+  margin-bottom: 24px;
+}
+
+.upload-dropzone {
+  position: relative;
+  border: 2px dashed #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.upload-dropzone:hover {
+  border-color: #4FC3F7;
+  background: #f1f5f9;
+}
+
+.upload-dropzone.dragover {
+  border-color: #4ECDC4;
+  background: #f0fdfa;
+}
+
+.upload-dropzone input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.upload-content {
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.upload-icon {
+  width: 64px;
+  height: 64px;
+  color: #4ECDC4;
+}
+
+.upload-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.upload-hint {
+  font-size: 14px;
+  color: #718096;
+}
+
+.upload-size {
+  font-size: 12px;
+  color: #a0aec0;
+}
+
+/* 文件预览 */
+.file-preview {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.preview-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.preview-icon {
+  width: 32px;
+  height: 32px;
+  color: #4ECDC4;
+}
+
+.preview-info {
+  flex: 1;
+}
+
+.preview-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.preview-size {
+  font-size: 12px;
+  color: #718096;
+}
+
+.preview-remove {
+  background: none;
+  border: none;
+  color: #e53e3e;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.preview-remove:hover {
+  background: #fed7d7;
+}
+
+.preview-remove svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* 上传按钮 */
+.upload-actions {
+  text-align: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #A8DDA8 0%, #FDFD96 100%);
+  color: #2d3748;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(168, 221, 168, 0.4);
+}
+
+.btn-outline {
+  background: white;
+  color: #4FC3F7;
+  border: 2px solid #4FC3F7;
+}
+
+.btn-outline:hover {
+  background: #4FC3F7;
+  color: white;
+}
+
+/* 流程时间线 */
+.process-card {
+  padding: 24px;
+}
+
+.process-timeline {
+  margin-top: 20px;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  position: relative;
+}
+
+.timeline-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 48px;
+  width: 2px;
+  height: calc(100% - 16px);
+  background: #e2e8f0;
+}
+
+.timeline-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7fafc;
+  color: #a0aec0;
+  flex-shrink: 0;
+}
+
+.timeline-item.active .timeline-icon {
+  background: linear-gradient(135deg, #4ECDC4 0%, #4FC3F7 100%);
+  color: white;
+}
+
+.timeline-item.pending .timeline-icon {
+  background: #f7fafc;
+  color: #a0aec0;
+}
+
+.timeline-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.timeline-text-line {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.timeline-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.timeline-desc {
+  font-size: 14px;
+  color: #718096;
+}
+
+.timeline-time {
+  font-size: 12px;
+  color: #a0aec0;
+  background: #f7fafc;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.timeline-item.active .timeline-time {
+  background: linear-gradient(135deg, #4ECDC4 0%, #4FC3F7 100%);
+  color: white;
+}
+
+/* 动画 */
+@keyframes heartBeat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .top-info-bar {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .info-left {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .job-info-content {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  
+  .job-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .timeline-text-line {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+</style>
+
+<script>
+// 实时时间更新
+function updateTime() {
+  const now = new Date();
+  const dateOptions = { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    weekday: 'long'
+  };
+  const timeOptions = { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    second: '2-digit'
+  };
+  
+  document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-CN', dateOptions);
+  document.getElementById('currentTime').textContent = now.toLocaleTimeString('zh-CN', timeOptions);
+}
+
+// 文件上传处理
+document.addEventListener('DOMContentLoaded', function() {
+  updateTime();
+  setInterval(updateTime, 1000);
+  
+  const dropzone = document.getElementById('uploadDropzone');
+  const fileInput = document.getElementById('cvFile');
+  const filePreview = document.getElementById('filePreview');
+  const previewFileName = document.getElementById('previewFileName');
+  const previewFileSize = document.getElementById('previewFileSize');
+  const removeFileBtn = document.getElementById('removeFile');
+  
+  // 拖拽上传
+  dropzone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    dropzone.classList.add('dragover');
+  });
+  
+  dropzone.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+  });
+  
+  dropzone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileSelect(files[0]);
+    }
+  });
+  
+  // 点击上传
+  dropzone.addEventListener('click', function() {
+    fileInput.click();
+  });
+  
+  fileInput.addEventListener('change', function() {
+    if (this.files.length > 0) {
+      handleFileSelect(this.files[0]);
+    }
+  });
+  
+  // 移除文件
+  removeFileBtn.addEventListener('click', function() {
+    fileInput.value = '';
+    filePreview.style.display = 'none';
+  });
+  
+  function handleFileSelect(file) {
+    // 检查文件大小 (20MB)
+    if (file.size > 20 * 1024 * 1024) {
+      alert('文件大小不能超过 20MB');
+      return;
+    }
+    
+    // 显示文件预览
+    previewFileName.textContent = file.name;
+    previewFileSize.textContent = formatFileSize(file.size);
+    filePreview.style.display = 'block';
+  }
+  
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+  
+  // 滚动动画
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, observerOptions);
+  
+  // 观察所有动画元素
+  document.querySelectorAll('.animate-fade-in-up, .animate-fade-in-down').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+    observer.observe(el);
+  });
+});
+</script>
 {% endblock %}
-
-

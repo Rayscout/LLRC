@@ -17,40 +17,282 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #e4f6ec 0%, #e0f5e9 50%, #ddf4e7 100%);
+            background: #ffffff;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
         }
         
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(228, 246, 236, 0.3);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(228, 246, 236, 0.3);
+        /* 动态背景 - 采用HR界面的优雅渐变晕染设计 */
+        .employee-parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #ffffff;
+            z-index: -2;
             overflow: hidden;
         }
         
-        .header {
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
-            color: white;
-            padding: 30px;
+        /* 微妙的渐变晕染背景装饰 */
+        .employee-parallax-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse 800px 600px at 20% 80%, rgba(144, 238, 144, 0.12) 0%, transparent 70%), /* 左下角光晕 - 更绿更明显 */
+                radial-gradient(ellipse 600px 800px at 80% 20%, rgba(152, 251, 152, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse 1000px 500px at 40% 40%, rgba(173, 255, 47, 0.04) 0%, transparent 70%),
+                radial-gradient(ellipse 700px 900px at 90% 60%, rgba(50, 205, 50, 0.08) 0%, transparent 70%), /* 右下角光晕 - 更绿更明显 */
+                radial-gradient(ellipse 500px 700px at 10% 30%, rgba(34, 139, 34, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: gentleDrift 60s ease-in-out infinite;
+        }
+        
+        /* 半透明遮罩层 */
+        .overlay-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            z-index: -1;
+        }
+        
+        /* 微妙的渐变晕染动画 */
+        @keyframes gentleDrift {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: translate(30px, -20px) scale(1.01);
+                opacity: 0.98;
+            }
+            50% {
+                transform: translate(-25px, 35px) scale(0.99);
+                opacity: 1.02;
+            }
+            75% {
+                transform: translate(20px, 25px) scale(1.005);
+                opacity: 0.99;
+            }
+        }
+        
+        /* 主容器样式 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 100px 20px 20px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 页面标题区域 - 直接显示，无背景图层 */
+        .page-header-wrapper {
+            margin-bottom: 30px;
             text-align: center;
         }
         
-        .header h1 {
+        .page-header h1 {
+            color: #1a4d1a;
             font-size: 2.5em;
-            margin-bottom: 10px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
         }
         
-        .header p {
+        .page-header h1 i {
+            font-size: 1.5em;
+            padding: 15px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFB3BA, #FFDFBA);
+            color: #FF6B9D;
+            box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+        }
+        
+        .page-header p {
             font-size: 1.2em;
-            opacity: 0.9;
+            color: #2d5a2d;
+            font-weight: 500;
         }
         
-        .content {
-            padding: 30px;
+        /* 返回仪表盘按钮样式 - 统一为目标设定页面样式 */
+        .back-to-dashboard {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #7FB069, #9DC183); /* 柔和的薄荷绿渐变 */
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(127, 176, 105, 0.4);
+            border: none;
+        }
+        
+        .back-to-dashboard:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(127, 176, 105, 0.6);
+            background: linear-gradient(135deg, #9DC183, #7FB069);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* 返回链接样式 */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(8px);
+            color: #2d5a2d;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+        }
+        
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+            color: #1a4d1a;
+        }
+        
+        .back-link i {
+            font-size: 1rem;
+        }
+        
+        /* 主要内容区域包装器 */
+        .content-wrapper {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 35px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+        }
+        
+        .content-wrapper:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Flash消息样式 */
+        .flash-messages {
+            margin-bottom: 30px;
+        }
+        
+        .flash-message {
+            padding: 15px 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-weight: 500;
+        }
+        
+        .flash-success {
+            background: rgba(144, 238, 144, 0.2);
+            color: #1a4d1a;
+            border-color: rgba(144, 238, 144, 0.3);
+        }
+        
+        .flash-danger {
+            background: rgba(255, 182, 193, 0.2);
+            color: #8b0000;
+            border-color: rgba(255, 182, 193, 0.3);
+        }
+        
+        .flash-warning {
+            background: rgba(255, 255, 224, 0.2);
+            color: #8b8b00;
+            border-color: rgba(255, 255, 224, 0.3);
+        }
+        
+        /* 表单样式 */
+        .form-section {
+            margin-bottom: 35px;
+        }
+        
+        .section-title {
+            color: #1a4d1a;
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(26, 77, 26, 0.2);
+        }
+        
+        .section-title i {
+            font-size: 1.2em;
+            padding: 12px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFB3BA, #FFDFBA);
+            color: #FF6B9D;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+        }
+        
+        /* 马卡龙色图标系统 */
+        .section-title:nth-child(1) i {
+            background: linear-gradient(135deg, #FFB3BA, #FFDFBA);
+            color: #FF6B9D;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+        }
+        
+        .section-title:nth-child(2) i {
+            background: linear-gradient(135deg, #BAFFC9, #BAE1FF);
+            color: #6BFF9D;
+            box-shadow: 0 4px 15px rgba(107, 255, 157, 0.3);
+        }
+        
+        .section-title:nth-child(3) i {
+            background: linear-gradient(135deg, #FFE4BA, #FFB3F7);
+            color: #FFB36B;
+            box-shadow: 0 4px 15px rgba(255, 179, 107, 0.3);
+        }
+        
+        .section-title:nth-child(4) i {
+            background: linear-gradient(135deg, #B3F7FF, #B3FFE4);
+            color: #6BB3FF;
+            box-shadow: 0 4px 15px rgba(107, 179, 255, 0.3);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
         }
         
         .form-group {
@@ -59,27 +301,34 @@
         
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
-            color: #333;
+            color: #1a4d1a;
+            font-size: 0.95rem;
         }
         
         .form-group input,
         .form-group textarea,
         .form-group select {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 8px;
+            padding: 15px 18px;
+            border: 2px solid rgba(45, 90, 45, 0.15);
+            border-radius: 15px;
             font-size: 16px;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px);
+            color: #1a4d1a;
         }
         
         .form-group input:focus,
         .form-group textarea:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #20B2AA;
+            border-color: #2d5a2d;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 3px rgba(45, 90, 45, 0.1);
+            transform: translateY(-1px);
         }
         
         .form-group textarea {
@@ -87,113 +336,142 @@
             min-height: 120px;
         }
         
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .help-text {
+            font-size: 0.85em;
+            color: #2d5a2d;
+            margin-top: 8px;
+            font-style: italic;
+            opacity: 0.8;
+        }
+        
+        /* 按钮样式 */
+        .actions {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid rgba(26, 77, 26, 0.1);
         }
         
         .btn {
-            display: inline-block;
-            padding: 12px 30px;
-            margin: 0 10px;
-            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            margin: 0 15px;
+            border-radius: 20px;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
             font-size: 16px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #20B2AA 0%, #2F4F4F 100%);
-            color: white;
+            background: linear-gradient(135deg, #A8D8EA, #8BC8E0);
+            color: #2F4F4F;
+            border: 2px solid #A8D8EA;
         }
         
         .btn-outline {
             background: transparent;
-            color: #20B2AA;
-            border: 2px solid #20B2AA;
+            color: #A8D8EA;
+            border: 2px solid #A8D8EA;
         }
         
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(32, 178, 170, 0.3);
+            box-shadow: 0 6px 20px rgba(168, 216, 234, 0.3);
         }
         
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #20B2AA;
-            text-decoration: none;
-            font-weight: 600;
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #8BC8E0, #A8D8EA);
+            color: #2F4F4F;
         }
         
-        .back-link:hover {
-            text-decoration: underline;
+        .btn-outline:hover {
+            background: #A8D8EA;
+            color: #2F4F4F;
         }
         
-        .back-link i {
-            margin-right: 8px;
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 80px 15px 15px 15px;
+            }
+            
+            .page-header-wrapper,
+            .content-wrapper {
+                padding: 25px;
+                border-radius: 20px;
+            }
+            
+            .page-header h1 {
+                font-size: 2em;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .btn {
+                display: block;
+                margin: 15px auto;
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
         }
         
-        .actions {
-            text-align: center;
-            margin-top: 30px;
-        }
-        
-        .help-text {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 5px;
-        }
-        
-        .section-title {
-            color: #333;
-            margin: 30px 0 20px 0;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e1e5e9;
-            font-size: 1.3em;
-        }
-        
-        .flash-messages {
-            margin-bottom: 20px;
-        }
-        
-        .flash-message {
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-        
-        .flash-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .flash-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .flash-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
+        @media (max-width: 480px) {
+            .container {
+                padding: 70px 15px 15px 15px;
+            }
+            
+            .page-header-wrapper,
+            .content-wrapper {
+                padding: 20px;
+                border-radius: 15px;
+            }
+            
+            .page-header h1 {
+                font-size: 1.8em;
+            }
+            
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                padding: 12px 15px;
+                border-radius: 12px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 动态背景 -->
+    <div class="employee-parallax-bg"></div>
+    <div class="overlay-layer"></div>
+    
+    <!-- 返回仪表盘按钮 -->
+    <a href="{{ url_for('talent_management.employee_management.employee_dashboard') }}" class="back-to-dashboard">
+        <i class="fas fa-tachometer-alt"></i> 返回仪表盘
+    </a>
+    
     <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-edit"></i> 编辑个人资料</h1>
-            <p>更新您的个人信息、技能和经验记录</p>
+        <!-- 页面标题区域 -->
+        <div class="page-header-wrapper">
+            <div class="page-header">
+                <h1><i class="fas fa-edit"></i> 编辑个人资料</h1>
+                <p>更新您的个人信息、技能和经验记录</p>
+            </div>
         </div>
         
-        <div class="content">
+        <!-- 主要内容区域 -->
+        <div class="content-wrapper">
             <a href="{{ url_for('talent_management.employee_manager.profile.profile_dashboard') }}" class="back-link">
                 <i class="fas fa-arrow-left"></i> 返回个人资料
             </a>
@@ -211,61 +489,69 @@
             
             <form method="POST" action="{{ url_for('talent_management.employee_manager.profile.edit_profile') }}">
                 <!-- 基本信息 -->
-                <h3 class="section-title"><i class="fas fa-user"></i> 基本信息</h3>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="first_name">姓名 *</label>
-                        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-user"></i> 基本信息</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="first_name">姓名 *</label>
+                            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name">姓氏 *</label>
+                            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="last_name">姓氏 *</label>
-                        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="phone_number">手机号码</label>
-                        <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="birthday">生日</label>
-                        <input type="date" id="birthday" name="birthday" value="{{ user.birthday }}">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone_number">手机号码</label>
+                            <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="birthday">生日</label>
+                            <input type="date" id="birthday" name="birthday" value="{{ user.birthday }}">
+                        </div>
                     </div>
                 </div>
                 
                 <!-- 专业信息 -->
-                <h3 class="section-title"><i class="fas fa-briefcase"></i> 专业信息</h3>
-                
-                <div class="form-group">
-                    <label for="bio">个人简介</label>
-                    <textarea id="bio" name="bio" placeholder="请简要介绍您的专业背景、职业目标和个人特点...">{{ user.bio or '' }}</textarea>
-                    <div class="help-text">这将帮助系统更好地了解您的专业背景和技能</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="skills">技能标签</label>
-                    <textarea id="skills" name="skills" placeholder="请输入您的技能，用逗号分隔，例如：Python, JavaScript, 项目管理...">{{ user.skills or '' }}</textarea>
-                    <div class="help-text">系统将根据这些技能为您推荐相关培训和发展机会</div>
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-briefcase"></i> 专业信息</h3>
+                    
+                    <div class="form-group">
+                        <label for="bio">个人简介</label>
+                        <textarea id="bio" name="bio" placeholder="请简要介绍您的专业背景、职业目标和个人特点...">{{ user.bio or '' }}</textarea>
+                        <div class="help-text">这将帮助系统更好地了解您的专业背景和技能</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="skills">技能标签</label>
+                        <textarea id="skills" name="skills" placeholder="请输入您的技能，用逗号分隔，例如：Python, JavaScript, 项目管理...">{{ user.skills or '' }}</textarea>
+                        <div class="help-text">系统将根据这些技能为您推荐相关培训和发展机会</div>
+                    </div>
                 </div>
                 
                 <!-- 教育经历 -->
-                <h3 class="section-title"><i class="fas fa-graduation-cap"></i> 教育经历</h3>
-                
-                <div class="form-group">
-                    <label for="education">教育背景</label>
-                    <textarea id="education" name="education" placeholder="请详细描述您的教育经历，包括学校、专业、学位等信息...">{{ user.education or '' }}</textarea>
-                    <div class="help-text">格式建议：学校名称 - 专业 - 学位 - 毕业年份</div>
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-graduation-cap"></i> 教育经历</h3>
+                    
+                    <div class="form-group">
+                        <label for="education">教育背景</label>
+                        <textarea id="education" name="education" placeholder="请详细描述您的教育经历，包括学校、专业、学位等信息...">{{ user.education or '' }}</textarea>
+                        <div class="help-text">格式建议：学校名称 - 专业 - 学位 - 毕业年份</div>
+                    </div>
                 </div>
                 
                 <!-- 工作经历 -->
-                <h3 class="section-title"><i class="fas fa-briefcase"></i> 工作经历</h3>
-                
-                <div class="form-group">
-                    <label for="experience">工作经验</label>
-                    <textarea id="experience" name="experience" placeholder="请详细描述您的工作经历，包括公司、职位、工作内容、成就等...">{{ user.experience or '' }}</textarea>
-                    <div class="help-text">这将帮助系统分析您的职业发展轨迹和技能成长</div>
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-briefcase"></i> 工作经历</h3>
+                    
+                    <div class="form-group">
+                        <label for="experience">工作经验</label>
+                        <textarea id="experience" name="experience" placeholder="请详细描述您的工作经历，包括公司、职位、工作内容、成就等...">{{ user.experience or '' }}</textarea>
+                        <div class="help-text">这将帮助系统分析您的职业发展轨迹和技能成长</div>
+                    </div>
                 </div>
                 
                 <div class="actions">

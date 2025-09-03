@@ -100,7 +100,7 @@ def compensation_dashboard():
                              
     except Exception as e:
         flash(f'加载薪酬页面时发生错误: {str(e)}', 'danger')
-        return redirect(url_for('talent_management.employee_auth.employee_dashboard'))
+        return redirect(url_for('talent_management.employee_management.employee_dashboard'))
 
 @compensation_bp.route('/api/salary_trends')
 def api_salary_trends():
