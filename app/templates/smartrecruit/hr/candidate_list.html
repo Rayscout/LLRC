@@ -7,8 +7,63 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
-        .ios-candidates-hero { background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%); }
-        .ios-candidates-list { background: var(--ios-bg-tertiary); }
+        /* 与HR仪表盘保持一致的背景样式 */
+        .ios-candidates-hero { 
+            background: radial-gradient(1200px 420px at 20% -10%, #dbece0 0%, #cfe5d6 40%, #ffffff 100%); 
+            position: relative; 
+            overflow: hidden;
+        }
+        .ios-candidates-hero:before {
+            content: "";
+            position: absolute;
+            inset: -20% -10% auto -10%;
+            height: 320px;
+            background: conic-gradient(from 180deg, rgba(196,223,204,.18), rgba(207,229,214,.14), rgba(184,216,193,.12), rgba(196,223,204,.18));
+            filter: blur(40px);
+            animation: spinSlow 22s linear infinite;
+            pointer-events: none;
+        }
+        .ios-candidates-hero:after {
+            content: "";
+            position: absolute;
+            right: -160px;
+            top: -120px;
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(closest-side, rgba(196,223,204,.25), rgba(196,223,204,0));
+            filter: blur(10px);
+            transform: rotate(15deg);
+            animation: floatY 12s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        .ios-candidates-list { 
+            background: var(--ios-bg-secondary); 
+            position: relative; 
+            overflow: hidden;
+        }
+        .ios-candidates-list:before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(1000px 380px at 85% -20%, rgba(196,223,204,.10), transparent 60%), 
+                        radial-gradient(800px 320px at 10% 120%, rgba(184,216,193,.10), transparent 55%);
+        }
+        
+        /* 添加与HR仪表盘首页一致的动画关键帧 */
+        @keyframes spinSlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes floatY {
+            0%, 100% { transform: rotate(15deg) translateY(0px); }
+            50% { transform: rotate(15deg) translateY(-20px); }
+        }
+        
+        /* 背景粒子画布 */
+        #bgParticles{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.7}
+        .ios-scroll-container{ position:relative; z-index:1 }
         
         .ios-candidate-card {
             background: rgba(255, 255, 255, 0.9);
@@ -251,8 +306,12 @@
         </div>
     </nav>
 
+    <!-- 视差背景 -->
     <div class="ios-parallax-bg"></div>
+    <!-- 粒子背景画布 -->
+    <canvas id="bgParticles"></canvas>
     
+    <!-- 滚动容器 -->
     <div class="ios-scroll-container">
         <!-- 欢迎Section -->
         <section class="ios-section ios-candidates-hero">
@@ -437,6 +496,76 @@
     </div>
 
     <script src="{{ url_for('static', filename='ios_hr_script.js') }}"></script>
+    <script>
+        // 视差背景与粒子动画
+        (function(){
+          var root = document.documentElement;
+          // 视差：根据鼠标移动调整背景偏移
+          var parallax = document.querySelector('.ios-parallax-bg');
+          if(parallax){
+            window.addEventListener('mousemove', function(e){
+              var x = (e.clientX / window.innerWidth - .5) * 10;
+              var y = (e.clientY / window.innerHeight - .5) * 10;
+              parallax.style.transform = 'translate3d(' + (-x) + 'px,' + (-y) + 'px,0)';
+            });
+          }
+
+          // 背景粒子动画（轻量，无依赖）
+          var canvas = document.getElementById('bgParticles');
+          if(canvas){
+            var ctx = canvas.getContext('2d');
+            var w, h, pr = window.devicePixelRatio || 1;
+            var particles = [], num = 70; // 数量适中
+            function resize(){
+              w = canvas.width = Math.floor(window.innerWidth * pr);
+              h = canvas.height = Math.floor(window.innerHeight * pr);
+              canvas.style.width = window.innerWidth + 'px';
+              canvas.style.height = window.innerHeight + 'px';
+            }
+            function rand(a,b){ return Math.random()*(b-a)+a }
+            function init(){
+              particles.length = 0;
+              for(var i=0;i<num;i++){
+                particles.push({
+                  x: rand(0,w), y: rand(0,h),
+                  vx: rand(-.15,.15)*pr, vy: rand(-.15,.15)*pr,
+                  r: rand(1.2,2.6)*pr, o: rand(.25,.65),
+                  c: Math.random()<.5? 'rgba(196,223,204,':'rgba(207,229,214,'
+                });
+              }
+            }
+            function step(){
+              ctx.clearRect(0,0,w,h);
+              for(var i=0;i<particles.length;i++){
+                var p = particles[i];
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0||p.x>w) p.vx*=-1;
+                if(p.y<0||p.y>h) p.vy*=-1;
+                ctx.beginPath();
+                ctx.fillStyle = p.c + p.o + ')';
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                ctx.fill();
+              }
+              // 连接近邻
+              for(var a=0;a<particles.length;a++){
+                for(var b=a+1;b<particles.length;b++){
+                  var pa=particles[a], pb=particles[b];
+                  var dx=pa.x-pb.x, dy=pa.y-pb.y; var d=dx*dx+dy*dy;
+                  if(d< (120*pr)*(120*pr)){
+                    ctx.strokeStyle = 'rgba(196,223,204,.08)';
+                    ctx.lineWidth = pr;
+                    ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke();
+                  }
+                }
+              }
+              requestAnimationFrame(step);
+            }
+            window.addEventListener('resize', function(){ resize(); init(); });
+            resize(); init(); step();
+          }
+        })();
+    </script>
+    
     <script>
       (function(){
         var btn = document.getElementById('iosThemeToggle');

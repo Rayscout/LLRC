@@ -7,9 +7,408 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='ios_hr_style.css') }}">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <style>
-        .ios-filter-hero { background: linear-gradient(135deg, var(--ios-bg-primary) 0%, var(--ios-bg-secondary) 100%); }
-        .ios-filters-section { background: var(--ios-bg-secondary); }
-        .ios-candidates-list { background: var(--ios-bg-tertiary); }
+        /* 与HR仪表盘保持一致的背景样式 */
+        .ios-filter-hero { 
+            background: radial-gradient(1200px 420px at 20% -10%, #dbece0 0%, #cfe5d6 40%, #ffffff 100%); 
+            position: relative; 
+            overflow: hidden;
+        }
+        .ios-filter-hero:before {
+            content: "";
+            position: absolute;
+            inset: -20% -10% auto -10%;
+            height: 320px;
+            background: conic-gradient(from 180deg, rgba(196,223,204,.18), rgba(207,229,214,.14), rgba(184,216,193,.12), rgba(196,223,204,.18));
+            filter: blur(40px);
+            animation: spinSlow 22s linear infinite;
+            pointer-events: none;
+        }
+        .ios-filter-hero:after {
+            content: "";
+            position: absolute;
+            right: -160px;
+            top: -120px;
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(closest-side, rgba(196,223,204,.25), rgba(196,223,204,0));
+            filter: blur(10px);
+            transform: rotate(15deg);
+            animation: floatY 12s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        .ios-filters-section { 
+            background: var(--ios-bg-secondary); 
+            position: relative; 
+            overflow: hidden;
+        }
+        .ios-filters-section:before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(196,223,204,.06), rgba(207,229,214,.06));
+            opacity: .6;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+        }
+        
+        .ios-candidates-list { 
+            background: var(--ios-bg-tertiary); 
+            position: relative; 
+            overflow: hidden;
+        }
+        .ios-candidates-list:before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(1000px 380px at 85% -20%, rgba(196,223,204,.10), transparent 60%), 
+                        radial-gradient(800px 320px at 10% 120%, rgba(184,216,193,.10), transparent 55%);
+        }
+        
+        /* 添加与HR仪表盘首页一致的动画关键帧 */
+        @keyframes spinSlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes floatY {
+            0%, 100% { transform: rotate(15deg) translateY(0px); }
+            50% { transform: rotate(15deg) translateY(-20px); }
+        }
+        
+        /* 背景粒子画布 */
+        #bgParticles{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.7}
+        .ios-main{ position:relative; z-index:1 }
+        
+        /* 筛选卡片样式 - 与员工仪表盘保持一致 */
+        .ios-filter-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            margin-bottom: var(--ios-spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+            transition: all var(--ios-transition-medium);
+        }
+        
+        .ios-filter-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--ios-shadow-medium);
+        }
+        
+        .ios-filter-card-header {
+            margin-bottom: var(--ios-spacing-lg);
+            text-align: center;
+        }
+        
+        .ios-filter-card-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--ios-spacing-sm);
+        }
+        
+        .ios-filter-card-header h3 i {
+            color: var(--ios-blue);
+        }
+        
+        .ios-filter-card-header p {
+            color: var(--ios-text-secondary);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+        
+        /* 操作按钮卡片样式 */
+        .ios-action-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            margin-bottom: var(--ios-spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+        }
+        
+        .ios-action-buttons {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .ios-action-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+            padding: var(--ios-spacing-md) var(--ios-spacing-lg);
+            border-radius: var(--ios-radius-medium);
+            border: none;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--ios-transition-medium);
+            cursor: pointer;
+            min-width: 140px;
+            justify-content: center;
+        }
+        
+        .ios-action-btn.primary {
+            background: linear-gradient(135deg, #20B2AA, #1A9B94);
+            color: white;
+            box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3);
+        }
+        
+        .ios-action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(32, 178, 170, 0.4);
+        }
+        
+        .ios-action-btn.secondary {
+            background: linear-gradient(135deg, #87CEEB, #6BB6FF);
+            color: white;
+            box-shadow: 0 4px 12px rgba(135, 206, 235, 0.3);
+        }
+        
+        .ios-action-btn.secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(135, 206, 235, 0.4);
+        }
+        
+        .ios-action-btn.success {
+            background: linear-gradient(135deg, #98FB98, #90EE90);
+            color: white;
+            box-shadow: 0 4px 12px rgba(152, 251, 152, 0.3);
+        }
+        
+        .ios-action-btn.success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(152, 251, 152, 0.4);
+        }
+        
+        /* 批量操作卡片样式 */
+        .ios-batch-actions-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: var(--ios-radius-large);
+            padding: var(--ios-spacing-xl);
+            margin-bottom: var(--ios-spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--ios-shadow-light);
+        }
+        
+        .ios-batch-actions-header {
+            margin-bottom: var(--ios-spacing-lg);
+            text-align: center;
+        }
+        
+        .ios-batch-actions-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--ios-text-primary);
+            margin-bottom: var(--ios-spacing-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--ios-spacing-sm);
+        }
+        
+        .ios-batch-actions-header h3 i {
+            color: var(--ios-blue);
+        }
+        
+        .ios-batch-actions-header p {
+            color: var(--ios-text-secondary);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+        
+        .ios-batch-actions-buttons {
+            display: flex;
+            gap: var(--ios-spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .ios-batch-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--ios-spacing-sm);
+            padding: var(--ios-spacing-md) var(--ios-spacing-lg);
+            border-radius: var(--ios-radius-medium);
+            border: none;
+            font-weight: 600;
+            transition: all var(--ios-transition-medium);
+            cursor: pointer;
+            min-width: 120px;
+            justify-content: center;
+        }
+        
+        .ios-batch-btn.primary {
+            background: linear-gradient(135deg, #20B2AA, #1A9B94);
+            color: white;
+            box-shadow: 0 4px 12px rgba(32, 178, 170, 0.3);
+        }
+        
+        .ios-batch-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(32, 178, 170, 0.4);
+        }
+        
+        .ios-batch-btn.secondary {
+            background: linear-gradient(135deg, #87CEEB, #6BB6FF);
+            color: white;
+            box-shadow: 0 4px 12px rgba(135, 206, 235, 0.3);
+        }
+        
+        .ios-batch-btn.secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(135, 206, 235, 0.4);
+        }
+        
+        .ios-batch-btn.danger {
+            background: linear-gradient(135deg, #FF6B6B, #FF5252);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .ios-batch-btn.danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* 标题动画样式 */
+        .ios-hero-content {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .animated-title {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #2c3e50;
+            margin: 0 0 1rem 0;
+            position: relative;
+            display: inline-block;
+            text-align: center;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+        
+        .title-text {
+            position: relative;
+            z-index: 2;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+        
+        .title-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #20B2AA, #87CEEB, #98FB98);
+            background-size: 200% 200%;
+            filter: blur(20px);
+            opacity: 0.3;
+            z-index: 1;
+            animation: glowPulse 2s ease-in-out infinite alternate;
+        }
+        
+        .animated-subtitle {
+            font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #5a6c7d;
+            margin: 0;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+            letter-spacing: 0.01em;
+            line-height: 1.5;
+        }
+        
+        /* 动画关键帧 */
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+        
+        @keyframes glowPulse {
+            0% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0.4;
+                transform: scale(1.05);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 标题进入动画 */
+        .animated-title {
+            opacity: 0;
+            transform: translateY(30px) scale(0.9);
+            animation: titleEntrance 1s ease-out 0.2s forwards;
+        }
+        
+        @keyframes titleEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .animated-title {
+                font-size: 2.5rem;
+            }
+            
+            .animated-subtitle {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .animated-title {
+                font-size: 2rem;
+            }
+            
+            .animated-subtitle {
+                font-size: 1rem;
+            }
+        }
         
         .ios-candidate-card {
             background: rgba(255, 255, 255, 0.9);
@@ -348,6 +747,11 @@
         </div>
     </nav>
 
+    <!-- 视差背景 -->
+    <div class="ios-parallax-bg"></div>
+    <!-- 粒子背景画布 -->
+    <canvas id="bgParticles"></canvas>
+    
     <!-- 主要内容区域 -->
     <main class="ios-main">
         <div class="ios-container">
@@ -360,8 +764,11 @@
             <!-- 页面标题 -->
             <div class="ios-filter-hero">
                 <div class="ios-hero-content">
-                    <h1 class="ios-hero-title">初筛</h1>
-                    <p class="ios-hero-subtitle">使用智能筛选功能快速找到最合适的候选人</p>
+                    <h1 class="ios-hero-title animated-title">
+                        <span class="title-text">初筛</span>
+                        <span class="title-glow"></span>
+                    </h1>
+                    <p class="ios-hero-subtitle animated-subtitle">使用智能筛选功能快速找到最合适的候选人</p>
                 </div>
             </div>
 
@@ -381,136 +788,152 @@
             <!-- 筛选表单 -->
             <div class="ios-filters-section">
                 <form id="filterForm" method="GET" action="{{ url_for('smartrecruit.hr.dashboard.candidates_filter') }}">
-                    <div class="ios-filter-group">
-                        <!-- 搜索框 -->
-                        <div class="ios-filter-item">
-                            <label class="ios-filter-label">搜索候选人</label>
-                            <input type="text" name="search" class="ios-input" 
-                                   placeholder="搜索姓名、邮箱或职位..." 
-                                   value="{{ search_query }}">
+                    <!-- 基础筛选卡片 -->
+                    <div class="ios-filter-card">
+                        <div class="ios-filter-card-header">
+                            <h3><i class="uil uil-filter"></i>基础筛选</h3>
+                            <p>设置基本的筛选条件</p>
                         </div>
+                        <div class="ios-grid ios-grid-2">
+                            <!-- 搜索框 -->
+                            <div class="ios-filter-item">
+                                <label class="ios-filter-label">搜索候选人</label>
+                                <input type="text" name="search" class="ios-input" 
+                                       placeholder="搜索姓名、邮箱或职位..." 
+                                       value="{{ search_query }}">
+                            </div>
 
-                        <!-- 状态筛选 -->
-                        <div class="ios-filter-item">
-                            <label class="ios-filter-label">申请状态</label>
-                            <select name="status" class="ios-input">
-                                <option value="">所有状态</option>
-                                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>待处理</option>
-                                <option value="interview" {% if status_filter == 'interview' %}selected{% endif %}>面试中</option>
-                                <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>已通过</option>
-                                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>已拒绝</option>
-                                <option value="withdrawn" {% if status_filter == 'withdrawn' %}selected{% endif %}>已撤销</option>
-                                <option value="screening_passed" {% if status_filter == 'screening_passed' %}selected{% endif %}>初筛通过</option>
-                            </select>
-                        </div>
+                            <!-- 状态筛选 -->
+                            <div class="ios-filter-item">
+                                <label class="ios-filter-label">申请状态</label>
+                                <select name="status" class="ios-input">
+                                    <option value="">所有状态</option>
+                                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>待处理</option>
+                                    <option value="interview" {% if status_filter == 'interview' %}selected{% endif %}>面试中</option>
+                                    <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>已通过</option>
+                                    <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>已拒绝</option>
+                                    <option value="withdrawn" {% if status_filter == 'withdrawn' %}selected{% endif %}>已撤销</option>
+                                    <option value="screening_passed" {% if status_filter == 'screening_passed' %}selected{% endif %}>初筛通过</option>
+                                </select>
+                            </div>
 
-                        <!-- 职位筛选 -->
-                        <div class="ios-filter-item">
-                            <label class="ios-filter-label">申请职位</label>
-                            <select name="job" class="ios-input">
-                                <option value="">所有职位</option>
-                                {% for job in available_jobs %}
-                                <option value="{{ job.id }}" {% if job_filter == job.id|string %}selected{% endif %}>
-                                    {{ job.title }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                            <!-- 职位筛选 -->
+                            <div class="ios-filter-item">
+                                <label class="ios-filter-label">申请职位</label>
+                                <select name="job" class="ios-input">
+                                    <option value="">所有职位</option>
+                                    {% for job in available_jobs %}
+                                    <option value="{{ job.id }}" {% if job_filter == job.id|string %}selected{% endif %}>
+                                        {{ job.title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
 
-                        <!-- 排序方式 -->
-                        <div class="ios-filter-item">
-                            <label class="ios-filter-label">排序方式</label>
-                            <select name="sort" class="ios-input">
-                                <option value="date_desc" {% if sort_by == 'date_desc' %}selected{% endif %}>申请时间（最新）</option>
-                                <option value="date_asc" {% if sort_by == 'date_asc' %}selected{% endif %}>申请时间（最早）</option>
-                                <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>姓名（A-Z）</option>
-                                <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>姓名（Z-A）</option>
-                                <option value="skills_match" {% if sort_by == 'skills_match' %}selected{% endif %}>技能匹配度</option>
-                                <option value="ai_score" {% if sort_by == 'ai_score' %}selected{% endif %}>AI评分</option>
-                            </select>
-                        </div>
-
-                        <!-- 智能筛选参数（默认隐藏） -->
-                        <div id="smartFilterParams" style="display: none; width: 100%; margin-top: var(--ios-spacing-lg);">
-                            <div class="ios-filter-group">
-                                <!-- 最低技能匹配度 -->
-                                <div class="ios-filter-item">
-                                    <label class="ios-filter-label">最低技能匹配度</label>
-                                    <input type="number" name="min_skills_match" class="ios-input" 
-                                           placeholder="60" min="0" max="100" 
-                                           value="{{ min_skills_match }}">
-                                </div>
-
-                                <!-- 最低工作经验 -->
-                                <div class="ios-filter-item">
-                                    <label class="ios-filter-label">最低工作经验（年）</label>
-                                    <input type="number" name="min_experience" class="ios-input" 
-                                           placeholder="0" min="0" max="50" 
-                                           value="{{ min_experience }}">
-                                </div>
-
-                                <!-- 教育要求 -->
-                                <div class="ios-filter-item">
-                                    <label class="ios-filter-label">教育要求</label>
-                                    <select name="education_required" class="ios-input">
-                                        <option value="">不限</option>
-                                        <option value="高中" {% if education_required == '高中' %}selected{% endif %}>高中</option>
-                                        <option value="专科" {% if education_required == '专科' %}selected{% endif %}>专科</option>
-                                        <option value="本科" {% if education_required == '本科' %}selected{% endif %}>本科</option>
-                                        <option value="硕士" {% if education_required == '硕士' %}selected{% endif %}>硕士</option>
-                                        <option value="博士" {% if education_required == '博士' %}selected{% endif %}>博士</option>
-                                    </select>
-                                </div>
-
-                                <!-- 位置匹配 -->
-                                <div class="ios-filter-item">
-                                    <label class="ios-filter-label">位置匹配</label>
-                                    <input type="text" name="location_match" class="ios-input" 
-                                           placeholder="输入城市名称..." 
-                                           value="{{ location_match }}">
-                                </div>
+                            <!-- 排序方式 -->
+                            <div class="ios-filter-item">
+                                <label class="ios-filter-label">排序方式</label>
+                                <select name="sort" class="ios-input">
+                                    <option value="date_desc" {% if sort_by == 'date_desc' %}selected{% endif %}>申请时间（最新）</option>
+                                    <option value="date_asc" {% if sort_by == 'date_asc' %}selected{% endif %}>申请时间（最早）</option>
+                                    <option value="name_asc" {% if sort_by == 'name_asc' %}selected{% endif %}>姓名（A-Z）</option>
+                                    <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>姓名（Z-A）</option>
+                                    <option value="skills_match" {% if sort_by == 'skills_match' %}selected{% endif %}>技能匹配度</option>
+                                    <option value="ai_score" {% if sort_by == 'ai_score' %}selected{% endif %}>AI评分</option>
+                                </select>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- 隐藏的智能筛选开关 -->
-                        <input type="hidden" name="auto_filter" id="autoFilterInput" value="{{ 'true' if auto_filter else 'false' }}">
-
-                        <!-- 操作按钮 -->
-                        <div class="ios-filter-item">
-                            <label class="ios-filter-label">&nbsp;</label>
-                            <div style="display: flex; gap: var(--ios-spacing-sm);">
-                                <button type="submit" class="ios-btn ios-btn-primary">
-                                    <i class="uil uil-search"></i>
-                                    筛选
-                                </button>
-                                <button type="button" id="clearFilters" class="ios-btn ios-btn-secondary">
-                                    <i class="uil uil-refresh"></i>
-                                    清除
-                                </button>
-                                <a href="{{ url_for('smartrecruit.hr.dashboard.candidates_filter', status='approved') }}" class="ios-btn ios-btn-secondary" style="text-decoration:none;">
-                                    <i class="uil uil-check-circle"></i>
-                                    筛选通过简历
-                                </a>
+                    <!-- 智能筛选卡片（默认隐藏） -->
+                    <div id="smartFilterParams" class="ios-filter-card" style="display: none; margin-top: var(--ios-spacing-lg);">
+                        <div class="ios-filter-card-header">
+                            <h3><i class="uil uil-brain"></i>智能筛选</h3>
+                            <p>使用AI算法进行高级筛选</p>
+                        </div>
+                        <div class="ios-grid ios-grid-2">
+                            <!-- 最低技能匹配度 -->
+                            <div class="ios-filter-item">
+                                <label class="ios-filter-label">最低技能匹配度</label>
+                                <input type="number" name="min_skills_match" class="ios-input" 
+                                       placeholder="60" min="0" max="100" 
+                                       value="{{ min_skills_match }}">
                             </div>
+
+                            <!-- 最低工作经验 -->
+                            <div class="ios-filter-item">
+                                <label class="ios-filter-label">最低工作经验（年）</label>
+                                <input type="number" name="min_experience" class="ios-input" 
+                                       placeholder="0" min="0" max="50" 
+                                       value="{{ min_experience }}">
+                            </div>
+
+                            <!-- 教育要求 -->
+                            <div class="ios-filter-item">
+                                <label class="ios-filter-label">教育要求</label>
+                                <select name="education_required" class="ios-input">
+                                    <option value="">不限</option>
+                                    <option value="高中" {% if education_required == '高中' %}selected{% endif %}>高中</option>
+                                    <option value="专科" {% if education_required == '专科' %}selected{% endif %}>专科</option>
+                                    <option value="本科" {% if education_required == '本科' %}selected{% endif %}>本科</option>
+                                    <option value="硕士" {% if education_required == '硕士' %}selected{% endif %}>硕士</option>
+                                    <option value="博士" {% if education_required == '博士' %}selected{% endif %}>博士</option>
+                                </select>
+                            </div>
+
+                            <!-- 位置匹配 -->
+                            <div class="ios-filter-item">
+                                <label class="ios-filter-label">位置匹配</label>
+                                <input type="text" name="location_match" class="ios-input" 
+                                       placeholder="输入城市名称..." 
+                                       value="{{ location_match }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 隐藏的智能筛选开关 -->
+                    <input type="hidden" name="auto_filter" id="autoFilterInput" value="{{ 'true' if auto_filter else 'false' }}">
+
+                    <!-- 操作按钮卡片 -->
+                    <div class="ios-action-card">
+                        <div class="ios-action-buttons">
+                            <button type="submit" class="ios-action-btn primary">
+                                <i class="uil uil-search"></i>
+                                <span>开始筛选</span>
+                            </button>
+                            <button type="button" id="clearFilters" class="ios-action-btn secondary">
+                                <i class="uil uil-refresh"></i>
+                                <span>清除筛选</span>
+                            </button>
+                            <a href="{{ url_for('smartrecruit.hr.dashboard.candidates_filter', status='approved') }}" class="ios-action-btn success">
+                                <i class="uil uil-check-circle"></i>
+                                <span>查看通过简历</span>
+                            </a>
                         </div>
                     </div>
                 </form>
             </div>
 
-            <!-- 批量操作按钮 -->
-            <div class="ios-batch-actions">
-                <button type="button" id="selectAllBtn" class="ios-batch-btn secondary">
-                    <i class="uil uil-check-square"></i>
-                    全选
-                </button>
-                <button type="button" id="approveSelectedBtn" class="ios-batch-btn primary" style="display: none;">
-                    <i class="uil uil-check-circle"></i>
-                    批量通过
-                </button>
-                <button type="button" id="rejectSelectedBtn" class="ios-batch-btn secondary" style="display: none;">
-                    <i class="uil uil-times-circle"></i>
-                    批量拒绝
-                </button>
+            <!-- 批量操作卡片 -->
+            <div class="ios-batch-actions-card">
+                <div class="ios-batch-actions-header">
+                    <h3><i class="uil uil-users-alt"></i>批量操作</h3>
+                    <p>对选中的候选人进行批量处理</p>
+                </div>
+                <div class="ios-batch-actions-buttons">
+                    <button type="button" id="selectAllBtn" class="ios-batch-btn secondary">
+                        <i class="uil uil-check-square"></i>
+                        <span>全选</span>
+                    </button>
+                    <button type="button" id="approveSelectedBtn" class="ios-batch-btn primary" style="display: none;">
+                        <i class="uil uil-check-circle"></i>
+                        <span>批量通过</span>
+                    </button>
+                    <button type="button" id="rejectSelectedBtn" class="ios-batch-btn danger" style="display: none;">
+                        <i class="uil uil-times-circle"></i>
+                        <span>批量拒绝</span>
+                    </button>
+                </div>
             </div>
 
             <!-- 候选人列表 -->
@@ -620,6 +1043,76 @@
     </div>
 
 
+    <script>
+        // 视差背景与粒子动画
+        (function(){
+          var root = document.documentElement;
+          // 视差：根据鼠标移动调整背景偏移
+          var parallax = document.querySelector('.ios-parallax-bg');
+          if(parallax){
+            window.addEventListener('mousemove', function(e){
+              var x = (e.clientX / window.innerWidth - .5) * 10;
+              var y = (e.clientY / window.innerHeight - .5) * 10;
+              parallax.style.transform = 'translate3d(' + (-x) + 'px,' + (-y) + 'px,0)';
+            });
+          }
+
+          // 背景粒子动画（轻量，无依赖）
+          var canvas = document.getElementById('bgParticles');
+          if(canvas){
+            var ctx = canvas.getContext('2d');
+            var w, h, pr = window.devicePixelRatio || 1;
+            var particles = [], num = 70; // 数量适中
+            function resize(){
+              w = canvas.width = Math.floor(window.innerWidth * pr);
+              h = canvas.height = Math.floor(window.innerHeight * pr);
+              canvas.style.width = window.innerWidth + 'px';
+              canvas.style.height = window.innerHeight + 'px';
+            }
+            function rand(a,b){ return Math.random()*(b-a)+a }
+            function init(){
+              particles.length = 0;
+              for(var i=0;i<num;i++){
+                particles.push({
+                  x: rand(0,w), y: rand(0,h),
+                  vx: rand(-.15,.15)*pr, vy: rand(-.15,.15)*pr,
+                  r: rand(1.2,2.6)*pr, o: rand(.25,.65),
+                  c: Math.random()<.5? 'rgba(196,223,204,':'rgba(207,229,214,'
+                });
+              }
+            }
+            function step(){
+              ctx.clearRect(0,0,w,h);
+              for(var i=0;i<particles.length;i++){
+                var p = particles[i];
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0||p.x>w) p.vx*=-1;
+                if(p.y<0||p.y>h) p.vy*=-1;
+                ctx.beginPath();
+                ctx.fillStyle = p.c + p.o + ')';
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                ctx.fill();
+              }
+              // 连接近邻
+              for(var a=0;a<particles.length;a++){
+                for(var b=a+1;b<particles.length;b++){
+                  var pa=particles[a], pb=particles[b];
+                  var dx=pa.x-pb.x, dy=pa.y-pb.y; var d=dx*dx+dy*dy;
+                  if(d< (120*pr)*(120*pr)){
+                    ctx.strokeStyle = 'rgba(196,223,204,.08)';
+                    ctx.lineWidth = pr;
+                    ctx.beginPath(); ctx.moveTo(pa.x,pa.y); ctx.lineTo(pb.x,pb.y); ctx.stroke();
+                  }
+                }
+              }
+              requestAnimationFrame(step);
+            }
+            window.addEventListener('resize', function(){ resize(); init(); });
+            resize(); init(); step();
+          }
+        })();
+    </script>
+    
     <script>
         // 智能筛选开关
         const smartFilterToggle = document.getElementById('smartFilterToggle');
