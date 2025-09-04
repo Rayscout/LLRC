@@ -1,3 +1,23 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/candidate_ios_new.js
+ 创建时间: 2025-08-19 10:03
+ 创建人: 潘显雨
+ 更新记录:
+ - 2025-08-19 10:33 by 李雨梦
+- 2025-08-20 09:01 by 谢佳悦
+- 2025-09-01 17:34 by 潘显雨
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/candidate_ios_new.js
+功能: 通用模块
+创建时间: 2025-09-02 17:14
+创建人: 潘显雨
+更新记录:
+- 2025-08-19 10:45 by 潘显雨
+*/
 /**
  * 求职者iOS新风格JavaScript
  * 包含深色模式、侧边栏控制、滚动效果、页面动画等功能

@@ -1,3 +1,25 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/ios_hr_script.js
+ 创建时间: 2025-08-19 13:34
+ 创建人: 潘显雨
+ 更新记录:
+ - 2025-08-19 14:04 by 潘显雨
+- 2025-08-27 16:48 by 李雨梦
+- 2025-08-27 17:13 by 苏杰
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/ios_hr_script.js
+功能: 通用模块
+创建时间: 2025-09-01 11:17
+创建人: 侯东杨
+更新记录:
+- 2025-08-21 15:53 by 潘显雨
+- 2025-08-24 14:13 by 侯东杨
+- 2025-08-25 17:31 by 潘显雨
+*/
 // iOS风格HR界面交互脚本
 class IOSHRInterface {
     constructor() {

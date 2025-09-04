@@ -1,4 +1,22 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/tools/remove_unique_constraint.py
+创建时间: 2025-08-26 12:03
+创建人: 苏杰
+更新记录:
+- 2025-09-01 16:58 by 谢佳悦
+LLRC Header End
+"""
 #!/usr/bin/env python3
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/tools/remove_unique_constraint.py
+功能: 通用模块
+创建时间: 2025-09-03 13:49
+创建人: 李雨梦
+更新记录:
+- 2025-08-26 12:33 by 李雨梦
+"""
 """
 删除Application表的唯一约束
 """

@@ -1,5 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/tools/create_test_user.py
+创建时间: 2025-08-25 09:12
+创建人: 潘显雨
+更新记录:
+- 2025-08-31 11:44 by 张宇成
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/tools/create_test_user.py
+功能: 通用模块
+创建时间: 2025-09-02 09:16
+创建人: 侯东杨
+更新记录:
+- 2025-08-25 09:42 by 谢佳悦
+- 2025-08-26 11:25 by 李雨梦
+"""
 
 import requests
 import time

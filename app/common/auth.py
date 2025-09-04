@@ -1,3 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/common/auth.py
+创建时间: 2025-08-21 14:05
+创建人: 张宇成
+更新记录:
+- 2025-08-21 14:35 by 张宇成
+- 2025-08-29 11:49 by 李雨梦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/common/auth.py
+功能: 通用模块
+创建时间: 2025-08-20 12:58
+创建人: 苏杰
+更新记录:
+- 2025-08-27 12:41 by 谢佳悦
+- 2025-08-30 11:16 by 张宇成
+- 2025-09-02 17:16 by 李雨梦
+"""
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, g, jsonify
 from ..models import User, db
 from datetime import datetime
@@ -6,6 +27,7 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth_bp.route('/sign', methods=['GET', 'POST'])
 def sign():
+    """函数 sign：核心业务逻辑。"""
     if request.method == 'POST':
         action = request.form.get('action')
 
@@ -165,6 +187,7 @@ def sign():
 
 @auth_bp.route('/logout')
 def logout():
+    """函数 logout：核心业务逻辑。"""
     session.pop('user_id', None)
     session.pop('user_type', None)
     session.clear()

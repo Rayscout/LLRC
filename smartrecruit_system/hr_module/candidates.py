@@ -1,3 +1,21 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/hr_module/candidates.py
+创建时间: 2025-08-28 15:05
+创建人: 张宇成
+更新记录:
+- 2025-08-28 15:35 by 张宇成
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/hr_module/candidates.py
+功能: 通用模块
+创建时间: 2025-09-01 14:34
+创建人: 苏杰
+更新记录:
+- 2025-08-30 17:13 by 潘显雨
+"""
 from flask import Blueprint, render_template, request, redirect, url_for, flash, g, current_app, abort, send_file, jsonify
 from app.models import Job, User, Application, db
 from app import applications_collection

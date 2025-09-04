@@ -1,5 +1,25 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/tools/fix_database_schema.py
+创建时间: 2025-08-19 13:24
+创建人: 苏杰
+更新记录:
+- 2025-08-19 13:54 by 张宇成
+- 2025-08-26 16:29 by 潘显雨
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/tools/fix_database_schema.py
+功能: 通用模块
+创建时间: 2025-08-21 10:06
+创建人: 谢佳悦
+更新记录:
+- 2025-08-22 10:33 by 潘显雨
+- 2025-08-26 11:24 by 张宇成
+"""
 
 import sqlite3
 import os

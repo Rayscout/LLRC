@@ -1,3 +1,24 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/js/icon_color_randomizer.js
+ 创建时间: 2025-08-20 14:14
+ 创建人: 谢佳悦
+ 更新记录:
+ - 2025-08-20 14:44 by 苏杰
+- 2025-08-30 11:22 by 潘显雨
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/js/icon_color_randomizer.js
+功能: 通用模块
+创建时间: 2025-08-30 15:56
+创建人: 潘显雨
+更新记录:
+- 2025-08-22 09:57 by 潘显雨
+- 2025-08-24 15:31 by 张宇成
+- 2025-08-29 12:11 by 侯东杨
+*/
 // 员工系统图标颜色随机分配器
 // 基于图中的五种颜色：浅黄色、珊瑚色、青色、天蓝色、浅绿色
 

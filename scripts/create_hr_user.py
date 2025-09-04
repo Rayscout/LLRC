@@ -1,5 +1,25 @@
+"""
+LLRC Header Start
+文件功能: 通用 Python 脚本/模块：scripts/create_hr_user.py
+创建时间: 2025-08-25 16:58
+创建人: 侯东杨
+更新记录:
+- 2025-08-25 17:28 by 苏杰
+- 2025-08-26 12:01 by 李雨梦
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: scripts/create_hr_user.py
+功能: 通用模块
+创建时间: 2025-08-29 14:57
+创建人: 张宇成
+更新记录:
+- 2025-08-28 15:05 by 侯东杨
+- 2025-09-01 11:41 by 苏杰
+"""
 """
 创建HR权限账户的脚本
 """

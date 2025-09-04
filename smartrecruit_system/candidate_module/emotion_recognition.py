@@ -1,4 +1,24 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/candidate_module/emotion_recognition.py
+创建时间: 2025-08-21 16:16
+创建人: 张宇成
+更新记录:
+- 2025-09-01 11:10 by 苏杰
+- 2025-09-02 13:03 by 李雨梦
+LLRC Header End
+"""
 #!/usr/bin/env python3
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/candidate_module/emotion_recognition.py
+功能: 通用模块
+创建时间: 2025-08-24 17:30
+创建人: 谢佳悦
+更新记录:
+- 2025-08-21 16:46 by 谢佳悦
+- 2025-08-27 10:19 by 侯东杨
+"""
 """
 表情识别模块 - 使用DeepFace
 """
@@ -22,7 +42,9 @@ def get_emotion_recognition_ai():
     if get_deepface_emotion_ai is None:
         # 如果DeepFace不可用，返回一个简单的模拟实例
             class MockEmotionAI:
+                """类 MockEmotionAI：封装与该模块相关的数据与行为。"""
                 def recognize_emotion_from_image(self, image_data, filename=None):
+                    """函数 recognize_emotion_from_image：处理 image_data, filename 相关逻辑。"""
                     return {
                         "success": True,
                         "faces_detected": 1,

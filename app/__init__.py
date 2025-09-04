@@ -1,3 +1,13 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/__init__.py
+创建时间: 2025-08-19 14:51
+创建人: 谢佳悦
+更新记录:
+- 2025-08-19 15:21 by 谢佳悦
+- 2025-08-21 14:10 by 李雨梦
+LLRC Header End
+"""
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 try:
@@ -10,7 +20,7 @@ try:
 except Exception:
     LoginManager = None
 from pymongo import MongoClient
-from .config import Config
+from config.config import Config
 import logging
 import sys
 import os
@@ -44,6 +54,7 @@ except Exception as e:
     logger.warning(f"Could not connect to MongoDB: {e}. MongoDB features will be disabled.")
 
 def create_app():
+    """函数 create_app：核心业务逻辑。"""
     # 显式指定模板与静态资源目录，避免路径解析异常导致找不到模板
     base_dir = os.path.dirname(os.path.abspath(__file__))
     templates_dir = os.path.join(base_dir, 'templates')
@@ -106,6 +117,7 @@ def create_app():
             
             @login_manager.user_loader
             def load_user(user_id):
+                """函数 load_user：处理 user_id 相关逻辑。"""
                 try:
                     from .models import User
                     return User.query.get(int(user_id))
@@ -273,12 +285,14 @@ def create_app():
         # 避免浏览器请求 /favicon.ico 导致 404 噪音
         @app.route('/favicon.ico')
         def favicon():
+            """函数 favicon：核心业务逻辑。"""
             from flask import Response
             return Response(status=204)
 
         # 添加全局模板助手
         @app.context_processor
         def inject_user():
+            """函数 inject_user：核心业务逻辑。"""
             from flask import g
             try:
                 return {'user': getattr(g, 'user', None)}
@@ -288,6 +302,7 @@ def create_app():
         
         @app.before_request
         def load_user():
+            """函数 load_user：核心业务逻辑。"""
             from flask import g, session
             try:
                 user_id = session.get('user_id')
@@ -329,11 +344,13 @@ def create_app():
         # 添加错误处理器
         @app.errorhandler(500)
         def internal_error(error):
+            """函数 internal_error：处理 error 相关逻辑。"""
             logger.error(f"Internal server error: {error}")
             return "内部服务器错误，请检查日志", 500
         
         @app.errorhandler(404)
         def not_found_error(error):
+            """函数 not_found_error：处理 error 相关逻辑。"""
             logger.error(f"Page not found: {error}")
             return "页面未找到", 404
         

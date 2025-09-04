@@ -1,3 +1,24 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/candidate_module/emotion_recognition_simple.py
+创建时间: 2025-08-23 12:03
+创建人: 谢佳悦
+更新记录:
+- 2025-08-23 12:38 by 李雨梦
+- 2025-09-02 11:53 by 李雨梦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/candidate_module/emotion_recognition_simple.py
+功能: 通用模块
+创建时间: 2025-08-19 14:41
+创建人: 潘显雨
+更新记录:
+- 2025-08-23 12:33 by 李雨梦
+- 2025-08-23 14:35 by 谢佳悦
+- 2025-08-25 15:40 by 张宇成
+"""
 import cv2
 import numpy as np
 import os
@@ -17,6 +38,7 @@ class SimpleEmotionRecognition:
     """简化版表情识别模块，用于测试和演示"""
     
     def __init__(self):
+        """函数 __init__：核心业务逻辑。"""
         self.emotion_labels = ['愤怒', '厌恶', '恐惧', '高兴', '悲伤', '惊讶', '中性']
         self.font = None
         self._load_font()

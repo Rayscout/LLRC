@@ -1,5 +1,26 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/hr_admin_module/talent_demand.py
+创建时间: 2025-08-19 11:08
+创建人: 谢佳悦
+更新记录:
+- 2025-08-19 11:38 by 谢佳悦
+- 2025-08-27 16:33 by 苏杰
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/hr_admin_module/talent_demand.py
+功能: 通用模块
+创建时间: 2025-08-27 18:36
+创建人: 侯东杨
+更新记录:
+- 2025-08-23 16:34 by 张宇成
+- 2025-08-31 09:05 by 张宇成
+- 2025-09-02 12:01 by 谢佳悦
+"""
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from app.models import db, User, TalentDemand, TalentDemandNotification, TalentDemandDraft
@@ -164,6 +185,7 @@ def hr_inbox_detail(notification_id: int):
 
 @talent_demand_bp.route('/hr_inbox/mark_read/<int:notification_id>', methods=['POST'])
 def mark_read(notification_id: int):
+    """函数 mark_read：处理 notification_id 相关逻辑。"""
     if 'user_id' not in session:
         return redirect(url_for('common.auth.sign'))
     user = User.query.get(session['user_id'])
@@ -178,6 +200,7 @@ def mark_read(notification_id: int):
 
 @talent_demand_bp.route('/hr_inbox/mark_all_read', methods=['POST'])
 def mark_all_read():
+    """函数 mark_all_read：核心业务逻辑。"""
     if 'user_id' not in session:
         return redirect(url_for('common.auth.sign'))
     user = User.query.get(session['user_id'])
@@ -189,6 +212,7 @@ def mark_all_read():
 
 @talent_demand_bp.route('/hr_inbox/clear_read', methods=['POST'])
 def clear_read():
+    """函数 clear_read：核心业务逻辑。"""
     if 'user_id' not in session:
         return redirect(url_for('common.auth.sign'))
     user = User.query.get(session['user_id'])

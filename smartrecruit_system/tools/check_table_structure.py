@@ -1,4 +1,25 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/tools/check_table_structure.py
+创建时间: 2025-08-19 09:14
+创建人: 侯东杨
+更新记录:
+- 2025-08-25 13:45 by 苏杰
+- 2025-08-29 14:02 by 苏杰
+- 2025-09-03 12:59 by 侯东杨
+LLRC Header End
+"""
 #!/usr/bin/env python3
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/tools/check_table_structure.py
+功能: 通用模块
+创建时间: 2025-09-02 12:33
+创建人: 张宇成
+更新记录:
+- 2025-08-19 09:44 by 潘显雨
+- 2025-08-29 11:30 by 张宇成
+"""
 """
 检查Application表结构
 """

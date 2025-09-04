@@ -1,4 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 通用 Python 脚本/模块：scripts/reset_or_create_executive.py
+创建时间: 2025-08-20 15:47
+创建人: 侯东杨
+更新记录:
+- 2025-08-20 16:17 by 侯东杨
+- 2025-08-24 16:49 by 张宇成
+LLRC Header End
+"""
 #!/usr/bin/env python3
+"""
+FILE-HEADER-AUTO-ADDED
+文件: scripts/reset_or_create_executive.py
+功能: 通用模块
+创建时间: 2025-08-22 09:51
+创建人: 张宇成
+更新记录:
+- 2025-08-21 18:02 by 李雨梦
+- 2025-09-03 09:15 by 潘显雨
+"""
 """
 重置或创建高管账号脚本。
 用法：
@@ -18,6 +38,7 @@ from app import create_app, db
 from app.models import User
 
 def main():
+	"""函数 main：核心业务逻辑。"""
 	email = sys.argv[1] if len(sys.argv) >= 2 else "executive@example.com"
 	password = sys.argv[2] if len(sys.argv) >= 3 else "password123"
 	app = create_app()

@@ -1,4 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/tools/init_database.py
+创建时间: 2025-08-21 16:58
+创建人: 潘显雨
+更新记录:
+- 2025-08-25 16:22 by 潘显雨
+LLRC Header End
+"""
 #!/usr/bin/env python3
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/tools/init_database.py
+功能: 通用模块
+创建时间: 2025-08-29 17:58
+创建人: 苏杰
+更新记录:
+- 2025-08-21 17:28 by 侯东杨
+- 2025-08-24 12:43 by 李雨梦
+- 2025-08-28 10:58 by 潘显雨
+"""
 """
 初始化数据库
 """

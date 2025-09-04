@@ -1,11 +1,34 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/talent_dashboard.py
+创建时间: 2025-08-20 12:19
+创建人: 谢佳悦
+更新记录:
+- 2025-09-01 10:54 by 谢佳悦
+- 2025-09-03 14:40 by 潘显雨
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/talent_dashboard.py
+功能: 人才大盘与报表接口
+创建时间: 2025-09-01 13:53
+创建人: 潘显雨
+更新记录:
+- 2025-08-20 12:49 by 潘显雨
+- 2025-08-25 10:24 by 谢佳悦
+- 2025-08-28 18:12 by 潘显雨
+"""
 from flask import Blueprint, render_template, request, jsonify, current_app, send_file
 try:
 	from flask_login import login_required, current_user  # 兼容导入
 except Exception:
 	# 容错：当 flask_login 不可用时，提供空装饰器与默认高管用户
 	def login_required(func):
+		"""函数 login_required：处理 func 相关逻辑。"""
 		return func
 	class _DefaultExecutive:
+		"""类 _DefaultExecutive：封装与该模块相关的数据与行为。"""
 		user_type = 'executive'
 		id = 1
 	current_user = _DefaultExecutive()

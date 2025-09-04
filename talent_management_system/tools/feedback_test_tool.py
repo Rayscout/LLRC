@@ -1,5 +1,25 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/tools/feedback_test_tool.py
+创建时间: 2025-08-21 17:27
+创建人: 谢佳悦
+更新记录:
+- 2025-08-31 12:35 by 张宇成
+- 2025-08-31 17:07 by 谢佳悦
+- 2025-09-01 13:05 by 张宇成
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/tools/feedback_test_tool.py
+功能: 通用模块
+创建时间: 2025-08-27 11:56
+创建人: 潘显雨
+更新记录:
+- 2025-08-21 17:57 by 苏杰
+"""
 """
 反馈系统测试工具
 整合所有反馈相关的测试和验证功能
@@ -19,6 +39,7 @@ class FeedbackTestTool:
     """反馈系统测试工具类"""
     
     def __init__(self, db_path='instance/site.db'):
+        """函数 __init__：处理 db_path 相关逻辑。"""
         self.db_path = db_path
         
     def test_feedback_system(self):

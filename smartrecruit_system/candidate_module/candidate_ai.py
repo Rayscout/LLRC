@@ -1,3 +1,23 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/candidate_module/candidate_ai.py
+创建时间: 2025-08-19 09:46
+创建人: 谢佳悦
+更新记录:
+- 2025-08-21 13:20 by 谢佳悦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/candidate_module/candidate_ai.py
+功能: 通用模块
+创建时间: 2025-09-03 09:36
+创建人: 张宇成
+更新记录:
+- 2025-08-19 10:16 by 李雨梦
+- 2025-08-29 14:50 by 潘显雨
+- 2025-08-31 17:37 by 李雨梦
+"""
 from flask import current_app
 from app.models import db
 from app.utils import extract_text_from_resume, ai_extract_skills_from_text

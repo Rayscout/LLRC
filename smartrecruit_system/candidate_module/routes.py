@@ -1,3 +1,25 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/candidate_module/routes.py
+创建时间: 2025-08-24 14:22
+创建人: 潘显雨
+更新记录:
+- 2025-08-24 14:52 by 侯东杨
+- 2025-08-28 13:59 by 苏杰
+- 2025-08-30 14:43 by 潘显雨
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/candidate_module/routes.py
+功能: 通用模块
+创建时间: 2025-08-22 12:52
+创建人: 谢佳悦
+更新记录:
+- 2025-08-29 16:31 by 潘显雨
+- 2025-08-31 16:26 by 谢佳悦
+- 2025-09-02 09:50 by 张宇成
+"""
 from flask import Blueprint, render_template, g, session, redirect, url_for, flash
 from .profile import profile_bp
 from .jobs import jobs_bp
@@ -120,6 +142,7 @@ def settings():
 # 收信箱（候选人与HR交流的消息列表）
 @candidate_bp.route('/messages/inbox')
 def messages_inbox():
+    """函数 messages_inbox：核心业务逻辑。"""
     if g.user is None:
         from flask import redirect, url_for, flash
         flash('请先登录。', 'danger')

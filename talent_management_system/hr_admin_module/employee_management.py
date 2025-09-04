@@ -1,3 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/hr_admin_module/employee_management.py
+创建时间: 2025-08-21 09:00
+创建人: 张宇成
+更新记录:
+- 2025-08-25 15:04 by 张宇成
+- 2025-08-31 14:22 by 苏杰
+- 2025-09-03 17:16 by 潘显雨
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/hr_admin_module/employee_management.py
+功能: 通用模块
+创建时间: 2025-09-03 10:37
+创建人: 侯东杨
+更新记录:
+- 2025-08-21 09:04 by 侯东杨
+- 2025-08-30 11:05 by 苏杰
+"""
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from app.models import User, db
 from datetime import datetime
