@@ -25,7 +25,7 @@
          }
         /* 页面特定样式 */
         /* 间距精确缩小：去除每个Section的最小高度并压缩上下内边距，重点缩小英雄区与关键指标区间隔 */
-        .ios-section{ min-height:auto !important; padding-top:16px !important; padding-bottom:16px !important; }
+        .ios-section{ min-height:auto !important; padding-top:calc(var(--ios-spacing-xl) + 120px) !important; padding-bottom:16px !important; }
         .ios-hero-section{ padding-bottom:12px !important; }
         .ios-stats-section{ padding-top:16px !important; }
                  .ios-hero-section { background: radial-gradient(1200px 420px at 20% -10%, #dbece0 0%, #cfe5d6 40%, #ffffff 100%); position:relative; overflow:hidden }
@@ -33,7 +33,7 @@
                  .ios-hero-section:after{content:""; position:absolute; right:-160px; top:-120px; width:520px; height:520px; background:radial-gradient(closest-side, rgba(196,223,204,.25), rgba(196,223,204,0)); filter:blur(10px); transform:rotate(15deg); animation:floatY 12s ease-in-out infinite; pointer-events:none}
         
         .ios-stats-section { background: var(--ios-bg-secondary); position:relative; overflow:hidden }
-                 .ios-stats-section:before{content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(196,223,204,.06), rgba(207,229,214,.06)); opacity:.6; mix-blend:multiply; pointer-events:none}
+                 .ios-stats-section:before{content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(196,223,204,.06), rgba(207,229,214,.06)); opacity:.6; mix-blend-mode:multiply; pointer-events:none}
         
         .ios-actions-section { background: var(--ios-bg-tertiary); position:relative }
                  .ios-actions-section:before{content:""; position:absolute; inset:0; background:radial-gradient(1000px 380px at 85% -20%, rgba(196,223,204,.10), transparent 60%), radial-gradient(800px 320px at 10% 120%, rgba(184,216,193,.10), transparent 55%)}
@@ -105,7 +105,7 @@
             text-align: center;
         }
         /* 关怀式欢迎标题与信息胶囊 */
-                 .ios-title.hello{font-size: 2.2rem; letter-spacing:.3px; font-weight:800; background:linear-gradient(90deg,#acd2b7,#b8d8c1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-align:center; margin-bottom:12px; background-size:200% 100%; animation:gradientBreath 6s ease-in-out infinite; position:relative}
+                 .ios-title.hello{font-size: 2.2rem; letter-spacing:.3px; font-weight:800; background:linear-gradient(90deg,#acd2b7,#b8d8c1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; text-align:center; margin-bottom:12px; background-size:200% 100%; animation:gradientBreath 6s ease-in-out infinite; position:relative}
         .ios-title.hello:after{content:""; position:absolute; inset:0; background:linear-gradient(115deg, transparent 0%, rgba(255,255,255,.8) 8%, transparent 16%) no-repeat; background-size:18% 100%; background-position:-25% 0; mix-blend-mode:screen; pointer-events:none; animation:sweepX 3.4s ease-in-out infinite}
         .ios-hero-pills{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom: var(--ios-spacing-lg)}
         .ios-hero-pills .pill{display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:#ffffff; border:1px solid var(--ios-border); box-shadow: var(--ios-shadow); color:var(--ios-text-secondary); font-size:.95rem}
@@ -206,7 +206,78 @@
                  .ios-metric-card:after{content:""; position:absolute; right:-30px; top:-30px; width:120px; height:120px; background:radial-gradient(circle at center, rgba(196,223,204,.18), rgba(196,223,204,0) 60%); z-index:-1; filter:blur(1px)}
         .ios-metric-card:hover{ transform:translateY(-6px); box-shadow: var(--ios-shadow-strong) }
                  .ios-metric-icon i{ color:#acd2b7; }
+                 
+                 /* 指标图标背景圆圈颜色定制 - 使用图标颜色作为背景，图标本身为白色 */
+                 .ios-grid .ios-metric-card:nth-of-type(1) .ios-metric-icon{ 
+                     background: #FFE4B5 !important; 
+                     border-radius: 50%; 
+                     width: 60px; 
+                     height: 60px; 
+                     display: flex !important; 
+                     align-items: center; 
+                     justify-content: center; 
+                     margin-bottom: 12px;
+                 }
+                 .ios-grid .ios-metric-card:nth-of-type(1) .ios-metric-icon i{ 
+                     color: #FFFFFF !important; 
+                     font-size: 24px !important;
+                     display: block !important;
+                 }
+                 
+                 .ios-grid .ios-metric-card:nth-of-type(2) .ios-metric-icon{ 
+                     background: #FF6B6B !important; 
+                     border-radius: 50%; 
+                     width: 60px; 
+                     height: 60px; 
+                     display: flex !important; 
+                     align-items: center; 
+                     justify-content: center; 
+                     margin-bottom: 12px;
+                 }
+                 .ios-grid .ios-metric-card:nth-of-type(2) .ios-metric-icon i{ 
+                     color: #FFFFFF !important; 
+                     font-size: 24px !important;
+                     display: block !important;
+                 }
+                 
+                 .ios-grid .ios-metric-card:nth-of-type(3) .ios-metric-icon{ 
+                     background: #20B2AA !important; 
+                     border-radius: 50%; 
+                     width: 60px; 
+                     height: 60px; 
+                     display: flex !important; 
+                     align-items: center; 
+                     justify-content: center; 
+                     margin-bottom: 12px;
+                 }
+                 .ios-grid .ios-metric-card:nth-of-type(3) .ios-metric-icon i{ 
+                     color: #FFFFFF !important; 
+                     font-size: 24px !important;
+                     display: block !important;
+                 }
+                 
+                 .ios-grid .ios-metric-card:nth-of-type(4) .ios-metric-icon{ 
+                     background: #87CEEB !important; 
+                     border-radius: 50%; 
+                     width: 60px; 
+                     height: 60px; 
+                     display: flex !important; 
+                     align-items: center; 
+                     justify-content: center; 
+                     margin-bottom: 12px;
+                 }
+                 .ios-grid .ios-metric-card:nth-of-type(4) .ios-metric-icon i{ 
+                     color: #FFFFFF !important; 
+                     font-size: 24px !important;
+                     display: block !important;
+                 }
                  .ios-metric-value{ font-weight:800; font-size:28px; color:#acd2b7; }
+                 
+                 /* 指标数值颜色定制 - 使用我的职位页面颜色方案 */
+                 .ios-grid .ios-metric-card:nth-of-type(1) .ios-metric-value{ color: #FFE4B5 !important; } /* 浅黄色 - 活跃职位 */
+                 .ios-grid .ios-metric-card:nth-of-type(2) .ios-metric-value{ color: #FF6B6B !important; } /* 红/珊瑚色 - 总申请数 */
+                 .ios-grid .ios-metric-card:nth-of-type(3) .ios-metric-value{ color: #20B2AA !important; } /* 青/浅蓝色 - 面试安排 */
+                 .ios-grid .ios-metric-card:nth-of-type(4) .ios-metric-value{ color: #87CEEB !important; } /* 中蓝/天蓝色 - 候选人库 */
 
         /* 头部 tabs 的视觉（明细/分析）可通过链接样式体现）*/
         .ios-title{ display:flex; align-items:center; gap:10px; }
@@ -277,6 +348,12 @@
         .mini-card{ background:var(--ios-surface); border:1px solid var(--ios-border); border-radius:12px; padding:12px 14px; box-shadow:var(--ios-shadow); display:flex; align-items:center; justify-content:space-between }
         .mini-card .label{ color:var(--ios-text-secondary); font-size:.85rem }
                  .mini-card .value{ font-weight:800; color:#acd2b7 }
+                 
+                 /* 迷你统计卡片数值颜色定制 - 使用我的职位页面颜色方案 */
+                 .mini-stats .mini-card:nth-of-type(1) .value{ color: #FFE4B5 !important; } /* 浅黄色 - 人员状态 */
+                 .mini-stats .mini-card:nth-of-type(2) .value{ color: #FF6B6B !important; } /* 红/珊瑚色 - 对齐率 */
+                 .mini-stats .mini-card:nth-of-type(3) .value{ color: #20B2AA !important; } /* 青/浅蓝色 - 更新率 */
+                 .mini-stats .mini-card:nth-of-type(4) .value{ color: #87CEEB !important; } /* 中蓝/天蓝色 - 总进度 */
         .mini-card .delta{ font-size:.75rem; color:#10b981 }
         .mini-card .delta.neg{ color:#ef4444 }
 
@@ -307,11 +384,7 @@
         .ios-metric-card{ border:1px solid transparent; background-clip:padding-box,border-box; background-image:linear-gradient(#ffffff,#ffffff),linear-gradient(135deg,rgba(196,223,204,.35),rgba(167,211,231,.25),rgba(201,184,232,.25)); box-shadow:0 6px 20px rgba(0,0,0,.08) }
         .ios-metric-card:hover{ box-shadow:0 14px 36px rgba(0,0,0,.14); background-image:linear-gradient(#ffffff,#ffffff),linear-gradient(135deg,rgba(196,223,204,.5),rgba(167,211,231,.35),rgba(201,184,232,.35)) }
 
-        /* 指标图标多色映射（前四张卡） */
-        .ios-grid .ios-metric-card:nth-of-type(1) .ios-metric-icon i{ color:var(--dash-accent-2) }
-        .ios-grid .ios-metric-card:nth-of-type(2) .ios-metric-icon i{ color:var(--dash-accent-3) }
-        .ios-grid .ios-metric-card:nth-of-type(3) .ios-metric-icon i{ color:var(--dash-accent-4) }
-        .ios-grid .ios-metric-card:nth-of-type(4) .ios-metric-icon i{ color:var(--dash-accent-1) }
+        /* 指标图标多色映射已移至上方统一样式设置 */
 
         /* 顶部胶囊条轻渐变描边 */
         .ios-hero-pills .pill{ background:linear-gradient(#ffffff,#ffffff); border:1px solid rgba(0,0,0,.08); position:relative }
@@ -402,7 +475,7 @@
                 <li class="ios-nav-item">
                     <a href="{{ url_for('smartrecruit.hr.recruitment.my_jobs') }}" class="ios-nav-link">
                         <i class="ios-nav-icon uil uil-briefcase-alt"></i>
-                        <span class="ios-nav-text">已发布职位</span>
+                        <span class="ios-nav-text">我的职位</span>
                     </a>
                 </li>
                 <li class="ios-nav-item">
@@ -1027,6 +1100,7 @@
             counterCards.forEach(function(c){ var val = parseInt(c.getAttribute('data-counter')||'0',10); var num=c.querySelector('.js-count'); if(num) num.textContent = val; });
           }
         })();
+      })();
     </script>
 </body>
 </html>
