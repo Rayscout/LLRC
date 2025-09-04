@@ -1,3 +1,21 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/js/moving_gradient_shapes.js
+ 创建时间: 2025-08-24 10:31
+ 创建人: 张宇成
+ 更新记录:
+ - 2025-08-24 11:01 by 苏杰
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/js/moving_gradient_shapes.js
+功能: 通用模块
+创建时间: 2025-08-30 09:35
+创建人: 李雨梦
+更新记录:
+- 2025-08-30 11:51 by 侯东杨
+*/
 // 员工系统移动渐变色形状脚本
 // 基于图中的天蓝色/浅蓝色
 

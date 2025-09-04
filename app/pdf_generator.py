@@ -1,3 +1,22 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/pdf_generator.py
+创建时间: 2025-08-20 09:43
+创建人: 侯东杨
+更新记录:
+- 2025-08-23 16:40 by 侯东杨
+- 2025-08-31 14:33 by 谢佳悦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/pdf_generator.py
+功能: 通用模块
+创建时间: 2025-09-01 10:37
+创建人: 侯东杨
+更新记录:
+- 2025-08-20 10:13 by 李雨梦
+"""
 import json
 import os
 from datetime import datetime
@@ -26,6 +45,7 @@ class TalentReportGenerator:
     """人才分析报告生成器"""
     
     def __init__(self, output_dir: str = "reports"):
+        """函数 __init__：处理 output_dir 相关逻辑。"""
         # 优先使用环境变量配置的绝对目录
         preferred = os.getenv('TALENT_REPORT_DIR') or os.getenv('REPORT_DIR')
         if preferred:

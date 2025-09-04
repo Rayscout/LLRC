@@ -1,3 +1,23 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/candidate_ios_script.js
+ 创建时间: 2025-08-19 10:28
+ 创建人: 潘显雨
+ 更新记录:
+ - 2025-08-19 10:58 by 潘显雨
+- 2025-08-26 15:50 by 谢佳悦
+- 2025-09-03 11:09 by 苏杰
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/candidate_ios_script.js
+功能: 通用模块
+创建时间: 2025-08-21 09:55
+创建人: 张宇成
+更新记录:
+- 2025-08-31 12:17 by 谢佳悦
+*/
 // 求职者iOS风格JavaScript - 苹果官网丝滑过渡效果
 
 document.addEventListener('DOMContentLoaded', function() {

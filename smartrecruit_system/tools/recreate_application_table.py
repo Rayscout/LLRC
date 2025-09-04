@@ -1,4 +1,22 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/tools/recreate_application_table.py
+创建时间: 2025-08-19 15:40
+创建人: 李雨梦
+更新记录:
+- 2025-08-19 16:10 by 潘显雨
+LLRC Header End
+"""
 #!/usr/bin/env python3
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/tools/recreate_application_table.py
+功能: 通用模块
+创建时间: 2025-08-29 14:50
+创建人: 苏杰
+更新记录:
+- 2025-08-26 10:15 by 李雨梦
+"""
 """
 重新创建Application表，移除唯一约束
 """

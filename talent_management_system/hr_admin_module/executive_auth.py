@@ -1,3 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/hr_admin_module/executive_auth.py
+创建时间: 2025-08-24 17:06
+创建人: 侯东杨
+更新记录:
+- 2025-08-24 17:36 by 李雨梦
+- 2025-08-26 09:55 by 侯东杨
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/hr_admin_module/executive_auth.py
+功能: 通用模块
+创建时间: 2025-08-20 16:03
+创建人: 潘显雨
+更新记录:
+- 2025-08-26 13:28 by 张宇成
+- 2025-08-29 11:22 by 张宇成
+- 2025-08-29 15:31 by 谢佳悦
+"""
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from app.models import User, db
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,6 +28,7 @@ executive_auth_bp = Blueprint('executive_auth', __name__, url_prefix='/executive
 
 @executive_auth_bp.route('/auth', methods=['GET', 'POST'])
 def executive_auth():
+    """函数 executive_auth：核心业务逻辑。"""
     if request.method == 'POST':
         action = request.form.get('action')
         
@@ -70,6 +92,7 @@ def executive_auth():
 
 @executive_auth_bp.route('/dashboard')
 def executive_dashboard():
+    """函数 executive_dashboard：核心业务逻辑。"""
     if 'user_id' not in session or session.get('user_type') != 'executive':
         flash('请先登录高管账户。', 'danger')
         return redirect(url_for('talent_management.executive_auth.executive_auth'))

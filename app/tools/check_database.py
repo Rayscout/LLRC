@@ -1,5 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/tools/check_database.py
+创建时间: 2025-08-24 09:20
+创建人: 张宇成
+更新记录:
+- 2025-08-24 09:50 by 侯东杨
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/tools/check_database.py
+功能: 通用模块
+创建时间: 2025-08-21 11:08
+创建人: 谢佳悦
+更新记录:
+- 2025-08-25 09:16 by 张宇成
+- 2025-08-30 13:21 by 李雨梦
+"""
 
 """
 检查数据库中的用户数据

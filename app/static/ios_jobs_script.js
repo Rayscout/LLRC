@@ -1,3 +1,23 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/ios_jobs_script.js
+ 创建时间: 2025-08-24 14:56
+ 创建人: 苏杰
+ 更新记录:
+ - 2025-08-24 15:26 by 李雨梦
+- 2025-08-27 12:01 by 张宇成
+- 2025-08-28 09:07 by 张宇成
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/ios_jobs_script.js
+功能: 通用模块
+创建时间: 2025-08-22 10:56
+创建人: 潘显雨
+更新记录:
+- 2025-09-01 09:53 by 李雨梦
+*/
 /**
  * iOS风格岗位展示页面JavaScript功能
  * 包含搜索、筛选、模态框、主题切换等功能

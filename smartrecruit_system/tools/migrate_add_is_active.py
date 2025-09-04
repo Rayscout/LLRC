@@ -1,4 +1,24 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/tools/migrate_add_is_active.py
+创建时间: 2025-08-21 11:18
+创建人: 苏杰
+更新记录:
+- 2025-08-21 11:48 by 潘显雨
+- 2025-08-28 09:33 by 李雨梦
+- 2025-08-30 16:28 by 苏杰
+LLRC Header End
+"""
 #!/usr/bin/env python3
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/tools/migrate_add_is_active.py
+功能: 通用模块
+创建时间: 2025-08-23 16:22
+创建人: 李雨梦
+更新记录:
+- 2025-09-03 11:58 by 李雨梦
+"""
 """
 数据库迁移脚本：
 1) 为 user 表添加账号状态字段：is_active, deactivated_at, deactivated_by

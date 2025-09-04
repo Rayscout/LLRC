@@ -1,3 +1,23 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/auth_sign.js
+ 创建时间: 2025-08-27 15:31
+ 创建人: 潘显雨
+ 更新记录:
+ - 2025-08-29 11:34 by 潘显雨
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/auth_sign.js
+功能: 通用模块
+创建时间: 2025-09-03 13:53
+创建人: 潘显雨
+更新记录:
+- 2025-08-27 16:01 by 苏杰
+- 2025-09-01 17:58 by 李雨梦
+- 2025-09-03 12:09 by 张宇成
+*/
 (function(){
   const qs = (s, el=document) => el.querySelector(s);
   const qsa = (s, el=document) => Array.from(el.querySelectorAll(s));

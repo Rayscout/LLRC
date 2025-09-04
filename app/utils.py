@@ -1,3 +1,21 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/utils.py
+创建时间: 2025-08-25 10:08
+创建人: 苏杰
+更新记录:
+- 2025-08-25 15:36 by 谢佳悦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/utils.py
+功能: 通用模块
+创建时间: 2025-08-28 11:23
+创建人: 侯东杨
+更新记录:
+- 2025-08-25 10:38 by 张宇成
+"""
 import os
 from werkzeug.utils import secure_filename
 from flask import current_app
@@ -23,6 +41,7 @@ except Exception:
 model = None
 
 def get_sentence_transformer():
+    """函数 get_sentence_transformer：核心业务逻辑。"""
     global model
     if model is not None:
         return model
@@ -199,6 +218,7 @@ def evaluate_cv(cv_text, job_description, threshold = 0.5):
     return similarity > threshold, similarity
 
 def _hf_generate(prompt: str, max_new_tokens: int = 600):
+    """函数 _hf_generate：处理 prompt, max_new_tokens 相关逻辑。"""
     if requests is None:
         return None
     try:
@@ -413,6 +433,7 @@ def ai_analyze_resume_text(resume_text: str) -> dict:
         }
     # 规整类型
     def _to_list(x):
+        """函数 _to_list：处理 x 相关逻辑。"""
         if isinstance(x, list):
             return [str(i).strip() for i in x if str(i).strip()]
         if isinstance(x, str):

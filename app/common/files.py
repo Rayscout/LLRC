@@ -1,3 +1,23 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/common/files.py
+创建时间: 2025-08-19 13:06
+创建人: 谢佳悦
+更新记录:
+- 2025-08-19 13:36 by 张宇成
+- 2025-08-25 14:28 by 谢佳悦
+- 2025-08-26 13:23 by 李雨梦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/common/files.py
+功能: 通用模块
+创建时间: 2025-09-02 15:23
+创建人: 谢佳悦
+更新记录:
+- 2025-08-31 16:05 by 潘显雨
+"""
 from flask import Blueprint, send_file, jsonify, g, current_app, abort, url_for
 import os
 from werkzeug.utils import secure_filename

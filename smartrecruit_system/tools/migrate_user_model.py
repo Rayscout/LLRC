@@ -1,5 +1,24 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/tools/migrate_user_model.py
+创建时间: 2025-08-22 10:07
+创建人: 谢佳悦
+更新记录:
+- 2025-08-23 17:52 by 张宇成
+- 2025-08-28 16:56 by 谢佳悦
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/tools/migrate_user_model.py
+功能: 通用模块
+创建时间: 2025-08-30 12:05
+创建人: 侯东杨
+更新记录:
+- 2025-08-22 10:37 by 谢佳悦
+"""
 
 """
 迁移User模型，添加员工管理所需的字段

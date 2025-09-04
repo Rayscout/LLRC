@@ -1,3 +1,23 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/hr_admin_module/pdf_report.py
+创建时间: 2025-08-20 12:33
+创建人: 潘显雨
+更新记录:
+- 2025-08-25 16:44 by 谢佳悦
+- 2025-08-28 13:53 by 谢佳悦
+- 2025-08-29 09:42 by 李雨梦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/hr_admin_module/pdf_report.py
+功能: 通用模块
+创建时间: 2025-08-23 09:20
+创建人: 苏杰
+更新记录:
+- 2025-08-20 13:03 by 谢佳悦
+"""
 from flask import Blueprint, render_template, request, jsonify, send_file, session
 from app.models import User, db
 from datetime import datetime, timedelta

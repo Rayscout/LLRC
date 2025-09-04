@@ -1,3 +1,22 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/models.py
+创建时间: 2025-08-19 16:22
+创建人: 张宇成
+更新记录:
+- 2025-08-19 16:52 by 谢佳悦
+- 2025-08-23 16:59 by 张宇成
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/models.py
+功能: 通用模块
+创建时间: 2025-08-22 09:47
+创建人: 侯东杨
+更新记录:
+- 2025-08-24 11:47 by 侯东杨
+"""
 from . import db
 from datetime import datetime
 try:
@@ -5,9 +24,11 @@ try:
 except Exception:
     # 如果Flask-Login不可用，提供兼容基类
     class UserMixin:
+        """类 UserMixin：封装与该模块相关的数据与行为。"""
         pass  # Flask-Login 方法将在User模型中实现
 
 class User(UserMixin, db.Model):
+    """类 User：封装与该模块相关的数据与行为。"""
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
@@ -40,17 +61,21 @@ class User(UserMixin, db.Model):
     
     # Flask-Login 所需的方法
     def get_id(self):
+        """函数 get_id：核心业务逻辑。"""
         return str(self.id)
     
     @property
     def is_authenticated(self):
+        """函数 is_authenticated：核心业务逻辑。"""
         return True
     
     @property
     def is_anonymous(self):
+        """函数 is_anonymous：核心业务逻辑。"""
         return False
 
 class Job(db.Model):
+    """类 Job：封装与该模块相关的数据与行为。"""
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     company_name = db.Column(db.String(100), nullable=False, default='未知公司')
@@ -77,6 +102,7 @@ class Job(db.Model):
     department = db.Column(db.String(100))
 
 class Application(db.Model):
+    """类 Application：封装与该模块相关的数据与行为。"""
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
@@ -460,6 +486,7 @@ class InterviewSchedule(db.Model):
     application = db.relationship('Application', backref=db.backref('interview_schedules', lazy=True))
     
     def __repr__(self):
+        """函数 __repr__：核心业务逻辑。"""
         return f'<InterviewSchedule {self.id}: {self.candidate_id} -> {self.job_id}>'
     
     @property

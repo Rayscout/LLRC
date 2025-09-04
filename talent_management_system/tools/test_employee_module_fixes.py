@@ -1,4 +1,23 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/tools/test_employee_module_fixes.py
+创建时间: 2025-08-20 09:51
+创建人: 苏杰
+更新记录:
+- 2025-08-21 17:23 by 潘显雨
+LLRC Header End
+"""
 #!/usr/bin/env python3
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/tools/test_employee_module_fixes.py
+功能: 通用模块
+创建时间: 2025-09-03 16:45
+创建人: 李雨梦
+更新记录:
+- 2025-08-20 10:21 by 张宇成
+- 2025-08-23 18:56 by 张宇成
+"""
 """
 员工模块修复测试脚本
 用于测试反馈发送、PDF导出和绩效历史记录功能

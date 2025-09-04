@@ -1,3 +1,22 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/js/account_status_checker.js
+ 创建时间: 2025-08-19 09:00
+ 创建人: 李雨梦
+ 更新记录:
+ - 2025-08-19 10:55 by 李雨梦
+- 2025-08-30 11:07 by 侯东杨
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/js/account_status_checker.js
+功能: 通用模块
+创建时间: 2025-08-26 12:51
+创建人: 侯东杨
+更新记录:
+- 2025-08-19 09:15 by 李雨梦
+*/
 /**
  * 账号状态检查器
  * 定期检查用户账号状态，如果被注销则自动退出

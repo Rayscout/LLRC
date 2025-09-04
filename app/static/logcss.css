@@ -1,3 +1,25 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端样式表（CSS）：app/static/logcss.css
+ 创建时间: 2025-08-19 12:35
+ 创建人: 张宇成
+ 更新记录:
+ - 2025-08-19 13:05 by 苏杰
+- 2025-08-25 16:37 by 谢佳悦
+- 2025-09-03 17:19 by 张宇成
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/logcss.css
+功能: 通用模块
+创建时间: 2025-08-27 15:51
+创建人: 张宇成
+更新记录:
+- 2025-08-21 15:55 by 谢佳悦
+- 2025-08-24 12:52 by 谢佳悦
+- 2025-08-25 13:10 by 侯东杨
+*/
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css");
 

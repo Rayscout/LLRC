@@ -1,3 +1,23 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/hr_module/recruitment.py
+创建时间: 2025-08-19 13:54
+创建人: 苏杰
+更新记录:
+- 2025-08-19 14:24 by 潘显雨
+- 2025-08-26 09:29 by 侯东杨
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/hr_module/recruitment.py
+功能: 通用模块
+创建时间: 2025-08-27 13:18
+创建人: 张宇成
+更新记录:
+- 2025-08-20 13:55 by 张宇成
+- 2025-08-31 10:08 by 谢佳悦
+"""
 from flask import Blueprint, render_template, request, redirect, url_for, flash, g, current_app, abort
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -157,6 +177,7 @@ def generate_from_draft():
     empty = {'title':'','location':'','salary':'','job_type':'fulltime','description':'','skills':''}
 
     def _estimate_salary(title: str, skills: str, description: str, location: str) -> str:
+        """函数 _estimate_salary：处理 title, skills, description, location 相关逻辑。"""
         t = (title or '' + ' ' + skills or '' + ' ' + description or '').lower()
         # 角色分类
         role = 'other'
@@ -334,6 +355,7 @@ def materialize_draft():
     current_app.logger.info(f'materialize_draft: draft_len={len(draft)}')
 
     def _fallback_from_draft(text: str):
+        """函数 _fallback_from_draft：处理 text 相关逻辑。"""
         try:
             import re as _re
             kw_match = _re.search(r'关键词：([^\n]+)', text or '')
@@ -363,6 +385,7 @@ def materialize_draft():
         pass
 
     def _estimate_salary(title: str, skills: str, description: str, location: str) -> str:
+        """函数 _estimate_salary：处理 title, skills, description, location 相关逻辑。"""
         t_all = ((title or '') + ' ' + (skills or '') + ' ' + (description or '')).lower()
         role = 'other'
         mapping = [
@@ -411,6 +434,7 @@ def materialize_draft():
         return f"{lo}k-{hi}k/月"
 
     def _compose_text(title: str, skills: str, description: str, location: str, salary: str) -> str:
+        """函数 _compose_text：处理 title, skills, description, location, salary 相关逻辑。"""
         parts = []
         if title:
             parts.append(f"标题：{title}")

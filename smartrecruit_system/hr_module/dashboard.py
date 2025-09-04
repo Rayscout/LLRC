@@ -1,3 +1,24 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/hr_module/dashboard.py
+创建时间: 2025-08-20 09:00
+创建人: 侯东杨
+更新记录:
+- 2025-08-20 09:11 by 潘显雨
+- 2025-08-24 10:33 by 侯东杨
+- 2025-08-27 16:57 by 李雨梦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/hr_module/dashboard.py
+功能: 通用模块
+创建时间: 2025-08-25 13:55
+创建人: 侯东杨
+更新记录:
+- 2025-08-25 14:55 by 潘显雨
+- 2025-08-30 10:49 by 张宇成
+"""
 from flask import Blueprint, render_template, g, redirect, url_for, flash, request, abort, jsonify
 from datetime import datetime
 import requests
@@ -70,6 +91,7 @@ def get_current_date_info():
 
 @dashboard_bp.route('/', endpoint='hr_dashboard')
 def index():
+    """函数 index：核心业务逻辑。"""
     if g.get('user') is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -136,6 +158,7 @@ def index():
 
 @dashboard_bp.route('/insights', endpoint='insights')
 def insights():
+    """函数 insights：核心业务逻辑。"""
     if g.get('user') is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -185,6 +208,7 @@ def insights():
 
 @dashboard_bp.route('/interviews', endpoint='interviews')
 def interviews():
+    """函数 interviews：核心业务逻辑。"""
     if g.get('user') is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -245,6 +269,7 @@ def interviews():
 @dashboard_bp.route('/candidates', endpoint='candidates')
 @dashboard_bp.route('/candidates/', endpoint='candidates_slash')
 def candidates():
+    """函数 candidates：核心业务逻辑。"""
     if g.get('user') is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -309,6 +334,7 @@ def candidates():
 
 @dashboard_bp.route('/reports', endpoint='reports')
 def reports():
+    """函数 reports：核心业务逻辑。"""
     if g.get('user') is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -376,6 +402,7 @@ def reports():
 
 @dashboard_bp.route('/candidates/ai_review', endpoint='candidates_ai_review')
 def candidates_ai_review():
+    """函数 candidates_ai_review：核心业务逻辑。"""
     if g.get('user') is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -569,6 +596,7 @@ def candidates_ai_review():
 @dashboard_bp.route('/candidates/list', endpoint='candidates_list')
 @dashboard_bp.route('/candidates/list/', endpoint='candidates_list_slash')
 def candidates_list():
+    """函数 candidates_list：核心业务逻辑。"""
     if g.get('user') is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -645,6 +673,7 @@ def candidates_list():
 @dashboard_bp.route('/candidates/filter', endpoint='candidates_filter')
 @dashboard_bp.route('/candidates/filter/', endpoint='candidates_filter_slash')
 def candidates_filter():
+    """函数 candidates_filter：核心业务逻辑。"""
     if g.get('user') is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -756,6 +785,7 @@ def candidates_filter():
 
         # 排序
         def sort_key(c):
+            """函数 sort_key：处理 c 相关逻辑。"""
             if sort_by == 'date_asc':
                 return c['applied_date']
             if sort_by == 'name_asc':
@@ -790,6 +820,7 @@ def candidates_filter():
 
 @dashboard_bp.route('/candidates/filter/apply', methods=['GET', 'POST'], endpoint='candidates_filter_apply')
 def candidates_filter_apply():
+    """函数 candidates_filter_apply：核心业务逻辑。"""
     if g.get('user') is None:
         flash('请先登录。', 'danger')
         return redirect(url_for('common.auth.sign'))
@@ -804,17 +835,20 @@ def candidates_filter_apply():
 
 @dashboard_bp.route('/candidates/filter/smart', methods=['POST'], endpoint='candidates_filter_smart')
 def candidates_filter_smart():
+    """函数 candidates_filter_smart：核心业务逻辑。"""
     # 预留智能筛选端口：当前不接AI，返回占位响应
     return {'ok': False, 'message': '智能筛选尚未启用（接口占位）'}, 501
 
 
 @dashboard_bp.route('/candidates/view/<int:candidate_id>', endpoint='view_candidate')
 def view_candidate(candidate_id: int):
+    """函数 view_candidate：处理 candidate_id 相关逻辑。"""
     # 直接复用现有的候选人简历视图
     return redirect(url_for('smartrecruit.hr.candidates.view_candidate_resume', user_id=candidate_id))
 
 
 def _find_latest_app_for_user(candidate_id: int):
+    """函数 _find_latest_app_for_user：处理 candidate_id 相关逻辑。"""
     if db is None:
         return None
     try:
@@ -833,6 +867,7 @@ def _find_latest_app_for_user(candidate_id: int):
 
 @dashboard_bp.route('/candidates/approve/<int:candidate_id>', methods=['POST'], endpoint='approve_candidate')
 def approve_candidate(candidate_id: int):
+    """函数 approve_candidate：处理 candidate_id 相关逻辑。"""
     if g.get('user') is None:
         abort(401)
     if not getattr(g.user, 'is_hr', False):
@@ -854,6 +889,7 @@ def approve_candidate(candidate_id: int):
 
 @dashboard_bp.route('/candidates/reject/<int:candidate_id>', methods=['POST'], endpoint='reject_candidate')
 def reject_candidate(candidate_id: int):
+    """函数 reject_candidate：处理 candidate_id 相关逻辑。"""
     if g.get('user') is None:
         abort(401)
     if not getattr(g.user, 'is_hr', False):
@@ -972,6 +1008,7 @@ def reject_ai_interview(application_id: int):
 
 @dashboard_bp.route('/candidates/schedule/<int:candidate_id>', methods=['GET', 'POST'], endpoint='schedule_interview')
 def schedule_interview(candidate_id: int):
+    """函数 schedule_interview：处理 candidate_id 相关逻辑。"""
     if g.get('user') is None:
         abort(401)
     if not getattr(g.user, 'is_hr', False):
@@ -983,6 +1020,7 @@ def schedule_interview(candidate_id: int):
 
 @dashboard_bp.route('/candidates/notify', methods=['POST'], endpoint='send_interview_notification')
 def send_interview_notification():
+    """函数 send_interview_notification：核心业务逻辑。"""
     # 仅返回成功，预留实际发送逻辑
     try:
         return {'success': True}, 200

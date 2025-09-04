@@ -1,3 +1,23 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/templates/1.js
+ 创建时间: 2025-08-19 13:23
+ 创建人: 张宇成
+ 更新记录:
+ - 2025-08-19 13:53 by 潘显雨
+- 2025-08-20 17:59 by 谢佳悦
+- 2025-08-29 14:14 by 侯东杨
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/templates/1.js
+功能: 前端页面模板
+创建时间: 2025-08-27 14:57
+创建人: 苏杰
+更新记录:
+- 2025-08-22 11:14 by 侯东杨
+*/
 (function () {
   // Data matching the React version
   const revenueData = [

@@ -1,5 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 通用 Python 脚本/模块：scripts/update_database.py
+创建时间: 2025-08-22 16:28
+创建人: 潘显雨
+更新记录:
+- 2025-08-28 16:16 by 李雨梦
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: scripts/update_database.py
+功能: 通用模块
+创建时间: 2025-08-31 12:55
+创建人: 张宇成
+更新记录:
+- 2025-08-22 16:58 by 侯东杨
+- 2025-08-26 09:13 by 张宇成
+"""
 
 import os
 import sqlite3

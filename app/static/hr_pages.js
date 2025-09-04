@@ -1,3 +1,21 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/hr_pages.js
+ 创建时间: 2025-08-19 16:09
+ 创建人: 苏杰
+ 更新记录:
+ - 2025-08-25 09:22 by 李雨梦
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/hr_pages.js
+功能: 通用模块
+创建时间: 2025-08-26 16:20
+创建人: 侯东杨
+更新记录:
+- 2025-08-19 16:39 by 潘显雨
+*/
 // HR页面交互增强脚本
 document.addEventListener('DOMContentLoaded', function() {
     

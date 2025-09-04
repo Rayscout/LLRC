@@ -1,0 +1,28 @@
+# FILE-HEADER-AUTO-ADDED
+# 文件: config/llrc_simple.service
+# 功能: 通用模块
+# 创建时间: 2025-08-19 13:28
+# 创建人: 潘显雨
+# 更新记录:
+# - 2025-08-21 11:05 by 谢佳悦
+# - 2025-08-30 17:35 by 谢佳悦
+[Unit]
+Description=LLRC Flask Application (Simple)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=llrcuser
+Group=llrcuser
+WorkingDirectory=/var/www/llrc
+Environment=PATH=/var/www/llrc/venv/bin
+Environment=FLASK_ENV=production
+ExecStart=/var/www/llrc/venv/bin/python run.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

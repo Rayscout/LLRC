@@ -1,3 +1,23 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端样式表（CSS）：app/static/ios_jobs_style.css
+ 创建时间: 2025-08-21 11:39
+ 创建人: 侯东杨
+ 更新记录:
+ - 2025-08-21 12:09 by 苏杰
+- 2025-08-27 15:38 by 李雨梦
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/ios_jobs_style.css
+功能: 通用模块
+创建时间: 2025-08-22 15:08
+创建人: 李雨梦
+更新记录:
+- 2025-08-25 10:22 by 李雨梦
+- 2025-08-28 09:57 by 张宇成
+*/
 /* iOS风格岗位展示页面样式 */
 /* 导入SF Pro字体（如果可用） */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
