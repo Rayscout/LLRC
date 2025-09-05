@@ -1,3 +1,22 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/candidate_module/ai_config.py
+创建时间: 2025-08-25 10:31
+创建人: 李雨梦
+更新记录:
+- 2025-08-25 11:01 by 谢佳悦
+- 2025-08-28 10:03 by 李雨梦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/candidate_module/ai_config.py
+功能: 通用模块
+创建时间: 2025-08-23 15:50
+创建人: 苏杰
+更新记录:
+- 2025-08-30 18:30 by 谢佳悦
+"""
 import os
 from pathlib import Path
 
@@ -5,6 +24,7 @@ class AIConfig:
     """AI模块配置文件"""
     
     def __init__(self):
+        """函数 __init__：核心业务逻辑。"""
         # 获取项目根目录
         self.project_root = Path(__file__).parent.parent.parent.parent
         

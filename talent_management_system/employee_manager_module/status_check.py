@@ -1,5 +1,23 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/employee_manager_module/status_check.py
+创建时间: 2025-08-28 10:07
+创建人: 苏杰
+更新记录:
+- 2025-09-02 17:21 by 谢佳悦
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/employee_manager_module/status_check.py
+功能: 通用模块
+创建时间: 2025-08-21 18:06
+创建人: 谢佳悦
+更新记录:
+- 2025-08-28 10:37 by 潘显雨
+"""
 
 """
 员工界面状态总结

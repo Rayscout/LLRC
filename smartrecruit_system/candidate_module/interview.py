@@ -1,3 +1,22 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/candidate_module/interview.py
+创建时间: 2025-08-24 12:02
+创建人: 张宇成
+更新记录:
+- 2025-08-24 12:32 by 苏杰
+- 2025-08-25 17:25 by 苏杰
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/candidate_module/interview.py
+功能: 通用模块
+创建时间: 2025-08-28 14:12
+创建人: 张宇成
+更新记录:
+- 2025-08-25 16:33 by 苏杰
+"""
 from flask import Blueprint, render_template, request, jsonify, session, g
 from app.models import User, Job, Application
 from app.utils import generate_interview_questions, generate_feedback

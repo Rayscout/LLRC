@@ -1,3 +1,23 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/hr_admin_module/career_tracking.py
+创建时间: 2025-08-24 15:49
+创建人: 潘显雨
+更新记录:
+- 2025-08-26 13:54 by 谢佳悦
+- 2025-08-31 09:18 by 侯东杨
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/hr_admin_module/career_tracking.py
+功能: 通用模块
+创建时间: 2025-08-23 10:10
+创建人: 潘显雨
+更新记录:
+- 2025-08-24 16:19 by 苏杰
+- 2025-08-26 15:07 by 苏杰
+"""
 from flask import Blueprint, render_template, request, jsonify, session, send_file
 from app.models import User, db
 from datetime import datetime, timedelta

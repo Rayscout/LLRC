@@ -1,5 +1,27 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/tools/add_talent_demand_tables.py
+创建时间: 2025-08-19 09:00
+创建人: 李雨梦
+更新记录:
+- 2025-08-19 09:04 by 苏杰
+- 2025-08-26 11:11 by 谢佳悦
+- 2025-08-27 15:13 by 侯东杨
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/tools/add_talent_demand_tables.py
+功能: 通用模块
+创建时间: 2025-08-23 18:20
+创建人: 潘显雨
+更新记录:
+- 2025-08-22 14:47 by 张宇成
+- 2025-08-24 18:06 by 谢佳悦
+- 2025-08-27 14:10 by 潘显雨
+"""
 """
 创建人才需求相关新表（如果不存在）。
 安全：不会删除任何现有数据，仅在缺表时创建。
@@ -16,6 +38,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, '..', '..'))
 sys.path.insert(0, PROJECT_ROOT)
 
 def main():
+    """函数 main：核心业务逻辑。"""
     from app import create_app, db
     # 导入模型以确保元数据包含新表
     from app.models import TalentDemand, TalentDemandNotification, TalentDemandDraft  # noqa: F401

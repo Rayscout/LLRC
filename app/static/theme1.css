@@ -1,3 +1,25 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端样式表（CSS）：app/static/theme1.css
+ 创建时间: 2025-08-19 09:00
+ 创建人: 李雨梦
+ 更新记录:
+ - 2025-08-19 09:30 by 侯东杨
+- 2025-08-21 11:14 by 谢佳悦
+- 2025-08-24 16:05 by 潘显雨
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/theme1.css
+功能: 通用模块
+创建时间: 2025-08-19 17:59
+创建人: 谢佳悦
+更新记录:
+- 2025-08-24 14:27 by 侯东杨
+- 2025-08-26 17:19 by 谢佳悦
+- 2025-08-27 18:20 by 潘显雨
+*/
 /* Minimal, framework-free styles to approximate the original UI */
 :root {
   --bg: #f8fafc;

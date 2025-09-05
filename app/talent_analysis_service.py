@@ -1,3 +1,22 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/talent_analysis_service.py
+创建时间: 2025-08-26 12:04
+创建人: 张宇成
+更新记录:
+- 2025-08-26 12:34 by 侯东杨
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/talent_analysis_service.py
+功能: 通用模块
+创建时间: 2025-08-21 10:24
+创建人: 苏杰
+更新记录:
+- 2025-08-27 18:16 by 潘显雨
+- 2025-08-30 17:07 by 谢佳悦
+"""
 import json
 import requests
 import logging
@@ -15,6 +34,7 @@ class TalentAnalysisService:
 	"""人才分析服务类"""
 
 	def __init__(self, ai_api_url: str = None, ai_api_key: str = None, timeout: int = 15):
+		"""函数 __init__：处理 ai_api_url, ai_api_key, timeout 相关逻辑。"""
 		self.ai_api_url = ai_api_url or "http://localhost:8000/api/analyze"
 		self.ai_api_key = ai_api_key or "your_ai_api_key"
 		# Gemini 配置（环境变量优先）

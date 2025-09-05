@@ -1,5 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/tools/add_task_evaluation_table.py
+创建时间: 2025-08-25 09:52
+创建人: 张宇成
+更新记录:
+- 2025-08-27 13:59 by 张宇成
+- 2025-08-29 10:56 by 苏杰
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/tools/add_task_evaluation_table.py
+功能: 通用模块
+创建时间: 2025-08-27 16:00
+创建人: 侯东杨
+更新记录:
+- 2025-08-25 10:22 by 潘显雨
+"""
 """
 添加任务绩效评价数据表
 """
@@ -13,6 +32,7 @@ from app.models import TaskEvaluation
 
 
 def add_task_evaluation_table():
+	"""函数 add_task_evaluation_table：核心业务逻辑。"""
 	app = create_app()
 	with app.app_context():
 		try:

@@ -1,5 +1,23 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/hr_admin_module/turnover_alert.py
+创建时间: 2025-08-22 15:50
+创建人: 侯东杨
+更新记录:
+- 2025-08-22 16:20 by 潘显雨
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/hr_admin_module/turnover_alert.py
+功能: 通用模块
+创建时间: 2025-08-19 11:37
+创建人: 潘显雨
+更新记录:
+- 2025-08-22 17:55 by 潘显雨
+"""
 """
 人才流失预警系统
 监控离职趋势，识别高风险岗位，生成预警报告

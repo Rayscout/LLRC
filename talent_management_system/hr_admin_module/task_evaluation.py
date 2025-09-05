@@ -1,5 +1,25 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/hr_admin_module/task_evaluation.py
+创建时间: 2025-08-19 15:20
+创建人: 潘显雨
+更新记录:
+- 2025-08-19 15:50 by 侯东杨
+- 2025-08-23 09:12 by 苏杰
+- 2025-08-30 12:26 by 潘显雨
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/hr_admin_module/task_evaluation.py
+功能: 通用模块
+创建时间: 2025-08-27 18:12
+创建人: 潘显雨
+更新记录:
+- 2025-08-27 11:58 by 苏杰
+"""
 """
 高管任务绩效评价模块
 """
@@ -13,6 +33,7 @@ task_evaluation_bp = Blueprint('task_evaluation', __name__, url_prefix='/feedbac
 
 
 def require_exec_login():
+    """函数 require_exec_login：核心业务逻辑。"""
     if 'user_id' not in session:
         return False, (jsonify({'error': '请先登录'}), 401)
     user = User.query.get(session['user_id'])
@@ -22,6 +43,7 @@ def require_exec_login():
 
 
 def get_team_members(executive_id):
+    """函数 get_team_members：处理 executive_id 相关逻辑。"""
     user = User.query.get(executive_id)
     if not user:
         return {}
@@ -34,6 +56,7 @@ def get_team_members(executive_id):
 
 @task_evaluation_bp.route('/dashboard')
 def evaluation_dashboard():
+    """函数 evaluation_dashboard：核心业务逻辑。"""
     ok, val = require_exec_login()
     if not ok:
         return val
@@ -56,6 +79,7 @@ def evaluation_dashboard():
 
 @task_evaluation_bp.route('/new', methods=['GET', 'POST'])
 def create_evaluation():
+    """函数 create_evaluation：核心业务逻辑。"""
     ok, val = require_exec_login()
     if not ok:
         return val
@@ -111,6 +135,7 @@ def create_evaluation():
 
 @task_evaluation_bp.route('/history')
 def evaluation_history():
+    """函数 evaluation_history：核心业务逻辑。"""
     ok, val = require_exec_login()
     if not ok:
         return val

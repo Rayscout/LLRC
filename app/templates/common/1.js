@@ -1,3 +1,24 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/templates/common/1.js
+ 创建时间: 2025-08-20 09:00
+ 创建人: 张宇成
+ 更新记录:
+ - 2025-08-20 09:23 by 张宇成
+- 2025-08-30 17:00 by 张宇成
+- 2025-09-03 12:20 by 谢佳悦
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/templates/common/1.js
+功能: 前端页面模板
+创建时间: 2025-08-27 12:29
+创建人: 谢佳悦
+更新记录:
+- 2025-08-25 10:30 by 侯东杨
+- 2025-08-28 13:48 by 谢佳悦
+*/
 (function(){
   const qs = (s, el=document) => el.querySelector(s);
   const qsa = (s, el=document) => Array.from(el.querySelectorAll(s));

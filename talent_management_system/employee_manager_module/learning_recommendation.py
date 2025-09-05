@@ -1,3 +1,21 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/employee_manager_module/learning_recommendation.py
+创建时间: 2025-08-20 13:03
+创建人: 苏杰
+更新记录:
+- 2025-08-20 13:33 by 李雨梦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/employee_manager_module/learning_recommendation.py
+功能: 通用模块
+创建时间: 2025-08-24 17:02
+创建人: 张宇成
+更新记录:
+- 2025-08-30 13:49 by 苏杰
+"""
 from flask import Blueprint, render_template, request, jsonify, g, flash, redirect, url_for
 from app.models import User, Job, Application, db
 import json
@@ -6,7 +24,9 @@ import re
 
 # 简单的登录检查装饰器
 def login_required(f):
+    """函数 login_required：处理 f 相关逻辑。"""
     def decorated_function(*args, **kwargs):
+        """函数 decorated_function：处理 *args, **kwargs 相关逻辑。"""
         # 暂时跳过登录检查，用于测试
         # if not hasattr(g, 'user') or g.user is None:
         #     flash('请先登录', 'warning')
@@ -20,7 +40,9 @@ def login_required(f):
             if not test_user:
                 # 如果没有员工用户，创建一个模拟用户对象
                 class MockUser:
+                    """类 MockUser：封装与该模块相关的数据与行为。"""
                     def __init__(self):
+                        """函数 __init__：核心业务逻辑。"""
                         self.id = 1
                         self.username = "测试员工"
                         self.bio = "我是一名Python开发工程师"

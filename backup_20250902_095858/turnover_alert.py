@@ -1,3 +1,14 @@
+"""
+LLRC Header Start
+文件功能: 通用 Python 脚本/模块：backup_20250902_095858/turnover_alert.py
+创建时间: 2025-08-19 12:17
+创建人: 苏杰
+更新记录:
+- 2025-08-19 12:47 by 谢佳悦
+- 2025-08-20 13:47 by 张宇成
+- 2025-08-26 12:01 by 谢佳悦
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """

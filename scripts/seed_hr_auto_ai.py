@@ -1,5 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 通用 Python 脚本/模块：scripts/seed_hr_auto_ai.py
+创建时间: 2025-08-22 16:48
+创建人: 李雨梦
+更新记录:
+- 2025-08-30 10:13 by 谢佳悦
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: scripts/seed_hr_auto_ai.py
+功能: 通用模块
+创建时间: 2025-08-20 12:47
+创建人: 侯东杨
+更新记录:
+- 2025-08-22 17:18 by 侯东杨
+- 2025-08-30 12:34 by 潘显雨
+"""
 """
 为 HR 账号 hr_auto@company.com 批量创建已通过 AI 正式面试的候选人数据，
 使其显示在“审批AI面试”页面（全局审核页）。
@@ -20,6 +39,7 @@ from werkzeug.security import generate_password_hash  # type: ignore
 
 
 def ensure_hr_user() -> User:
+    """函数 ensure_hr_user：核心业务逻辑。"""
     hr_email = 'hr_auto@company.com'
     hr = User.query.filter_by(email=hr_email).first()
     if hr:
@@ -44,6 +64,7 @@ def ensure_hr_user() -> User:
 
 
 def ensure_jobs(hr: User) -> list[Job]:
+    """函数 ensure_jobs：处理 hr 相关逻辑。"""
     job_titles = ['自动化测试工程师', '数据标注专员']
     jobs: list[Job] = []
     for title in job_titles:
@@ -66,6 +87,7 @@ def ensure_jobs(hr: User) -> list[Job]:
 
 
 def create_candidate(email: str, name: str, position: str) -> User:
+    """函数 create_candidate：处理 email, name, position 相关逻辑。"""
     user = User.query.filter_by(email=email).first()
     if user:
         return user
@@ -93,6 +115,7 @@ def create_candidate(email: str, name: str, position: str) -> User:
 
 
 def ensure_application(candidate: User, job: Job) -> Application:
+    """函数 ensure_application：处理 candidate, job 相关逻辑。"""
     app_row = Application.query.filter_by(user_id=candidate.id, job_id=job.id).first()
     if app_row:
         return app_row
@@ -108,6 +131,7 @@ def ensure_application(candidate: User, job: Job) -> Application:
 
 
 def upsert_ai_interview_result(candidate: User, job: Job, score: int, status: str = 'passed') -> None:
+    """函数 upsert_ai_interview_result：处理 candidate, job, score, status 相关逻辑。"""
     doc = {
         'user_id': str(candidate.id),
         'job_id': str(job.id),
@@ -133,6 +157,7 @@ def upsert_ai_interview_result(candidate: User, job: Job, score: int, status: st
 
 
 def main():
+    """函数 main：核心业务逻辑。"""
     app = create_app()
     with app.app_context():
         hr = ensure_hr_user()

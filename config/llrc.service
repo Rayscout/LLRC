@@ -1,0 +1,36 @@
+# FILE-HEADER-AUTO-ADDED
+# 文件: config/llrc.service
+# 功能: 通用模块
+# 创建时间: 2025-09-02 15:05
+# 创建人: 张宇成
+# 更新记录:
+# - 2025-08-23 15:20 by 潘显雨
+# - 2025-08-25 11:24 by 侯东杨
+# - 2025-08-26 12:45 by 潘显雨
+[Unit]
+Description=LLRC Flask Application
+After=network.target
+Wants=network.target
+
+[Service]
+Type=notify
+User=llrcuser
+Group=llrcuser
+WorkingDirectory=/var/www/llrc
+Environment=PATH=/var/www/llrc/venv/bin
+Environment=FLASK_ENV=production
+ExecStart=/var/www/llrc/venv/bin/gunicorn --config gunicorn.conf.py wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+# 安全设置
+NoNewPrivileges=false
+PrivateTmp=false
+ProtectSystem=strict
+ReadWritePaths=/var/www/llrc /var/log/llrc /var/run/llrc /tmp
+
+[Install]
+WantedBy=multi-user.target

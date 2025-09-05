@@ -1,3 +1,24 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/hr_scroll_fix.js
+ 创建时间: 2025-08-19 16:49
+ 创建人: 侯东杨
+ 更新记录:
+ - 2025-08-24 10:00 by 张宇成
+- 2025-08-26 14:46 by 谢佳悦
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/hr_scroll_fix.js
+功能: 通用模块
+创建时间: 2025-08-23 16:53
+创建人: 苏杰
+更新记录:
+- 2025-08-19 17:19 by 侯东杨
+- 2025-08-21 11:16 by 潘显雨
+- 2025-08-26 18:51 by 李雨梦
+*/
 // HR页面滚动修复脚本
 // 确保所有HR页面都能正常滚动
 

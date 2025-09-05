@@ -1,5 +1,27 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/tools/add_user_fields.py
+创建时间: 2025-08-20 12:13
+创建人: 张宇成
+更新记录:
+- 2025-08-20 12:43 by 张宇成
+- 2025-08-27 17:57 by 李雨梦
+- 2025-09-03 13:24 by 谢佳悦
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/tools/add_user_fields.py
+功能: 通用模块
+创建时间: 2025-08-27 09:02
+创建人: 谢佳悦
+更新记录:
+- 2025-08-22 13:10 by 苏杰
+- 2025-08-30 09:07 by 张宇成
+- 2025-08-30 16:00 by 张宇成
+"""
 
 import sqlite3
 import os

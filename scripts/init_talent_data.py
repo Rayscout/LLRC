@@ -1,4 +1,23 @@
+"""
+LLRC Header Start
+文件功能: 通用 Python 脚本/模块：scripts/init_talent_data.py
+创建时间: 2025-08-22 09:28
+创建人: 潘显雨
+更新记录:
+- 2025-08-22 09:58 by 苏杰
+- 2025-08-22 17:49 by 李雨梦
+LLRC Header End
+"""
 #!/usr/bin/env python3
+"""
+FILE-HEADER-AUTO-ADDED
+文件: scripts/init_talent_data.py
+功能: 通用模块
+创建时间: 2025-08-23 17:25
+创建人: 潘显雨
+更新记录:
+- 2025-08-24 09:48 by 苏杰
+"""
 """
 人才发展数据初始化脚本
 生成100组示例数据用于测试和演示

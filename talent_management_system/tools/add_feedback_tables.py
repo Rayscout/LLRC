@@ -1,5 +1,27 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/tools/add_feedback_tables.py
+创建时间: 2025-08-22 09:03
+创建人: 李雨梦
+更新记录:
+- 2025-08-22 09:33 by 谢佳悦
+- 2025-08-28 14:35 by 苏杰
+- 2025-09-01 12:52 by 谢佳悦
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/tools/add_feedback_tables.py
+功能: 通用模块
+创建时间: 2025-09-03 14:14
+创建人: 侯东杨
+更新记录:
+- 2025-08-23 15:19 by 侯东杨
+- 2025-08-26 11:11 by 潘显雨
+- 2025-09-02 15:54 by 李雨梦
+"""
 """
 添加反馈系统数据表的数据库迁移脚本
 """

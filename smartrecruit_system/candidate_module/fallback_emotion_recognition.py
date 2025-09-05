@@ -1,3 +1,24 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/candidate_module/fallback_emotion_recognition.py
+创建时间: 2025-08-19 11:43
+创建人: 苏杰
+更新记录:
+- 2025-08-20 09:58 by 苏杰
+- 2025-08-25 17:04 by 张宇成
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/candidate_module/fallback_emotion_recognition.py
+功能: 通用模块
+创建时间: 2025-08-29 15:01
+创建人: 侯东杨
+更新记录:
+- 2025-08-19 12:13 by 侯东杨
+- 2025-08-20 18:06 by 李雨梦
+- 2025-08-24 16:37 by 谢佳悦
+"""
 
 import cv2
 import numpy as np
@@ -10,6 +31,7 @@ class FallbackEmotionRecognition:
     """备用的表情识别类，当YOLO模型不可用时使用"""
     
     def __init__(self):
+        """函数 __init__：核心业务逻辑。"""
         self.emotion_labels = ['愤怒', '厌恶', '恐惧', '高兴', '悲伤', '惊讶', '中性']
         self.font = None
         self._load_font()

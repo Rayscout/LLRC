@@ -1,3 +1,22 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端样式表（CSS）：app/static/ios_hr_style.css
+ 创建时间: 2025-08-29 10:42
+ 创建人: 潘显雨
+ 更新记录:
+ - 2025-08-29 11:12 by 苏杰
+- 2025-09-03 15:54 by 苏杰
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/ios_hr_style.css
+功能: 通用模块
+创建时间: 2025-08-27 11:40
+创建人: 潘显雨
+更新记录:
+- 2025-08-30 17:45 by 李雨梦
+*/
 /* iOS风格HR界面样式 */
 @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=SF+Pro+Text:wght@300;400;500;600&display=swap');
 

@@ -1,5 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/tools/ui_fix_tool.py
+创建时间: 2025-08-19 14:26
+创建人: 苏杰
+更新记录:
+- 2025-08-19 14:56 by 苏杰
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/tools/ui_fix_tool.py
+功能: 通用模块
+创建时间: 2025-09-01 17:16
+创建人: 谢佳悦
+更新记录:
+- 2025-08-26 12:06 by 谢佳悦
+- 2025-09-02 17:53 by 张宇成
+"""
 """
 UI修复工具
 整合所有UI相关的修复和优化功能
@@ -13,6 +32,7 @@ class UIFixTool:
     """UI修复工具类"""
     
     def __init__(self, project_root='.'):
+        """函数 __init__：处理 project_root 相关逻辑。"""
         self.project_root = Path(project_root)
         self.templates_dir = self.project_root / 'app' / 'templates'
         

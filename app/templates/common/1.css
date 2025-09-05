@@ -1,3 +1,22 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端样式表（CSS）：app/templates/common/1.css
+ 创建时间: 2025-08-23 17:08
+ 创建人: 张宇成
+ 更新记录:
+ - 2025-08-23 17:38 by 侯东杨
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/templates/common/1.css
+功能: 前端页面模板
+创建时间: 2025-09-01 18:57
+创建人: 李雨梦
+更新记录:
+- 2025-08-24 13:27 by 潘显雨
+- 2025-08-28 14:42 by 谢佳悦
+*/
 :root{
   --bg:#f9fafb;
   --fg:#0f172a;

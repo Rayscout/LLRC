@@ -1,4 +1,24 @@
+"""
+LLRC Header Start
+文件功能: 通用 Python 脚本/模块：scripts/link_employees_to_executive.py
+创建时间: 2025-08-19 09:18
+创建人: 张宇成
+更新记录:
+- 2025-08-19 09:48 by 潘显雨
+- 2025-08-23 12:10 by 谢佳悦
+- 2025-08-23 12:33 by 潘显雨
+LLRC Header End
+"""
 #!/usr/bin/env python3
+"""
+FILE-HEADER-AUTO-ADDED
+文件: scripts/link_employees_to_executive.py
+功能: 通用模块
+创建时间: 2025-09-01 15:34
+创建人: 谢佳悦
+更新记录:
+- 2025-08-25 16:22 by 苏杰
+"""
 """
 把现有员工批量挂到某位高管名下（设置 supervisor_id），
 用于让高管首页与员工管理页面的统计不为 0。
@@ -17,6 +37,7 @@ from app import create_app, db
 from app.models import User
 
 def main():
+	"""函数 main：核心业务逻辑。"""
 	app = create_app()
 	with app.app_context():
 		exec_email = sys.argv[1] if len(sys.argv) > 1 else "executive@example.com"

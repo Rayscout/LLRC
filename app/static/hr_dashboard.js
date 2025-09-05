@@ -1,3 +1,23 @@
+/*
+ LLRC Header Start
+ 文件功能: 前端 JavaScript 脚本：app/static/hr_dashboard.js
+ 创建时间: 2025-08-21 10:34
+ 创建人: 李雨梦
+ 更新记录:
+ - 2025-08-29 14:13 by 张宇成
+ LLRC Header End
+*/
+/*
+FILE-HEADER-AUTO-ADDED
+文件: app/static/hr_dashboard.js
+功能: 通用模块
+创建时间: 2025-08-31 17:10
+创建人: 谢佳悦
+更新记录:
+- 2025-08-21 11:04 by 潘显雨
+- 2025-08-25 15:07 by 李雨梦
+- 2025-08-25 18:38 by 李雨梦
+*/
 // HR仪表盘交互增强脚本
 document.addEventListener('DOMContentLoaded', function() {
     

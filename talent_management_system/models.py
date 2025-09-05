@@ -1,3 +1,22 @@
+"""
+LLRC Header Start
+文件功能: 人才管理子系统 Python 模块：talent_management_system/models.py
+创建时间: 2025-08-28 13:38
+创建人: 潘显雨
+更新记录:
+- 2025-09-01 11:25 by 苏杰
+- 2025-09-01 12:53 by 谢佳悦
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: talent_management_system/models.py
+功能: 通用模块
+创建时间: 2025-09-02 10:33
+创建人: 侯东杨
+更新记录:
+- 2025-08-28 14:08 by 李雨梦
+"""
 # 人才管理系统数据模型
 # 包含人才管理相关的所有数据模型定义
 

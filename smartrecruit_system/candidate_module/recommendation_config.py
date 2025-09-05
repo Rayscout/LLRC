@@ -1,4 +1,26 @@
 """
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/candidate_module/recommendation_config.py
+创建时间: 2025-08-19 12:07
+创建人: 潘显雨
+更新记录:
+- 2025-08-19 12:37 by 潘显雨
+- 2025-08-23 10:55 by 谢佳悦
+- 2025-08-24 13:55 by 张宇成
+LLRC Header End
+"""
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/candidate_module/recommendation_config.py
+功能: 通用模块
+创建时间: 2025-08-28 15:11
+创建人: 李雨梦
+更新记录:
+- 2025-08-26 11:11 by 谢佳悦
+- 2025-09-01 11:35 by 谢佳悦
+- 2025-09-03 09:55 by 潘显雨
+"""
+"""
 智能推荐系统配置文件
 """
 

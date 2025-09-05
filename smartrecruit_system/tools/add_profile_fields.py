@@ -1,5 +1,24 @@
+"""
+LLRC Header Start
+文件功能: SmartRecruit 子系统 Python 模块：smartrecruit_system/tools/add_profile_fields.py
+创建时间: 2025-08-24 13:09
+创建人: 苏杰
+更新记录:
+- 2025-08-24 13:39 by 张宇成
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: smartrecruit_system/tools/add_profile_fields.py
+功能: 通用模块
+创建时间: 2025-08-20 17:25
+创建人: 苏杰
+更新记录:
+- 2025-08-24 16:17 by 苏杰
+- 2025-08-27 17:36 by 李雨梦
+"""
 
 import sqlite3
 import os

@@ -1,5 +1,25 @@
+"""
+LLRC Header Start
+文件功能: 应用后端 Python 模块：app/tools/debug_login_error.py
+创建时间: 2025-08-19 11:17
+创建人: 潘显雨
+更新记录:
+- 2025-08-19 11:47 by 李雨梦
+- 2025-08-22 11:47 by 谢佳悦
+LLRC Header End
+"""
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+FILE-HEADER-AUTO-ADDED
+文件: app/tools/debug_login_error.py
+功能: 通用模块
+创建时间: 2025-08-26 10:40
+创建人: 侯东杨
+更新记录:
+- 2025-08-28 18:14 by 张宇成
+- 2025-08-30 11:29 by 李雨梦
+"""
 
 """
 调试登录错误
